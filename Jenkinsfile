@@ -8,11 +8,12 @@ pipeline {
             }
         }
     }
-       stages {
-            stage('test2') {
-                steps {
-                    echo 'testtsd'
-                }
+
+    stages {
+        stage('test2') {
+            steps {
+                echo 'testtsd'
             }
         }
+    }
 }
