@@ -1,0 +1,81 @@
+package logic
+
+import (
+	"context"
+	"errors"
+	"strings"
+
+	"SLGaming/back/services/user/internal/model"
+	"SLGaming/back/services/user/internal/svc"
+	"SLGaming/back/services/user/user"
+
+	"github.com/zeromicro/go-zero/core/logx"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
+)
+
+type UpdateUserLogic struct {
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+	logx.Logger
+}
+
+func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateUserLogic {
+	return &UpdateUserLogic{
+		ctx:    ctx,
+		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx),
+	}
+}
+
+func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
+	db := l.svcCtx.DB().WithContext(l.ctx)
+	var u model.User
+	if err := db.Where("id = ?", in.GetId()).First(&u).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	updates := map[string]interface{}{}
+
+	if nickname := strings.TrimSpace(in.GetNickname()); nickname != "" && nickname != u.Nickname {
+		updates["nickname"] = nickname
+	}
+
+	if phone := in.GetPhone(); phone != "" && phone != u.Phone {
+		var count int64
+		if err := db.Model(&model.User{}).
+			Where("phone = ? AND id <> ?", phone, in.GetId()).
+			Count(&count).Error; err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		if count > 0 {
+			return nil, status.Error(codes.AlreadyExists, "phone already used")
+		}
+		updates["phone"] = phone
+	}
+
+	if password := strings.TrimSpace(in.GetPassword()); password != "" {
+		hashed, err := hashPassword(password)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		updates["password"] = hashed
+	}
+
+	if len(updates) > 0 {
+		if err := db.Model(&u).Updates(updates).Error; err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		if err := db.Where("id = ?", in.GetId()).First(&u).Error; err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &user.UpdateUserResponse{
+		User: userToProto(&u),
+	}, nil
+}

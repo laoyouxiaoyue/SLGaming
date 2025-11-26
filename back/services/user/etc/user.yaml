@@ -1,0 +1,29 @@
+Name: user.rpc
+ListenOn: 0.0.0.0:8085
+
+Nacos:
+  Hosts:
+    - 120.26.29.194
+  Namespace: "df1bdb69-492b-4b4a-81a4-26419cc53c71"
+  Group: dev
+  DataId: user.yaml
+  Username: "nacos"
+  Password: "nacos"
+
+# MySQL 数据库
+Mysql:
+  DSN: "root:root123456@tcp(120.26.29.194:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
+  MaxIdleConns: 10
+  MaxOpenConns: 100
+  ConnMaxLifetime: "300s"
+  ConnMaxIdleTime: "60s"
+
+
+#Nacos:
+#  Hosts:
+#    - 127.0.0.1
+#  Namespace: "d70834dc-214d-49f3-a960-d4fba6b6e576"
+#  Group: DEFAULT_GROUP
+#  DataId: user.yaml
+#  Username: "nacos"
+#  Password: "nacos"

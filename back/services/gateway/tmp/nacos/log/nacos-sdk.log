@@ -1,0 +1,14 @@
+2025-11-26T17:49:03.685+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36_failover.
+2025-11-26T17:49:03.709+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-8209a8e3-ecb2-49be-9bf5-83adeee7519e)
+2025-11-26T17:49:03.709+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-26T17:49:03.709+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-26T17:49:03.709+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-26T17:49:03.709+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-8209a8e3-ecb2-49be-9bf5-83adeee7519e try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-11-26T17:49:03.709+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-26T17:49:03.709+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-26T17:49:03.709+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-26T17:49:03.723+0800	INFO	util/common.go:96	Local IP:172.28.112.1
+2025-11-26T17:49:03.874+0800	INFO	rpc/rpc_client.go:337	config-0-8209a8e3-ecb2-49be-9bf5-83adeee7519e success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764150544574_116.147.66.195_10660
+2025-11-26T17:49:03.874+0800	INFO	rpc/rpc_client.go:487	config-0-8209a8e3-ecb2-49be-9bf5-83adeee7519e notify connected event to listeners , connectionId=1764150544574_116.147.66.195_10660
+2025-11-26T17:49:03.874+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-11-26T17:49:03.897+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36.: file not exist

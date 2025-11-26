@@ -1,0 +1,5 @@
+// api/gateway/gateway.api
+syntax = "v1"
+
+import "base.api"
+import "user.api"

@@ -1,0 +1,79 @@
+syntax = "proto3";
+package user;
+option go_package = "./user";
+
+message RegisterRequest {
+  string phone = 1;
+  string password = 2;
+  string nickname = 3;
+}
+
+message RegisterResponse {
+  uint64 id = 1;
+  uint64 uid = 2;
+}
+
+message LoginRequest {
+  string phone = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string accessToken = 1;
+}
+
+message GetUserRequest {
+  uint64 id = 1;
+  uint64 uid = 2;
+  string phone = 3;
+}
+
+message UserInfo {
+  uint64 id = 1;
+  uint64 uid = 2;
+  string nickname = 3;
+  string phone = 4;
+}
+
+message GetUserResponse {
+  UserInfo user = 1;
+}
+
+message UpdateUserRequest {
+  uint64 id = 1;
+  string nickname = 2;
+  string password = 3;
+  string phone = 4;
+}
+
+message UpdateUserResponse {
+  UserInfo user = 1;
+}
+
+message LoginByCodeRequest {
+  string phone = 1;
+  string code = 2;
+}
+
+message LoginByCodeResponse {
+  string accessToken = 1;
+}
+
+message ForgetPasswordRequest {
+  string phone = 1;
+  string code = 2;
+  string password = 3;
+}
+
+message ForgetPasswordResponse {
+  string accessToken = 1;
+}
+
+service User {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc LoginByCode(LoginByCodeRequest) returns (LoginByCodeResponse);
+  rpc ForgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse);
+}

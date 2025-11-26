@@ -1,0 +1,7 @@
+// api/gateway/base.api
+syntax = "v1"
+
+type BaseResp {
+    Code int32  `json:"code"`
+    Msg  string `json:"msg"`
+}
