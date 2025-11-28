@@ -5,6 +5,7 @@ import "base.api"
 
 type RegisterRequest {
     Phone    string `json:"phone"`
+    Code     string `json:"code"`
     Password string `json:"password"`
     Nickname string `json:"nickname,optional"`
 }

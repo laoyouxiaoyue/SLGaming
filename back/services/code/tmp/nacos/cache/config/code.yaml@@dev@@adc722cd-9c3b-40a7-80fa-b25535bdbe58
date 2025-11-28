@@ -35,18 +35,8 @@ Consul:
     CheckTimeout: 5s
 
 RateLimit:
-  IPSendInterval: 60    # IP发送间隔（秒），默认60秒
-  IPDailyLimit: 100     # IP每日最大发送次数，默认100次
-  PhoneSendInterval: 60 # 手机号发送间隔（秒），默认60秒
-
-Prometheus:
-  Host: 127.0.0.1
-  Port: 9091
-  Path: /metrics
-
-# Prometheus Pushgateway 配置（推送模式）
-PushGateway:
-  Enabled: true                    # 是否启用推送，true=推送模式，false=拉取模式
-  URL: "http://120.26.29.194:9091" # Pushgateway 服务器地址
-  Job: "code-service"              # Job 名称
-  Interval: 15                     # 推送间隔（秒）
+  IPSendInterval: 60      # IP发送间隔（秒），默认60秒
+  IPDailyLimit: 100       # IP每日最大发送次数，默认100次
+  PhoneSendInterval: 60   # 手机号发送间隔（秒），默认60秒
+  VerifyPhoneDailyLimit: 50 # 验证操作单个手机号每日次数上限
+  VerifyIPDailyLimit: 200   # 验证操作单个IP每日次数上限

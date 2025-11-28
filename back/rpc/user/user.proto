@@ -19,7 +19,8 @@ message LoginRequest {
 }
 
 message LoginResponse {
-  string accessToken = 1;
+  uint64 id = 1;
+  uint64 uid = 2;
 }
 
 message GetUserRequest {
@@ -52,21 +53,21 @@ message UpdateUserResponse {
 
 message LoginByCodeRequest {
   string phone = 1;
-  string code = 2;
 }
 
 message LoginByCodeResponse {
-  string accessToken = 1;
+  uint64 id = 1;
+  uint64 uid = 2;
 }
 
 message ForgetPasswordRequest {
   string phone = 1;
-  string code = 2;
   string password = 3;
 }
 
 message ForgetPasswordResponse {
-  string accessToken = 1;
+  uint64 id = 1;
+  uint64 uid = 2;
 }
 
 service User {

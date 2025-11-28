@@ -2,3 +2,25 @@ syntax = "v1"
 
 import "base.api"
 
+type SendCodeRequest {
+    Phone   string `json:"phone"`
+    Purpose string `json:"purpose"`
+}
+
+type SendCodeResponse {
+    BaseResp
+    Data SendCodeData `json:"data"`
+}
+
+type SendCodeData {
+    Sucess bool `json:"sucess"`
+}
+
+@server(
+    group: code
+)
+service code {
+    @handler sendCode
+    post /api/code/send (SendCodeRequest) returns (SendCodeResponse)
+}
+

@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -29,9 +30,15 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
-	phone := in.GetPhone()
-	var u model.User
+	phone := strings.TrimSpace(in.GetPhone())
+	password := strings.TrimSpace(in.GetPassword())
+
+	if phone == "" || password == "" {
+		return nil, status.Error(codes.InvalidArgument, "phone and password are required")
+	}
+
 	db := l.svcCtx.DB().WithContext(l.ctx)
+	var u model.User
 	if err := db.Where("phone = ?", phone).First(&u).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -39,11 +46,12 @@ func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if !verifyPassword(u.Password, in.GetPassword()) {
-		return nil, status.Error(codes.Unauthenticated, "password incorrect")
+	if err := verifyPassword(u.Password, password); err != nil {
+		return nil, status.Error(codes.PermissionDenied, "invalid credentials")
 	}
 
 	return &user.LoginResponse{
-		AccessToken: generateToken(u.ID, u.UID),
+		Id:  u.ID,
+		Uid: u.UID,
 	}, nil
 }

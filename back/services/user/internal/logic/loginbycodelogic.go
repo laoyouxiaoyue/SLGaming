@@ -30,12 +30,13 @@ func NewLoginByCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Login
 }
 
 func (l *LoginByCodeLogic) LoginByCode(in *user.LoginByCodeRequest) (*user.LoginByCodeResponse, error) {
-	phone := in.GetPhone()
-	code := strings.TrimSpace(in.GetCode())
-	_ = code // TODO: integrate SMS verification
+	phone := strings.TrimSpace(in.GetPhone())
+	if phone == "" {
+		return nil, status.Error(codes.InvalidArgument, "phone is required")
+	}
 
-	var u model.User
 	db := l.svcCtx.DB().WithContext(l.ctx)
+	var u model.User
 	if err := db.Where("phone = ?", phone).First(&u).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -43,9 +44,8 @@ func (l *LoginByCodeLogic) LoginByCode(in *user.LoginByCodeRequest) (*user.Login
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// TODO: integrate real SMS code verification service.
-
 	return &user.LoginByCodeResponse{
-		AccessToken: generateToken(u.ID, u.UID),
+		Id:  u.ID,
+		Uid: u.UID,
 	}, nil
 }

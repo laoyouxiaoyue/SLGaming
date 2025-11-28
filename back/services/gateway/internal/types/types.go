@@ -19,15 +19,15 @@ type ForgetPasswordResponse struct {
 	Data LoginData `json:"data"`
 }
 
-type GetUserResponse struct {
-	BaseResp
-	Data UserInfo `json:"data"`
-}
-
 type GetUserRequest struct {
 	Id    uint64 `form:"id,optional"`
 	Uid   uint64 `form:"uid,optional"`
 	Phone string `form:"phone,optional"`
+}
+
+type GetUserResponse struct {
+	BaseResp
+	Data UserInfo `json:"data"`
 }
 
 type LoginByCodeRequest struct {
@@ -60,6 +60,7 @@ type RegisterData struct {
 
 type RegisterRequest struct {
 	Phone    string `json:"phone"`
+	Code     string `json:"code"`
 	Password string `json:"password"`
 	Nickname string `json:"nickname,optional"`
 }

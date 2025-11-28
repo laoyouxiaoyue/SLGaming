@@ -30,6 +30,10 @@ func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 }
 
 func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
+	if in.GetId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "id is required")
+	}
+
 	db := l.svcCtx.DB().WithContext(l.ctx)
 	var u model.User
 	if err := db.Where("id = ?", in.GetId()).First(&u).Error; err != nil {
@@ -39,17 +43,15 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUs
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	updates := map[string]interface{}{}
+	updates := map[string]any{}
 
 	if nickname := strings.TrimSpace(in.GetNickname()); nickname != "" && nickname != u.Nickname {
 		updates["nickname"] = nickname
 	}
 
-	if phone := in.GetPhone(); phone != "" && phone != u.Phone {
+	if phone := strings.TrimSpace(in.GetPhone()); phone != "" && phone != u.Phone {
 		var count int64
-		if err := db.Model(&model.User{}).
-			Where("phone = ? AND id <> ?", phone, in.GetId()).
-			Count(&count).Error; err != nil {
+		if err := db.Model(&model.User{}).Where("phone = ? AND id <> ?", phone, u.ID).Count(&count).Error; err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 		if count > 0 {
@@ -70,12 +72,12 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUs
 		if err := db.Model(&u).Updates(updates).Error; err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
-		if err := db.Where("id = ?", in.GetId()).First(&u).Error; err != nil {
+		if err := db.Where("id = ?", u.ID).First(&u).Error; err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
 
 	return &user.UpdateUserResponse{
-		User: userToProto(&u),
+		User: toUserInfo(&u),
 	}, nil
 }

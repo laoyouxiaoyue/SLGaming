@@ -30,10 +30,8 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 
 func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, error) {
 	db := l.svcCtx.DB().WithContext(l.ctx)
-	var (
-		u   model.User
-		err error
-	)
+	var u model.User
+	var err error
 
 	switch {
 	case in.GetId() != 0:
@@ -43,7 +41,7 @@ func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, 
 	case in.GetPhone() != "":
 		err = db.Where("phone = ?", in.GetPhone()).First(&u).Error
 	default:
-		err = gorm.ErrRecordNotFound
+		return nil, status.Error(codes.InvalidArgument, "missing query condition")
 	}
 
 	if err != nil {
@@ -54,6 +52,6 @@ func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, 
 	}
 
 	return &user.GetUserResponse{
-		User: userToProto(&u),
+		User: toUserInfo(&u),
 	}, nil
 }
