@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"SLGaming/back/services/gateway/internal/config"
+	"SLGaming/back/services/code/internal/config"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
@@ -21,8 +21,9 @@ const (
 	defaultPort        = 8848
 	defaultTimeoutMs   = 5000
 
-	cacheDir = "tmp/nacos/cache"
-	logDir   = "tmp/nacos/log"
+	cacheDir       = "tmp/nacos/cache"
+	cacheConfigDir = "tmp/nacos/cache/config"
+	logDir         = "tmp/nacos/log"
 )
 
 // InitNacos 根据配置创建一个 Nacos 配置客户端。
@@ -47,32 +48,57 @@ func InitNacos(cfg config.NacosConf) (config_client.IConfigClient, error) {
 		return nil, fmt.Errorf("build server configs: %w", err)
 	}
 
-	client, err := clients.NewConfigClient(vo.NacosClientParam{
-		ClientConfig:  &clientConfig,
-		ServerConfigs: serverConfigs,
-	})
+	configClient, err := clients.NewConfigClient(
+		vo.NacosClientParam{
+			ClientConfig:  &clientConfig,
+			ServerConfigs: serverConfigs,
+		},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("new nacos client: %w", err)
 	}
 
-	return client, nil
+	return configClient, nil
 }
 
-// FetchConfig 从 Nacos 拉取配置
-func FetchConfig(cli config_client.IConfigClient, cfg config.NacosConf) (string, error) {
-	if cli == nil {
+// FetchConfig 从 Nacos 获取配置内容
+func FetchConfig(client config_client.IConfigClient, cfg config.NacosConf) (string, error) {
+	if client == nil {
 		return "", fmt.Errorf("nil nacos client")
 	}
-	content, err := cli.GetConfig(vo.ConfigParam{
+	content, err := client.GetConfig(vo.ConfigParam{
 		DataId: cfg.DataId,
 		Group:  cfg.Group,
 	})
 	if err != nil {
-		return "", fmt.Errorf("get config: %w", err)
+		return "", fmt.Errorf("get config from nacos: %w", err)
 	}
 	return content, nil
 }
 
+// ListenConfig 监听 Nacos 配置变化
+func ListenConfig(client config_client.IConfigClient, cfg config.NacosConf, onChange func(string)) error {
+	if client == nil {
+		return fmt.Errorf("nil nacos client")
+	}
+	return client.ListenConfig(vo.ConfigParam{
+		DataId: cfg.DataId,
+		Group:  cfg.Group,
+		OnChange: func(namespace, group, dataId, data string) {
+			logx.Infof("nacos config updated, dataId=%s, group=%s", dataId, group)
+			defer func() {
+				if r := recover(); r != nil {
+					logx.Errorf("panic recovered in nacos listener: %v", r)
+				}
+			}()
+			if onChange != nil {
+				onChange(data)
+			}
+		},
+	})
+}
+
+// buildServerConfigs 解析 hosts 列表生成 ServerConfig 切片。
 func buildServerConfigs(hosts []string) ([]constant.ServerConfig, error) {
 	var serverConfigs []constant.ServerConfig
 	for _, h := range hosts {
@@ -91,16 +117,17 @@ func buildServerConfigs(hosts []string) ([]constant.ServerConfig, error) {
 	return serverConfigs, nil
 }
 
+// toServerConfig 将 host 字符串解析为单个 ServerConfig。
 func toServerConfig(host string) (constant.ServerConfig, error) {
 	scheme := defaultScheme
 	contextPath := defaultContextPath
-	address := host
 	port := defaultPort
+	address := host
 
 	if strings.Contains(host, "://") {
 		u, err := url.Parse(host)
 		if err != nil {
-			return constant.ServerConfig{}, fmt.Errorf("invalid host %s: %w", host, err)
+			return constant.ServerConfig{}, fmt.Errorf("invalid nacos host %s: %w", host, err)
 		}
 		address = u.Host
 		if u.Scheme != "" {
@@ -112,11 +139,14 @@ func toServerConfig(host string) (constant.ServerConfig, error) {
 	}
 
 	if strings.Contains(address, ":") {
-		var portStr string
-		address, portStr, _ = strings.Cut(address, ":")
-		p, err := strconv.Atoi(portStr)
+		hostPart, portPart, ok := strings.Cut(address, ":")
+		if !ok {
+			return constant.ServerConfig{}, fmt.Errorf("invalid nacos address %s", address)
+		}
+		address = hostPart
+		p, err := strconv.Atoi(portPart)
 		if err != nil {
-			return constant.ServerConfig{}, fmt.Errorf("invalid nacos port %s: %w", portStr, err)
+			return constant.ServerConfig{}, fmt.Errorf("invalid nacos port %s: %w", portPart, err)
 		}
 		port = p
 	}
@@ -127,21 +157,4 @@ func toServerConfig(host string) (constant.ServerConfig, error) {
 		Scheme:      scheme,
 		ContextPath: contextPath,
 	}, nil
-}
-
-// ListenConfig 监听 Nacos 配置变化
-func ListenConfig(cli config_client.IConfigClient, cfg config.NacosConf, onChange func(string)) error {
-	if cli == nil {
-		return fmt.Errorf("nil nacos client")
-	}
-	return cli.ListenConfig(vo.ConfigParam{
-		DataId: cfg.DataId,
-		Group:  cfg.Group,
-		OnChange: func(namespace, group, dataId, data string) {
-			logx.Infof("nacos config updated, dataId=%s, group=%s", dataId, group)
-			if onChange != nil {
-				onChange(data)
-			}
-		},
-	})
 }

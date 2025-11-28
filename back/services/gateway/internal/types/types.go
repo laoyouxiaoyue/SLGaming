@@ -24,6 +24,12 @@ type GetUserResponse struct {
 	Data UserInfo `json:"data"`
 }
 
+type GetUserRequest struct {
+	Id    uint64 `form:"id,optional"`
+	Uid   uint64 `form:"uid,optional"`
+	Phone string `form:"phone,optional"`
+}
+
 type LoginByCodeRequest struct {
 	Phone string `json:"phone"`
 	Code  string `json:"code"`
@@ -64,6 +70,7 @@ type RegisterResponse struct {
 }
 
 type UpdateUserRequest struct {
+	Id       uint64 `json:"id"`
 	Nickname string `json:"nickname,optional"`
 	Password string `json:"password,optional"`
 	Phone    string `json:"phone,optional"`

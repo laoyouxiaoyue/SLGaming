@@ -39,12 +39,19 @@ type UserInfo {
     Phone    string `json:"phone"`
 }
 
+type GetUserRequest {
+    Id    uint64 `form:"id,optional"`
+    Uid   uint64 `form:"uid,optional"`
+    Phone string `form:"phone,optional"`
+}
+
 type GetUserResponse {
     BaseResp
     Data UserInfo `json:"data"`
 }
 
 type UpdateUserRequest {
+    Id       uint64 `json:"id"`
     Nickname string `json:"nickname,optional"`
     Password string `json:"password,optional"`
     Phone    string `json:"phone,optional"`
@@ -93,11 +100,11 @@ service user {
     post /api/user/login-by-code (LoginByCodeRequest) returns (LoginByCodeResponse)
 
     @handler getUser
-    get /api/user returns (GetUserResponse)
+    get /api/user (GetUserRequest) returns (GetUserResponse)
 
     @handler updateUser
     put /api/user (UpdateUserRequest) returns (UpdateUserResponse)
 
     @handler forgetPassword
-    put /api/user/forgePassword (ForgetPasswordRequest) returns (ForgetPasswordResponse)
+    put /api/user/forgetPassword (ForgetPasswordRequest) returns (ForgetPasswordResponse)
 }

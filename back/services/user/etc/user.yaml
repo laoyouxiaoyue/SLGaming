@@ -18,6 +18,19 @@ Mysql:
   ConnMaxLifetime: "300s"
   ConnMaxIdleTime: "60s"
 
+Consul:
+  Address: 120.26.29.194:8500
+  Token: ""
+  Service:
+    Name: user-rpc
+    ID: user-rpc-1
+    Address: 120.26.29.194
+    Tags:
+      - rpc
+      - user
+    CheckInterval: 10s
+    CheckTimeout: 5s
+
 
 #Nacos:
 #  Hosts:

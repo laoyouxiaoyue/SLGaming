@@ -1,0 +1,42 @@
+Name: code.rpc
+ListenOn: 0.0.0.0:8085
+
+Redis:
+  Key: ""
+  Host: 120.26.29.194:6379
+  Type: node
+  Pass: ""
+  Tls: false
+
+Nacos:
+  Hosts:
+    - 120.26.29.194
+  Namespace: "adc722cd-9c3b-40a7-80fa-b25535bdbe58"
+  Group: dev
+  DataId: code.yaml
+  Username: nacos
+  Password: nacos
+
+TemplateNacos:
+  DataId: code-templates.yaml
+  Group: dev
+
+Consul:
+  Address: 120.26.29.194:8500
+  Token: ""
+  Service:
+    Name: code-rpc
+    ID: code-rpc-1
+    Address: 120.26.29.194
+    Tags:
+      - rpc
+      - code
+    CheckInterval: 10s
+    CheckTimeout: 5s
+
+RateLimit:
+  IPSendInterval: 60      # IP发送间隔（秒），默认60秒
+  IPDailyLimit: 100       # IP每日最大发送次数，默认100次
+  PhoneSendInterval: 60   # 手机号发送间隔（秒），默认60秒
+  VerifyPhoneDailyLimit: 50 # 验证操作单个手机号每日次数上限
+  VerifyIPDailyLimit: 200   # 验证操作单个IP每日次数上限

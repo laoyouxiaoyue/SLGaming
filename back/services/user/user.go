@@ -58,6 +58,13 @@ func main() {
 
 	ctx := svc.NewServiceContext(cfg)
 
+	registrar, err := ioc.RegisterConsul(cfg.Consul, cfg.ListenOn)
+	if err != nil {
+		logx.Errorf("consul register failed: %v", err)
+	} else if registrar != nil {
+		defer registrar.Deregister()
+	}
+
 	if nacosClient != nil {
 		if err := ioc.ListenConfig(nacosClient, cfg.Nacos, func(content string) {
 			if strings.TrimSpace(content) == "" {

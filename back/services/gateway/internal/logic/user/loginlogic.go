@@ -4,10 +4,9 @@
 package user
 
 import (
-	"context"
-
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"context"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package code;
+
+option go_package = "./code";
+
+message SendCodeRequest {
+  string phone = 1;
+  string purpose = 2; // e.g. register/login/forget_password
+}
+
+message SendCodeResponse {
+  string request_id = 1;
+  int64 expire_at = 2; // unix timestamp
+}
+
+message VerifyCodeRequest {
+  string phone = 1;
+  string purpose = 2;
+  string code = 3;
+}
+
+message VerifyCodeResponse {
+  bool passed = 1;
+}
+
+service Code {
+  rpc SendCode(SendCodeRequest) returns (SendCodeResponse);
+  rpc VerifyCode(VerifyCodeRequest) returns (VerifyCodeResponse);
+}
+

@@ -18,8 +18,9 @@ type NacosConf struct {
 
 type Config struct {
 	zrpc.RpcServerConf
-	Nacos NacosConf `json:",optional"` // Nacos 配置
-	Mysql MysqlConf `json:",optional"` // Mysql 配置
+	Nacos  NacosConf  `json:",optional"` // Nacos 配置
+	Mysql  MysqlConf  `json:",optional"` // Mysql 配置
+	Consul ConsulConf `json:",optional"`
 }
 
 // MysqlConf MySQL 数据库配置
@@ -29,4 +30,19 @@ type MysqlConf struct {
 	MaxOpenConns    int           `json:",default=100"`  // 最大打开连接数
 	ConnMaxLifetime time.Duration `json:",default=300s"` // 连接最大生命周期
 	ConnMaxIdleTime time.Duration `json:",default=60s"`  // 连接最大空闲时间
+}
+
+type ConsulConf struct {
+	Address string            `json:",optional"`
+	Token   string            `json:",optional"`
+	Service ConsulServiceConf `json:",optional"`
+}
+
+type ConsulServiceConf struct {
+	Name          string   `json:",optional"`
+	ID            string   `json:",optional"`
+	Address       string   `json:",optional"`
+	Tags          []string `json:",optional"`
+	CheckInterval string   `json:",optional"`
+	CheckTimeout  string   `json:",optional"`
 }
