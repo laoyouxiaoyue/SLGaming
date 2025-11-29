@@ -58,6 +58,7 @@ func RegisterConsul(cfg config.ConsulConf, listenOn string) (*consulRegistrar, e
 		return nil, fmt.Errorf("invalid listen port: %w", err)
 	}
 
+<<<<<<< HEAD
 	// 确定服务注册地址
 	serviceAddr := cfg.Service.Address
 	if strings.TrimSpace(serviceAddr) == "" || serviceAddr == "0.0.0.0" {
@@ -74,6 +75,11 @@ func RegisterConsul(cfg config.ConsulConf, listenOn string) (*consulRegistrar, e
 		} else {
 			serviceAddr = host
 		}
+=======
+	serviceAddr := cfg.Service.Address
+	if strings.TrimSpace(serviceAddr) == "" || serviceAddr == "0.0.0.0" {
+		serviceAddr = host
+>>>>>>> 5ed88c3a42e9d34a1159206890590d6c06288f3d
 	}
 
 	serviceID := cfg.Service.ID
@@ -112,10 +118,16 @@ func RegisterConsul(cfg config.ConsulConf, listenOn string) (*consulRegistrar, e
 	}
 
 	if err := client.Agent().ServiceRegister(reg); err != nil {
+<<<<<<< HEAD
 		logx.Errorf("注册服务到 Consul 失败: service=%s, error=%v", reg.Name, err)
 		return nil, fmt.Errorf("register consul service: %w", err)
 	}
 	logx.Infof("成功注册服务到 Consul: service=%s, address=%s:%d", reg.Name, serviceAddr, port)
+=======
+		return nil, fmt.Errorf("register consul service: %w", err)
+	}
+	logx.Infof("registered consul service %s (%s:%d)", reg.Name, serviceAddr, port)
+>>>>>>> 5ed88c3a42e9d34a1159206890590d6c06288f3d
 
 	return &consulRegistrar{
 		client:    client,
@@ -128,7 +140,11 @@ func (r *consulRegistrar) Deregister() {
 		return
 	}
 	if err := r.client.Agent().ServiceDeregister(r.serviceID); err != nil {
+<<<<<<< HEAD
 		logx.Errorf("注销 Consul 服务失败: service_id=%s, error=%v", r.serviceID, err)
+=======
+		logx.Errorf("deregister consul service failed: %v", err)
+>>>>>>> 5ed88c3a42e9d34a1159206890590d6c06288f3d
 	}
 }
 
@@ -143,6 +159,7 @@ func ResolveServiceEndpoints(cfg config.ConsulConf, serviceName string) ([]strin
 		Token:   cfg.Token,
 	})
 	if err != nil {
+<<<<<<< HEAD
 		logx.Errorf("创建 Consul 客户端失败: service=%s, consul=%s, error=%v", serviceName, cfg.Address, err)
 		return nil, fmt.Errorf("create consul client: %w", err)
 	}
@@ -181,6 +198,17 @@ func ResolveServiceEndpoints(cfg config.ConsulConf, serviceName string) ([]strin
 		}
 
 		logx.Errorf("在 Consul 中未找到服务: service=%s", serviceName)
+=======
+		return nil, fmt.Errorf("create consul client: %w", err)
+	}
+
+	services, _, err := client.Health().Service(serviceName, "", true, nil)
+	if err != nil {
+		return nil, fmt.Errorf("query consul service: %w", err)
+	}
+
+	if len(services) == 0 {
+>>>>>>> 5ed88c3a42e9d34a1159206890590d6c06288f3d
 		return nil, fmt.Errorf("service %s not found in consul", serviceName)
 	}
 
@@ -191,10 +219,16 @@ func ResolveServiceEndpoints(cfg config.ConsulConf, serviceName string) ([]strin
 		if address == "" {
 			address = "127.0.0.1"
 		}
+<<<<<<< HEAD
 		endpoint := fmt.Sprintf("%s:%d", address, port)
 		endpoints = append(endpoints, endpoint)
 	}
 
 	logx.Infof("成功解析服务端点: service=%s, endpoints=%v", serviceName, endpoints)
+=======
+		endpoints = append(endpoints, fmt.Sprintf("%s:%d", address, port))
+	}
+
+>>>>>>> 5ed88c3a42e9d34a1159206890590d6c06288f3d
 	return endpoints, nil
 }
