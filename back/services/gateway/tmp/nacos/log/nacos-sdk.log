@@ -1,14 +1,959 @@
-2025-11-28T18:15:51.468+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36_failover.
-2025-11-28T18:15:51.475+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-5a731c2b-4142-48b3-afad-ae68ddfbbb3e)
-2025-11-28T18:15:51.475+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
-2025-11-28T18:15:51.475+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
-2025-11-28T18:15:51.475+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
-2025-11-28T18:15:51.475+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-5a731c2b-4142-48b3-afad-ae68ddfbbb3e try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
-2025-11-28T18:15:51.475+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
-2025-11-28T18:15:51.475+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
-2025-11-28T18:15:51.475+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
-2025-11-28T18:15:51.492+0800	INFO	util/common.go:96	Local IP:172.30.208.1
-2025-11-28T18:15:51.638+0800	INFO	rpc/rpc_client.go:337	config-0-5a731c2b-4142-48b3-afad-ae68ddfbbb3e success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764324951492_116.147.66.195_10831
-2025-11-28T18:15:51.638+0800	INFO	rpc/rpc_client.go:487	config-0-5a731c2b-4142-48b3-afad-ae68ddfbbb3e notify connected event to listeners , connectionId=1764324951492_116.147.66.195_10831
-2025-11-28T18:15:51.638+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
-2025-11-28T18:15:51.697+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36.: file not exist
+2025-11-29T13:29:40.418+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@DEFAULT_GROUP@@_failover.
+2025-11-29T13:29:40.418+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c)
+2025-11-29T13:29:40.418+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-29T13:29:40.418+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-29T13:29:40.418+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-29T13:29:40.439+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c try to connect to server on start up, server: {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T13:29:40.439+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:40.439+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:40.439+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:40.455+0800	INFO	util/common.go:96	Local IP:172.31.240.1
+2025-11-29T13:29:40.455+0800	WARN	rpc/rpc_client.go:329	[RpcClient.Start] config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect to server on start up, error message=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it.", start up retry times left=2
+2025-11-29T13:29:40.455+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c try to connect to server on start up, server: {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T13:29:40.455+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:40.455+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:40.455+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:40.455+0800	WARN	rpc/rpc_client.go:329	[RpcClient.Start] config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect to server on start up, error message=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it.", start up retry times left=1
+2025-11-29T13:29:40.455+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c try to connect to server on start up, server: {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T13:29:40.455+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:40.455+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:40.455+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:40.456+0800	WARN	rpc/rpc_client.go:329	[RpcClient.Start] config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect to server on start up, error message=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it.", start up retry times left=0
+2025-11-29T13:29:40.456+0800	INFO	rpc/rpc_client.go:427	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c try to re connect to a new server, server is not appointed, will choose a random server.
+2025-11-29T13:29:40.456+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:40.456+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:40.456+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:40.456+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigQueryRequest, body={"requestId":"","group":"DEFAULT_GROUP","dataId":"gateway.yaml","tenant":"","module":"config","tag":""}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).queryConfig
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:128
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).getConfigInner
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:198
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).GetConfig
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:166
+SLGaming/back/services/gateway/internal/ioc.FetchConfig
+	G:/gopath/src/SLGaming/back/services/gateway/internal/ioc/nacos.go:69
+SLGaming/back/services/gateway/internal/ioc.LoadConfig
+	G:/gopath/src/SLGaming/back/services/gateway/internal/ioc/config_loader.go:31
+main.main
+	G:/gopath/src/SLGaming/back/services/gateway/gateway.go:25
+runtime.main
+	D:/go/src/runtime/proc.go:272
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:40.456+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:40.456+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:40.456+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:40.457+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 1 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:40.564+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:40.564+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:40.564+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigQueryRequest, body={"requestId":"","group":"DEFAULT_GROUP","dataId":"gateway.yaml","tenant":"","module":"config","tag":""}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).queryConfig
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:128
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).getConfigInner
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:198
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).GetConfig
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:166
+SLGaming/back/services/gateway/internal/ioc.FetchConfig
+	G:/gopath/src/SLGaming/back/services/gateway/internal/ioc/nacos.go:69
+SLGaming/back/services/gateway/internal/ioc.LoadConfig
+	G:/gopath/src/SLGaming/back/services/gateway/internal/ioc/config_loader.go:31
+main.main
+	G:/gopath/src/SLGaming/back/services/gateway/gateway.go:25
+runtime.main
+	D:/go/src/runtime/proc.go:272
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:40.564+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:40.564+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 2 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:40.664+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigQueryRequest, body={"requestId":"","group":"DEFAULT_GROUP","dataId":"gateway.yaml","tenant":"","module":"config","tag":""}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).queryConfig
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:128
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).getConfigInner
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:198
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).GetConfig
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:166
+SLGaming/back/services/gateway/internal/ioc.FetchConfig
+	G:/gopath/src/SLGaming/back/services/gateway/internal/ioc/nacos.go:69
+SLGaming/back/services/gateway/internal/ioc.LoadConfig
+	G:/gopath/src/SLGaming/back/services/gateway/internal/ioc/config_loader.go:31
+main.main
+	G:/gopath/src/SLGaming/back/services/gateway/gateway.go:25
+runtime.main
+	D:/go/src/runtime/proc.go:272
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:40.764+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:40.764+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:40.764+0800	ERROR	config_client/config_client.go:201	get config from server error:client not connected, current status:STARTING, dataId=gateway.yaml, group=DEFAULT_GROUP, namespaceId=
+2025-11-29T13:29:40.764+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:40.764+0800	WARN	config_client/config_client.go:335	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@DEFAULT_GROUP@@.: file not exist
+2025-11-29T13:29:40.764+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@DEFAULT_GROUP@@.: file not exist
+2025-11-29T13:29:40.765+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 3 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:41.065+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:41.065+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:41.065+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:41.065+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 4 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:41.475+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:41.475+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:41.475+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:41.475+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 5 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:41.975+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:41.975+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:41.975+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:41.976+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 6 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:42.577+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:42.577+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:42.577+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:42.577+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 7 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:43.282+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:43.282+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:43.282+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:43.282+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 8 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:44.084+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:44.084+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:44.084+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:44.084+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 9 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:44.991+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:44.991+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:44.991+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:44.992+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 10 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:45.419+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:45.526+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:45.636+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:45.737+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:29:46.001+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:46.001+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:46.001+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:46.002+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 11 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:47.111+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:47.122+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:47.122+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:47.123+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 12 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:48.323+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:48.323+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:48.323+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:48.324+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 13 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:49.624+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:49.625+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:49.625+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:49.625+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 14 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:50.738+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:50.844+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:50.944+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:51.026+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:51.026+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:51.026+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:51.026+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 15 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:51.044+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:29:52.527+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:52.527+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:52.527+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:52.528+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 16 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:54.128+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:54.128+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:54.128+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:54.129+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 17 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:55.829+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:55.829+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:55.829+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:55.830+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 18 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:56.045+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:56.146+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:56.247+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:29:56.347+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:29:57.636+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:57.636+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:57.636+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:57.636+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 19 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:29:59.536+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:29:59.536+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:29:59.536+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:29:59.537+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 20 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:01.348+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:01.449+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:01.537+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:01.537+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:01.537+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:01.537+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 21 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:01.549+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:01.649+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:03.643+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:03.643+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:03.643+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:03.643+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 22 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:05.844+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:05.844+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:05.844+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:05.845+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 23 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:06.650+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:06.750+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:06.855+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:06.955+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:08.145+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:08.145+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:08.145+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:08.146+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 24 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:10.546+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:10.546+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:10.546+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:10.546+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 25 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:11.956+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:12.057+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:12.158+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:12.258+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:13.054+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:13.054+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:13.054+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:13.054+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 26 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:15.655+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:15.655+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:15.655+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:15.655+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 27 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:17.259+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:17.359+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:17.460+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:17.560+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:18.356+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:18.356+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:18.356+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:18.356+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 28 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:21.157+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:21.157+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:21.157+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:21.158+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 29 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:22.560+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:22.661+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:22.761+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:22.862+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:24.058+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:24.058+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:24.058+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:24.058+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 30 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:27.064+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:27.064+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:27.064+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:27.064+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 31 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:27.868+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:27.975+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:28.075+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:28.176+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:30.164+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:30.164+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:30.164+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:30.165+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 32 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:33.176+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:33.277+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:33.365+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:33.365+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:33.365+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:33.366+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 33 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:33.377+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:33.477+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:36.666+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:36.666+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:36.666+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:36.667+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 34 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:38.478+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:38.579+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:38.679+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:38.780+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:40.067+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:40.067+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:40.067+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:40.068+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 35 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:43.568+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:43.568+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:43.568+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:43.569+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 36 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:43.780+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:43.881+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:43.981+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:44.082+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:47.169+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:47.169+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:47.170+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:47.170+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 37 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:49.082+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:49.182+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:49.283+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:49.383+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:50.870+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:50.870+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:50.870+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:50.871+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 38 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:54.384+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:54.484+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:54.585+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:54.671+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:54.671+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:54.671+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:54.672+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 39 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:54.685+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:30:58.572+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:30:58.572+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:30:58.572+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:30:58.573+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 40 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:30:59.686+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:59.786+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:59.887+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:30:59.988+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:31:02.582+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:31:02.582+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:31:02.582+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:31:02.582+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 41 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:31:04.995+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:05.096+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:05.196+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:05.297+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:31:06.682+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:31:06.682+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:31:06.682+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:31:06.683+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 42 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:31:10.297+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:10.397+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:10.498+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:10.598+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:31:10.884+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:31:10.884+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:31:10.884+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:31:10.884+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 43 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:31:15.185+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:31:15.185+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:31:15.185+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:31:15.185+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 44 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:31:15.599+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:15.699+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:15.799+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:15.900+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:31:19.585+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:31:19.585+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:31:19.585+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:31:19.586+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 45 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:31:20.900+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:21.000+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:21.100+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:21.201+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:31:24.086+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:31:24.086+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:31:24.086+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:31:24.087+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 46 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-11-29T13:31:26.201+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=0, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:26.302+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=1, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:26.402+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"DEFAULT_GROUP","md5":"","dataId":"gateway.yaml","tenant":""}]}, retryTimes=2, error=client not connected, current status:STARTING
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-11-29T13:31:26.502+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:STARTING
+2025-11-29T13:31:28.687+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:31:28.687+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:31:28.687+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:31:28.687+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 47 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."

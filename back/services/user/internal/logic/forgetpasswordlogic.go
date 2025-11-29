@@ -30,12 +30,15 @@ func NewForgetPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Fo
 }
 
 func (l *ForgetPasswordLogic) ForgetPassword(in *user.ForgetPasswordRequest) (*user.ForgetPasswordResponse, error) {
-	phone := in.GetPhone()
-	code := strings.TrimSpace(in.GetCode())
-	_ = code // TODO: integrate SMS verification
+	phone := strings.TrimSpace(in.GetPhone())
+	newPassword := strings.TrimSpace(in.GetPassword())
 
-	var u model.User
+	if phone == "" || newPassword == "" {
+		return nil, status.Error(codes.InvalidArgument, "phone and password are required")
+	}
+
 	db := l.svcCtx.DB().WithContext(l.ctx)
+	var u model.User
 	if err := db.Where("phone = ?", phone).First(&u).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -43,7 +46,7 @@ func (l *ForgetPasswordLogic) ForgetPassword(in *user.ForgetPasswordRequest) (*u
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	hashed, err := hashPassword(in.GetPassword())
+	hashed, err := hashPassword(newPassword)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -52,9 +55,8 @@ func (l *ForgetPasswordLogic) ForgetPassword(in *user.ForgetPasswordRequest) (*u
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// TODO: integrate real SMS code verification service.
-
 	return &user.ForgetPasswordResponse{
-		AccessToken: generateToken(u.ID, u.UID),
+		Id:  u.ID,
+		Uid: u.UID,
 	}, nil
 }

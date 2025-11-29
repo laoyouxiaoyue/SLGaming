@@ -26,6 +26,7 @@ func LoginByCodeHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
+			// 将 token 设置到响应头
 			if resp != nil && resp.Data.AccessToken != "" {
 				w.Header().Set("Authorization", "Bearer "+resp.Data.AccessToken)
 			}

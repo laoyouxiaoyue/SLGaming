@@ -70,6 +70,20 @@ type RegisterResponse struct {
 	Data RegisterData `json:"data"`
 }
 
+type SendCodeData struct {
+	Success bool `json:"success"`
+}
+
+type SendCodeRequest struct {
+	Phone   string `json:"phone"`
+	Purpose string `json:"purpose"`
+}
+
+type SendCodeResponse struct {
+	BaseResp
+	Data SendCodeData `json:"data"`
+}
+
 type UpdateUserRequest struct {
 	Id       uint64 `json:"id"`
 	Nickname string `json:"nickname,optional"`

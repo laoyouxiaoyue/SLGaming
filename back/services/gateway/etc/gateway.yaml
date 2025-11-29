@@ -1,0 +1,38 @@
+Name: gateway
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+
+# Nacos 配置（可选）
+Nacos:
+  Hosts:
+    - 127.0.0.1:8848
+  Namespace: ""
+  Group: DEFAULT_GROUP
+  DataId: gateway.yaml
+  Username: ""
+  Password: ""
+
+# Consul 配置（可选）
+Consul:
+  Address: 127.0.0.1:8500
+  Token: ""
+  Service:
+    Name: gateway
+    ID: ""
+    Address: ""
+    Tags:
+      - gateway
+      - api
+    CheckInterval: 10s
+    CheckTimeout: 5s
+
+# 上游服务配置（用于服务发现）
+Upstream:
+  CodeService: code  # Consul 中的验证码服务名称
+  UserService: user  # Consul 中的用户服务名称
+
+# JWT 配置
+JWT:
+  SecretKey: "your-secret-key-change-in-production"  # JWT 密钥（生产环境请修改）
+  TokenDuration: 7200s  # Token 过期时间，默认 2 小时（7200 秒）

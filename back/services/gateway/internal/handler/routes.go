@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	code "SLGaming/back/services/gateway/internal/handler/code"
 	user "SLGaming/back/services/gateway/internal/handler/user"
 	"SLGaming/back/services/gateway/internal/svc"
 
@@ -13,6 +14,16 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/code/send",
+				Handler: code.SendCodeHandler(serverCtx),
+			},
+		},
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{

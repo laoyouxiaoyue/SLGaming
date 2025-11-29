@@ -13,14 +13,13 @@ type SendCodeResponse {
 }
 
 type SendCodeData {
-    Sucess bool `json:"sucess"`
+    Success bool `json:"success"`
 }
 
 @server(
     group: code
 )
-service code {
-    @handler sendCode
+service gateway {
+   @handler sendCode
     post /api/code/send (SendCodeRequest) returns (SendCodeResponse)
 }
-

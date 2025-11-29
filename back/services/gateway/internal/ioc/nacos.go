@@ -12,6 +12,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const (
@@ -25,7 +26,7 @@ const (
 	logDir         = "tmp/nacos/log"
 )
 
-// InitNacos 创建 Nacos 配置客户端
+// InitNacos 根据配置创建一个 Nacos 配置客户端。
 func InitNacos(cfg config.NacosConf) (config_client.IConfigClient, error) {
 	if len(cfg.Hosts) == 0 {
 		return nil, fmt.Errorf("nacos hosts is empty")
@@ -60,7 +61,7 @@ func InitNacos(cfg config.NacosConf) (config_client.IConfigClient, error) {
 	return configClient, nil
 }
 
-// FetchConfig 从 Nacos 获取配置
+// FetchConfig 从 Nacos 获取配置内容
 func FetchConfig(client config_client.IConfigClient, cfg config.NacosConf) (string, error) {
 	if client == nil {
 		return "", fmt.Errorf("nil nacos client")
@@ -75,7 +76,7 @@ func FetchConfig(client config_client.IConfigClient, cfg config.NacosConf) (stri
 	return content, nil
 }
 
-// ListenConfig 监听配置变更
+// ListenConfig 监听 Nacos 配置变化
 func ListenConfig(client config_client.IConfigClient, cfg config.NacosConf, onChange func(string)) error {
 	if client == nil {
 		return fmt.Errorf("nil nacos client")
@@ -84,6 +85,12 @@ func ListenConfig(client config_client.IConfigClient, cfg config.NacosConf, onCh
 		DataId: cfg.DataId,
 		Group:  cfg.Group,
 		OnChange: func(namespace, group, dataId, data string) {
+			logx.Infof("nacos config updated, dataId=%s, group=%s", dataId, group)
+			defer func() {
+				if r := recover(); r != nil {
+					logx.Errorf("panic recovered in nacos listener: %v", r)
+				}
+			}()
 			if onChange != nil {
 				onChange(data)
 			}
@@ -91,6 +98,7 @@ func ListenConfig(client config_client.IConfigClient, cfg config.NacosConf, onCh
 	})
 }
 
+// buildServerConfigs 解析 hosts 列表生成 ServerConfig 切片。
 func buildServerConfigs(hosts []string) ([]constant.ServerConfig, error) {
 	var serverConfigs []constant.ServerConfig
 	for _, h := range hosts {
@@ -109,6 +117,7 @@ func buildServerConfigs(hosts []string) ([]constant.ServerConfig, error) {
 	return serverConfigs, nil
 }
 
+// toServerConfig 将 host 字符串解析为单个 ServerConfig。
 func toServerConfig(host string) (constant.ServerConfig, error) {
 	scheme := defaultScheme
 	contextPath := defaultContextPath
