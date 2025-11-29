@@ -5,7 +5,7 @@ package user
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -28,31 +28,37 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 	}
 }
 
-func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (*types.GetUserResponse, error) {
-	if req == nil {
-		return nil, errors.New("request is nil")
-	}
-	if req.Id == 0 && req.Uid == 0 && req.Phone == "" {
-		return nil, errors.New("must provide id, uid or phone")
+func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (resp *types.GetUserResponse, err error) {
+	if l.svcCtx.UserRPC == nil {
+		return nil, fmt.Errorf("user rpc client not initialized")
 	}
 
-	rpc, err := getRPC("user", l.svcCtx)
-	if err != nil {
-		return nil, err
-	}
-	userRPC := rpc.(userclient.User)
-
-	rpcResp, err := userRPC.GetUser(l.ctx, &userclient.GetUserRequest{
+	// 调用用户服务的 RPC
+	rpcResp, err := l.svcCtx.UserRPC.GetUser(l.ctx, &userclient.GetUserRequest{
 		Id:    req.Id,
 		Uid:   req.Uid,
 		Phone: req.Phone,
 	})
 	if err != nil {
-		return nil, err
+		l.Errorf("call user rpc failed: %v", err)
+		return &types.GetUserResponse{
+			BaseResp: types.BaseResp{
+				Code: 500,
+				Msg:  "获取用户信息失败: " + err.Error(),
+			},
+		}, nil
 	}
 
 	return &types.GetUserResponse{
-		BaseResp: successResp(),
-		Data:     toUserInfo(rpcResp.GetUser()),
+		BaseResp: types.BaseResp{
+			Code: 0,
+			Msg:  "success",
+		},
+		Data: types.UserInfo{
+			Id:       rpcResp.User.Id,
+			Uid:      rpcResp.User.Uid,
+			Nickname: rpcResp.User.Nickname,
+			Phone:    rpcResp.User.Phone,
+		},
 	}, nil
 }

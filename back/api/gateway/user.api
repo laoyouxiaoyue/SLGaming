@@ -90,7 +90,7 @@ type ForgetPasswordResponse{
 @server(
     group: user
 )
-service user {
+service gateway {
     @handler register
     post /api/user/register (RegisterRequest) returns (RegisterResponse)
 

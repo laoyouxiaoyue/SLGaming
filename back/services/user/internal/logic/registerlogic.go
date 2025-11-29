@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -29,8 +30,19 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterResponse, error) {
-	phone := in.GetPhone()
+	phone := strings.TrimSpace(in.GetPhone())
+	password := strings.TrimSpace(in.GetPassword())
+	nickname := strings.TrimSpace(in.GetNickname())
+
+	if phone == "" {
+		return nil, status.Error(codes.InvalidArgument, "phone is required")
+	}
+	if password == "" {
+		return nil, status.Error(codes.InvalidArgument, "password is required")
+	}
+
 	db := l.svcCtx.DB().WithContext(l.ctx)
+
 	var existing model.User
 	if err := db.Where("phone = ?", phone).First(&existing).Error; err == nil {
 		return nil, status.Error(codes.AlreadyExists, "phone already registered")
@@ -38,23 +50,23 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	hashed, err := hashPassword(in.GetPassword())
+	hashed, err := hashPassword(password)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	newUser := &model.User{
-		Nickname: ensureNickname(in.GetNickname(), phone),
+	userModel := &model.User{
 		Phone:    phone,
 		Password: hashed,
+		Nickname: ensureNickname(nickname, phone),
 	}
 
-	if err := db.Create(newUser).Error; err != nil {
+	if err := db.Create(userModel).Error; err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &user.RegisterResponse{
-		Id:  newUser.ID,
-		Uid: newUser.UID,
+		Id:  userModel.ID,
+		Uid: userModel.UID,
 	}, nil
 }

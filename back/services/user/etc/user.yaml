@@ -24,7 +24,7 @@ Consul:
   Service:
     Name: user-rpc
     ID: user-rpc-1
-    Address: 120.26.29.194
+    Address: 127.0.0.1
     Tags:
       - rpc
       - user

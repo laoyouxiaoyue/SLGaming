@@ -331,3 +331,100 @@
 2025-11-28T18:06:11.567+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
 2025-11-28T18:06:11.591+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
 2025-11-28T18:06:11.614+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-11-29T10:54:18.154+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T10:54:18.182+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-93363547-4d2d-4b59-a684-d74cd488b54f)
+2025-11-29T10:54:18.182+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-29T10:54:18.182+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-29T10:54:18.182+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-29T10:54:18.182+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-93363547-4d2d-4b59-a684-d74cd488b54f try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T10:54:18.182+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T10:54:18.182+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T10:54:18.182+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T10:54:18.198+0800	INFO	util/common.go:96	Local IP:172.31.240.1
+2025-11-29T10:54:18.347+0800	INFO	rpc/rpc_client.go:337	config-0-93363547-4d2d-4b59-a684-d74cd488b54f success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764384859089_116.147.66.195_9884
+2025-11-29T10:54:18.348+0800	INFO	rpc/rpc_client.go:487	config-0-93363547-4d2d-4b59-a684-d74cd488b54f notify connected event to listeners , connectionId=1764384859089_116.147.66.195_9884
+2025-11-29T10:54:18.348+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-11-29T10:54:18.567+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T10:54:18.599+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T10:54:18.622+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-11-29T13:28:47.408+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T13:28:47.421+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-6a993891-21b7-42fc-883d-b2987e2666cf)
+2025-11-29T13:28:47.426+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-29T13:28:47.426+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-29T13:28:47.426+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-29T13:28:47.426+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-6a993891-21b7-42fc-883d-b2987e2666cf try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T13:28:47.426+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T13:28:47.426+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T13:28:47.426+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T13:28:47.441+0800	INFO	util/common.go:96	Local IP:172.31.240.1
+2025-11-29T13:28:47.603+0800	INFO	rpc/rpc_client.go:337	config-0-6a993891-21b7-42fc-883d-b2987e2666cf success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764394128328_116.147.66.195_9679
+2025-11-29T13:28:47.603+0800	INFO	rpc/rpc_client.go:487	config-0-6a993891-21b7-42fc-883d-b2987e2666cf notify connected event to listeners , connectionId=1764394128328_116.147.66.195_9679
+2025-11-29T13:28:47.603+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-11-29T13:28:47.626+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T13:28:47.648+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T13:28:47.671+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-11-29T20:09:14.738+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:09:14.921+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-576d3495-b427-4e40-a8d3-c4038d914816)
+2025-11-29T20:09:14.921+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-29T20:09:14.921+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-29T20:09:14.921+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-29T20:09:14.921+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-576d3495-b427-4e40-a8d3-c4038d914816 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T20:09:14.921+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T20:09:14.921+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T20:09:14.921+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T20:09:14.936+0800	INFO	util/common.go:96	Local IP:172.25.0.1
+2025-11-29T20:09:15.079+0800	INFO	rpc/rpc_client.go:337	config-0-576d3495-b427-4e40-a8d3-c4038d914816 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764418156339_116.147.66.195_9993
+2025-11-29T20:09:15.079+0800	INFO	rpc/rpc_client.go:487	config-0-576d3495-b427-4e40-a8d3-c4038d914816 notify connected event to listeners , connectionId=1764418156339_116.147.66.195_9993
+2025-11-29T20:09:15.079+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-11-29T20:09:16.258+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:09:18.133+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:09:19.492+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-11-29T20:20:29.203+0800	INFO	config_client/config_proxy.go:216	config-0-576d3495-b427-4e40-a8d3-c4038d914816 [server-push] config changed. dataId=code.yaml, group=dev,tenant=adc722cd-9c3b-40a7-80fa-b25535bdbe58
+2025-11-29T20:21:10.094+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:21:10.094+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-c8250ad6-ced5-4369-93b0-413368e174f4)
+2025-11-29T20:21:10.094+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-29T20:21:10.094+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-29T20:21:10.094+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-29T20:21:10.094+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-c8250ad6-ced5-4369-93b0-413368e174f4 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T20:21:10.095+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T20:21:10.095+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T20:21:10.095+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T20:21:10.110+0800	INFO	util/common.go:96	Local IP:172.25.0.1
+2025-11-29T20:21:10.256+0800	INFO	rpc/rpc_client.go:337	config-0-c8250ad6-ced5-4369-93b0-413368e174f4 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764418871512_116.147.66.195_10852
+2025-11-29T20:21:10.256+0800	INFO	rpc/rpc_client.go:487	config-0-c8250ad6-ced5-4369-93b0-413368e174f4 notify connected event to listeners , connectionId=1764418871512_116.147.66.195_10852
+2025-11-29T20:21:10.256+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-11-29T20:21:10.279+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:21:10.301+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:21:10.324+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-11-29T20:32:14.082+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:32:14.082+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-663ffcc3-3779-4d1a-8812-efed4049f361)
+2025-11-29T20:32:14.082+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-29T20:32:14.082+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-29T20:32:14.082+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-29T20:32:14.082+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-663ffcc3-3779-4d1a-8812-efed4049f361 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T20:32:14.082+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T20:32:14.082+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T20:32:14.082+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T20:32:14.097+0800	INFO	util/common.go:96	Local IP:172.25.0.1
+2025-11-29T20:32:14.239+0800	INFO	rpc/rpc_client.go:337	config-0-663ffcc3-3779-4d1a-8812-efed4049f361 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764419535498_116.147.66.195_10522
+2025-11-29T20:32:14.239+0800	INFO	rpc/rpc_client.go:487	config-0-663ffcc3-3779-4d1a-8812-efed4049f361 notify connected event to listeners , connectionId=1764419535498_116.147.66.195_10522
+2025-11-29T20:32:14.239+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-11-29T20:32:14.259+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:32:14.278+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:32:14.299+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-11-29T20:38:50.327+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:38:50.327+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-25372064-b8d1-4868-a09b-67dc6b963b31)
+2025-11-29T20:38:50.327+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-11-29T20:38:50.327+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-11-29T20:38:50.327+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-11-29T20:38:50.327+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-25372064-b8d1-4868-a09b-67dc6b963b31 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-11-29T20:38:50.327+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-11-29T20:38:50.327+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-11-29T20:38:50.327+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-11-29T20:38:50.342+0800	INFO	util/common.go:96	Local IP:172.25.0.1
+2025-11-29T20:38:50.490+0800	INFO	rpc/rpc_client.go:337	config-0-25372064-b8d1-4868-a09b-67dc6b963b31 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764419931746_116.147.66.195_10719
+2025-11-29T20:38:50.490+0800	INFO	rpc/rpc_client.go:487	config-0-25372064-b8d1-4868-a09b-67dc6b963b31 notify connected event to listeners , connectionId=1764419931746_116.147.66.195_10719
+2025-11-29T20:38:50.490+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-11-29T20:38:50.512+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:38:50.534+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-11-29T20:38:50.555+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist

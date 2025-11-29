@@ -5,8 +5,9 @@ package user
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
+	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/user/userclient"
@@ -28,38 +29,71 @@ func NewForgetPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Fo
 	}
 }
 
-func (l *ForgetPasswordLogic) ForgetPassword(req *types.ForgetPasswordRequest) (*types.ForgetPasswordResponse, error) {
-	if req == nil {
-		return nil, errors.New("request is nil")
+func (l *ForgetPasswordLogic) ForgetPassword(req *types.ForgetPasswordRequest) (resp *types.ForgetPasswordResponse, err error) {
+	if l.svcCtx.UserRPC == nil {
+		return nil, fmt.Errorf("user rpc client not initialized")
 	}
 
-	if err := verifyCode(l.ctx, l.svcCtx, req.Phone, req.Code, "forget_password"); err != nil {
-		return nil, err
+	// 验证验证码
+	if l.svcCtx.CodeRPC != nil {
+		verifyResp, err := l.svcCtx.CodeRPC.VerifyCode(l.ctx, &codeclient.VerifyCodeRequest{
+			Phone:   req.Phone,
+			Purpose: "forget_password",
+			Code:    req.Code,
+		})
+		if err != nil {
+			l.Errorf("verify code failed: %v", err)
+			return &types.ForgetPasswordResponse{
+				BaseResp: types.BaseResp{
+					Code: 400,
+					Msg:  "验证码验证失败: " + err.Error(),
+				},
+			}, nil
+		}
+		if !verifyResp.Passed {
+			return &types.ForgetPasswordResponse{
+				BaseResp: types.BaseResp{
+					Code: 400,
+					Msg:  "验证码错误或已过期",
+				},
+			}, nil
+		}
 	}
 
-	rpc, err := getRPC("user", l.svcCtx)
-	if err != nil {
-		return nil, err
-	}
-	userRPC := rpc.(userclient.User)
-
-	rpcResp, err := userRPC.ForgetPassword(l.ctx, &userclient.ForgetPasswordRequest{
+	// 调用用户服务的 RPC
+	rpcResp, err := l.svcCtx.UserRPC.ForgetPassword(l.ctx, &userclient.ForgetPasswordRequest{
 		Phone:    req.Phone,
 		Password: req.Password,
 	})
 	if err != nil {
-		return nil, err
+		l.Errorf("call user rpc failed: %v", err)
+		return &types.ForgetPasswordResponse{
+			BaseResp: types.BaseResp{
+				Code: 500,
+				Msg:  "重置密码失败: " + err.Error(),
+			},
+		}, nil
 	}
 
-	token, err := generateAccessToken(l.ctx, l.svcCtx, rpcResp.GetId())
+	// 生成 JWT token
+	accessToken, err := l.svcCtx.JWT.GenerateToken(rpcResp.Id)
 	if err != nil {
-		return nil, err
+		l.Errorf("generate jwt token failed: %v", err)
+		return &types.ForgetPasswordResponse{
+			BaseResp: types.BaseResp{
+				Code: 500,
+				Msg:  "生成 token 失败: " + err.Error(),
+			},
+		}, nil
 	}
 
 	return &types.ForgetPasswordResponse{
-		BaseResp: successResp(),
+		BaseResp: types.BaseResp{
+			Code: 0,
+			Msg:  "success",
+		},
 		Data: types.LoginData{
-			AccessToken: token,
+			AccessToken: accessToken,
 		},
 	}, nil
 }

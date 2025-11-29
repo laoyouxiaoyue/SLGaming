@@ -5,7 +5,7 @@ package user
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -28,32 +28,38 @@ func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 	}
 }
 
-func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (*types.UpdateUserResponse, error) {
-	if req == nil {
-		return nil, errors.New("request is nil")
-	}
-	if req.Id == 0 {
-		return nil, errors.New("id is required")
+func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.UpdateUserResponse, err error) {
+	if l.svcCtx.UserRPC == nil {
+		return nil, fmt.Errorf("user rpc client not initialized")
 	}
 
-	rpc, err := getRPC("user", l.svcCtx)
-	if err != nil {
-		return nil, err
-	}
-	userRPC := rpc.(userclient.User)
-
-	rpcResp, err := userRPC.UpdateUser(l.ctx, &userclient.UpdateUserRequest{
+	// 调用用户服务的 RPC
+	rpcResp, err := l.svcCtx.UserRPC.UpdateUser(l.ctx, &userclient.UpdateUserRequest{
 		Id:       req.Id,
 		Nickname: req.Nickname,
 		Password: req.Password,
 		Phone:    req.Phone,
 	})
 	if err != nil {
-		return nil, err
+		l.Errorf("call user rpc failed: %v", err)
+		return &types.UpdateUserResponse{
+			BaseResp: types.BaseResp{
+				Code: 500,
+				Msg:  "更新用户信息失败: " + err.Error(),
+			},
+		}, nil
 	}
 
 	return &types.UpdateUserResponse{
-		BaseResp: successResp(),
-		Data:     toUserInfo(rpcResp.GetUser()),
+		BaseResp: types.BaseResp{
+			Code: 0,
+			Msg:  "success",
+		},
+		Data: types.UserInfo{
+			Id:       rpcResp.User.Id,
+			Uid:      rpcResp.User.Uid,
+			Nickname: rpcResp.User.Nickname,
+			Phone:    rpcResp.User.Phone,
+		},
 	}, nil
 }

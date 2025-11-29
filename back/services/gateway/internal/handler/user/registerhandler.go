@@ -9,6 +9,7 @@ import (
 	"SLGaming/back/services/gateway/internal/logic/user"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/validator"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
@@ -21,11 +22,18 @@ func RegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
+		// 表单验证
+		if err := validator.ValidateRegisterRequest(&req); err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
+
 		l := user.NewRegisterLogic(r.Context(), svcCtx)
 		resp, err := l.Register(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
+			// 将 token 设置到响应头
 			if resp != nil && resp.Data.AccessToken != "" {
 				w.Header().Set("Authorization", "Bearer "+resp.Data.AccessToken)
 			}

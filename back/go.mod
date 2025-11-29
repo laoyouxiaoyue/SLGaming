@@ -4,7 +4,9 @@ go 1.23.4
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0
+	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/google/uuid v1.6.0
+	github.com/hashicorp/consul/api v1.29.1
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5
 	github.com/zeromicro/go-zero v1.9.3
 	golang.org/x/crypto v0.33.0
@@ -33,8 +35,6 @@ require (
 	github.com/alibabacloud-go/tea-utils v1.4.4 // indirect
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.7 // indirect
 	github.com/alibabacloud-go/tea-xml v1.1.3 // indirect
-	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
-	github.com/alicebob/miniredis/v2 v2.35.0 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1800 // indirect
 	github.com/aliyun/alibabacloud-dkms-gcs-go-sdk v0.5.1 // indirect
 	github.com/aliyun/alibabacloud-dkms-transfer-go-sdk v0.1.8 // indirect
@@ -53,14 +53,17 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator/v10 v10.16.0 // indirect
 	github.com/go-sql-driver/mysql v1.9.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
@@ -69,7 +72,6 @@ require (
 	github.com/grafana/pyroscope-go v1.2.7 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.9 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
-	github.com/hashicorp/consul/api v1.29.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
@@ -84,6 +86,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -103,7 +106,6 @@ require (
 	github.com/redis/go-redis/v9 v9.16.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
-	github.com/yuin/gopher-lua v1.1.1 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.15 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.15 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.15 // indirect

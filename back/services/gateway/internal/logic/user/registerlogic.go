@@ -5,8 +5,9 @@ package user
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
+	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/user/userclient"
@@ -28,49 +29,72 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 	}
 }
 
-func (l *RegisterLogic) Register(req *types.RegisterRequest) (*types.RegisterResponse, error) {
-	if req == nil {
-		return nil, errors.New("request is nil")
-	}
-	if req.Phone == "" {
-		return nil, errors.New("phone is required")
+func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.RegisterResponse, err error) {
+	if l.svcCtx.UserRPC == nil {
+		return nil, fmt.Errorf("user rpc client not initialized")
 	}
 
-	if err := verifyCode(l.ctx, l.svcCtx, req.Phone, req.Code, "register"); err != nil {
-		return nil, err
+	// 验证验证码
+	if l.svcCtx.CodeRPC != nil {
+		verifyResp, err := l.svcCtx.CodeRPC.VerifyCode(l.ctx, &codeclient.VerifyCodeRequest{
+			Phone:   req.Phone,
+			Purpose: "register",
+			Code:    req.Code,
+		})
+		if err != nil {
+			l.Errorf("verify code failed: %v", err)
+			return &types.RegisterResponse{
+				BaseResp: types.BaseResp{
+					Code: 400,
+					Msg:  "验证码验证失败: " + err.Error(),
+				},
+			}, nil
+		}
+		if !verifyResp.Passed {
+			return &types.RegisterResponse{
+				BaseResp: types.BaseResp{
+					Code: 400,
+					Msg:  "验证码错误或已过期",
+				},
+			}, nil
+		}
 	}
 
-	rpc, err := getRPC("user", l.svcCtx)
-	if err != nil {
-		return nil, err
-	}
-	userRPC := rpc.(userclient.User)
-
-	if _, err := userRPC.Register(l.ctx, &userclient.RegisterRequest{
+	// 调用用户服务的 RPC
+	rpcResp, err := l.svcCtx.UserRPC.Register(l.ctx, &userclient.RegisterRequest{
 		Phone:    req.Phone,
 		Password: req.Password,
 		Nickname: req.Nickname,
-	}); err != nil {
-		return nil, err
-	}
-
-	loginResp, err := userRPC.Login(l.ctx, &userclient.LoginRequest{
-		Phone:    req.Phone,
-		Password: req.Password,
 	})
 	if err != nil {
-		return nil, err
+		l.Errorf("call user rpc failed: %v", err)
+		return &types.RegisterResponse{
+			BaseResp: types.BaseResp{
+				Code: 500,
+				Msg:  "注册失败: " + err.Error(),
+			},
+		}, nil
 	}
 
-	token, err := generateAccessToken(l.ctx, l.svcCtx, loginResp.GetId())
+	// 生成 JWT token
+	accessToken, err := l.svcCtx.JWT.GenerateToken(rpcResp.Id)
 	if err != nil {
-		return nil, err
+		l.Errorf("generate jwt token failed: %v", err)
+		return &types.RegisterResponse{
+			BaseResp: types.BaseResp{
+				Code: 500,
+				Msg:  "生成 token 失败: " + err.Error(),
+			},
+		}, nil
 	}
 
 	return &types.RegisterResponse{
-		BaseResp: successResp(),
+		BaseResp: types.BaseResp{
+			Code: 0,
+			Msg:  "success",
+		},
 		Data: types.RegisterData{
-			AccessToken: token,
+			AccessToken: accessToken,
 		},
 	}, nil
 }

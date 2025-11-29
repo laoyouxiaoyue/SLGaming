@@ -12,11 +12,24 @@ Nacos:
 
 # MySQL 数据库
 Mysql:
-  DSN: "root:password@tcp(120.26.29.194:3306)/slgaming_user?charset=utf8mb4&parseTime=true&loc=Local"
+  DSN: "root:root123456@tcp(120.26.29.194:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
   MaxIdleConns: 10
   MaxOpenConns: 100
   ConnMaxLifetime: "300s"
   ConnMaxIdleTime: "60s"
+
+Consul:
+  Address: 120.26.29.194:8500
+  Token: ""
+  Service:
+    Name: user-rpc
+    ID: user-rpc-1
+    Address: 127.0.0.1
+    Tags:
+      - rpc
+      - user
+    CheckInterval: 10s
+    CheckTimeout: 5s
 
 
 #Nacos:
