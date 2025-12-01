@@ -48,10 +48,9 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 		}, nil
 	}
 
-	// 生成 JWT token
-	accessToken, err := l.svcCtx.JWT.GenerateToken(rpcResp.Id)
+	// 生成 Access Token 和 Refresh Token
+	tokenData, err := generateTokens(l.ctx, l.svcCtx, rpcResp.Id, l.Logger)
 	if err != nil {
-		l.Errorf("generate jwt token failed: %v", err)
 		return &types.LoginResponse{
 			BaseResp: types.BaseResp{
 				Code: 500,
@@ -65,8 +64,6 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 			Code: 0,
 			Msg:  "success",
 		},
-		Data: types.LoginData{
-			AccessToken: accessToken,
-		},
+		Data: *tokenData,
 	}, nil
 }

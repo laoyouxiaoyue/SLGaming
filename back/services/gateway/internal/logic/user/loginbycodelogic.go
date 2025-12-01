@@ -74,10 +74,9 @@ func (l *LoginByCodeLogic) LoginByCode(req *types.LoginByCodeRequest) (resp *typ
 		}, nil
 	}
 
-	// 生成 JWT token
-	accessToken, err := l.svcCtx.JWT.GenerateToken(rpcResp.Id)
+	// 生成 Access Token 和 Refresh Token
+	tokenData, err := generateTokens(l.ctx, l.svcCtx, rpcResp.Id, l.Logger)
 	if err != nil {
-		l.Errorf("generate jwt token failed: %v", err)
 		return &types.LoginByCodeResponse{
 			BaseResp: types.BaseResp{
 				Code: 500,
@@ -91,8 +90,6 @@ func (l *LoginByCodeLogic) LoginByCode(req *types.LoginByCodeRequest) (resp *typ
 			Code: 0,
 			Msg:  "success",
 		},
-		Data: types.LoginData{
-			AccessToken: accessToken,
-		},
+		Data: *tokenData,
 	}, nil
 }

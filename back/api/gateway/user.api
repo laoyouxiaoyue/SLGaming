@@ -11,7 +11,9 @@ type RegisterRequest {
 }
 
 type RegisterData {
-    AccessToken string `json:"accessToken"`
+    AccessToken  string `json:"accessToken"`  // Access Token（短期，15分钟）
+    RefreshToken string `json:"refreshToken"` // Refresh Token（长期，7天）
+    ExpiresIn    int64  `json:"expiresIn"`    // Access Token 过期时间（秒）
 }
 
 type RegisterResponse {
@@ -25,7 +27,9 @@ type LoginRequest {
 }
 
 type LoginData {
-    AccessToken string `json:"accessToken"`
+    AccessToken  string `json:"accessToken"`  // Access Token（短期，15分钟）
+    RefreshToken string `json:"refreshToken"` // Refresh Token（长期，7天）
+    ExpiresIn    int64  `json:"expiresIn"`    // Access Token 过期时间（秒）
 }
 
 type LoginResponse {
@@ -85,6 +89,26 @@ type ForgetPasswordResponse{
     Data LoginData `json:"data"`
 }
 
+type RefreshTokenRequest {
+    RefreshToken string `json:"refreshToken"`
+}
+
+type RefreshTokenResponse {
+    BaseResp
+    Data LoginData `json:"data"`
+}
+
+type LogoutRequest {
+}
+
+type LogoutData {
+    Success bool `json:"success"`
+}
+
+type LogoutResponse {
+    BaseResp
+    Data LogoutData `json:"data"`
+}
 
 // 用户服务接口定义
 @server(
@@ -108,4 +132,10 @@ service gateway {
 
     @handler forgetPassword
     put /api/user/forgetPassword (ForgetPasswordRequest) returns (ForgetPasswordResponse)
+
+    @handler refreshToken
+    post /api/user/refresh-token (RefreshTokenRequest) returns (RefreshTokenResponse)
+
+    @handler logout
+    post /api/user/logout (LogoutRequest) returns (LogoutResponse)
 }

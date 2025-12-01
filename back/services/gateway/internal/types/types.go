@@ -41,7 +41,9 @@ type LoginByCodeResponse struct {
 }
 
 type LoginData struct {
-	AccessToken string `json:"accessToken"`
+	AccessToken  string `json:"accessToken"`  // Access Token（短期，15分钟）
+	RefreshToken string `json:"refreshToken"` // Refresh Token（长期，7天）
+	ExpiresIn    int64  `json:"expiresIn"`    // Access Token 过期时间（秒）
 }
 
 type LoginRequest struct {
@@ -54,8 +56,31 @@ type LoginResponse struct {
 	Data LoginData `json:"data"`
 }
 
+type LogoutData struct {
+	Success bool `json:"success"`
+}
+
+type LogoutRequest struct {
+}
+
+type LogoutResponse struct {
+	BaseResp
+	Data LogoutData `json:"data"`
+}
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refreshToken"`
+}
+
+type RefreshTokenResponse struct {
+	BaseResp
+	Data LoginData `json:"data"`
+}
+
 type RegisterData struct {
-	AccessToken string `json:"accessToken"`
+	AccessToken  string `json:"accessToken"`  // Access Token（短期，15分钟）
+	RefreshToken string `json:"refreshToken"` // Refresh Token（长期，7天）
+	ExpiresIn    int64  `json:"expiresIn"`    // Access Token 过期时间（秒）
 }
 
 type RegisterRequest struct {

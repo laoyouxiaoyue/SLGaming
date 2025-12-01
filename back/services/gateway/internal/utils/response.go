@@ -44,6 +44,14 @@ func WriteResponse(ctx context.Context, w http.ResponseWriter, resp interface{})
 		if v != nil {
 			code = v.Code
 		}
+	case *types.RefreshTokenResponse:
+		if v != nil {
+			code = v.Code
+		}
+	case *types.LogoutResponse:
+		if v != nil {
+			code = v.Code
+		}
 	}
 
 	// 根据业务 code 映射到 HTTP 状态码

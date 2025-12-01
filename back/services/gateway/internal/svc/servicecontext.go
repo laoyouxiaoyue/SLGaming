@@ -13,15 +13,17 @@ import (
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type ServiceContext struct {
 	Config config.Config
 
-	CodeRPC codeclient.Code
-	UserRPC userclient.User
-	JWT     *jwt.JWTManager
+	CodeRPC    codeclient.Code
+	UserRPC    userclient.User
+	JWT        *jwt.JWTManager
+	TokenStore jwt.TokenStore
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -55,11 +57,24 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		secretKey = "default-secret-key-change-in-production" // 默认密钥，生产环境需要修改
 		logx.Infof("JWT secret key not configured, using default key")
 	}
-	tokenDuration := c.JWT.TokenDuration
-	if tokenDuration <= 0 {
-		tokenDuration = 2 * time.Hour // 默认 2 小时
+	accessTokenDuration := c.JWT.AccessTokenDuration
+	if accessTokenDuration <= 0 {
+		accessTokenDuration = 15 * time.Minute // 默认 15 分钟
 	}
-	ctx.JWT = jwt.NewJWTManager(secretKey, tokenDuration)
+	refreshTokenDuration := c.JWT.RefreshTokenDuration
+	if refreshTokenDuration <= 0 {
+		refreshTokenDuration = 7 * 24 * time.Hour // 默认 7 天
+	}
+	ctx.JWT = jwt.NewJWTManager(secretKey, accessTokenDuration, refreshTokenDuration)
+
+	// 初始化 Token 存储（必须使用 Redis）
+	if c.Redis.Host == "" {
+		logx.Errorf("Redis 配置不能为空，Refresh Token 存储需要 Redis")
+		panic("Redis 配置不能为空，Refresh Token 存储需要 Redis")
+	}
+	redisClient := redis.MustNewRedis(c.Redis.RedisConf)
+	ctx.TokenStore = jwt.NewRedisTokenStore(redisClient)
+	logx.Infof("使用 Redis 存储 Refresh Token")
 
 	return ctx
 }

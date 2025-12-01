@@ -6,6 +6,7 @@ package config
 import (
 	"time"
 
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 )
 
@@ -15,12 +16,14 @@ type Config struct {
 	Consul   ConsulConf   `json:",optional"` // Consul 配置
 	Upstream UpstreamConf `json:",optional"` // 上游服务配置
 	JWT      JWTConf      `json:",optional"` // JWT 配置
+	Redis    RedisConf    `json:",optional"` // Redis 配置
 }
 
 // JWTConf JWT 配置
 type JWTConf struct {
-	SecretKey     string        `json:",optional"`      // JWT 密钥
-	TokenDuration time.Duration `json:",default=7200s"` // Token 过期时间，默认 2 小时
+	SecretKey            string        `json:",optional"`        // JWT 密钥
+	AccessTokenDuration  time.Duration `json:",default=900s"`    // Access Token 过期时间，默认 15 分钟
+	RefreshTokenDuration time.Duration `json:",default=604800s"` // Refresh Token 过期时间，默认 7 天
 }
 
 // NacosConf Nacos 配置结构
@@ -54,4 +57,9 @@ type ConsulServiceConf struct {
 type UpstreamConf struct {
 	CodeService string `json:",optional"` // 验证码服务名称（用于 Consul 服务发现）
 	UserService string `json:",optional"` // 用户服务名称（用于 Consul 服务发现）
+}
+
+// RedisConf Redis 配置
+type RedisConf struct {
+	redis.RedisConf
 }

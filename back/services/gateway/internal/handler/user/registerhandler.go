@@ -38,6 +38,9 @@ func RegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			if resp != nil && resp.Data.AccessToken != "" {
 				w.Header().Set("Authorization", "Bearer "+resp.Data.AccessToken)
 			}
+			if resp != nil && resp.Data.RefreshToken != "" {
+				w.Header().Set("X-Refresh-Token", resp.Data.RefreshToken)
+			}
 			// 根据响应码返回正确的 HTTP 状态码
 			utils.WriteResponse(r.Context(), w, resp)
 		}

@@ -32,7 +32,16 @@ Upstream:
   CodeService: code-rpc  # Consul 中的验证码服务名称
   UserService: user-rpc  # Consul 中的用户服务名称
 
+# Redis 配置（用于存储 Refresh Token）
+Redis:
+  Key: ""
+  Host: 120.26.29.194:6379
+  Type: node
+  Pass: ""
+  Tls: false
+
 # JWT 配置
 JWT:
   SecretKey: "your-secret-key-change-in-production"  # JWT 密钥（生产环境请修改）
-  TokenDuration: 7200s  # Token 过期时间，默认 2 小时（7200 秒）
+  AccessTokenDuration: 900s   # Access Token 过期时间，默认 15 分钟（900 秒）
+  RefreshTokenDuration: 604800s  # Refresh Token 过期时间，默认 7 天（604800 秒）

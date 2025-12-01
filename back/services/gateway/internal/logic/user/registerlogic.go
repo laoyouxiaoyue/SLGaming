@@ -76,10 +76,9 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 		}, nil
 	}
 
-	// 生成 JWT token
-	accessToken, err := l.svcCtx.JWT.GenerateToken(rpcResp.Id)
+	// 生成 Access Token 和 Refresh Token
+	tokenData, err := generateTokens(l.ctx, l.svcCtx, rpcResp.Id, l.Logger)
 	if err != nil {
-		l.Errorf("generate jwt token failed: %v", err)
 		return &types.RegisterResponse{
 			BaseResp: types.BaseResp{
 				Code: 500,
@@ -94,7 +93,9 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 			Msg:  "success",
 		},
 		Data: types.RegisterData{
-			AccessToken: accessToken,
+			AccessToken:  tokenData.AccessToken,
+			RefreshToken: tokenData.RefreshToken,
+			ExpiresIn:    tokenData.ExpiresIn,
 		},
 	}, nil
 }

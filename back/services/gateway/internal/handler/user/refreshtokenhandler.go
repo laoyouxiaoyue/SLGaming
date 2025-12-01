@@ -10,27 +10,20 @@ import (
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
-	"SLGaming/back/services/gateway/internal/validator"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func ForgetPasswordHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func RefreshTokenHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ForgetPasswordRequest
+		var req types.RefreshTokenRequest
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		// 表单验证
-		if err := validator.ValidateForgetPasswordRequest(&req); err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-			return
-		}
-
-		l := user.NewForgetPasswordLogic(r.Context(), svcCtx)
-		resp, err := l.ForgetPassword(&req)
+		l := user.NewRefreshTokenLogic(r.Context(), svcCtx)
+		resp, err := l.RefreshToken(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

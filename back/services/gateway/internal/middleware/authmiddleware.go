@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strings"
@@ -20,6 +21,7 @@ var publicPaths = map[string]bool{
 	"/api/user/login":          true,
 	"/api/user/login-by-code":  true,
 	"/api/user/forgetPassword": true,
+	"/api/user/refresh-token":  true, // 刷新Token接口（使用RefreshToken，不需要AccessToken）
 	"/health":                  true, // 健康检查接口
 }
 
@@ -60,14 +62,41 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 			// 验证 token
 			claims, err := svcCtx.JWT.VerifyToken(tokenString)
 			if err != nil {
-				logx.Errorf("jwt verify failed: %v", err)
-				var errMsg string
+				// 如果 Access Token 过期，尝试使用 Refresh Token 自动刷新
 				if err == jwt.ErrExpiredToken {
-					errMsg = "认证令牌已过期"
-				} else {
-					errMsg = "认证令牌无效"
+					// 尝试从请求头获取 Refresh Token
+					refreshToken := r.Header.Get("X-Refresh-Token")
+					if refreshToken == "" {
+						// 如果没有 Refresh Token，返回错误
+						httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌已过期"))
+						return
+					}
+
+					// 尝试自动刷新 Access Token
+					newAccessToken, newRefreshToken, userID, refreshErr := tryAutoRefreshToken(r.Context(), svcCtx, refreshToken)
+					if refreshErr != nil {
+						logx.Errorf("auto refresh token failed: %v", refreshErr)
+						httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌已过期，刷新失败"))
+						return
+					}
+
+					// 将新的 Access Token 设置到响应头
+					w.Header().Set("Authorization", "Bearer "+newAccessToken)
+					if newRefreshToken != "" {
+						w.Header().Set("X-Refresh-Token", newRefreshToken)
+					}
+
+					// 将用户 ID 存储到 context 中
+					ctx := SetUserID(r.Context(), userID)
+
+					// 继续处理请求
+					next.ServeHTTP(w, r.WithContext(ctx))
+					return
 				}
-				httpx.ErrorCtx(r.Context(), w, errors.New(errMsg))
+
+				// 其他错误（无效 token）
+				logx.Errorf("jwt verify failed: %v", err)
+				httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌无效"))
 				return
 			}
 
@@ -78,4 +107,40 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 	}
+}
+
+// tryAutoRefreshToken 尝试使用 Refresh Token 自动刷新 Access Token
+// 返回: newAccessToken, refreshToken(保持不变), userID, error
+func tryAutoRefreshToken(ctx context.Context, svcCtx *svc.ServiceContext, refreshToken string) (string, string, uint64, error) {
+	// 验证 Refresh Token
+	claims, err := svcCtx.JWT.VerifyToken(refreshToken)
+	if err != nil {
+		if err == jwt.ErrExpiredToken {
+			return "", "", 0, errors.New("Refresh Token 已过期")
+		}
+		return "", "", 0, errors.New("Refresh Token 无效")
+	}
+
+	// 验证 Refresh Token 是否在黑名单中（未被撤销）
+	if svcCtx.TokenStore != nil {
+		tokenExpiration := claims.ExpiresAt.Time
+		valid, err := svcCtx.TokenStore.VerifyRefreshToken(ctx, claims.UserID, refreshToken, tokenExpiration)
+		if err != nil {
+			logx.Errorf("verify refresh token failed: %v", err)
+			return "", "", 0, errors.New("验证 Refresh Token 失败")
+		}
+		if !valid {
+			return "", "", 0, errors.New("Refresh Token 已被撤销")
+		}
+	}
+
+	// 只生成新的 Access Token，Refresh Token 保持不变
+	accessToken, err := svcCtx.JWT.GenerateAccessToken(claims.UserID)
+	if err != nil {
+		logx.Errorf("generate access token failed: %v", err)
+		return "", "", 0, errors.New("生成 Access Token 失败")
+	}
+
+	// Refresh Token 不刷新，保持原样返回
+	return accessToken, refreshToken, claims.UserID, nil
 }
