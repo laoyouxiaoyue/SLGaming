@@ -721,6 +721,382 @@ func (x *ForgetPasswordResponse) GetUid() uint64 {
 	return 0
 }
 
+// 钱包信息
+type WalletInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                      // 用户ID
+	Balance       int64                  `protobuf:"varint,2,opt,name=balance,proto3" json:"balance,omitempty"`                                  // 帅币可用余额
+	FrozenBalance int64                  `protobuf:"varint,3,opt,name=frozen_balance,json=frozenBalance,proto3" json:"frozen_balance,omitempty"` // 冻结帅币余额（预留）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WalletInfo) Reset() {
+	*x = WalletInfo{}
+	mi := &file_user_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WalletInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WalletInfo) ProtoMessage() {}
+
+func (x *WalletInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WalletInfo.ProtoReflect.Descriptor instead.
+func (*WalletInfo) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *WalletInfo) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *WalletInfo) GetBalance() int64 {
+	if x != nil {
+		return x.Balance
+	}
+	return 0
+}
+
+func (x *WalletInfo) GetFrozenBalance() int64 {
+	if x != nil {
+		return x.FrozenBalance
+	}
+	return 0
+}
+
+// 查询钱包
+type GetWalletRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWalletRequest) Reset() {
+	*x = GetWalletRequest{}
+	mi := &file_user_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWalletRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWalletRequest) ProtoMessage() {}
+
+func (x *GetWalletRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWalletRequest.ProtoReflect.Descriptor instead.
+func (*GetWalletRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetWalletRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type GetWalletResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Wallet        *WalletInfo            `protobuf:"bytes,1,opt,name=wallet,proto3" json:"wallet,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWalletResponse) Reset() {
+	*x = GetWalletResponse{}
+	mi := &file_user_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWalletResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWalletResponse) ProtoMessage() {}
+
+func (x *GetWalletResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWalletResponse.ProtoReflect.Descriptor instead.
+func (*GetWalletResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetWalletResponse) GetWallet() *WalletInfo {
+	if x != nil {
+		return x.Wallet
+	}
+	return nil
+}
+
+// 充值帅币（现金 -> 帅币），这里只处理“加币”，实际支付回调可以在上游确认后调用此接口
+type RechargeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`              // 用户ID
+	Amount        int64                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`                            // 充值帅币数量（正数）
+	BizOrderId    string                 `protobuf:"bytes,3,opt,name=biz_order_id,json=bizOrderId,proto3" json:"biz_order_id,omitempty"` // 关联的支付单号 / 业务订单号
+	Remark        string                 `protobuf:"bytes,4,opt,name=remark,proto3" json:"remark,omitempty"`                             // 备注
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RechargeRequest) Reset() {
+	*x = RechargeRequest{}
+	mi := &file_user_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RechargeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RechargeRequest) ProtoMessage() {}
+
+func (x *RechargeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RechargeRequest.ProtoReflect.Descriptor instead.
+func (*RechargeRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *RechargeRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *RechargeRequest) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *RechargeRequest) GetBizOrderId() string {
+	if x != nil {
+		return x.BizOrderId
+	}
+	return ""
+}
+
+func (x *RechargeRequest) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+type RechargeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Wallet        *WalletInfo            `protobuf:"bytes,1,opt,name=wallet,proto3" json:"wallet,omitempty"` // 充值后的最新钱包信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RechargeResponse) Reset() {
+	*x = RechargeResponse{}
+	mi := &file_user_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RechargeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RechargeResponse) ProtoMessage() {}
+
+func (x *RechargeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RechargeResponse.ProtoReflect.Descriptor instead.
+func (*RechargeResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *RechargeResponse) GetWallet() *WalletInfo {
+	if x != nil {
+		return x.Wallet
+	}
+	return nil
+}
+
+// 消费帅币（支付订单时扣减帅币）
+type ConsumeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`              // 用户ID
+	Amount        int64                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`                            // 消费帅币数量（正数，服务内部会按负数写流水）
+	BizOrderId    string                 `protobuf:"bytes,3,opt,name=biz_order_id,json=bizOrderId,proto3" json:"biz_order_id,omitempty"` // 关联的业务订单号
+	Remark        string                 `protobuf:"bytes,4,opt,name=remark,proto3" json:"remark,omitempty"`                             // 备注
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConsumeRequest) Reset() {
+	*x = ConsumeRequest{}
+	mi := &file_user_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConsumeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConsumeRequest) ProtoMessage() {}
+
+func (x *ConsumeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConsumeRequest.ProtoReflect.Descriptor instead.
+func (*ConsumeRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *ConsumeRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *ConsumeRequest) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *ConsumeRequest) GetBizOrderId() string {
+	if x != nil {
+		return x.BizOrderId
+	}
+	return ""
+}
+
+func (x *ConsumeRequest) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+type ConsumeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Wallet        *WalletInfo            `protobuf:"bytes,1,opt,name=wallet,proto3" json:"wallet,omitempty"` // 扣减后的最新钱包信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConsumeResponse) Reset() {
+	*x = ConsumeResponse{}
+	mi := &file_user_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConsumeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConsumeResponse) ProtoMessage() {}
+
+func (x *ConsumeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConsumeResponse.ProtoReflect.Descriptor instead.
+func (*ConsumeResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ConsumeResponse) GetWallet() *WalletInfo {
+	if x != nil {
+		return x.Wallet
+	}
+	return nil
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
@@ -768,7 +1144,32 @@ const file_user_proto_rawDesc = "" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\":\n" +
 	"\x16ForgetPasswordResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x10\n" +
-	"\x03uid\x18\x02 \x01(\x04R\x03uid2\xfd\x02\n" +
+	"\x03uid\x18\x02 \x01(\x04R\x03uid\"f\n" +
+	"\n" +
+	"WalletInfo\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x18\n" +
+	"\abalance\x18\x02 \x01(\x03R\abalance\x12%\n" +
+	"\x0efrozen_balance\x18\x03 \x01(\x03R\rfrozenBalance\"+\n" +
+	"\x10GetWalletRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"=\n" +
+	"\x11GetWalletResponse\x12(\n" +
+	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet\"|\n" +
+	"\x0fRechargeRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\x12 \n" +
+	"\fbiz_order_id\x18\x03 \x01(\tR\n" +
+	"bizOrderId\x12\x16\n" +
+	"\x06remark\x18\x04 \x01(\tR\x06remark\"<\n" +
+	"\x10RechargeResponse\x12(\n" +
+	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet\"{\n" +
+	"\x0eConsumeRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\x12 \n" +
+	"\fbiz_order_id\x18\x03 \x01(\tR\n" +
+	"bizOrderId\x12\x16\n" +
+	"\x06remark\x18\x04 \x01(\tR\x06remark\";\n" +
+	"\x0fConsumeResponse\x12(\n" +
+	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet2\xae\x04\n" +
 	"\x04User\x129\n" +
 	"\bRegister\x12\x15.user.RegisterRequest\x1a\x16.user.RegisterResponse\x120\n" +
 	"\x05Login\x12\x12.user.LoginRequest\x1a\x13.user.LoginResponse\x126\n" +
@@ -776,7 +1177,10 @@ const file_user_proto_rawDesc = "" +
 	"\n" +
 	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x18.user.UpdateUserResponse\x12B\n" +
 	"\vLoginByCode\x12\x18.user.LoginByCodeRequest\x1a\x19.user.LoginByCodeResponse\x12K\n" +
-	"\x0eForgetPassword\x12\x1b.user.ForgetPasswordRequest\x1a\x1c.user.ForgetPasswordResponseB\bZ\x06./userb\x06proto3"
+	"\x0eForgetPassword\x12\x1b.user.ForgetPasswordRequest\x1a\x1c.user.ForgetPasswordResponse\x12<\n" +
+	"\tGetWallet\x12\x16.user.GetWalletRequest\x1a\x17.user.GetWalletResponse\x129\n" +
+	"\bRecharge\x12\x15.user.RechargeRequest\x1a\x16.user.RechargeResponse\x126\n" +
+	"\aConsume\x12\x14.user.ConsumeRequest\x1a\x15.user.ConsumeResponseB\bZ\x06./userb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -790,7 +1194,7 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_user_proto_goTypes = []any{
 	(*RegisterRequest)(nil),        // 0: user.RegisterRequest
 	(*RegisterResponse)(nil),       // 1: user.RegisterResponse
@@ -805,27 +1209,43 @@ var file_user_proto_goTypes = []any{
 	(*LoginByCodeResponse)(nil),    // 10: user.LoginByCodeResponse
 	(*ForgetPasswordRequest)(nil),  // 11: user.ForgetPasswordRequest
 	(*ForgetPasswordResponse)(nil), // 12: user.ForgetPasswordResponse
+	(*WalletInfo)(nil),             // 13: user.WalletInfo
+	(*GetWalletRequest)(nil),       // 14: user.GetWalletRequest
+	(*GetWalletResponse)(nil),      // 15: user.GetWalletResponse
+	(*RechargeRequest)(nil),        // 16: user.RechargeRequest
+	(*RechargeResponse)(nil),       // 17: user.RechargeResponse
+	(*ConsumeRequest)(nil),         // 18: user.ConsumeRequest
+	(*ConsumeResponse)(nil),        // 19: user.ConsumeResponse
 }
 var file_user_proto_depIdxs = []int32{
 	5,  // 0: user.GetUserResponse.user:type_name -> user.UserInfo
 	5,  // 1: user.UpdateUserResponse.user:type_name -> user.UserInfo
-	0,  // 2: user.User.Register:input_type -> user.RegisterRequest
-	2,  // 3: user.User.Login:input_type -> user.LoginRequest
-	4,  // 4: user.User.GetUser:input_type -> user.GetUserRequest
-	7,  // 5: user.User.UpdateUser:input_type -> user.UpdateUserRequest
-	9,  // 6: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
-	11, // 7: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
-	1,  // 8: user.User.Register:output_type -> user.RegisterResponse
-	3,  // 9: user.User.Login:output_type -> user.LoginResponse
-	6,  // 10: user.User.GetUser:output_type -> user.GetUserResponse
-	8,  // 11: user.User.UpdateUser:output_type -> user.UpdateUserResponse
-	10, // 12: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
-	12, // 13: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
-	8,  // [8:14] is the sub-list for method output_type
-	2,  // [2:8] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	13, // 2: user.GetWalletResponse.wallet:type_name -> user.WalletInfo
+	13, // 3: user.RechargeResponse.wallet:type_name -> user.WalletInfo
+	13, // 4: user.ConsumeResponse.wallet:type_name -> user.WalletInfo
+	0,  // 5: user.User.Register:input_type -> user.RegisterRequest
+	2,  // 6: user.User.Login:input_type -> user.LoginRequest
+	4,  // 7: user.User.GetUser:input_type -> user.GetUserRequest
+	7,  // 8: user.User.UpdateUser:input_type -> user.UpdateUserRequest
+	9,  // 9: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
+	11, // 10: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
+	14, // 11: user.User.GetWallet:input_type -> user.GetWalletRequest
+	16, // 12: user.User.Recharge:input_type -> user.RechargeRequest
+	18, // 13: user.User.Consume:input_type -> user.ConsumeRequest
+	1,  // 14: user.User.Register:output_type -> user.RegisterResponse
+	3,  // 15: user.User.Login:output_type -> user.LoginResponse
+	6,  // 16: user.User.GetUser:output_type -> user.GetUserResponse
+	8,  // 17: user.User.UpdateUser:output_type -> user.UpdateUserResponse
+	10, // 18: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
+	12, // 19: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
+	15, // 20: user.User.GetWallet:output_type -> user.GetWalletResponse
+	17, // 21: user.User.Recharge:output_type -> user.RechargeResponse
+	19, // 22: user.User.Consume:output_type -> user.ConsumeResponse
+	14, // [14:23] is the sub-list for method output_type
+	5,  // [5:14] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -839,7 +1259,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

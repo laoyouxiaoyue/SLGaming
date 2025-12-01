@@ -14,19 +14,26 @@ import (
 )
 
 type (
+	ConsumeRequest         = user.ConsumeRequest
+	ConsumeResponse        = user.ConsumeResponse
 	ForgetPasswordRequest  = user.ForgetPasswordRequest
 	ForgetPasswordResponse = user.ForgetPasswordResponse
 	GetUserRequest         = user.GetUserRequest
 	GetUserResponse        = user.GetUserResponse
+	GetWalletRequest       = user.GetWalletRequest
+	GetWalletResponse      = user.GetWalletResponse
 	LoginByCodeRequest     = user.LoginByCodeRequest
 	LoginByCodeResponse    = user.LoginByCodeResponse
 	LoginRequest           = user.LoginRequest
 	LoginResponse          = user.LoginResponse
+	RechargeRequest        = user.RechargeRequest
+	RechargeResponse       = user.RechargeResponse
 	RegisterRequest        = user.RegisterRequest
 	RegisterResponse       = user.RegisterResponse
 	UpdateUserRequest      = user.UpdateUserRequest
 	UpdateUserResponse     = user.UpdateUserResponse
 	UserInfo               = user.UserInfo
+	WalletInfo             = user.WalletInfo
 
 	User interface {
 		Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
@@ -35,6 +42,10 @@ type (
 		UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 		LoginByCode(ctx context.Context, in *LoginByCodeRequest, opts ...grpc.CallOption) (*LoginByCodeResponse, error)
 		ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error)
+		// 帅币钱包相关接口
+		GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
+		Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
+		Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
 	}
 
 	defaultUser struct {
@@ -76,4 +87,20 @@ func (m *defaultUser) LoginByCode(ctx context.Context, in *LoginByCodeRequest, o
 func (m *defaultUser) ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.ForgetPassword(ctx, in, opts...)
+}
+
+// 帅币钱包相关接口
+func (m *defaultUser) GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetWallet(ctx, in, opts...)
+}
+
+func (m *defaultUser) Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.Recharge(ctx, in, opts...)
+}
+
+func (m *defaultUser) Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.Consume(ctx, in, opts...)
 }

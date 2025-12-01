@@ -110,6 +110,18 @@ type LogoutResponse {
     Data LogoutData `json:"data"`
 }
 
+// ---------------- 帅币钱包 ----------------
+type WalletInfo {
+    UserId        uint64 `json:"userId"`
+    Balance       int64  `json:"balance"`
+    FrozenBalance int64  `json:"frozenBalance"`
+}
+
+type GetWalletResponse {
+    BaseResp
+    Data WalletInfo `json:"data"`
+}
+
 // 用户服务接口定义
 @server(
     group: user
@@ -138,4 +150,8 @@ service gateway {
 
     @handler logout
     post /api/user/logout (LogoutRequest) returns (LogoutResponse)
+
+    // 查询帅币钱包余额（需要登录）
+    @handler getWallet
+    get /api/user/wallet returns (GetWalletResponse)
 }

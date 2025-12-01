@@ -70,6 +70,48 @@ message ForgetPasswordResponse {
   uint64 uid = 2;
 }
 
+// ---------------- 帅币钱包相关 ----------------
+
+// 钱包信息
+message WalletInfo {
+  uint64 user_id = 1;       // 用户ID
+  int64  balance = 2;       // 帅币可用余额
+  int64  frozen_balance = 3; // 冻结帅币余额（预留）
+}
+
+// 查询钱包
+message GetWalletRequest {
+  uint64 user_id = 1;       // 用户ID
+}
+
+message GetWalletResponse {
+  WalletInfo wallet = 1;
+}
+
+// 充值帅币（现金 -> 帅币），这里只处理“加币”，实际支付回调可以在上游确认后调用此接口
+message RechargeRequest {
+  uint64 user_id = 1;       // 用户ID
+  int64  amount = 2;        // 充值帅币数量（正数）
+  string biz_order_id = 3;  // 关联的支付单号 / 业务订单号
+  string remark = 4;        // 备注
+}
+
+message RechargeResponse {
+  WalletInfo wallet = 1;    // 充值后的最新钱包信息
+}
+
+// 消费帅币（支付订单时扣减帅币）
+message ConsumeRequest {
+  uint64 user_id = 1;       // 用户ID
+  int64  amount = 2;        // 消费帅币数量（正数，服务内部会按负数写流水）
+  string biz_order_id = 3;  // 关联的业务订单号
+  string remark = 4;        // 备注
+}
+
+message ConsumeResponse {
+  WalletInfo wallet = 1;    // 扣减后的最新钱包信息
+}
+
 service User {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
@@ -77,4 +119,9 @@ service User {
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc LoginByCode(LoginByCodeRequest) returns (LoginByCodeResponse);
   rpc ForgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse);
+
+  // 帅币钱包相关接口
+  rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
+  rpc Recharge(RechargeRequest) returns (RechargeResponse);
+  rpc Consume(ConsumeRequest) returns (ConsumeResponse);
 }

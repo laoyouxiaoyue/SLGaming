@@ -30,6 +30,11 @@ type GetUserResponse struct {
 	Data UserInfo `json:"data"`
 }
 
+type GetWalletResponse struct {
+	BaseResp
+	Data WalletInfo `json:"data"`
+}
+
 type LoginByCodeRequest struct {
 	Phone string `json:"phone"`
 	Code  string `json:"code"`
@@ -126,4 +131,10 @@ type UserInfo struct {
 	Uid      uint64 `json:"uid"`
 	Nickname string `json:"nickname"`
 	Phone    string `json:"phone"`
+}
+
+type WalletInfo struct {
+	UserId        uint64 `json:"userId"`
+	Balance       int64  `json:"balance"`
+	FrozenBalance int64  `json:"frozenBalance"`
 }

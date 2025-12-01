@@ -25,6 +25,9 @@ const (
 	User_UpdateUser_FullMethodName     = "/user.User/UpdateUser"
 	User_LoginByCode_FullMethodName    = "/user.User/LoginByCode"
 	User_ForgetPassword_FullMethodName = "/user.User/ForgetPassword"
+	User_GetWallet_FullMethodName      = "/user.User/GetWallet"
+	User_Recharge_FullMethodName       = "/user.User/Recharge"
+	User_Consume_FullMethodName        = "/user.User/Consume"
 )
 
 // UserClient is the client API for User service.
@@ -37,6 +40,10 @@ type UserClient interface {
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	LoginByCode(ctx context.Context, in *LoginByCodeRequest, opts ...grpc.CallOption) (*LoginByCodeResponse, error)
 	ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error)
+	// 帅币钱包相关接口
+	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
+	Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
+	Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
 }
 
 type userClient struct {
@@ -107,6 +114,36 @@ func (c *userClient) ForgetPassword(ctx context.Context, in *ForgetPasswordReque
 	return out, nil
 }
 
+func (c *userClient) GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWalletResponse)
+	err := c.cc.Invoke(ctx, User_GetWallet_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RechargeResponse)
+	err := c.cc.Invoke(ctx, User_Recharge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConsumeResponse)
+	err := c.cc.Invoke(ctx, User_Consume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -117,6 +154,10 @@ type UserServer interface {
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	LoginByCode(context.Context, *LoginByCodeRequest) (*LoginByCodeResponse, error)
 	ForgetPassword(context.Context, *ForgetPasswordRequest) (*ForgetPasswordResponse, error)
+	// 帅币钱包相关接口
+	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
+	Recharge(context.Context, *RechargeRequest) (*RechargeResponse, error)
+	Consume(context.Context, *ConsumeRequest) (*ConsumeResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -144,6 +185,15 @@ func (UnimplementedUserServer) LoginByCode(context.Context, *LoginByCodeRequest)
 }
 func (UnimplementedUserServer) ForgetPassword(context.Context, *ForgetPasswordRequest) (*ForgetPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ForgetPassword not implemented")
+}
+func (UnimplementedUserServer) GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWallet not implemented")
+}
+func (UnimplementedUserServer) Recharge(context.Context, *RechargeRequest) (*RechargeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Recharge not implemented")
+}
+func (UnimplementedUserServer) Consume(context.Context, *ConsumeRequest) (*ConsumeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Consume not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -274,6 +324,60 @@ func _User_ForgetPassword_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetWallet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWalletRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetWallet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetWallet_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetWallet(ctx, req.(*GetWalletRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_Recharge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RechargeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).Recharge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_Recharge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).Recharge(ctx, req.(*RechargeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_Consume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConsumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).Consume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_Consume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).Consume(ctx, req.(*ConsumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +408,18 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ForgetPassword",
 			Handler:    _User_ForgetPassword_Handler,
+		},
+		{
+			MethodName: "GetWallet",
+			Handler:    _User_GetWallet_Handler,
+		},
+		{
+			MethodName: "Recharge",
+			Handler:    _User_Recharge_Handler,
+		},
+		{
+			MethodName: "Consume",
+			Handler:    _User_Consume_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
