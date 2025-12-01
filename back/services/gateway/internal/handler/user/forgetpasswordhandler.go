@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"SLGaming/back/services/gateway/internal/logic/user"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/validator"
@@ -37,7 +38,8 @@ func ForgetPasswordHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			if resp != nil && resp.Data.AccessToken != "" {
 				w.Header().Set("Authorization", "Bearer "+resp.Data.AccessToken)
 			}
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			// 根据响应码返回正确的 HTTP 状态码
+			utils.WriteResponse(r.Context(), w, resp)
 		}
 	}
 }
