@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package order;
+
+option go_package = "./order";
+
+// ---------------- 订单基础模型 ----------------
+
+// 订单状态：
+// 1 = CREATED    已创建，待支付/扣款
+// 2 = PAID       已支付/已扣款，待陪玩接单
+// 3 = ACCEPTED   陪玩已接单，待开始服务
+// 4 = IN_SERVICE 服务中
+// 5 = COMPLETED  已完成
+// 6 = CANCELLED  已取消
+// 7 = RATED      已评价
+
+// OrderInfo 订单信息（用于对外展示）
+message OrderInfo {
+  uint64 id = 1;          // 订单ID（内部主键）
+  string order_no = 2;    // 订单号（对用户展示）
+
+  uint64 boss_id = 3;      // 老板ID（下单方）
+  uint64 companion_id = 4; // 陪玩ID（接单方）
+
+  string game_name = 5;      // 游戏名称
+  string game_mode = 6;      // 模式/段位等补充信息（可选）
+
+  int32 duration_minutes = 7; // 服务时长（分钟）
+
+  int64 price_per_hour = 8; // 单价（每小时帅币）
+  int64 total_amount = 9;   // 订单总价（帅币）
+
+  int32 status = 10; // 订单状态（见上方状态说明）
+
+  // 时间相关（时间戳，单位：秒）
+  int64 created_at = 11;
+  int64 paid_at = 12;
+  int64 accepted_at = 13;
+  int64 start_at = 14;
+  int64 completed_at = 15;
+  int64 cancelled_at = 16;
+
+  // 评价相关
+  double rating = 17;  // 老板对陪玩的评分（0-5）
+  string comment = 18; // 评价内容
+
+  // 取消相关
+  string cancel_reason = 19; // 取消原因
+}
+
+// ---------------- 创建订单 ----------------
+
+// CreateOrderRequest 老板创建订单
+// 前提：前端已选定陪玩、游戏和时长
+message CreateOrderRequest {
+  uint64 boss_id = 1;      // 老板ID（从网关鉴权拿）
+  uint64 companion_id = 2; // 陪玩ID
+
+  string game_name = 3;     // 游戏名称
+  string game_mode = 4;     // 模式/段位等补充信息（可选）
+  int32 duration_minutes = 5; // 服务时长（分钟）
+}
+
+message CreateOrderResponse {
+  OrderInfo order = 1; // 创建成功的订单信息（一般为 PAID 或 PENDING 状态）
+}
+
+// ---------------- 接单 / 流转 ----------------
+
+// AcceptOrderRequest 陪玩接单
+message AcceptOrderRequest {
+  uint64 order_id = 1;     // 订单ID
+  uint64 companion_id = 2; // 陪玩ID（从网关鉴权拿）
+}
+
+message AcceptOrderResponse {
+  OrderInfo order = 1;
+}
+
+// StartOrderRequest 开始服务
+message StartOrderRequest {
+  uint64 order_id = 1;
+  uint64 companion_id = 2; // 陪玩ID
+}
+
+message StartOrderResponse {
+  OrderInfo order = 1;
+}
+
+// CompleteOrderRequest 完成订单
+message CompleteOrderRequest {
+  uint64 order_id = 1;
+  uint64 operator_id = 2; // 操作人ID（陪玩或系统）
+}
+
+message CompleteOrderResponse {
+  OrderInfo order = 1;
+}
+
+// CancelOrderRequest 取消订单
+message CancelOrderRequest {
+  uint64 order_id = 1;
+  uint64 operator_id = 2;  // 取消人ID（老板/陪玩/管理员）
+  string reason = 3;       // 取消原因
+}
+
+message CancelOrderResponse {
+  OrderInfo order = 1;
+}
+
+// RateOrderRequest 评价订单（老板对陪玩）
+message RateOrderRequest {
+  uint64 order_id = 1;
+  uint64 boss_id = 2;  // 老板ID
+  double rating = 3;   // 评分（0-5）
+  string comment = 4;  // 评价内容
+}
+
+message RateOrderResponse {
+  OrderInfo order = 1;
+}
+
+// ---------------- 查询接口 ----------------
+
+message GetOrderRequest {
+  uint64 id = 1;        // 订单ID
+  string order_no = 2;  // 或者订单号
+}
+
+message GetOrderResponse {
+  OrderInfo order = 1;
+}
+
+// GetOrderListRequest 查询订单列表
+message GetOrderListRequest {
+  uint64 boss_id = 1;      // 可选：按老板查询
+  uint64 companion_id = 2; // 可选：按陪玩查询
+
+  int32 status = 3; // 可选：按状态筛选
+
+  int32 page = 4;       // 页码（从1开始）
+  int32 page_size = 5;  // 每页数量
+}
+
+message GetOrderListResponse {
+  repeated OrderInfo orders = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// ---------------- 服务定义 ----------------
+
+service Order {
+  // 订单创建与流转
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc AcceptOrder(AcceptOrderRequest) returns (AcceptOrderResponse);
+  rpc StartOrder(StartOrderRequest) returns (StartOrderResponse);
+  rpc CompleteOrder(CompleteOrderRequest) returns (CompleteOrderResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+  rpc RateOrder(RateOrderRequest) returns (RateOrderResponse);
+
+  // 查询相关
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  rpc GetOrderList(GetOrderListRequest) returns (GetOrderListResponse);
+}
+
+

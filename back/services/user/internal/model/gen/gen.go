@@ -13,7 +13,7 @@ func main() {
 	if err != nil {
 		log.Panicf("database connection failed: %v", err)
 	}
-	err = db.AutoMigrate(&model.User{})
+	err = db.AutoMigrate(&model.User{}, &model.UserWallet{}, &model.WalletTransaction{}, &model.CompanionProfile{})
 	if err != nil {
 		log.Panicf("database migration failed: %v", err)
 		return

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	code "SLGaming/back/services/gateway/internal/handler/code"
+	order "SLGaming/back/services/gateway/internal/handler/order"
 	user "SLGaming/back/services/gateway/internal/handler/user"
 	"SLGaming/back/services/gateway/internal/svc"
 
@@ -20,6 +21,51 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/api/code/send",
 				Handler: code.SendCodeHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/order",
+				Handler: order.CreateOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/order",
+				Handler: order.GetOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/order/accept",
+				Handler: order.AcceptOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/order/cancel",
+				Handler: order.CancelOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/order/complete",
+				Handler: order.CompleteOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/order/rate",
+				Handler: order.RateOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/order/start",
+				Handler: order.StartOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/orders",
+				Handler: order.GetOrderListHandler(serverCtx),
 			},
 		},
 	)

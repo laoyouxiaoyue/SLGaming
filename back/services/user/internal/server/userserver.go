@@ -80,6 +80,11 @@ func (s *UserServer) UpdateCompanionProfile(ctx context.Context, in *user.Update
 	return l.UpdateCompanionProfile(in)
 }
 
+func (s *UserServer) UpdateCompanionStats(ctx context.Context, in *user.UpdateCompanionStatsRequest) (*user.UpdateCompanionStatsResponse, error) {
+	l := logic.NewUpdateCompanionStatsLogic(ctx, s.svcCtx)
+	return l.UpdateCompanionStats(in)
+}
+
 func (s *UserServer) GetCompanionList(ctx context.Context, in *user.GetCompanionListRequest) (*user.GetCompanionListResponse, error) {
 	l := logic.NewGetCompanionListLogic(ctx, s.svcCtx)
 	return l.GetCompanionList(in)

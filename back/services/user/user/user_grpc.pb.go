@@ -30,6 +30,7 @@ const (
 	User_Consume_FullMethodName                = "/user.User/Consume"
 	User_GetCompanionProfile_FullMethodName    = "/user.User/GetCompanionProfile"
 	User_UpdateCompanionProfile_FullMethodName = "/user.User/UpdateCompanionProfile"
+	User_UpdateCompanionStats_FullMethodName   = "/user.User/UpdateCompanionStats"
 	User_GetCompanionList_FullMethodName       = "/user.User/GetCompanionList"
 )
 
@@ -50,6 +51,7 @@ type UserClient interface {
 	// 陪玩信息相关接口
 	GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
 	UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
+	UpdateCompanionStats(ctx context.Context, in *UpdateCompanionStatsRequest, opts ...grpc.CallOption) (*UpdateCompanionStatsResponse, error)
 	GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error)
 }
 
@@ -171,6 +173,16 @@ func (c *userClient) UpdateCompanionProfile(ctx context.Context, in *UpdateCompa
 	return out, nil
 }
 
+func (c *userClient) UpdateCompanionStats(ctx context.Context, in *UpdateCompanionStatsRequest, opts ...grpc.CallOption) (*UpdateCompanionStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateCompanionStatsResponse)
+	err := c.cc.Invoke(ctx, User_UpdateCompanionStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetCompanionListResponse)
@@ -198,6 +210,7 @@ type UserServer interface {
 	// 陪玩信息相关接口
 	GetCompanionProfile(context.Context, *GetCompanionProfileRequest) (*GetCompanionProfileResponse, error)
 	UpdateCompanionProfile(context.Context, *UpdateCompanionProfileRequest) (*UpdateCompanionProfileResponse, error)
+	UpdateCompanionStats(context.Context, *UpdateCompanionStatsRequest) (*UpdateCompanionStatsResponse, error)
 	GetCompanionList(context.Context, *GetCompanionListRequest) (*GetCompanionListResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
@@ -241,6 +254,9 @@ func (UnimplementedUserServer) GetCompanionProfile(context.Context, *GetCompanio
 }
 func (UnimplementedUserServer) UpdateCompanionProfile(context.Context, *UpdateCompanionProfileRequest) (*UpdateCompanionProfileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCompanionProfile not implemented")
+}
+func (UnimplementedUserServer) UpdateCompanionStats(context.Context, *UpdateCompanionStatsRequest) (*UpdateCompanionStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCompanionStats not implemented")
 }
 func (UnimplementedUserServer) GetCompanionList(context.Context, *GetCompanionListRequest) (*GetCompanionListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCompanionList not implemented")
@@ -464,6 +480,24 @@ func _User_UpdateCompanionProfile_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UpdateCompanionStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCompanionStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateCompanionStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateCompanionStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateCompanionStats(ctx, req.(*UpdateCompanionStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetCompanionList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetCompanionListRequest)
 	if err := dec(in); err != nil {
@@ -532,6 +566,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateCompanionProfile",
 			Handler:    _User_UpdateCompanionProfile_Handler,
+		},
+		{
+			MethodName: "UpdateCompanionStats",
+			Handler:    _User_UpdateCompanionStats_Handler,
 		},
 		{
 			MethodName: "GetCompanionList",

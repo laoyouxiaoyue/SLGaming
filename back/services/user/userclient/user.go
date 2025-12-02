@@ -37,6 +37,8 @@ type (
 	RegisterResponse               = user.RegisterResponse
 	UpdateCompanionProfileRequest  = user.UpdateCompanionProfileRequest
 	UpdateCompanionProfileResponse = user.UpdateCompanionProfileResponse
+	UpdateCompanionStatsRequest    = user.UpdateCompanionStatsRequest
+	UpdateCompanionStatsResponse   = user.UpdateCompanionStatsResponse
 	UpdateUserRequest              = user.UpdateUserRequest
 	UpdateUserResponse             = user.UpdateUserResponse
 	UserInfo                       = user.UserInfo
@@ -56,6 +58,7 @@ type (
 		// 陪玩信息相关接口
 		GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
 		UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
+		UpdateCompanionStats(ctx context.Context, in *UpdateCompanionStatsRequest, opts ...grpc.CallOption) (*UpdateCompanionStatsResponse, error)
 		GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error)
 	}
 
@@ -125,6 +128,11 @@ func (m *defaultUser) GetCompanionProfile(ctx context.Context, in *GetCompanionP
 func (m *defaultUser) UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.UpdateCompanionProfile(ctx, in, opts...)
+}
+
+func (m *defaultUser) UpdateCompanionStats(ctx context.Context, in *UpdateCompanionStatsRequest, opts ...grpc.CallOption) (*UpdateCompanionStatsResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateCompanionStats(ctx, in, opts...)
 }
 
 func (m *defaultUser) GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error) {

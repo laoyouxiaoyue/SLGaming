@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/gateway/internal/config"
 	"SLGaming/back/services/gateway/internal/ioc"
 	"SLGaming/back/services/gateway/internal/jwt"
+	"SLGaming/back/services/order/orderclient"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -22,6 +23,7 @@ type ServiceContext struct {
 
 	CodeRPC    codeclient.Code
 	UserRPC    userclient.User
+	OrderRPC   orderclient.Order
 	JWT        *jwt.JWTManager
 	TokenStore jwt.TokenStore
 }
@@ -48,6 +50,16 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		} else {
 			ctx.UserRPC = userclient.NewUser(cli)
 			logx.Infof("成功初始化 User RPC 客户端: service=%s", c.Upstream.UserService)
+		}
+	}
+
+	// 初始化 Order RPC 客户端
+	if c.Upstream.OrderService != "" {
+		if cli, err := newRPCClient(c.Consul, c.Upstream.OrderService); err != nil {
+			logx.Errorf("初始化 Order RPC 客户端失败: service=%s, error=%v", c.Upstream.OrderService, err)
+		} else {
+			ctx.OrderRPC = orderclient.NewOrder(cli)
+			logx.Infof("成功初始化 Order RPC 客户端: service=%s", c.Upstream.OrderService)
 		}
 	}
 

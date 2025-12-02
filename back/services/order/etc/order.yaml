@@ -1,0 +1,48 @@
+Name: order.rpc
+ListenOn: 0.0.0.0:8087
+
+# Nacos 配置（可选）
+Nacos:
+  Hosts:
+    - 120.26.29.194:8848
+  Namespace: "31b819c6-62bf-4081-b6bb-7d3e52d09b36"
+  Group: dev
+  DataId: order.yaml
+  Username: "nacos"
+  Password: "nacos"
+
+# MySQL 数据库
+Mysql:
+  DSN: "root:root123456@tcp(120.26.29.194:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
+  MaxIdleConns: 10
+  MaxOpenConns: 100
+  ConnMaxLifetime: "300s"
+  ConnMaxIdleTime: "60s"
+
+# Consul 配置（可选）
+Consul:
+  Address: 120.26.29.194:8500
+  Token: ""
+  Service:
+    Name: order-rpc
+    ID: order-rpc-1
+    Address: 127.0.0.1
+    Tags:
+      - rpc
+      - order
+    CheckInterval: 10s
+    CheckTimeout: 5s
+
+# Redis 配置（如果订单服务需要用缓存）
+Redis:
+  Key: ""
+  Host: 120.26.29.194:6379
+  Type: node
+  Pass: ""
+  Tls: false
+
+# 上游服务（通过 Consul 发现）
+Upstream:
+  UserService: user-rpc
+
+

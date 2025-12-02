@@ -153,6 +153,17 @@ message UpdateCompanionProfileResponse {
   CompanionInfo profile = 1;
 }
 
+// 更新陪玩统计信息（评分 & 接单数）
+message UpdateCompanionStatsRequest {
+  uint64 user_id = 1;      // 用户ID（陪玩）
+  int64  delta_orders = 2; // 接单数增量（一般为1）
+  double new_rating = 3;   // 本次订单评分（0-5）
+}
+
+message UpdateCompanionStatsResponse {
+  CompanionInfo profile = 1;
+}
+
 // 获取陪玩列表（用于订单匹配）
 message GetCompanionListRequest {
   repeated string game_skills = 1; // 可选，游戏技能筛选
@@ -187,5 +198,6 @@ service User {
   // 陪玩信息相关接口
   rpc GetCompanionProfile(GetCompanionProfileRequest) returns (GetCompanionProfileResponse);
   rpc UpdateCompanionProfile(UpdateCompanionProfileRequest) returns (UpdateCompanionProfileResponse);
+  rpc UpdateCompanionStats(UpdateCompanionStatsRequest) returns (UpdateCompanionStatsResponse);
   rpc GetCompanionList(GetCompanionListRequest) returns (GetCompanionListResponse);
 }

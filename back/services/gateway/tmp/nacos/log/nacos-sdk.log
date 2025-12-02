@@ -957,3 +957,259 @@ runtime.goexit
 2025-11-29T13:31:28.687+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
 2025-11-29T13:31:28.687+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
 2025-11-29T13:31:28.687+0800	WARN	rpc/rpc_client.go:458	config-0-14f4b0d7-f17b-4fd9-8b33-e471d01aa64c fail to connect server, after trying 47 times, last try server is {serverIp:127.0.0.1 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-01T10:53:10.933+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36_failover.
+2025-12-01T10:53:10.944+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-985035b7-8b54-43da-96ae-062f21b5afee)
+2025-12-01T10:53:10.944+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-01T10:53:10.944+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-01T10:53:10.944+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-01T10:53:10.944+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-985035b7-8b54-43da-96ae-062f21b5afee try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-01T10:53:10.944+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T10:53:10.944+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T10:53:10.944+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T10:53:10.959+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-01T10:53:11.110+0800	INFO	rpc/rpc_client.go:337	config-0-985035b7-8b54-43da-96ae-062f21b5afee success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764557590977_116.147.66.195_10987
+2025-12-01T10:53:11.110+0800	INFO	rpc/rpc_client.go:487	config-0-985035b7-8b54-43da-96ae-062f21b5afee notify connected event to listeners , connectionId=1764557590977_116.147.66.195_10987
+2025-12-01T10:53:11.110+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T10:53:11.279+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36.: file not exist
+2025-12-01T11:13:40.962+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36_failover.
+2025-12-01T11:13:41.156+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-837d384b-10e7-4452-8012-0391fb7ffc8f)
+2025-12-01T11:13:41.166+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-01T11:13:41.166+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-01T11:13:41.166+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-01T11:13:41.166+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-837d384b-10e7-4452-8012-0391fb7ffc8f try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-01T11:13:41.166+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T11:13:41.166+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T11:13:41.166+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T11:13:41.182+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-01T11:13:41.351+0800	INFO	rpc/rpc_client.go:337	config-0-837d384b-10e7-4452-8012-0391fb7ffc8f success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764558821205_116.147.66.195_9973
+2025-12-01T11:13:41.351+0800	INFO	rpc/rpc_client.go:487	config-0-837d384b-10e7-4452-8012-0391fb7ffc8f notify connected event to listeners , connectionId=1764558821205_116.147.66.195_9973
+2025-12-01T11:13:41.351+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T11:13:41.402+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36.: file not exist
+2025-12-01T12:37:31.490+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36_failover.
+2025-12-01T12:37:31.501+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-954b0e9e-6321-4da8-a991-4be76dc7e974)
+2025-12-01T12:37:31.512+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-01T12:37:31.512+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-01T12:37:31.512+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-01T12:37:31.512+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-01T12:37:31.512+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T12:37:31.512+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T12:37:31.512+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T12:37:31.527+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-01T12:37:31.693+0800	INFO	rpc/rpc_client.go:337	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764563851551_116.147.66.195_10691
+2025-12-01T12:37:31.693+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764563851551_116.147.66.195_10691
+2025-12-01T12:37:31.693+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T12:37:31.783+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36.: file not exist
+2025-12-01T15:58:33.747+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T15:58:33.747+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764563851551_116.147.66.195_10691
+2025-12-01T15:58:33.747+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T15:58:33.747+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:58:33.747+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:58:33.747+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:58:36.749+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:58:36.749+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:58:36.749+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:58:37.718+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764575917180_116.147.66.195_10823
+2025-12-01T15:58:37.718+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764563851551_116.147.66.195_10691
+2025-12-01T15:58:37.718+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764575917180_116.147.66.195_10823
+2025-12-01T15:58:37.718+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764563851551_116.147.66.195_10691 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T15:58:37.718+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T15:58:37.720+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764575917180_116.147.66.195_10823
+2025-12-01T15:58:37.720+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T15:59:01.153+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T15:59:01.153+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764575917180_116.147.66.195_10823
+2025-12-01T15:59:01.153+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T15:59:01.153+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:59:01.153+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:59:01.153+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:59:04.153+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:59:04.153+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:59:04.153+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:59:07.154+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 1 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = received context error while waiting for new LB policy update: context deadline exceeded
+2025-12-01T15:59:07.254+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:59:07.254+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:59:07.254+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:59:10.254+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 2 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = received context error while waiting for new LB policy update: context deadline exceeded
+2025-12-01T15:59:10.454+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:59:10.454+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:59:10.454+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:59:13.455+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 3 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = received context error while waiting for new LB policy update: context deadline exceeded
+2025-12-01T15:59:13.755+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:59:13.755+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:59:13.755+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:59:16.756+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 4 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = received context error while waiting for new LB policy update: context deadline exceeded
+2025-12-01T15:59:17.156+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T15:59:17.156+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T15:59:17.156+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T15:59:19.880+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764575959554_116.147.66.195_11175
+2025-12-01T15:59:19.880+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764575917180_116.147.66.195_10823
+2025-12-01T15:59:19.880+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764575959554_116.147.66.195_11175
+2025-12-01T15:59:19.880+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764575917180_116.147.66.195_10823 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T15:59:19.880+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T15:59:19.880+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764575959554_116.147.66.195_11175
+2025-12-01T15:59:19.880+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T16:00:13.187+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T16:00:13.187+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764575959554_116.147.66.195_11175
+2025-12-01T16:00:13.187+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T16:00:13.187+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T16:00:13.187+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T16:00:13.187+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T16:00:16.188+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T16:00:16.188+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T16:00:16.188+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T16:00:19.189+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 1 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = received context error while waiting for new LB policy update: context deadline exceeded
+2025-12-01T16:00:19.290+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T16:00:19.290+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T16:00:19.290+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T16:00:22.198+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764576020950_66.90.99.250_34454
+2025-12-01T16:00:22.198+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764575959554_116.147.66.195_11175
+2025-12-01T16:00:22.198+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764576020950_66.90.99.250_34454
+2025-12-01T16:00:22.198+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764575959554_116.147.66.195_11175 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T16:00:22.198+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T16:00:22.198+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764576020950_66.90.99.250_34454
+2025-12-01T16:00:22.198+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T16:00:51.777+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T16:00:51.777+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764576020950_66.90.99.250_34454
+2025-12-01T16:00:51.777+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T16:00:51.777+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T16:00:51.777+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T16:00:51.777+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T16:00:52.764+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764576052329_66.90.99.250_37216
+2025-12-01T16:00:52.764+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764576020950_66.90.99.250_34454
+2025-12-01T16:00:52.764+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764576052329_66.90.99.250_37216
+2025-12-01T16:00:52.764+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764576020950_66.90.99.250_34454 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T16:00:52.764+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T16:00:52.764+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764576052329_66.90.99.250_37216
+2025-12-01T16:00:52.764+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T16:21:19.078+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T16:21:19.079+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764576052329_66.90.99.250_37216
+2025-12-01T16:21:19.079+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T16:21:19.079+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T16:21:19.079+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T16:21:19.079+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T16:21:19.273+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764577279131_116.147.66.195_10339
+2025-12-01T16:21:19.273+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764576052329_66.90.99.250_37216
+2025-12-01T16:21:19.273+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764576052329_66.90.99.250_37216 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T16:21:19.273+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764577279131_116.147.66.195_10339
+2025-12-01T16:21:19.273+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T16:21:19.273+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764577279131_116.147.66.195_10339
+2025-12-01T16:21:19.273+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T16:47:32.972+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T16:47:32.972+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764577279131_116.147.66.195_10339
+2025-12-01T16:47:32.972+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T16:47:32.972+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T16:47:32.972+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T16:47:32.972+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T16:47:33.148+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764578853013_116.147.66.195_9706
+2025-12-01T16:47:33.148+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764577279131_116.147.66.195_10339
+2025-12-01T16:47:33.148+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764578853013_116.147.66.195_9706
+2025-12-01T16:47:33.148+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764577279131_116.147.66.195_10339 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T16:47:33.148+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T16:47:33.148+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764578853013_116.147.66.195_9706
+2025-12-01T16:47:33.148+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T18:12:54.503+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T18:12:55.305+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764578853013_116.147.66.195_9706
+2025-12-01T18:12:55.305+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T18:12:55.305+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T18:12:55.305+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T18:12:55.306+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T18:12:55.412+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T18:12:55.412+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T18:12:55.412+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T18:12:55.413+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 1 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: A socket operation was attempted to an unreachable host."
+2025-12-01T18:12:55.514+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T18:12:55.514+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T18:12:55.514+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T18:12:55.514+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 2 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: A socket operation was attempted to an unreachable host."
+2025-12-01T18:12:55.714+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T18:12:55.714+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T18:12:55.714+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T18:12:55.815+0800	WARN	rpc/rpc_client.go:458	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 fail to connect server, after trying 3 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "error reading server preface: read tcp 198.18.0.1:12583->120.26.29.194:9848: wsarecv: An existing connection was forcibly closed by the remote host."
+2025-12-01T18:12:56.120+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T18:12:56.120+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T18:12:56.120+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T18:12:56.533+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764578853013_116.147.66.195_9706 received error event, isRunning:false, isAbandon=false, error=EOF
+2025-12-01T18:12:56.776+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764583976332_116.147.66.195_10342
+2025-12-01T18:12:56.776+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764578853013_116.147.66.195_9706
+2025-12-01T18:12:56.776+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764583976332_116.147.66.195_10342
+2025-12-01T18:12:56.776+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T18:12:56.777+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"0ea4876bfa2e6723ab609b8ff1d1d11e","dataId":"gateway.yaml","tenant":"31b819c6-62bf-4081-b6bb-7d3e52d09b36"}]}, retryTimes=0, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T18:12:56.777+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764583976332_116.147.66.195_10342
+2025-12-01T18:12:56.777+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-01T19:09:42.502+0800	ERROR	rpc/rpc_client.go:526	client sendHealthCheck failed,err=rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-01T19:09:42.502+0800	INFO	rpc/rpc_client.go:512	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 server healthy check fail, currentConnection=1764583976332_116.147.66.195_10342
+2025-12-01T19:09:42.502+0800	INFO	rpc/rpc_client.go:427	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-01T19:09:42.502+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T19:09:42.502+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T19:09:42.502+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T19:09:43.440+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"0ea4876bfa2e6723ab609b8ff1d1d11e","dataId":"gateway.yaml","tenant":"31b819c6-62bf-4081-b6bb-7d3e52d09b36"}]}, retryTimes=0, error=client not connected, current status:UNHEALTHY
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-01T19:09:43.545+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"0ea4876bfa2e6723ab609b8ff1d1d11e","dataId":"gateway.yaml","tenant":"31b819c6-62bf-4081-b6bb-7d3e52d09b36"}]}, retryTimes=1, error=client not connected, current status:UNHEALTHY
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-01T19:09:43.645+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"0ea4876bfa2e6723ab609b8ff1d1d11e","dataId":"gateway.yaml","tenant":"31b819c6-62bf-4081-b6bb-7d3e52d09b36"}]}, retryTimes=2, error=client not connected, current status:UNHEALTHY
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:416
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-01T19:09:43.746+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:UNHEALTHY
+2025-12-01T19:09:45.580+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-01T19:09:45.580+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-01T19:09:45.580+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-01T19:09:46.136+0800	INFO	rpc/rpc_client.go:440	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764587386136_116.147.66.195_9441
+2025-12-01T19:09:46.136+0800	INFO	rpc/rpc_client.go:444	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764583976332_116.147.66.195_10342
+2025-12-01T19:09:46.136+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify disconnected event to listeners , connectionId=1764587386136_116.147.66.195_9441
+2025-12-01T19:09:46.136+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-01T19:09:46.136+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764583976332_116.147.66.195_10342 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-01T19:09:46.136+0800	INFO	rpc/rpc_client.go:487	config-0-954b0e9e-6321-4da8-a991-4be76dc7e974 notify connected event to listeners , connectionId=1764587386136_116.147.66.195_9441
+2025-12-01T19:09:46.136+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-02T13:00:36.614+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36_failover.
+2025-12-02T13:00:36.643+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-21ac514e-c12f-4be1-b645-bd6b18572c87)
+2025-12-02T13:00:36.643+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-02T13:00:36.643+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-02T13:00:36.643+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-02T13:00:36.643+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-21ac514e-c12f-4be1-b645-bd6b18572c87 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-02T13:00:36.643+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T13:00:36.643+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T13:00:36.643+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T13:00:36.658+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-02T13:00:36.829+0800	INFO	rpc/rpc_client.go:337	config-0-21ac514e-c12f-4be1-b645-bd6b18572c87 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764651636174_116.147.66.195_9500
+2025-12-02T13:00:36.829+0800	INFO	rpc/rpc_client.go:487	config-0-21ac514e-c12f-4be1-b645-bd6b18572c87 notify connected event to listeners , connectionId=1764651636174_116.147.66.195_9500
+2025-12-02T13:00:36.829+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-02T13:00:36.861+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36.: file not exist
+2025-12-02T16:51:14.503+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36_failover.
+2025-12-02T16:51:14.524+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-21748593-82ad-4cb5-8aca-ac8056590fb6)
+2025-12-02T16:51:14.524+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-02T16:51:14.524+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-02T16:51:14.524+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-02T16:51:14.524+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-21748593-82ad-4cb5-8aca-ac8056590fb6 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-02T16:51:14.524+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T16:51:14.524+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T16:51:14.524+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T16:51:14.541+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-02T16:51:14.729+0800	INFO	rpc/rpc_client.go:337	config-0-21748593-82ad-4cb5-8aca-ac8056590fb6 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764665474068_116.147.66.195_11037
+2025-12-02T16:51:14.729+0800	INFO	rpc/rpc_client.go:487	config-0-21748593-82ad-4cb5-8aca-ac8056590fb6 notify connected event to listeners , connectionId=1764665474068_116.147.66.195_11037
+2025-12-02T16:51:14.729+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-02T16:51:14.778+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\gateway.yaml@@dev@@31b819c6-62bf-4081-b6bb-7d3e52d09b36.: file not exist

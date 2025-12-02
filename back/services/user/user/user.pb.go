@@ -1448,6 +1448,111 @@ func (x *UpdateCompanionProfileResponse) GetProfile() *CompanionInfo {
 	return nil
 }
 
+// 更新陪玩统计信息（评分 & 接单数）
+type UpdateCompanionStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                // 用户ID（陪玩）
+	DeltaOrders   int64                  `protobuf:"varint,2,opt,name=delta_orders,json=deltaOrders,proto3" json:"delta_orders,omitempty"` // 接单数增量（一般为1）
+	NewRating     float64                `protobuf:"fixed64,3,opt,name=new_rating,json=newRating,proto3" json:"new_rating,omitempty"`      // 本次订单评分（0-5）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCompanionStatsRequest) Reset() {
+	*x = UpdateCompanionStatsRequest{}
+	mi := &file_user_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCompanionStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCompanionStatsRequest) ProtoMessage() {}
+
+func (x *UpdateCompanionStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCompanionStatsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCompanionStatsRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *UpdateCompanionStatsRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *UpdateCompanionStatsRequest) GetDeltaOrders() int64 {
+	if x != nil {
+		return x.DeltaOrders
+	}
+	return 0
+}
+
+func (x *UpdateCompanionStatsRequest) GetNewRating() float64 {
+	if x != nil {
+		return x.NewRating
+	}
+	return 0
+}
+
+type UpdateCompanionStatsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Profile       *CompanionInfo         `protobuf:"bytes,1,opt,name=profile,proto3" json:"profile,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCompanionStatsResponse) Reset() {
+	*x = UpdateCompanionStatsResponse{}
+	mi := &file_user_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCompanionStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCompanionStatsResponse) ProtoMessage() {}
+
+func (x *UpdateCompanionStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCompanionStatsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateCompanionStatsResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UpdateCompanionStatsResponse) GetProfile() *CompanionInfo {
+	if x != nil {
+		return x.Profile
+	}
+	return nil
+}
+
 // 获取陪玩列表（用于订单匹配）
 type GetCompanionListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1464,7 +1569,7 @@ type GetCompanionListRequest struct {
 
 func (x *GetCompanionListRequest) Reset() {
 	*x = GetCompanionListRequest{}
-	mi := &file_user_proto_msgTypes[25]
+	mi := &file_user_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1476,7 +1581,7 @@ func (x *GetCompanionListRequest) String() string {
 func (*GetCompanionListRequest) ProtoMessage() {}
 
 func (x *GetCompanionListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[25]
+	mi := &file_user_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1489,7 +1594,7 @@ func (x *GetCompanionListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionListRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionListRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{25}
+	return file_user_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GetCompanionListRequest) GetGameSkills() []string {
@@ -1553,7 +1658,7 @@ type GetCompanionListResponse struct {
 
 func (x *GetCompanionListResponse) Reset() {
 	*x = GetCompanionListResponse{}
-	mi := &file_user_proto_msgTypes[26]
+	mi := &file_user_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1565,7 +1670,7 @@ func (x *GetCompanionListResponse) String() string {
 func (*GetCompanionListResponse) ProtoMessage() {}
 
 func (x *GetCompanionListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[26]
+	mi := &file_user_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1578,7 +1683,7 @@ func (x *GetCompanionListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionListResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionListResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{26}
+	return file_user_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetCompanionListResponse) GetCompanions() []*CompanionInfo {
@@ -1712,6 +1817,13 @@ const file_user_proto_rawDesc = "" +
 	"\x0eprice_per_hour\x18\x03 \x01(\x03R\fpricePerHour\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\x05R\x06status\"O\n" +
 	"\x1eUpdateCompanionProfileResponse\x12-\n" +
+	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"x\n" +
+	"\x1bUpdateCompanionStatsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12!\n" +
+	"\fdelta_orders\x18\x02 \x01(\x03R\vdeltaOrders\x12\x1d\n" +
+	"\n" +
+	"new_rating\x18\x03 \x01(\x01R\tnewRating\"M\n" +
+	"\x1cUpdateCompanionStatsResponse\x12-\n" +
 	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"\xde\x01\n" +
 	"\x17GetCompanionListRequest\x12\x1f\n" +
 	"\vgame_skills\x18\x01 \x03(\tR\n" +
@@ -1729,7 +1841,7 @@ const file_user_proto_rawDesc = "" +
 	"companions\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\xc2\x06\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\xa1\a\n" +
 	"\x04User\x129\n" +
 	"\bRegister\x12\x15.user.RegisterRequest\x1a\x16.user.RegisterResponse\x120\n" +
 	"\x05Login\x12\x12.user.LoginRequest\x1a\x13.user.LoginResponse\x126\n" +
@@ -1742,7 +1854,8 @@ const file_user_proto_rawDesc = "" +
 	"\bRecharge\x12\x15.user.RechargeRequest\x1a\x16.user.RechargeResponse\x126\n" +
 	"\aConsume\x12\x14.user.ConsumeRequest\x1a\x15.user.ConsumeResponse\x12Z\n" +
 	"\x13GetCompanionProfile\x12 .user.GetCompanionProfileRequest\x1a!.user.GetCompanionProfileResponse\x12c\n" +
-	"\x16UpdateCompanionProfile\x12#.user.UpdateCompanionProfileRequest\x1a$.user.UpdateCompanionProfileResponse\x12Q\n" +
+	"\x16UpdateCompanionProfile\x12#.user.UpdateCompanionProfileRequest\x1a$.user.UpdateCompanionProfileResponse\x12]\n" +
+	"\x14UpdateCompanionStats\x12!.user.UpdateCompanionStatsRequest\x1a\".user.UpdateCompanionStatsResponse\x12Q\n" +
 	"\x10GetCompanionList\x12\x1d.user.GetCompanionListRequest\x1a\x1e.user.GetCompanionListResponseB\bZ\x06./userb\x06proto3"
 
 var (
@@ -1757,7 +1870,7 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_user_proto_goTypes = []any{
 	(*RegisterRequest)(nil),                // 0: user.RegisterRequest
 	(*RegisterResponse)(nil),               // 1: user.RegisterResponse
@@ -1784,8 +1897,10 @@ var file_user_proto_goTypes = []any{
 	(*GetCompanionProfileResponse)(nil),    // 22: user.GetCompanionProfileResponse
 	(*UpdateCompanionProfileRequest)(nil),  // 23: user.UpdateCompanionProfileRequest
 	(*UpdateCompanionProfileResponse)(nil), // 24: user.UpdateCompanionProfileResponse
-	(*GetCompanionListRequest)(nil),        // 25: user.GetCompanionListRequest
-	(*GetCompanionListResponse)(nil),       // 26: user.GetCompanionListResponse
+	(*UpdateCompanionStatsRequest)(nil),    // 25: user.UpdateCompanionStatsRequest
+	(*UpdateCompanionStatsResponse)(nil),   // 26: user.UpdateCompanionStatsResponse
+	(*GetCompanionListRequest)(nil),        // 27: user.GetCompanionListRequest
+	(*GetCompanionListResponse)(nil),       // 28: user.GetCompanionListResponse
 }
 var file_user_proto_depIdxs = []int32{
 	5,  // 0: user.GetUserResponse.user:type_name -> user.UserInfo
@@ -1795,36 +1910,39 @@ var file_user_proto_depIdxs = []int32{
 	13, // 4: user.ConsumeResponse.wallet:type_name -> user.WalletInfo
 	20, // 5: user.GetCompanionProfileResponse.profile:type_name -> user.CompanionInfo
 	20, // 6: user.UpdateCompanionProfileResponse.profile:type_name -> user.CompanionInfo
-	20, // 7: user.GetCompanionListResponse.companions:type_name -> user.CompanionInfo
-	0,  // 8: user.User.Register:input_type -> user.RegisterRequest
-	2,  // 9: user.User.Login:input_type -> user.LoginRequest
-	4,  // 10: user.User.GetUser:input_type -> user.GetUserRequest
-	7,  // 11: user.User.UpdateUser:input_type -> user.UpdateUserRequest
-	9,  // 12: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
-	11, // 13: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
-	14, // 14: user.User.GetWallet:input_type -> user.GetWalletRequest
-	16, // 15: user.User.Recharge:input_type -> user.RechargeRequest
-	18, // 16: user.User.Consume:input_type -> user.ConsumeRequest
-	21, // 17: user.User.GetCompanionProfile:input_type -> user.GetCompanionProfileRequest
-	23, // 18: user.User.UpdateCompanionProfile:input_type -> user.UpdateCompanionProfileRequest
-	25, // 19: user.User.GetCompanionList:input_type -> user.GetCompanionListRequest
-	1,  // 20: user.User.Register:output_type -> user.RegisterResponse
-	3,  // 21: user.User.Login:output_type -> user.LoginResponse
-	6,  // 22: user.User.GetUser:output_type -> user.GetUserResponse
-	8,  // 23: user.User.UpdateUser:output_type -> user.UpdateUserResponse
-	10, // 24: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
-	12, // 25: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
-	15, // 26: user.User.GetWallet:output_type -> user.GetWalletResponse
-	17, // 27: user.User.Recharge:output_type -> user.RechargeResponse
-	19, // 28: user.User.Consume:output_type -> user.ConsumeResponse
-	22, // 29: user.User.GetCompanionProfile:output_type -> user.GetCompanionProfileResponse
-	24, // 30: user.User.UpdateCompanionProfile:output_type -> user.UpdateCompanionProfileResponse
-	26, // 31: user.User.GetCompanionList:output_type -> user.GetCompanionListResponse
-	20, // [20:32] is the sub-list for method output_type
-	8,  // [8:20] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	20, // 7: user.UpdateCompanionStatsResponse.profile:type_name -> user.CompanionInfo
+	20, // 8: user.GetCompanionListResponse.companions:type_name -> user.CompanionInfo
+	0,  // 9: user.User.Register:input_type -> user.RegisterRequest
+	2,  // 10: user.User.Login:input_type -> user.LoginRequest
+	4,  // 11: user.User.GetUser:input_type -> user.GetUserRequest
+	7,  // 12: user.User.UpdateUser:input_type -> user.UpdateUserRequest
+	9,  // 13: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
+	11, // 14: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
+	14, // 15: user.User.GetWallet:input_type -> user.GetWalletRequest
+	16, // 16: user.User.Recharge:input_type -> user.RechargeRequest
+	18, // 17: user.User.Consume:input_type -> user.ConsumeRequest
+	21, // 18: user.User.GetCompanionProfile:input_type -> user.GetCompanionProfileRequest
+	23, // 19: user.User.UpdateCompanionProfile:input_type -> user.UpdateCompanionProfileRequest
+	25, // 20: user.User.UpdateCompanionStats:input_type -> user.UpdateCompanionStatsRequest
+	27, // 21: user.User.GetCompanionList:input_type -> user.GetCompanionListRequest
+	1,  // 22: user.User.Register:output_type -> user.RegisterResponse
+	3,  // 23: user.User.Login:output_type -> user.LoginResponse
+	6,  // 24: user.User.GetUser:output_type -> user.GetUserResponse
+	8,  // 25: user.User.UpdateUser:output_type -> user.UpdateUserResponse
+	10, // 26: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
+	12, // 27: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
+	15, // 28: user.User.GetWallet:output_type -> user.GetWalletResponse
+	17, // 29: user.User.Recharge:output_type -> user.RechargeResponse
+	19, // 30: user.User.Consume:output_type -> user.ConsumeResponse
+	22, // 31: user.User.GetCompanionProfile:output_type -> user.GetCompanionProfileResponse
+	24, // 32: user.User.UpdateCompanionProfile:output_type -> user.UpdateCompanionProfileResponse
+	26, // 33: user.User.UpdateCompanionStats:output_type -> user.UpdateCompanionStatsResponse
+	28, // 34: user.User.GetCompanionList:output_type -> user.GetCompanionListResponse
+	22, // [22:35] is the sub-list for method output_type
+	9,  // [9:22] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -1838,7 +1956,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

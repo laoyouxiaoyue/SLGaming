@@ -3,9 +3,28 @@
 
 package types
 
+type AcceptOrderRequest struct {
+	OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type AcceptOrderResponse struct {
+	BaseResp
+	Data OrderInfo `json:"data"`
+}
+
 type BaseResp struct {
 	Code int32  `json:"code"`
 	Msg  string `json:"msg"`
+}
+
+type CancelOrderRequest struct {
+	OrderId uint64 `json:"orderId"`         // 订单ID
+	Reason  string `json:"reason,optional"` // 取消原因
+}
+
+type CancelOrderResponse struct {
+	BaseResp
+	Data OrderInfo `json:"data"`
 }
 
 type CompanionInfo struct {
@@ -16,6 +35,27 @@ type CompanionInfo struct {
 	Rating       float64 `json:"rating"`       // 评分（0-5分）
 	TotalOrders  int64   `json:"totalOrders"`  // 总接单数
 	IsVerified   bool    `json:"isVerified"`   // 是否认证
+}
+
+type CompleteOrderRequest struct {
+	OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type CompleteOrderResponse struct {
+	BaseResp
+	Data OrderInfo `json:"data"`
+}
+
+type CreateOrderRequest struct {
+	CompanionId     uint64 `json:"companionId"`       // 陪玩ID
+	GameName        string `json:"gameName"`          // 游戏名称
+	GameMode        string `json:"gameMode,optional"` // 游戏模式/段位
+	DurationMinutes int32  `json:"durationMinutes"`   // 服务时长（分钟）
+}
+
+type CreateOrderResponse struct {
+	BaseResp
+	Data OrderInfo `json:"data"`
 }
 
 type ForgetPasswordRequest struct {
@@ -54,6 +94,35 @@ type GetCompanionListResponse struct {
 type GetCompanionProfileResponse struct {
 	BaseResp
 	Data CompanionInfo `json:"data"`
+}
+
+type GetOrderListData struct {
+	Orders   []OrderInfo `json:"orders"`
+	Total    int32       `json:"total"`
+	Page     int32       `json:"page"`
+	PageSize int32       `json:"pageSize"`
+}
+
+type GetOrderListRequest struct {
+	Role     string `form:"role,optional"`     // 角色：boss / companion（默认 boss）
+	Status   int32  `form:"status,optional"`   // 状态筛选
+	Page     int32  `form:"page,optional"`     // 页码
+	PageSize int32  `form:"pageSize,optional"` // 每页数量
+}
+
+type GetOrderListResponse struct {
+	BaseResp
+	Data GetOrderListData `json:"data"`
+}
+
+type GetOrderRequest struct {
+	Id      uint64 `form:"id,optional"`      // 订单ID
+	OrderNo string `form:"orderNo,optional"` // 订单号
+}
+
+type GetOrderResponse struct {
+	BaseResp
+	Data OrderInfo `json:"data"`
 }
 
 type GetUserRequest struct {
@@ -110,6 +179,39 @@ type LogoutResponse struct {
 	Data LogoutData `json:"data"`
 }
 
+type OrderInfo struct {
+	Id           uint64  `json:"id"`           // 订单ID
+	OrderNo      string  `json:"orderNo"`      // 订单号
+	BossId       uint64  `json:"bossId"`       // 老板ID
+	CompanionId  uint64  `json:"companionId"`  // 陪玩ID
+	GameName     string  `json:"gameName"`     // 游戏名称
+	GameMode     string  `json:"gameMode"`     // 游戏模式/段位
+	Duration     int32   `json:"duration"`     // 时长（分钟）
+	PricePerHour int64   `json:"pricePerHour"` // 每小时价格（帅币）
+	TotalAmount  int64   `json:"totalAmount"`  // 订单总价（帅币）
+	Status       int32   `json:"status"`       // 状态：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED
+	CreatedAt    int64   `json:"createdAt"`    // 创建时间
+	PaidAt       int64   `json:"paidAt"`       // 支付时间
+	AcceptedAt   int64   `json:"acceptedAt"`   // 接单时间
+	StartAt      int64   `json:"startAt"`      // 开始服务时间
+	CompletedAt  int64   `json:"completedAt"`  // 完成时间
+	CancelledAt  int64   `json:"cancelledAt"`  // 取消时间
+	Rating       float64 `json:"rating"`       // 评分
+	Comment      string  `json:"comment"`      // 评价内容
+	CancelReason string  `json:"cancelReason"` // 取消原因
+}
+
+type RateOrderRequest struct {
+	OrderId uint64  `json:"orderId"`          // 订单ID
+	Rating  float64 `json:"rating"`           // 评分（0-5）
+	Comment string  `json:"comment,optional"` // 评价内容
+}
+
+type RateOrderResponse struct {
+	BaseResp
+	Data OrderInfo `json:"data"`
+}
+
 type RefreshTokenRequest struct {
 	RefreshToken string `json:"refreshToken"`
 }
@@ -150,6 +252,15 @@ type SendCodeRequest struct {
 type SendCodeResponse struct {
 	BaseResp
 	Data SendCodeData `json:"data"`
+}
+
+type StartOrderRequest struct {
+	OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type StartOrderResponse struct {
+	BaseResp
+	Data OrderInfo `json:"data"`
 }
 
 type UpdateCompanionProfileRequest struct {

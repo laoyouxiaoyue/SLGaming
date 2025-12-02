@@ -1,0 +1,169 @@
+// api/gateway/order.api
+syntax = "v1"
+
+import "base.api"
+
+// ---------------- 公共类型 ----------------
+
+type OrderInfo {
+    Id           uint64 `json:"id"`           // 订单ID
+    OrderNo      string `json:"orderNo"`      // 订单号
+    BossId       uint64 `json:"bossId"`       // 老板ID
+    CompanionId  uint64 `json:"companionId"`  // 陪玩ID
+    GameName     string `json:"gameName"`     // 游戏名称
+    GameMode     string `json:"gameMode"`     // 游戏模式/段位
+    Duration     int32  `json:"duration"`     // 时长（分钟）
+    PricePerHour int64  `json:"pricePerHour"` // 每小时价格（帅币）
+    TotalAmount  int64  `json:"totalAmount"`  // 订单总价（帅币）
+    Status       int32  `json:"status"`       // 状态：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED
+    CreatedAt    int64  `json:"createdAt"`    // 创建时间
+    PaidAt       int64  `json:"paidAt"`       // 支付时间
+    AcceptedAt   int64  `json:"acceptedAt"`   // 接单时间
+    StartAt      int64  `json:"startAt"`      // 开始服务时间
+    CompletedAt  int64  `json:"completedAt"`  // 完成时间
+    CancelledAt  int64  `json:"cancelledAt"`  // 取消时间
+    Rating       float64 `json:"rating"`      // 评分
+    Comment      string  `json:"comment"`     // 评价内容
+    CancelReason string  `json:"cancelReason"`// 取消原因
+}
+
+// ---------------- 创建订单 ----------------
+
+type CreateOrderRequest {
+    CompanionId     uint64 `json:"companionId"`               // 陪玩ID
+    GameName        string `json:"gameName"`                  // 游戏名称
+    GameMode        string `json:"gameMode,optional"`         // 游戏模式/段位
+    DurationMinutes int32  `json:"durationMinutes"`           // 服务时长（分钟）
+}
+
+type CreateOrderResponse {
+    BaseResp
+    Data OrderInfo `json:"data"`
+}
+
+// ---------------- 订单详情 & 列表 ----------------
+
+type GetOrderRequest {
+    Id      uint64 `form:"id,optional"`      // 订单ID
+    OrderNo string `form:"orderNo,optional"` // 订单号
+}
+
+type GetOrderResponse {
+    BaseResp
+    Data OrderInfo `json:"data"`
+}
+
+type GetOrderListRequest {
+    Role        string `form:"role,optional"`        // 角色：boss / companion（默认 boss）
+    Status      int32  `form:"status,optional"`      // 状态筛选
+    Page        int32  `form:"page,optional"`        // 页码
+    PageSize    int32  `form:"pageSize,optional"`    // 每页数量
+}
+
+type GetOrderListData {
+    Orders   []OrderInfo `json:"orders"`
+    Total    int32       `json:"total"`
+    Page     int32       `json:"page"`
+    PageSize int32       `json:"pageSize"`
+}
+
+type GetOrderListResponse {
+    BaseResp
+    Data GetOrderListData `json:"data"`
+}
+
+// ---------------- 状态流转 ----------------
+
+// 陪玩接单
+type AcceptOrderRequest {
+    OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type AcceptOrderResponse {
+    BaseResp
+    Data OrderInfo `json:"data"`
+}
+
+// 陪玩开始服务
+type StartOrderRequest {
+    OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type StartOrderResponse {
+    BaseResp
+    Data OrderInfo `json:"data"`
+}
+
+// 完成订单
+type CompleteOrderRequest {
+    OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type CompleteOrderResponse {
+    BaseResp
+    Data OrderInfo `json:"data"`
+}
+
+// 取消订单
+type CancelOrderRequest {
+    OrderId uint64 `json:"orderId"`          // 订单ID
+    Reason  string `json:"reason,optional"`  // 取消原因
+}
+
+type CancelOrderResponse {
+    BaseResp
+    Data OrderInfo `json:"data"`
+}
+
+// 评价订单
+type RateOrderRequest {
+    OrderId uint64 `json:"orderId"`           // 订单ID
+    Rating  float64 `json:"rating"`           // 评分（0-5）
+    Comment string  `json:"comment,optional"` // 评价内容
+}
+
+type RateOrderResponse {
+    BaseResp
+    Data OrderInfo `json:"data"`
+}
+
+// ---------------- 服务定义 ----------------
+
+@server(
+    group: order
+)
+service gateway {
+    // 创建订单（老板，需登录）
+    @handler createOrder
+    post /api/order (CreateOrderRequest) returns (CreateOrderResponse)
+
+    // 获取订单详情（老板/陪玩，需登录）
+    @handler getOrder
+    get /api/order (GetOrderRequest) returns (GetOrderResponse)
+
+    // 获取订单列表（老板/陪玩，需登录）
+    @handler getOrderList
+    get /api/orders (GetOrderListRequest) returns (GetOrderListResponse)
+
+    // 陪玩接单（需登录，陪玩角色）
+    @handler acceptOrder
+    post /api/order/accept (AcceptOrderRequest) returns (AcceptOrderResponse)
+
+    // 陪玩开始服务（需登录，陪玩角色）
+    @handler startOrder
+    post /api/order/start (StartOrderRequest) returns (StartOrderResponse)
+
+    // 完成订单（需登录，陪玩/系统）
+    @handler completeOrder
+    post /api/order/complete (CompleteOrderRequest) returns (CompleteOrderResponse)
+
+    // 取消订单（需登录，老板/陪玩）
+    @handler cancelOrder
+    post /api/order/cancel (CancelOrderRequest) returns (CancelOrderResponse)
+
+    // 老板评价订单（需登录）
+    @handler rateOrder
+    post /api/order/rate (RateOrderRequest) returns (RateOrderResponse)
+}
+
+
