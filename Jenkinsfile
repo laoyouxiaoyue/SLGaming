@@ -14,6 +14,8 @@ pipeline {
         PROJECT_PATH = 'back'
         // 构建输出目录
         BUILD_DIR    = 'build'
+        // Go 模块缓存目录（持久化到 Jenkins 挂载目录，避免每次重新下载）
+        GOMODCACHE   = "${GOPATH}/pkg/mod"
     }
 
     stages {
@@ -30,21 +32,16 @@ pipeline {
                 sh '''
                     echo "GOROOT = $GOROOT"
                     echo "GOPATH = $GOPATH"
+                    echo "GOMODCACHE = $GOMODCACHE"
                     echo "PATH   = $PATH"
                     echo "Go version:"
                     go version
+                    mkdir -p ${GOMODCACHE}
                 '''
             }
         }
 
-        stage('Download Dependencies') {
-            steps {
-                echo 'Downloading Go dependencies...'
-                dir("${PROJECT_PATH}") {
-                    sh 'go mod download'
-                }
-            }
-        }
+
 
         stage('Build Services') {
             parallel {
