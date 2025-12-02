@@ -68,6 +68,25 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUs
 		updates["password"] = hashed
 	}
 
+	// 更新角色
+	if in.GetRole() != 0 {
+		role := int(in.GetRole())
+		if role != model.RoleBoss && role != model.RoleCompanion && role != model.RoleAdmin {
+			return nil, status.Error(codes.InvalidArgument, "invalid role")
+		}
+		updates["role"] = role
+	}
+
+	// 更新头像
+	if avatarURL := strings.TrimSpace(in.GetAvatarUrl()); avatarURL != "" {
+		updates["avatar_url"] = avatarURL
+	}
+
+	// 更新个人简介
+	if bio := strings.TrimSpace(in.GetBio()); bio != "" {
+		updates["bio"] = bio
+	}
+
 	if len(updates) > 0 {
 		if err := db.Model(&u).Updates(updates).Error; err != nil {
 			return nil, status.Error(codes.Internal, err.Error())

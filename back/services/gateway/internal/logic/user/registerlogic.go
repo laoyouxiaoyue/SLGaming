@@ -65,6 +65,7 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 		Phone:    req.Phone,
 		Password: req.Password,
 		Nickname: req.Nickname,
+		Role:     int32(req.Role),
 	})
 	if err != nil {
 		l.Errorf("call user rpc failed: %v", err)

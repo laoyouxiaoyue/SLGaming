@@ -19,15 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_Register_FullMethodName       = "/user.User/Register"
-	User_Login_FullMethodName          = "/user.User/Login"
-	User_GetUser_FullMethodName        = "/user.User/GetUser"
-	User_UpdateUser_FullMethodName     = "/user.User/UpdateUser"
-	User_LoginByCode_FullMethodName    = "/user.User/LoginByCode"
-	User_ForgetPassword_FullMethodName = "/user.User/ForgetPassword"
-	User_GetWallet_FullMethodName      = "/user.User/GetWallet"
-	User_Recharge_FullMethodName       = "/user.User/Recharge"
-	User_Consume_FullMethodName        = "/user.User/Consume"
+	User_Register_FullMethodName               = "/user.User/Register"
+	User_Login_FullMethodName                  = "/user.User/Login"
+	User_GetUser_FullMethodName                = "/user.User/GetUser"
+	User_UpdateUser_FullMethodName             = "/user.User/UpdateUser"
+	User_LoginByCode_FullMethodName            = "/user.User/LoginByCode"
+	User_ForgetPassword_FullMethodName         = "/user.User/ForgetPassword"
+	User_GetWallet_FullMethodName              = "/user.User/GetWallet"
+	User_Recharge_FullMethodName               = "/user.User/Recharge"
+	User_Consume_FullMethodName                = "/user.User/Consume"
+	User_GetCompanionProfile_FullMethodName    = "/user.User/GetCompanionProfile"
+	User_UpdateCompanionProfile_FullMethodName = "/user.User/UpdateCompanionProfile"
+	User_GetCompanionList_FullMethodName       = "/user.User/GetCompanionList"
 )
 
 // UserClient is the client API for User service.
@@ -44,6 +47,10 @@ type UserClient interface {
 	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 	Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
 	Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
+	// 陪玩信息相关接口
+	GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
+	UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
+	GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error)
 }
 
 type userClient struct {
@@ -144,6 +151,36 @@ func (c *userClient) Consume(ctx context.Context, in *ConsumeRequest, opts ...gr
 	return out, nil
 }
 
+func (c *userClient) GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCompanionProfileResponse)
+	err := c.cc.Invoke(ctx, User_GetCompanionProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateCompanionProfileResponse)
+	err := c.cc.Invoke(ctx, User_UpdateCompanionProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCompanionListResponse)
+	err := c.cc.Invoke(ctx, User_GetCompanionList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -158,6 +195,10 @@ type UserServer interface {
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
 	Recharge(context.Context, *RechargeRequest) (*RechargeResponse, error)
 	Consume(context.Context, *ConsumeRequest) (*ConsumeResponse, error)
+	// 陪玩信息相关接口
+	GetCompanionProfile(context.Context, *GetCompanionProfileRequest) (*GetCompanionProfileResponse, error)
+	UpdateCompanionProfile(context.Context, *UpdateCompanionProfileRequest) (*UpdateCompanionProfileResponse, error)
+	GetCompanionList(context.Context, *GetCompanionListRequest) (*GetCompanionListResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -194,6 +235,15 @@ func (UnimplementedUserServer) Recharge(context.Context, *RechargeRequest) (*Rec
 }
 func (UnimplementedUserServer) Consume(context.Context, *ConsumeRequest) (*ConsumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Consume not implemented")
+}
+func (UnimplementedUserServer) GetCompanionProfile(context.Context, *GetCompanionProfileRequest) (*GetCompanionProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCompanionProfile not implemented")
+}
+func (UnimplementedUserServer) UpdateCompanionProfile(context.Context, *UpdateCompanionProfileRequest) (*UpdateCompanionProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCompanionProfile not implemented")
+}
+func (UnimplementedUserServer) GetCompanionList(context.Context, *GetCompanionListRequest) (*GetCompanionListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCompanionList not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -378,6 +428,60 @@ func _User_Consume_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetCompanionProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCompanionProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetCompanionProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetCompanionProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetCompanionProfile(ctx, req.(*GetCompanionProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateCompanionProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCompanionProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateCompanionProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateCompanionProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateCompanionProfile(ctx, req.(*UpdateCompanionProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetCompanionList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCompanionListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetCompanionList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetCompanionList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetCompanionList(ctx, req.(*GetCompanionListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -420,6 +524,18 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Consume",
 			Handler:    _User_Consume_Handler,
+		},
+		{
+			MethodName: "GetCompanionProfile",
+			Handler:    _User_GetCompanionProfile_Handler,
+		},
+		{
+			MethodName: "UpdateCompanionProfile",
+			Handler:    _User_UpdateCompanionProfile_Handler,
+		},
+		{
+			MethodName: "GetCompanionList",
+			Handler:    _User_GetCompanionList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -40,9 +40,27 @@ func toUserInfo(u *model.User) *user.UserInfo {
 		return nil
 	}
 	return &user.UserInfo{
-		Id:       u.ID,
-		Uid:      u.UID,
-		Nickname: u.Nickname,
-		Phone:    u.Phone,
+		Id:        u.ID,
+		Uid:       u.UID,
+		Nickname:  u.Nickname,
+		Phone:     u.Phone,
+		Role:      int32(u.Role),
+		AvatarUrl: u.AvatarURL,
+		Bio:       u.Bio,
+	}
+}
+
+func toCompanionInfo(p *model.CompanionProfile) *user.CompanionInfo {
+	if p == nil {
+		return nil
+	}
+	return &user.CompanionInfo{
+		UserId:       p.UserID,
+		GameSkills:   p.GameSkills,
+		PricePerHour: p.PricePerHour,
+		Status:       int32(p.Status),
+		Rating:       p.Rating,
+		TotalOrders:  p.TotalOrders,
+		IsVerified:   p.IsVerified,
 	}
 }

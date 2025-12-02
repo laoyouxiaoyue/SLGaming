@@ -14,26 +14,33 @@ import (
 )
 
 type (
-	ConsumeRequest         = user.ConsumeRequest
-	ConsumeResponse        = user.ConsumeResponse
-	ForgetPasswordRequest  = user.ForgetPasswordRequest
-	ForgetPasswordResponse = user.ForgetPasswordResponse
-	GetUserRequest         = user.GetUserRequest
-	GetUserResponse        = user.GetUserResponse
-	GetWalletRequest       = user.GetWalletRequest
-	GetWalletResponse      = user.GetWalletResponse
-	LoginByCodeRequest     = user.LoginByCodeRequest
-	LoginByCodeResponse    = user.LoginByCodeResponse
-	LoginRequest           = user.LoginRequest
-	LoginResponse          = user.LoginResponse
-	RechargeRequest        = user.RechargeRequest
-	RechargeResponse       = user.RechargeResponse
-	RegisterRequest        = user.RegisterRequest
-	RegisterResponse       = user.RegisterResponse
-	UpdateUserRequest      = user.UpdateUserRequest
-	UpdateUserResponse     = user.UpdateUserResponse
-	UserInfo               = user.UserInfo
-	WalletInfo             = user.WalletInfo
+	CompanionInfo                  = user.CompanionInfo
+	ConsumeRequest                 = user.ConsumeRequest
+	ConsumeResponse                = user.ConsumeResponse
+	ForgetPasswordRequest          = user.ForgetPasswordRequest
+	ForgetPasswordResponse         = user.ForgetPasswordResponse
+	GetCompanionListRequest        = user.GetCompanionListRequest
+	GetCompanionListResponse       = user.GetCompanionListResponse
+	GetCompanionProfileRequest     = user.GetCompanionProfileRequest
+	GetCompanionProfileResponse    = user.GetCompanionProfileResponse
+	GetUserRequest                 = user.GetUserRequest
+	GetUserResponse                = user.GetUserResponse
+	GetWalletRequest               = user.GetWalletRequest
+	GetWalletResponse              = user.GetWalletResponse
+	LoginByCodeRequest             = user.LoginByCodeRequest
+	LoginByCodeResponse            = user.LoginByCodeResponse
+	LoginRequest                   = user.LoginRequest
+	LoginResponse                  = user.LoginResponse
+	RechargeRequest                = user.RechargeRequest
+	RechargeResponse               = user.RechargeResponse
+	RegisterRequest                = user.RegisterRequest
+	RegisterResponse               = user.RegisterResponse
+	UpdateCompanionProfileRequest  = user.UpdateCompanionProfileRequest
+	UpdateCompanionProfileResponse = user.UpdateCompanionProfileResponse
+	UpdateUserRequest              = user.UpdateUserRequest
+	UpdateUserResponse             = user.UpdateUserResponse
+	UserInfo                       = user.UserInfo
+	WalletInfo                     = user.WalletInfo
 
 	User interface {
 		Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
@@ -46,6 +53,10 @@ type (
 		GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 		Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
 		Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
+		// 陪玩信息相关接口
+		GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
+		UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
+		GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error)
 	}
 
 	defaultUser struct {
@@ -103,4 +114,20 @@ func (m *defaultUser) Recharge(ctx context.Context, in *RechargeRequest, opts ..
 func (m *defaultUser) Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.Consume(ctx, in, opts...)
+}
+
+// 陪玩信息相关接口
+func (m *defaultUser) GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetCompanionProfile(ctx, in, opts...)
+}
+
+func (m *defaultUser) UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateCompanionProfile(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetCompanionList(ctx, in, opts...)
 }

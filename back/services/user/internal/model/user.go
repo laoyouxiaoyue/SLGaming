@@ -3,9 +3,17 @@ package model
 import (
 	"SLGaming/back/pkg/snowflake"
 	"errors"
-	"gorm.io/gorm"
 	"math/rand"
 	"time"
+
+	"gorm.io/gorm"
+)
+
+// 用户角色常量
+const (
+	RoleBoss      = 1 // 老板（下单方）
+	RoleCompanion = 2 // 陪玩（服务提供方）
+	RoleAdmin     = 3 // 管理员
 )
 
 // BaseModel 基础模型
@@ -27,10 +35,34 @@ type User struct {
 	Nickname string `gorm:"size:64;not null;default:'';comment:昵称" json:"nickname"`
 	Password string `gorm:"size:128;not null;comment:加密密码" json:"password"`
 	Phone    string `gorm:"size:20;uniqueIndex;not null;comment:手机号" json:"phone"`
+
+	// 用户角色：1=老板, 2=陪玩, 3=管理员
+	Role int `gorm:"not null;default:1;index;comment:用户角色(1=老板,2=陪玩,3=管理员)" json:"role"`
+
+	// 头像URL（所有用户通用）
+	AvatarURL string `gorm:"size:255;comment:头像URL" json:"avatar_url"`
+
+	// 个人简介（所有用户通用）
+	Bio string `gorm:"type:text;comment:个人简介" json:"bio"`
 }
 
 func (u *User) TableName() string {
 	return "users"
+}
+
+// IsBoss 判断是否为老板
+func (u *User) IsBoss() bool {
+	return u.Role == RoleBoss
+}
+
+// IsCompanion 判断是否为陪玩
+func (u *User) IsCompanion() bool {
+	return u.Role == RoleCompanion
+}
+
+// IsAdmin 判断是否为管理员
+func (u *User) IsAdmin() bool {
+	return u.Role == RoleAdmin
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {
@@ -39,7 +71,12 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 		u.ID = uint64(snowflake.GenID())
 	}
 
-	// 2. 生成展示 UID (如果已经有了就不生成)
+	// 2. 设置默认角色（如果未设置，默认为老板）
+	if u.Role == 0 {
+		u.Role = RoleBoss
+	}
+
+	// 3. 生成展示 UID (如果已经有了就不生成)
 	if u.UID == 0 {
 		// 重试机制：最多尝试 5 次
 		for i := 0; i < 5; i++ {

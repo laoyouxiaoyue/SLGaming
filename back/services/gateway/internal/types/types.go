@@ -8,6 +8,16 @@ type BaseResp struct {
 	Msg  string `json:"msg"`
 }
 
+type CompanionInfo struct {
+	UserId       uint64  `json:"userId"`       // 用户ID
+	GameSkills   string  `json:"gameSkills"`   // 游戏技能列表（JSON格式）
+	PricePerHour int64   `json:"pricePerHour"` // 每小时价格（帅币）
+	Status       int     `json:"status"`       // 状态：0=离线, 1=在线, 2=忙碌
+	Rating       float64 `json:"rating"`       // 评分（0-5分）
+	TotalOrders  int64   `json:"totalOrders"`  // 总接单数
+	IsVerified   bool    `json:"isVerified"`   // 是否认证
+}
+
 type ForgetPasswordRequest struct {
 	Phone    string `json:"phone"`
 	Code     string `json:"code"`
@@ -17,6 +27,33 @@ type ForgetPasswordRequest struct {
 type ForgetPasswordResponse struct {
 	BaseResp
 	Data LoginData `json:"data"`
+}
+
+type GetCompanionListData struct {
+	Companions []CompanionInfo `json:"companions"` // 陪玩列表
+	Total      int             `json:"total"`      // 总数
+	Page       int             `json:"page"`       // 当前页码
+	PageSize   int             `json:"pageSize"`   // 每页数量
+}
+
+type GetCompanionListRequest struct {
+	GameSkills []string `form:"gameSkills,optional"` // 游戏技能筛选
+	MinPrice   int      `form:"minPrice,optional"`   // 最低价格
+	MaxPrice   int      `form:"maxPrice,optional"`   // 最高价格
+	Status     int      `form:"status,optional"`     // 状态筛选：0=离线, 1=在线, 2=忙碌（默认1）
+	IsVerified bool     `form:"isVerified,optional"` // 是否只返回认证陪玩
+	Page       int      `form:"page,optional"`       // 页码（从1开始）
+	PageSize   int      `form:"pageSize,optional"`   // 每页数量
+}
+
+type GetCompanionListResponse struct {
+	BaseResp
+	Data GetCompanionListData `json:"data"`
+}
+
+type GetCompanionProfileResponse struct {
+	BaseResp
+	Data CompanionInfo `json:"data"`
 }
 
 type GetUserRequest struct {
@@ -93,6 +130,7 @@ type RegisterRequest struct {
 	Code     string `json:"code"`
 	Password string `json:"password"`
 	Nickname string `json:"nickname,optional"`
+	Role     int    `json:"role,optional"` // 用户角色：1=老板, 2=陪玩, 3=管理员（默认1）
 }
 
 type RegisterResponse struct {
@@ -114,11 +152,25 @@ type SendCodeResponse struct {
 	Data SendCodeData `json:"data"`
 }
 
+type UpdateCompanionProfileRequest struct {
+	GameSkills   string `json:"gameSkills,optional"`   // 游戏技能列表（JSON格式）
+	PricePerHour int64  `json:"pricePerHour,optional"` // 每小时价格（帅币）
+	Status       int    `json:"status,optional"`       // 状态：0=离线, 1=在线, 2=忙碌
+}
+
+type UpdateCompanionProfileResponse struct {
+	BaseResp
+	Data CompanionInfo `json:"data"`
+}
+
 type UpdateUserRequest struct {
-	Id       uint64 `json:"id"`
-	Nickname string `json:"nickname,optional"`
-	Password string `json:"password,optional"`
-	Phone    string `json:"phone,optional"`
+	Id        uint64 `json:"id"`
+	Nickname  string `json:"nickname,optional"`
+	Password  string `json:"password,optional"`
+	Phone     string `json:"phone,optional"`
+	Role      int    `json:"role,optional"`      // 用户角色
+	AvatarUrl string `json:"avatarUrl,optional"` // 头像URL
+	Bio       string `json:"bio,optional"`       // 个人简介
 }
 
 type UpdateUserResponse struct {
@@ -127,10 +179,13 @@ type UpdateUserResponse struct {
 }
 
 type UserInfo struct {
-	Id       uint64 `json:"id"`
-	Uid      uint64 `json:"uid"`
-	Nickname string `json:"nickname"`
-	Phone    string `json:"phone"`
+	Id        uint64 `json:"id"`
+	Uid       uint64 `json:"uid"`
+	Nickname  string `json:"nickname"`
+	Phone     string `json:"phone"`
+	Role      int    `json:"role"`      // 用户角色：1=老板, 2=陪玩, 3=管理员
+	AvatarUrl string `json:"avatarUrl"` // 头像URL
+	Bio       string `json:"bio"`       // 个人简介
 }
 
 type WalletInfo struct {

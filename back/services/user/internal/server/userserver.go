@@ -52,3 +52,35 @@ func (s *UserServer) ForgetPassword(ctx context.Context, in *user.ForgetPassword
 	l := logic.NewForgetPasswordLogic(ctx, s.svcCtx)
 	return l.ForgetPassword(in)
 }
+
+// 帅币钱包相关接口
+func (s *UserServer) GetWallet(ctx context.Context, in *user.GetWalletRequest) (*user.GetWalletResponse, error) {
+	l := logic.NewGetWalletLogic(ctx, s.svcCtx)
+	return l.GetWallet(in)
+}
+
+func (s *UserServer) Recharge(ctx context.Context, in *user.RechargeRequest) (*user.RechargeResponse, error) {
+	l := logic.NewRechargeLogic(ctx, s.svcCtx)
+	return l.Recharge(in)
+}
+
+func (s *UserServer) Consume(ctx context.Context, in *user.ConsumeRequest) (*user.ConsumeResponse, error) {
+	l := logic.NewConsumeLogic(ctx, s.svcCtx)
+	return l.Consume(in)
+}
+
+// 陪玩信息相关接口
+func (s *UserServer) GetCompanionProfile(ctx context.Context, in *user.GetCompanionProfileRequest) (*user.GetCompanionProfileResponse, error) {
+	l := logic.NewGetCompanionProfileLogic(ctx, s.svcCtx)
+	return l.GetCompanionProfile(in)
+}
+
+func (s *UserServer) UpdateCompanionProfile(ctx context.Context, in *user.UpdateCompanionProfileRequest) (*user.UpdateCompanionProfileResponse, error) {
+	l := logic.NewUpdateCompanionProfileLogic(ctx, s.svcCtx)
+	return l.UpdateCompanionProfile(in)
+}
+
+func (s *UserServer) GetCompanionList(ctx context.Context, in *user.GetCompanionListRequest) (*user.GetCompanionListResponse, error) {
+	l := logic.NewGetCompanionListLogic(ctx, s.svcCtx)
+	return l.GetCompanionList(in)
+}

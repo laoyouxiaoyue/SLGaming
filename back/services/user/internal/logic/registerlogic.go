@@ -55,10 +55,21 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	// 处理角色，默认为老板
+	role := int(in.GetRole())
+	if role == 0 {
+		role = model.RoleBoss
+	}
+	// 验证角色值
+	if role != model.RoleBoss && role != model.RoleCompanion && role != model.RoleAdmin {
+		return nil, status.Error(codes.InvalidArgument, "invalid role")
+	}
+
 	userModel := &model.User{
 		Phone:    phone,
 		Password: hashed,
 		Nickname: ensureNickname(nickname, phone),
+		Role:     role,
 	}
 
 	if err := db.Create(userModel).Error; err != nil {

@@ -35,10 +35,13 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.
 
 	// 调用用户服务的 RPC
 	rpcResp, err := l.svcCtx.UserRPC.UpdateUser(l.ctx, &userclient.UpdateUserRequest{
-		Id:       req.Id,
-		Nickname: req.Nickname,
-		Password: req.Password,
-		Phone:    req.Phone,
+		Id:        req.Id,
+		Nickname:  req.Nickname,
+		Password:  req.Password,
+		Phone:     req.Phone,
+		Role:      int32(req.Role),
+		AvatarUrl: req.AvatarUrl,
+		Bio:       req.Bio,
 	})
 	if err != nil {
 		l.Errorf("call user rpc failed: %v", err)
@@ -56,10 +59,13 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.
 			Msg:  "success",
 		},
 		Data: types.UserInfo{
-			Id:       rpcResp.User.Id,
-			Uid:      rpcResp.User.Uid,
-			Nickname: rpcResp.User.Nickname,
-			Phone:    rpcResp.User.Phone,
+			Id:        rpcResp.User.Id,
+			Uid:       rpcResp.User.Uid,
+			Nickname:  rpcResp.User.Nickname,
+			Phone:     rpcResp.User.Phone,
+			Role:      int(rpcResp.User.Role),
+			AvatarUrl: rpcResp.User.AvatarUrl,
+			Bio:       rpcResp.User.Bio,
 		},
 	}, nil
 }

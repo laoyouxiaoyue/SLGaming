@@ -26,6 +26,7 @@ type RegisterRequest struct {
 	Phone         string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	Nickname      string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Role          int32                  `protobuf:"varint,4,opt,name=role,proto3" json:"role,omitempty"` // 用户角色：1=老板, 2=陪玩, 3=管理员（默认1）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -79,6 +80,13 @@ func (x *RegisterRequest) GetNickname() string {
 		return x.Nickname
 	}
 	return ""
+}
+
+func (x *RegisterRequest) GetRole() int32 {
+	if x != nil {
+		return x.Role
+	}
+	return 0
 }
 
 type RegisterResponse struct {
@@ -303,6 +311,9 @@ type UserInfo struct {
 	Uid           uint64                 `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`
 	Nickname      string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
 	Phone         string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
+	Role          int32                  `protobuf:"varint,5,opt,name=role,proto3" json:"role,omitempty"`                           // 用户角色：1=老板, 2=陪玩, 3=管理员
+	AvatarUrl     string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"` // 头像URL
+	Bio           string                 `protobuf:"bytes,7,opt,name=bio,proto3" json:"bio,omitempty"`                              // 个人简介
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -365,6 +376,27 @@ func (x *UserInfo) GetPhone() string {
 	return ""
 }
 
+func (x *UserInfo) GetRole() int32 {
+	if x != nil {
+		return x.Role
+	}
+	return 0
+}
+
+func (x *UserInfo) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
+func (x *UserInfo) GetBio() string {
+	if x != nil {
+		return x.Bio
+	}
+	return ""
+}
+
 type GetUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *UserInfo              `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
@@ -412,9 +444,12 @@ func (x *GetUserResponse) GetUser() *UserInfo {
 type UpdateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Nickname      string                 `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
-	Phone         string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
+	Nickname      string                 `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`                    // 可选
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`                    // 可选
+	Phone         string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`                          // 可选
+	Role          int32                  `protobuf:"varint,5,opt,name=role,proto3" json:"role,omitempty"`                           // 可选，用户角色
+	AvatarUrl     string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"` // 可选，头像URL
+	Bio           string                 `protobuf:"bytes,7,opt,name=bio,proto3" json:"bio,omitempty"`                              // 可选，个人简介
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -473,6 +508,27 @@ func (x *UpdateUserRequest) GetPassword() string {
 func (x *UpdateUserRequest) GetPhone() string {
 	if x != nil {
 		return x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetRole() int32 {
+	if x != nil {
+		return x.Role
+	}
+	return 0
+}
+
+func (x *UpdateUserRequest) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetBio() string {
+	if x != nil {
+		return x.Bio
 	}
 	return ""
 }
@@ -1097,16 +1153,473 @@ func (x *ConsumeResponse) GetWallet() *WalletInfo {
 	return nil
 }
 
+// 陪玩信息
+type CompanionInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                     // 用户ID
+	GameSkills    string                 `protobuf:"bytes,2,opt,name=game_skills,json=gameSkills,proto3" json:"game_skills,omitempty"`          // 游戏技能列表（JSON格式）
+	PricePerHour  int64                  `protobuf:"varint,3,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"` // 每小时价格（帅币）
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                                   // 状态：0=离线, 1=在线, 2=忙碌
+	Rating        float64                `protobuf:"fixed64,5,opt,name=rating,proto3" json:"rating,omitempty"`                                  // 评分（0-5分）
+	TotalOrders   int64                  `protobuf:"varint,6,opt,name=total_orders,json=totalOrders,proto3" json:"total_orders,omitempty"`      // 总接单数
+	IsVerified    bool                   `protobuf:"varint,7,opt,name=is_verified,json=isVerified,proto3" json:"is_verified,omitempty"`         // 是否认证
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompanionInfo) Reset() {
+	*x = CompanionInfo{}
+	mi := &file_user_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompanionInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompanionInfo) ProtoMessage() {}
+
+func (x *CompanionInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompanionInfo.ProtoReflect.Descriptor instead.
+func (*CompanionInfo) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *CompanionInfo) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *CompanionInfo) GetGameSkills() string {
+	if x != nil {
+		return x.GameSkills
+	}
+	return ""
+}
+
+func (x *CompanionInfo) GetPricePerHour() int64 {
+	if x != nil {
+		return x.PricePerHour
+	}
+	return 0
+}
+
+func (x *CompanionInfo) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *CompanionInfo) GetRating() float64 {
+	if x != nil {
+		return x.Rating
+	}
+	return 0
+}
+
+func (x *CompanionInfo) GetTotalOrders() int64 {
+	if x != nil {
+		return x.TotalOrders
+	}
+	return 0
+}
+
+func (x *CompanionInfo) GetIsVerified() bool {
+	if x != nil {
+		return x.IsVerified
+	}
+	return false
+}
+
+// 获取陪玩信息
+type GetCompanionProfileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCompanionProfileRequest) Reset() {
+	*x = GetCompanionProfileRequest{}
+	mi := &file_user_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCompanionProfileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCompanionProfileRequest) ProtoMessage() {}
+
+func (x *GetCompanionProfileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCompanionProfileRequest.ProtoReflect.Descriptor instead.
+func (*GetCompanionProfileRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetCompanionProfileRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type GetCompanionProfileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Profile       *CompanionInfo         `protobuf:"bytes,1,opt,name=profile,proto3" json:"profile,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCompanionProfileResponse) Reset() {
+	*x = GetCompanionProfileResponse{}
+	mi := &file_user_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCompanionProfileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCompanionProfileResponse) ProtoMessage() {}
+
+func (x *GetCompanionProfileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCompanionProfileResponse.ProtoReflect.Descriptor instead.
+func (*GetCompanionProfileResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetCompanionProfileResponse) GetProfile() *CompanionInfo {
+	if x != nil {
+		return x.Profile
+	}
+	return nil
+}
+
+// 更新陪玩信息
+type UpdateCompanionProfileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                     // 用户ID（必填）
+	GameSkills    string                 `protobuf:"bytes,2,opt,name=game_skills,json=gameSkills,proto3" json:"game_skills,omitempty"`          // 可选，游戏技能列表（JSON格式）
+	PricePerHour  int64                  `protobuf:"varint,3,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"` // 可选，每小时价格（帅币）
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                                   // 可选，状态：0=离线, 1=在线, 2=忙碌
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCompanionProfileRequest) Reset() {
+	*x = UpdateCompanionProfileRequest{}
+	mi := &file_user_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCompanionProfileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCompanionProfileRequest) ProtoMessage() {}
+
+func (x *UpdateCompanionProfileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCompanionProfileRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCompanionProfileRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *UpdateCompanionProfileRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *UpdateCompanionProfileRequest) GetGameSkills() string {
+	if x != nil {
+		return x.GameSkills
+	}
+	return ""
+}
+
+func (x *UpdateCompanionProfileRequest) GetPricePerHour() int64 {
+	if x != nil {
+		return x.PricePerHour
+	}
+	return 0
+}
+
+func (x *UpdateCompanionProfileRequest) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+type UpdateCompanionProfileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Profile       *CompanionInfo         `protobuf:"bytes,1,opt,name=profile,proto3" json:"profile,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCompanionProfileResponse) Reset() {
+	*x = UpdateCompanionProfileResponse{}
+	mi := &file_user_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCompanionProfileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCompanionProfileResponse) ProtoMessage() {}
+
+func (x *UpdateCompanionProfileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCompanionProfileResponse.ProtoReflect.Descriptor instead.
+func (*UpdateCompanionProfileResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *UpdateCompanionProfileResponse) GetProfile() *CompanionInfo {
+	if x != nil {
+		return x.Profile
+	}
+	return nil
+}
+
+// 获取陪玩列表（用于订单匹配）
+type GetCompanionListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GameSkills    []string               `protobuf:"bytes,1,rep,name=game_skills,json=gameSkills,proto3" json:"game_skills,omitempty"`  // 可选，游戏技能筛选
+	MinPrice      int32                  `protobuf:"varint,2,opt,name=min_price,json=minPrice,proto3" json:"min_price,omitempty"`       // 可选，最低价格
+	MaxPrice      int32                  `protobuf:"varint,3,opt,name=max_price,json=maxPrice,proto3" json:"max_price,omitempty"`       // 可选，最高价格
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                           // 可选，状态筛选：0=离线, 1=在线, 2=忙碌（默认只返回在线）
+	IsVerified    bool                   `protobuf:"varint,5,opt,name=is_verified,json=isVerified,proto3" json:"is_verified,omitempty"` // 可选，是否只返回认证陪玩
+	Page          int32                  `protobuf:"varint,6,opt,name=page,proto3" json:"page,omitempty"`                               // 页码（从1开始）
+	PageSize      int32                  `protobuf:"varint,7,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`       // 每页数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCompanionListRequest) Reset() {
+	*x = GetCompanionListRequest{}
+	mi := &file_user_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCompanionListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCompanionListRequest) ProtoMessage() {}
+
+func (x *GetCompanionListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCompanionListRequest.ProtoReflect.Descriptor instead.
+func (*GetCompanionListRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetCompanionListRequest) GetGameSkills() []string {
+	if x != nil {
+		return x.GameSkills
+	}
+	return nil
+}
+
+func (x *GetCompanionListRequest) GetMinPrice() int32 {
+	if x != nil {
+		return x.MinPrice
+	}
+	return 0
+}
+
+func (x *GetCompanionListRequest) GetMaxPrice() int32 {
+	if x != nil {
+		return x.MaxPrice
+	}
+	return 0
+}
+
+func (x *GetCompanionListRequest) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *GetCompanionListRequest) GetIsVerified() bool {
+	if x != nil {
+		return x.IsVerified
+	}
+	return false
+}
+
+func (x *GetCompanionListRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetCompanionListRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type GetCompanionListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Companions    []*CompanionInfo       `protobuf:"bytes,1,rep,name=companions,proto3" json:"companions,omitempty"`              // 陪玩列表
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`                       // 总数
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`                         // 当前页码
+	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 每页数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCompanionListResponse) Reset() {
+	*x = GetCompanionListResponse{}
+	mi := &file_user_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCompanionListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCompanionListResponse) ProtoMessage() {}
+
+func (x *GetCompanionListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCompanionListResponse.ProtoReflect.Descriptor instead.
+func (*GetCompanionListResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *GetCompanionListResponse) GetCompanions() []*CompanionInfo {
+	if x != nil {
+		return x.Companions
+	}
+	return nil
+}
+
+func (x *GetCompanionListResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *GetCompanionListResponse) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetCompanionListResponse) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\x04user\"_\n" +
+	"user.proto\x12\x04user\"s\n" +
 	"\x0fRegisterRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x1a\n" +
-	"\bnickname\x18\x03 \x01(\tR\bnickname\"4\n" +
+	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x12\n" +
+	"\x04role\x18\x04 \x01(\x05R\x04role\"4\n" +
 	"\x10RegisterResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x04R\x03uid\"@\n" +
@@ -1119,19 +1632,27 @@ const file_user_proto_rawDesc = "" +
 	"\x0eGetUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x04R\x03uid\x12\x14\n" +
-	"\x05phone\x18\x03 \x01(\tR\x05phone\"^\n" +
+	"\x05phone\x18\x03 \x01(\tR\x05phone\"\xa3\x01\n" +
 	"\bUserInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x04R\x03uid\x12\x1a\n" +
 	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x14\n" +
-	"\x05phone\x18\x04 \x01(\tR\x05phone\"5\n" +
+	"\x05phone\x18\x04 \x01(\tR\x05phone\x12\x12\n" +
+	"\x04role\x18\x05 \x01(\x05R\x04role\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\x12\x10\n" +
+	"\x03bio\x18\a \x01(\tR\x03bio\"5\n" +
 	"\x0fGetUserResponse\x12\"\n" +
-	"\x04user\x18\x01 \x01(\v2\x0e.user.UserInfoR\x04user\"q\n" +
+	"\x04user\x18\x01 \x01(\v2\x0e.user.UserInfoR\x04user\"\xb6\x01\n" +
 	"\x11UpdateUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x14\n" +
-	"\x05phone\x18\x04 \x01(\tR\x05phone\"8\n" +
+	"\x05phone\x18\x04 \x01(\tR\x05phone\x12\x12\n" +
+	"\x04role\x18\x05 \x01(\x05R\x04role\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\x12\x10\n" +
+	"\x03bio\x18\a \x01(\tR\x03bio\"8\n" +
 	"\x12UpdateUserResponse\x12\"\n" +
 	"\x04user\x18\x01 \x01(\v2\x0e.user.UserInfoR\x04user\"*\n" +
 	"\x12LoginByCodeRequest\x12\x14\n" +
@@ -1169,7 +1690,46 @@ const file_user_proto_rawDesc = "" +
 	"bizOrderId\x12\x16\n" +
 	"\x06remark\x18\x04 \x01(\tR\x06remark\";\n" +
 	"\x0fConsumeResponse\x12(\n" +
-	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet2\xae\x04\n" +
+	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet\"\xe3\x01\n" +
+	"\rCompanionInfo\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1f\n" +
+	"\vgame_skills\x18\x02 \x01(\tR\n" +
+	"gameSkills\x12$\n" +
+	"\x0eprice_per_hour\x18\x03 \x01(\x03R\fpricePerHour\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x16\n" +
+	"\x06rating\x18\x05 \x01(\x01R\x06rating\x12!\n" +
+	"\ftotal_orders\x18\x06 \x01(\x03R\vtotalOrders\x12\x1f\n" +
+	"\vis_verified\x18\a \x01(\bR\n" +
+	"isVerified\"5\n" +
+	"\x1aGetCompanionProfileRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"L\n" +
+	"\x1bGetCompanionProfileResponse\x12-\n" +
+	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"\x97\x01\n" +
+	"\x1dUpdateCompanionProfileRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1f\n" +
+	"\vgame_skills\x18\x02 \x01(\tR\n" +
+	"gameSkills\x12$\n" +
+	"\x0eprice_per_hour\x18\x03 \x01(\x03R\fpricePerHour\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\x05R\x06status\"O\n" +
+	"\x1eUpdateCompanionProfileResponse\x12-\n" +
+	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"\xde\x01\n" +
+	"\x17GetCompanionListRequest\x12\x1f\n" +
+	"\vgame_skills\x18\x01 \x03(\tR\n" +
+	"gameSkills\x12\x1b\n" +
+	"\tmin_price\x18\x02 \x01(\x05R\bminPrice\x12\x1b\n" +
+	"\tmax_price\x18\x03 \x01(\x05R\bmaxPrice\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x1f\n" +
+	"\vis_verified\x18\x05 \x01(\bR\n" +
+	"isVerified\x12\x12\n" +
+	"\x04page\x18\x06 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\a \x01(\x05R\bpageSize\"\x96\x01\n" +
+	"\x18GetCompanionListResponse\x123\n" +
+	"\n" +
+	"companions\x18\x01 \x03(\v2\x13.user.CompanionInfoR\n" +
+	"companions\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\xc2\x06\n" +
 	"\x04User\x129\n" +
 	"\bRegister\x12\x15.user.RegisterRequest\x1a\x16.user.RegisterResponse\x120\n" +
 	"\x05Login\x12\x12.user.LoginRequest\x1a\x13.user.LoginResponse\x126\n" +
@@ -1180,7 +1740,10 @@ const file_user_proto_rawDesc = "" +
 	"\x0eForgetPassword\x12\x1b.user.ForgetPasswordRequest\x1a\x1c.user.ForgetPasswordResponse\x12<\n" +
 	"\tGetWallet\x12\x16.user.GetWalletRequest\x1a\x17.user.GetWalletResponse\x129\n" +
 	"\bRecharge\x12\x15.user.RechargeRequest\x1a\x16.user.RechargeResponse\x126\n" +
-	"\aConsume\x12\x14.user.ConsumeRequest\x1a\x15.user.ConsumeResponseB\bZ\x06./userb\x06proto3"
+	"\aConsume\x12\x14.user.ConsumeRequest\x1a\x15.user.ConsumeResponse\x12Z\n" +
+	"\x13GetCompanionProfile\x12 .user.GetCompanionProfileRequest\x1a!.user.GetCompanionProfileResponse\x12c\n" +
+	"\x16UpdateCompanionProfile\x12#.user.UpdateCompanionProfileRequest\x1a$.user.UpdateCompanionProfileResponse\x12Q\n" +
+	"\x10GetCompanionList\x12\x1d.user.GetCompanionListRequest\x1a\x1e.user.GetCompanionListResponseB\bZ\x06./userb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -1194,28 +1757,35 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_user_proto_goTypes = []any{
-	(*RegisterRequest)(nil),        // 0: user.RegisterRequest
-	(*RegisterResponse)(nil),       // 1: user.RegisterResponse
-	(*LoginRequest)(nil),           // 2: user.LoginRequest
-	(*LoginResponse)(nil),          // 3: user.LoginResponse
-	(*GetUserRequest)(nil),         // 4: user.GetUserRequest
-	(*UserInfo)(nil),               // 5: user.UserInfo
-	(*GetUserResponse)(nil),        // 6: user.GetUserResponse
-	(*UpdateUserRequest)(nil),      // 7: user.UpdateUserRequest
-	(*UpdateUserResponse)(nil),     // 8: user.UpdateUserResponse
-	(*LoginByCodeRequest)(nil),     // 9: user.LoginByCodeRequest
-	(*LoginByCodeResponse)(nil),    // 10: user.LoginByCodeResponse
-	(*ForgetPasswordRequest)(nil),  // 11: user.ForgetPasswordRequest
-	(*ForgetPasswordResponse)(nil), // 12: user.ForgetPasswordResponse
-	(*WalletInfo)(nil),             // 13: user.WalletInfo
-	(*GetWalletRequest)(nil),       // 14: user.GetWalletRequest
-	(*GetWalletResponse)(nil),      // 15: user.GetWalletResponse
-	(*RechargeRequest)(nil),        // 16: user.RechargeRequest
-	(*RechargeResponse)(nil),       // 17: user.RechargeResponse
-	(*ConsumeRequest)(nil),         // 18: user.ConsumeRequest
-	(*ConsumeResponse)(nil),        // 19: user.ConsumeResponse
+	(*RegisterRequest)(nil),                // 0: user.RegisterRequest
+	(*RegisterResponse)(nil),               // 1: user.RegisterResponse
+	(*LoginRequest)(nil),                   // 2: user.LoginRequest
+	(*LoginResponse)(nil),                  // 3: user.LoginResponse
+	(*GetUserRequest)(nil),                 // 4: user.GetUserRequest
+	(*UserInfo)(nil),                       // 5: user.UserInfo
+	(*GetUserResponse)(nil),                // 6: user.GetUserResponse
+	(*UpdateUserRequest)(nil),              // 7: user.UpdateUserRequest
+	(*UpdateUserResponse)(nil),             // 8: user.UpdateUserResponse
+	(*LoginByCodeRequest)(nil),             // 9: user.LoginByCodeRequest
+	(*LoginByCodeResponse)(nil),            // 10: user.LoginByCodeResponse
+	(*ForgetPasswordRequest)(nil),          // 11: user.ForgetPasswordRequest
+	(*ForgetPasswordResponse)(nil),         // 12: user.ForgetPasswordResponse
+	(*WalletInfo)(nil),                     // 13: user.WalletInfo
+	(*GetWalletRequest)(nil),               // 14: user.GetWalletRequest
+	(*GetWalletResponse)(nil),              // 15: user.GetWalletResponse
+	(*RechargeRequest)(nil),                // 16: user.RechargeRequest
+	(*RechargeResponse)(nil),               // 17: user.RechargeResponse
+	(*ConsumeRequest)(nil),                 // 18: user.ConsumeRequest
+	(*ConsumeResponse)(nil),                // 19: user.ConsumeResponse
+	(*CompanionInfo)(nil),                  // 20: user.CompanionInfo
+	(*GetCompanionProfileRequest)(nil),     // 21: user.GetCompanionProfileRequest
+	(*GetCompanionProfileResponse)(nil),    // 22: user.GetCompanionProfileResponse
+	(*UpdateCompanionProfileRequest)(nil),  // 23: user.UpdateCompanionProfileRequest
+	(*UpdateCompanionProfileResponse)(nil), // 24: user.UpdateCompanionProfileResponse
+	(*GetCompanionListRequest)(nil),        // 25: user.GetCompanionListRequest
+	(*GetCompanionListResponse)(nil),       // 26: user.GetCompanionListResponse
 }
 var file_user_proto_depIdxs = []int32{
 	5,  // 0: user.GetUserResponse.user:type_name -> user.UserInfo
@@ -1223,29 +1793,38 @@ var file_user_proto_depIdxs = []int32{
 	13, // 2: user.GetWalletResponse.wallet:type_name -> user.WalletInfo
 	13, // 3: user.RechargeResponse.wallet:type_name -> user.WalletInfo
 	13, // 4: user.ConsumeResponse.wallet:type_name -> user.WalletInfo
-	0,  // 5: user.User.Register:input_type -> user.RegisterRequest
-	2,  // 6: user.User.Login:input_type -> user.LoginRequest
-	4,  // 7: user.User.GetUser:input_type -> user.GetUserRequest
-	7,  // 8: user.User.UpdateUser:input_type -> user.UpdateUserRequest
-	9,  // 9: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
-	11, // 10: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
-	14, // 11: user.User.GetWallet:input_type -> user.GetWalletRequest
-	16, // 12: user.User.Recharge:input_type -> user.RechargeRequest
-	18, // 13: user.User.Consume:input_type -> user.ConsumeRequest
-	1,  // 14: user.User.Register:output_type -> user.RegisterResponse
-	3,  // 15: user.User.Login:output_type -> user.LoginResponse
-	6,  // 16: user.User.GetUser:output_type -> user.GetUserResponse
-	8,  // 17: user.User.UpdateUser:output_type -> user.UpdateUserResponse
-	10, // 18: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
-	12, // 19: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
-	15, // 20: user.User.GetWallet:output_type -> user.GetWalletResponse
-	17, // 21: user.User.Recharge:output_type -> user.RechargeResponse
-	19, // 22: user.User.Consume:output_type -> user.ConsumeResponse
-	14, // [14:23] is the sub-list for method output_type
-	5,  // [5:14] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	20, // 5: user.GetCompanionProfileResponse.profile:type_name -> user.CompanionInfo
+	20, // 6: user.UpdateCompanionProfileResponse.profile:type_name -> user.CompanionInfo
+	20, // 7: user.GetCompanionListResponse.companions:type_name -> user.CompanionInfo
+	0,  // 8: user.User.Register:input_type -> user.RegisterRequest
+	2,  // 9: user.User.Login:input_type -> user.LoginRequest
+	4,  // 10: user.User.GetUser:input_type -> user.GetUserRequest
+	7,  // 11: user.User.UpdateUser:input_type -> user.UpdateUserRequest
+	9,  // 12: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
+	11, // 13: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
+	14, // 14: user.User.GetWallet:input_type -> user.GetWalletRequest
+	16, // 15: user.User.Recharge:input_type -> user.RechargeRequest
+	18, // 16: user.User.Consume:input_type -> user.ConsumeRequest
+	21, // 17: user.User.GetCompanionProfile:input_type -> user.GetCompanionProfileRequest
+	23, // 18: user.User.UpdateCompanionProfile:input_type -> user.UpdateCompanionProfileRequest
+	25, // 19: user.User.GetCompanionList:input_type -> user.GetCompanionListRequest
+	1,  // 20: user.User.Register:output_type -> user.RegisterResponse
+	3,  // 21: user.User.Login:output_type -> user.LoginResponse
+	6,  // 22: user.User.GetUser:output_type -> user.GetUserResponse
+	8,  // 23: user.User.UpdateUser:output_type -> user.UpdateUserResponse
+	10, // 24: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
+	12, // 25: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
+	15, // 26: user.User.GetWallet:output_type -> user.GetWalletResponse
+	17, // 27: user.User.Recharge:output_type -> user.RechargeResponse
+	19, // 28: user.User.Consume:output_type -> user.ConsumeResponse
+	22, // 29: user.User.GetCompanionProfile:output_type -> user.GetCompanionProfileResponse
+	24, // 30: user.User.UpdateCompanionProfile:output_type -> user.UpdateCompanionProfileResponse
+	26, // 31: user.User.GetCompanionList:output_type -> user.GetCompanionListResponse
+	20, // [20:32] is the sub-list for method output_type
+	8,  // [8:20] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -1259,7 +1838,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

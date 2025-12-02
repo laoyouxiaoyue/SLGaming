@@ -6,6 +6,7 @@ message RegisterRequest {
   string phone = 1;
   string password = 2;
   string nickname = 3;
+  int32  role = 4;        // 用户角色：1=老板, 2=陪玩, 3=管理员（默认1）
 }
 
 message RegisterResponse {
@@ -34,6 +35,9 @@ message UserInfo {
   uint64 uid = 2;
   string nickname = 3;
   string phone = 4;
+  int32  role = 5;        // 用户角色：1=老板, 2=陪玩, 3=管理员
+  string avatar_url = 6; // 头像URL
+  string bio = 7;        // 个人简介
 }
 
 message GetUserResponse {
@@ -42,9 +46,12 @@ message GetUserResponse {
 
 message UpdateUserRequest {
   uint64 id = 1;
-  string nickname = 2;
-  string password = 3;
-  string phone = 4;
+  string nickname = 2;   // 可选
+  string password = 3;   // 可选
+  string phone = 4;      // 可选
+  int32  role = 5;       // 可选，用户角色
+  string avatar_url = 6; // 可选，头像URL
+  string bio = 7;        // 可选，个人简介
 }
 
 message UpdateUserResponse {
@@ -112,6 +119,58 @@ message ConsumeResponse {
   WalletInfo wallet = 1;    // 扣减后的最新钱包信息
 }
 
+// ---------------- 陪玩信息相关 ----------------
+
+// 陪玩信息
+message CompanionInfo {
+  uint64 user_id = 1;        // 用户ID
+  string game_skills = 2;    // 游戏技能列表（JSON格式）
+  int64  price_per_hour = 3;  // 每小时价格（帅币）
+  int32  status = 4;         // 状态：0=离线, 1=在线, 2=忙碌
+  double rating = 5;          // 评分（0-5分）
+  int64  total_orders = 6;    // 总接单数
+  bool   is_verified = 7;    // 是否认证
+}
+
+// 获取陪玩信息
+message GetCompanionProfileRequest {
+  uint64 user_id = 1;        // 用户ID
+}
+
+message GetCompanionProfileResponse {
+  CompanionInfo profile = 1;
+}
+
+// 更新陪玩信息
+message UpdateCompanionProfileRequest {
+  uint64 user_id = 1;         // 用户ID（必填）
+  string game_skills = 2;     // 可选，游戏技能列表（JSON格式）
+  int64  price_per_hour = 3;  // 可选，每小时价格（帅币）
+  int32  status = 4;          // 可选，状态：0=离线, 1=在线, 2=忙碌
+}
+
+message UpdateCompanionProfileResponse {
+  CompanionInfo profile = 1;
+}
+
+// 获取陪玩列表（用于订单匹配）
+message GetCompanionListRequest {
+  repeated string game_skills = 1; // 可选，游戏技能筛选
+  int32  min_price = 2;           // 可选，最低价格
+  int32  max_price = 3;           // 可选，最高价格
+  int32  status = 4;              // 可选，状态筛选：0=离线, 1=在线, 2=忙碌（默认只返回在线）
+  bool   is_verified = 5;        // 可选，是否只返回认证陪玩
+  int32  page = 6;               // 页码（从1开始）
+  int32  page_size = 7;          // 每页数量
+}
+
+message GetCompanionListResponse {
+  repeated CompanionInfo companions = 1; // 陪玩列表
+  int32 total = 2;                       // 总数
+  int32 page = 3;                        // 当前页码
+  int32 page_size = 4;                   // 每页数量
+}
+
 service User {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
@@ -124,4 +183,9 @@ service User {
   rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
   rpc Recharge(RechargeRequest) returns (RechargeResponse);
   rpc Consume(ConsumeRequest) returns (ConsumeResponse);
+
+  // 陪玩信息相关接口
+  rpc GetCompanionProfile(GetCompanionProfileRequest) returns (GetCompanionProfileResponse);
+  rpc UpdateCompanionProfile(UpdateCompanionProfileRequest) returns (UpdateCompanionProfileResponse);
+  rpc GetCompanionList(GetCompanionListRequest) returns (GetCompanionListResponse);
 }

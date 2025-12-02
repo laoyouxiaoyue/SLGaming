@@ -52,6 +52,22 @@ func WriteResponse(ctx context.Context, w http.ResponseWriter, resp interface{})
 		if v != nil {
 			code = v.Code
 		}
+	case *types.GetWalletResponse:
+		if v != nil {
+			code = v.Code
+		}
+	case *types.GetCompanionProfileResponse:
+		if v != nil {
+			code = v.Code
+		}
+	case *types.UpdateCompanionProfileResponse:
+		if v != nil {
+			code = v.Code
+		}
+	case *types.GetCompanionListResponse:
+		if v != nil {
+			code = v.Code
+		}
 	}
 
 	// 根据业务 code 映射到 HTTP 状态码
