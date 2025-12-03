@@ -31,16 +31,7 @@ func NewUpdateCompanionProfileLogic(ctx context.Context, svcCtx *svc.ServiceCont
 
 func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(req *types.UpdateCompanionProfileRequest) (resp *types.UpdateCompanionProfileResponse, err error) {
 	// 从 context 中获取当前登录用户 ID（由网关鉴权中间件注入）
-	userID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || userID == 0 {
-		l.Errorf("get user id from context failed: %v", getUserErr)
-		return &types.UpdateCompanionProfileResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-		}, nil
-	}
+	userID, _ := middleware.GetUserID(l.ctx)
 
 	if l.svcCtx.UserRPC == nil {
 		return nil, fmt.Errorf("user rpc client not initialized")

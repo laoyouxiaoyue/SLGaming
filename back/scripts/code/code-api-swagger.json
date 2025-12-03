@@ -1,0 +1,151 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "验证码服务 API",
+    "description": "验证码相关的接口文档，用于发送短信验证码",
+    "version": "1.0.0"
+  },
+  "host": "api.example.com",
+  "basePath": "/api",
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/code/send": {
+      "post": {
+        "tags": ["验证码"],
+        "summary": "发送验证码",
+        "description": "向指定手机号发送验证码短信，支持多种用途（注册、登录、验证、重置密码）",
+        "operationId": "sendCode",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SendCodeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "发送成功",
+            "schema": {
+              "$ref": "#/definitions/SendCodeResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "验证码发送成功",
+                "data": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "手机号格式错误"
+              }
+            }
+          },
+          "429": {
+            "description": "发送过于频繁",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 429,
+                "msg": "手机号发送过于频繁，请 60 秒后再试"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "验证码发送失败，请稍后重试"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BaseResp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "响应码，0表示成功"
+        },
+        "msg": {
+          "type": "string",
+          "description": "响应消息"
+        }
+      },
+      "required": ["code", "msg"]
+    },
+    "SendCodeRequest": {
+      "type": "object",
+      "required": ["phone", "purpose"],
+      "properties": {
+        "phone": {
+          "type": "string",
+          "description": "手机号",
+          "example": "13800138000"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "验证码用途：verification（验证）、login（登录）、register（注册）、resetpassword（重置密码）",
+          "enum": ["verification", "login", "register", "resetpassword"],
+          "example": "register"
+        }
+      },
+      "example": {
+        "phone": "13800138000",
+        "purpose": "register"
+      }
+    },
+    "SendCodeData": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "是否发送成功",
+          "example": true
+        }
+      }
+    },
+    "SendCodeResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/SendCodeData"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+

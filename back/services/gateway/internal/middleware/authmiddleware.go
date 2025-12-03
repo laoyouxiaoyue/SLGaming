@@ -86,8 +86,9 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 						w.Header().Set("X-Refresh-Token", newRefreshToken)
 					}
 
-					// 将用户 ID 存储到 context 中
+					// 将用户 ID 和 Access Token 存储到 context 中
 					ctx := SetUserID(r.Context(), userID)
+					ctx = SetAccessToken(ctx, newAccessToken)
 
 					// 继续处理请求
 					next.ServeHTTP(w, r.WithContext(ctx))
@@ -100,8 +101,24 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 				return
 			}
 
-			// 将用户 ID 存储到 context 中
+			// 验证 Access Token 是否在黑名单中（已被撤销）
+			if svcCtx.TokenStore != nil {
+				tokenExpiration := claims.ExpiresAt.Time
+				valid, err := svcCtx.TokenStore.VerifyAccessToken(r.Context(), claims.UserID, tokenString, tokenExpiration)
+				if err != nil {
+					logx.Errorf("verify access token failed: %v", err)
+					httpx.ErrorCtx(r.Context(), w, errors.New("验证认证令牌失败"))
+					return
+				}
+				if !valid {
+					httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌已被撤销"))
+					return
+				}
+			}
+
+			// 将用户 ID 和 Access Token 存储到 context 中
 			ctx := SetUserID(r.Context(), claims.UserID)
+			ctx = SetAccessToken(ctx, tokenString)
 
 			// 继续处理请求
 			next.ServeHTTP(w, r.WithContext(ctx))

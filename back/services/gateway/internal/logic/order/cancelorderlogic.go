@@ -35,17 +35,8 @@ func (l *CancelOrderLogic) CancelOrder(req *types.CancelOrderRequest) (resp *typ
 		return nil, fmt.Errorf("order rpc client not initialized")
 	}
 
-	// 当前登录用户作为 operator_id
-	operatorID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || operatorID == 0 {
-		l.Errorf("get user id from context failed: %v", getUserErr)
-		return &types.CancelOrderResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-		}, nil
-	}
+	// 当前登录用户作为 operator_id（由网关鉴权中间件注入）
+	operatorID, _ := middleware.GetUserID(l.ctx)
 
 	rpcResp, err := l.svcCtx.OrderRPC.CancelOrder(l.ctx, &orderclient.CancelOrderRequest{
 		OrderId:    req.OrderId,

@@ -1,0 +1,1408 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "用户服务 API",
+    "description": "用户相关的接口文档，包括注册、登录、用户信息管理、钱包和陪玩功能",
+    "version": "1.0.0"
+  },
+  "host": "api.example.com",
+  "basePath": "/api",
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Bearer Token 认证，格式: Bearer {accessToken}"
+    }
+  },
+  "paths": {
+    "/user/register": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "用户注册",
+        "description": "通过手机号和验证码注册新用户",
+        "operationId": "register",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "注册成功",
+            "schema": {
+              "$ref": "#/definitions/RegisterResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "注册成功",
+                "data": {
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "expiresIn": 900
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "验证码错误或已过期"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "注册失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "用户登录",
+        "description": "通过手机号和密码登录",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "登录成功",
+                "data": {
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "expiresIn": 900
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "用户名或密码错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "用户名或密码错误"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "登录失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login-by-code": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "验证码登录",
+        "description": "通过手机号和验证码登录",
+        "operationId": "loginByCode",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginByCodeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "schema": {
+              "$ref": "#/definitions/LoginByCodeResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "登录成功",
+                "data": {
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "expiresIn": 900
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "验证码错误或已过期",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "验证码错误或已过期"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "登录失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": ["用户信息"],
+        "summary": "获取用户信息",
+        "description": "根据ID、UID或手机号查询用户信息",
+        "operationId": "getUser",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "integer",
+            "format": "int64",
+            "description": "用户ID"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "type": "integer",
+            "format": "int64",
+            "description": "用户UID"
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "type": "string",
+            "description": "手机号"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetUserResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "获取成功",
+                "data": {
+                  "id": 1,
+                  "uid": 10001,
+                  "nickname": "张三",
+                  "phone": "13800138000",
+                  "role": 1,
+                  "avatarUrl": "https://example.com/avatar/1.jpg",
+                  "bio": "这是一个测试用户"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "404": {
+            "description": "用户不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "用户不存在"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["用户信息"],
+        "summary": "更新用户信息",
+        "description": "更新用户的基本信息",
+        "operationId": "updateUser",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "schema": {
+              "$ref": "#/definitions/UpdateUserResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "更新成功",
+                "data": {
+                  "id": 1,
+                  "uid": 10001,
+                  "nickname": "李四",
+                  "phone": "13800138000",
+                  "role": 1,
+                  "avatarUrl": "https://example.com/avatar/1.jpg",
+                  "bio": "更新后的个人简介"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "请求参数错误"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/forgetPassword": {
+      "put": {
+        "tags": ["用户认证"],
+        "summary": "忘记密码",
+        "description": "通过手机号和验证码重置密码",
+        "operationId": "forgetPassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ForgetPasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "密码重置成功",
+            "schema": {
+              "$ref": "#/definitions/ForgetPasswordResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "密码重置成功",
+                "data": {
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "expiresIn": 900
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "验证码错误或已过期",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "验证码错误或已过期"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "重置密码失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/refresh-token": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "刷新Token",
+        "description": "使用Refresh Token刷新Access Token",
+        "operationId": "refreshToken",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RefreshTokenRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "刷新成功",
+            "schema": {
+              "$ref": "#/definitions/RefreshTokenResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "刷新成功",
+                "data": {
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "expiresIn": 900
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh Token无效或已过期",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "Refresh Token无效或已过期"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "用户登出",
+        "description": "登出当前用户，使Token失效",
+        "operationId": "logout",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "登出成功",
+            "schema": {
+              "$ref": "#/definitions/LogoutResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "登出成功",
+                "data": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/wallet": {
+      "get": {
+        "tags": ["钱包"],
+        "summary": "获取钱包余额",
+        "description": "查询当前用户的帅币钱包余额（需要登录）",
+        "operationId": "getWallet",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetWalletResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "获取成功",
+                "data": {
+                  "userId": 1,
+                  "balance": 10000,
+                  "frozenBalance": 500
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "获取钱包余额失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/companion/profile": {
+      "get": {
+        "tags": ["陪玩信息"],
+        "summary": "获取陪玩信息",
+        "description": "获取当前用户的陪玩信息（需要登录）",
+        "operationId": "getCompanionProfile",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetCompanionProfileResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "获取成功",
+                "data": {
+                  "userId": 2,
+                  "gameSkills": "[\"王者荣耀\", \"和平精英\", \"原神\"]",
+                  "pricePerHour": 50,
+                  "status": 1,
+                  "rating": 4.8,
+                  "totalOrders": 128,
+                  "isVerified": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，当前用户不是陪玩角色",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "当前用户不是陪玩角色"
+              }
+            }
+          },
+          "404": {
+            "description": "陪玩信息不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "陪玩信息不存在"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["陪玩信息"],
+        "summary": "更新陪玩信息",
+        "description": "更新当前用户的陪玩信息（需要登录，仅陪玩角色）",
+        "operationId": "updateCompanionProfile",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateCompanionProfileRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "schema": {
+              "$ref": "#/definitions/UpdateCompanionProfileResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "更新成功",
+                "data": {
+                  "userId": 2,
+                  "gameSkills": "[\"王者荣耀\", \"和平精英\"]",
+                  "pricePerHour": 60,
+                  "status": 1,
+                  "rating": 4.8,
+                  "totalOrders": 128,
+                  "isVerified": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，当前用户不是陪玩角色",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "当前用户不是陪玩角色"
+              }
+            }
+          },
+          "404": {
+            "description": "陪玩信息不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "陪玩信息不存在"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/companions": {
+      "get": {
+        "tags": ["陪玩信息"],
+        "summary": "获取陪玩列表",
+        "description": "获取陪玩列表（公开接口，用于订单匹配）",
+        "operationId": "getCompanionList",
+        "parameters": [
+          {
+            "name": "gameSkills",
+            "in": "query",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "游戏技能筛选"
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "type": "integer",
+            "format": "int64",
+            "description": "最低价格"
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "type": "integer",
+            "format": "int64",
+            "description": "最高价格"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "integer",
+            "description": "状态筛选：0=离线, 1=在线, 2=忙碌（默认1）"
+          },
+          {
+            "name": "isVerified",
+            "in": "query",
+            "type": "boolean",
+            "description": "是否只返回认证陪玩"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "页码（从1开始）"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "description": "每页数量"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetCompanionListResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "获取成功",
+                "data": {
+                  "companions": [
+                    {
+                      "userId": 2,
+                      "gameSkills": "[\"王者荣耀\", \"和平精英\"]",
+                      "pricePerHour": 50,
+                      "status": 1,
+                      "rating": 4.8,
+                      "totalOrders": 128,
+                      "isVerified": true
+                    },
+                    {
+                      "userId": 3,
+                      "gameSkills": "[\"原神\", \"崩坏：星穹铁道\"]",
+                      "pricePerHour": 45,
+                      "status": 1,
+                      "rating": 4.6,
+                      "totalOrders": 95,
+                      "isVerified": true
+                    }
+                  ],
+                  "total": 25,
+                  "page": 1,
+                  "pageSize": 10
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "获取陪玩列表失败"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BaseResp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "响应码，0表示成功"
+        },
+        "msg": {
+          "type": "string",
+          "description": "响应消息"
+        }
+      },
+      "required": ["code", "msg"]
+    },
+    "RegisterRequest": {
+      "type": "object",
+      "required": ["phone", "code", "password"],
+      "properties": {
+        "phone": {
+          "type": "string",
+          "description": "手机号",
+          "example": "13800138000"
+        },
+        "code": {
+          "type": "string",
+          "description": "验证码",
+          "example": "123456"
+        },
+        "password": {
+          "type": "string",
+          "description": "密码",
+          "example": "password123"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "昵称（可选）",
+          "example": "张三"
+        },
+        "role": {
+          "type": "integer",
+          "description": "用户角色：1=老板, 2=陪玩, 3=管理员（默认1）",
+          "example": 1
+        }
+      },
+      "example": {
+        "phone": "13800138000",
+        "code": "123456",
+        "password": "password123",
+        "nickname": "张三",
+        "role": 1
+      }
+    },
+    "RegisterData": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "description": "Access Token（短期，15分钟）"
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "Refresh Token（长期，7天）"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Access Token 过期时间（秒）"
+        }
+      }
+    },
+    "RegisterResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/RegisterData"
+            }
+          }
+        }
+      ]
+    },
+    "LoginRequest": {
+      "type": "object",
+      "required": ["phone", "password"],
+      "properties": {
+        "phone": {
+          "type": "string",
+          "description": "手机号",
+          "example": "13800138000"
+        },
+        "password": {
+          "type": "string",
+          "description": "密码",
+          "example": "password123"
+        }
+      },
+      "example": {
+        "phone": "13800138000",
+        "password": "password123"
+      }
+    },
+    "LoginData": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "description": "Access Token（短期，15分钟）"
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "Refresh Token（长期，7天）"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Access Token 过期时间（秒）"
+        }
+      }
+    },
+    "LoginResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/LoginData"
+            }
+          }
+        }
+      ]
+    },
+    "LoginByCodeRequest": {
+      "type": "object",
+      "required": ["phone", "code"],
+      "properties": {
+        "phone": {
+          "type": "string",
+          "description": "手机号",
+          "example": "13800138000"
+        },
+        "code": {
+          "type": "string",
+          "description": "验证码",
+          "example": "123456"
+        }
+      },
+      "example": {
+        "phone": "13800138000",
+        "code": "123456"
+      }
+    },
+    "LoginByCodeResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/LoginData"
+            }
+          }
+        }
+      ]
+    },
+    "UserInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户ID"
+        },
+        "uid": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户UID"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "昵称"
+        },
+        "phone": {
+          "type": "string",
+          "description": "手机号"
+        },
+        "role": {
+          "type": "integer",
+          "description": "用户角色：1=老板, 2=陪玩, 3=管理员"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "头像URL"
+        },
+        "bio": {
+          "type": "string",
+          "description": "个人简介"
+        }
+      }
+    },
+    "GetUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户ID"
+        },
+        "uid": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户UID"
+        },
+        "phone": {
+          "type": "string",
+          "description": "手机号"
+        }
+      }
+    },
+    "GetUserResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/UserInfo"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateUserRequest": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户ID",
+          "example": 1
+        },
+        "nickname": {
+          "type": "string",
+          "description": "昵称（可选）",
+          "example": "李四"
+        },
+        "password": {
+          "type": "string",
+          "description": "密码（可选）",
+          "example": "newpassword123"
+        },
+        "phone": {
+          "type": "string",
+          "description": "手机号（可选）",
+          "example": "13800138000"
+        },
+        "role": {
+          "type": "integer",
+          "description": "用户角色（可选）",
+          "example": 1
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "头像URL（可选）",
+          "example": "https://example.com/avatar/1.jpg"
+        },
+        "bio": {
+          "type": "string",
+          "description": "个人简介（可选）",
+          "example": "更新后的个人简介"
+        }
+      },
+      "example": {
+        "id": 1,
+        "nickname": "李四",
+        "avatarUrl": "https://example.com/avatar/1.jpg",
+        "bio": "更新后的个人简介"
+      }
+    },
+    "UpdateUserResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/UserInfo"
+            }
+          }
+        }
+      ]
+    },
+    "ForgetPasswordRequest": {
+      "type": "object",
+      "required": ["phone", "code", "password"],
+      "properties": {
+        "phone": {
+          "type": "string",
+          "description": "手机号",
+          "example": "13800138000"
+        },
+        "code": {
+          "type": "string",
+          "description": "验证码",
+          "example": "123456"
+        },
+        "password": {
+          "type": "string",
+          "description": "新密码",
+          "example": "newpassword123"
+        }
+      },
+      "example": {
+        "phone": "13800138000",
+        "code": "123456",
+        "password": "newpassword123"
+      }
+    },
+    "ForgetPasswordResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/LoginData"
+            }
+          }
+        }
+      ]
+    },
+    "RefreshTokenRequest": {
+      "type": "object",
+      "required": ["refreshToken"],
+      "properties": {
+        "refreshToken": {
+          "type": "string",
+          "description": "Refresh Token",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "example": {
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      }
+    },
+    "RefreshTokenResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/LoginData"
+            }
+          }
+        }
+      ]
+    },
+    "LogoutData": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "是否成功"
+        }
+      }
+    },
+    "LogoutResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/LogoutData"
+            }
+          }
+        }
+      ]
+    },
+    "WalletInfo": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户ID"
+        },
+        "balance": {
+          "type": "integer",
+          "format": "int64",
+          "description": "余额（帅币）"
+        },
+        "frozenBalance": {
+          "type": "integer",
+          "format": "int64",
+          "description": "冻结余额（帅币）"
+        }
+      }
+    },
+    "GetWalletResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/WalletInfo"
+            }
+          }
+        }
+      ]
+    },
+    "CompanionInfo": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户ID"
+        },
+        "gameSkills": {
+          "type": "string",
+          "description": "游戏技能列表（JSON格式）"
+        },
+        "pricePerHour": {
+          "type": "integer",
+          "format": "int64",
+          "description": "每小时价格（帅币）"
+        },
+        "status": {
+          "type": "integer",
+          "description": "状态：0=离线, 1=在线, 2=忙碌"
+        },
+        "rating": {
+          "type": "number",
+          "format": "double",
+          "description": "评分（0-5分）"
+        },
+        "totalOrders": {
+          "type": "integer",
+          "format": "int64",
+          "description": "总接单数"
+        },
+        "isVerified": {
+          "type": "boolean",
+          "description": "是否认证"
+        }
+      }
+    },
+    "GetCompanionProfileResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/CompanionInfo"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateCompanionProfileRequest": {
+      "type": "object",
+      "properties": {
+        "gameSkills": {
+          "type": "string",
+          "description": "游戏技能列表（JSON格式，可选）",
+          "example": "[\"王者荣耀\", \"和平精英\"]"
+        },
+        "pricePerHour": {
+          "type": "integer",
+          "format": "int64",
+          "description": "每小时价格（帅币，可选）",
+          "example": 60
+        },
+        "status": {
+          "type": "integer",
+          "description": "状态：0=离线, 1=在线, 2=忙碌（可选）",
+          "example": 1
+        }
+      },
+      "example": {
+        "gameSkills": "[\"王者荣耀\", \"和平精英\"]",
+        "pricePerHour": 60,
+        "status": 1
+      }
+    },
+    "UpdateCompanionProfileResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/CompanionInfo"
+            }
+          }
+        }
+      ]
+    },
+    "GetCompanionListData": {
+      "type": "object",
+      "properties": {
+        "companions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CompanionInfo"
+          },
+          "description": "陪玩列表"
+        },
+        "total": {
+          "type": "integer",
+          "description": "总数"
+        },
+        "page": {
+          "type": "integer",
+          "description": "当前页码"
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "每页数量"
+        }
+      }
+    },
+    "GetCompanionListResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/GetCompanionListData"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+

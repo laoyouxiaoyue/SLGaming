@@ -30,17 +30,7 @@ func NewGetWalletLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetWall
 
 func (l *GetWalletLogic) GetWallet() (resp *types.GetWalletResponse, err error) {
 	// 从 context 中获取当前登录用户 ID（由网关鉴权中间件注入）
-	userID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || userID == 0 {
-		l.Errorf("get user id from context failed: %v", getUserErr)
-		return &types.GetWalletResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-			Data: types.WalletInfo{},
-		}, nil
-	}
+	userID, err := middleware.GetUserID(l.ctx)
 
 	// 调用 User RPC 的 GetWallet 接口
 	rpcResp, err := l.svcCtx.UserRPC.GetWallet(l.ctx, &userclient.GetWalletRequest{

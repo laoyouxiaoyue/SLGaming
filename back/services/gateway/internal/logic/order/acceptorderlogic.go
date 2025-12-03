@@ -34,17 +34,8 @@ func (l *AcceptOrderLogic) AcceptOrder(req *types.AcceptOrderRequest) (resp *typ
 		return nil, fmt.Errorf("order rpc client not initialized")
 	}
 
-	// 当前登录用户作为陪玩ID
-	companionID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || companionID == 0 {
-		l.Errorf("get user id from context failed: %v", getUserErr)
-		return &types.AcceptOrderResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-		}, nil
-	}
+	// 当前登录用户作为陪玩ID（由网关鉴权中间件注入）
+	companionID, _ := middleware.GetUserID(l.ctx)
 
 	rpcResp, err := l.svcCtx.OrderRPC.AcceptOrder(l.ctx, &orderclient.AcceptOrderRequest{
 		OrderId:     req.OrderId,

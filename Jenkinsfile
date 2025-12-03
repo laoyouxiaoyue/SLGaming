@@ -16,6 +16,11 @@ pipeline {
         BUILD_DIR    = 'build'
         // Go 模块缓存目录（持久化到 Jenkins 挂载目录，避免每次重新下载）
         GOMODCACHE   = "${GOPATH}/pkg/mod"
+
+        // 使用国内 Go 模块代理，避免 proxy.golang.org 超时
+        GOPROXY      = 'https://goproxy.cn,direct'
+        // 关闭 Go 官方校验（国内环境下常用配置）
+        GOSUMDB      = 'off'
     }
 
     stages {
@@ -33,6 +38,8 @@ pipeline {
                     echo "GOROOT = $GOROOT"
                     echo "GOPATH = $GOPATH"
                     echo "GOMODCACHE = $GOMODCACHE"
+                    echo "GOPROXY = $GOPROXY"
+                    echo "GOSUMDB = $GOSUMDB"
                     echo "PATH   = $PATH"
                     echo "Go version:"
                     go version
@@ -44,7 +51,6 @@ pipeline {
 
 
         stage('Build Services') {
-            parallel {
                 stage('Build Gateway') {
                     steps {
                         echo 'Building Gateway service...'
@@ -77,7 +83,6 @@ pipeline {
                         }
                     }
                 }
-            }
         }
 
         stage('Package') {

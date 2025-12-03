@@ -1,5 +1,11 @@
 package model
 
+import (
+	"SLGaming/back/pkg/snowflake"
+
+	"gorm.io/gorm"
+)
+
 // 用户钱包与钱包流水模型（帅币）
 //
 // 设计说明：
@@ -22,6 +28,15 @@ type UserWallet struct {
 
 func (w *UserWallet) TableName() string {
 	return "user_wallets"
+}
+
+// BeforeCreate 创建前钩子：生成 ID
+func (w *UserWallet) BeforeCreate(tx *gorm.DB) error {
+	// 生成系统主键 (雪花算法，必须有)
+	if w.ID == 0 {
+		w.ID = uint64(snowflake.GenID())
+	}
+	return nil
 }
 
 // WalletTransaction 钱包流水
@@ -57,4 +72,11 @@ func (t *WalletTransaction) TableName() string {
 	return "wallet_transactions"
 }
 
-
+// BeforeCreate 创建前钩子：生成 ID
+func (t *WalletTransaction) BeforeCreate(tx *gorm.DB) error {
+	// 生成系统主键 (雪花算法，必须有)
+	if t.ID == 0 {
+		t.ID = uint64(snowflake.GenID())
+	}
+	return nil
+}

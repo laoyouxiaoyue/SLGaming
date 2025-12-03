@@ -34,17 +34,8 @@ func (l *RateOrderLogic) RateOrder(req *types.RateOrderRequest) (resp *types.Rat
 		return nil, fmt.Errorf("order rpc client not initialized")
 	}
 
-	// 当前登录用户作为 boss_id
-	bossID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || bossID == 0 {
-		l.Errorf("get user id from context failed: %v", getUserErr)
-		return &types.RateOrderResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-		}, nil
-	}
+	// 当前登录用户作为 boss_id（由网关鉴权中间件注入）
+	bossID, _ := middleware.GetUserID(l.ctx)
 
 	rpcResp, err := l.svcCtx.OrderRPC.RateOrder(l.ctx, &orderclient.RateOrderRequest{
 		OrderId: req.OrderId,

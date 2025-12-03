@@ -811,3 +811,196 @@ runtime.goexit
 2025-12-02T13:00:59.029+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
 2025-12-02T13:00:59.060+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
 2025-12-02T13:00:59.090+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-12-02T17:29:57.208+0800	ERROR	rpc/grpc_client.go:273	connectionId 1764651658285_116.147.66.195_9637 request stream error, switch server, error=rpc error: code = Unavailable desc = error reading from server: EOF
+2025-12-02T17:29:57.208+0800	INFO	rpc/rpc_client.go:427	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-02T17:29:57.208+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:29:57.208+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:29:57.208+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:29:57.273+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:29:57.273+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:29:57.273+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:00.274+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 1 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = received context error while waiting for new LB policy update: context deadline exceeded
+2025-12-02T17:30:00.374+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:00.374+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:00.374+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:02.725+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 2 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:02.926+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:02.926+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:02.926+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:05.114+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 3 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:05.414+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:05.414+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:05.414+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:07.628+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 4 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:08.028+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:08.028+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:08.028+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:10.264+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 5 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:10.765+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:10.765+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:10.765+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:12.941+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 6 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:13.541+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:13.541+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:13.541+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:15.891+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 7 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:16.592+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:16.592+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:16.592+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:18.795+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 8 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:19.595+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:19.595+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:19.595+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:22.253+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 9 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:23.153+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:23.153+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:23.153+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:25.441+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 10 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:26.442+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:26.442+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:26.442+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:28.605+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 11 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 120.26.29.194:9848: connectex: No connection could be made because the target machine actively refused it."
+2025-12-02T17:30:29.706+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:29.706+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:29.706+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:32.707+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 12 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = received context error while waiting for new LB policy update: context deadline exceeded
+2025-12-02T17:30:33.908+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:33.908+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:33.908+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:36.961+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 13 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-02T17:30:38.261+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:38.261+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:38.261+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:41.583+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 14 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-02T17:30:42.983+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:42.983+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:42.983+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:46.224+0800	WARN	rpc/rpc_client.go:458	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f fail to connect server, after trying 15 times, last try server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, error=server check request failed , err:rpc error: code = DeadlineExceeded desc = context deadline exceeded
+2025-12-02T17:30:47.724+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:47.724+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:47.724+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:48.044+0800	INFO	rpc/rpc_client.go:440	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764667847275_116.147.66.195_10434
+2025-12-02T17:30:48.044+0800	INFO	rpc/rpc_client.go:444	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764651658285_116.147.66.195_9637
+2025-12-02T17:30:48.044+0800	INFO	rpc/rpc_client.go:487	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f notify disconnected event to listeners , connectionId=1764667847275_116.147.66.195_10434
+2025-12-02T17:30:48.044+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-02T17:30:48.046+0800	INFO	rpc/rpc_client.go:487	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f notify connected event to listeners , connectionId=1764667847275_116.147.66.195_10434
+2025-12-02T17:30:48.046+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-02T17:30:48.183+0800	INFO	rpc/rpc_client.go:604	Connection is unregistered, switch server, connectionId=1764667847275_116.147.66.195_10434, request=ConfigBatchListenRequest
+2025-12-02T17:30:48.183+0800	INFO	rpc/rpc_client.go:427	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f try to re connect to a new server, server is not appointed, will choose a random server.
+2025-12-02T17:30:48.183+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-02T17:30:48.183+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-02T17:30:48.183+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-02T17:30:48.183+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"6f673ec39d6cc1b5084601c21e7fb1a4","dataId":"code.yaml","tenant":"adc722cd-9c3b-40a7-80fa-b25535bdbe58"}]}, retryTimes=0, error=Connection is unregistered.
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:610
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:414
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-02T17:30:48.284+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"6f673ec39d6cc1b5084601c21e7fb1a4","dataId":"code.yaml","tenant":"adc722cd-9c3b-40a7-80fa-b25535bdbe58"}]}, retryTimes=1, error=client not connected, current status:UNHEALTHY
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:414
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-02T17:30:48.385+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"6f673ec39d6cc1b5084601c21e7fb1a4","dataId":"code.yaml","tenant":"adc722cd-9c3b-40a7-80fa-b25535bdbe58"}]}, retryTimes=2, error=client not connected, current status:UNHEALTHY
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:414
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-02T17:30:48.402+0800	INFO	rpc/rpc_client.go:440	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f success to connect a server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId=1764667847730_116.147.66.195_10440
+2025-12-02T17:30:48.402+0800	INFO	rpc/rpc_client.go:444	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f abandon prev connection, server is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}, connectionId is 1764667847275_116.147.66.195_10434
+2025-12-02T17:30:48.402+0800	INFO	rpc/rpc_client.go:487	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f notify disconnected event to listeners , connectionId=1764667847730_116.147.66.195_10440
+2025-12-02T17:30:48.403+0800	ERROR	rpc/grpc_client.go:280	connectionId 1764667847275_116.147.66.195_10434 received error event, isRunning:true, isAbandon=true, error=rpc error: code = Canceled desc = grpc: the client connection is closing
+2025-12-02T17:30:48.403+0800	INFO	config_client/config_connection_event_listener.go:45	[ConfigConnectionEventListener] disconnect from config server for taskId: 0
+2025-12-02T17:30:48.403+0800	INFO	rpc/rpc_client.go:487	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f notify connected event to listeners , connectionId=1764667847730_116.147.66.195_10440
+2025-12-02T17:30:48.403+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-02T17:30:48.486+0800	WARN	config_client/config_client.go:441	ConfigBatchListenRequest failure, err:client not connected, current status:UNHEALTHY
+2025-12-02T17:30:48.486+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"6f673ec39d6cc1b5084601c21e7fb1a4","dataId":"code.yaml","tenant":"adc722cd-9c3b-40a7-80fa-b25535bdbe58"}]}, retryTimes=0, error=client not connected, current status:UNHEALTHY
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:414
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-02T17:30:48.587+0800	ERROR	rpc/rpc_client.go:630	Send request fail, request=ConfigBatchListenRequest, body={"requestId":"","group":"","dataId":"","tenant":"","module":"config","listen":true,"configListenContexts":[{"group":"dev","md5":"6f673ec39d6cc1b5084601c21e7fb1a4","dataId":"code.yaml","tenant":"adc722cd-9c3b-40a7-80fa-b25535bdbe58"}]}, retryTimes=1, error=client not connected, current status:UNHEALTHY
+github.com/nacos-group/nacos-sdk-go/v2/common/remote/rpc.(*RpcClient).Request
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/common/remote/rpc/rpc_client.go:592
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigProxy).requestProxy
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_proxy.go:63
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).executeConfigListen
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:439
+github.com/nacos-group/nacos-sdk-go/v2/clients/config_client.(*ConfigClient).startInternal.func1
+	G:/gopath/pkg/mod/github.com/nacos-group/nacos-sdk-go/v2@v2.3.5/clients/config_client/config_client.go:414
+runtime.goexit
+	D:/go/src/runtime/asm_amd64.s:1700
+2025-12-02T17:30:48.653+0800	INFO	rpc/rpc_client.go:415	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f server check success, currentServer is {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-02T17:30:48.653+0800	INFO	rpc/rpc_client.go:487	config-0-a9eb21ec-83d0-4e28-bba6-28b474f2ae5f notify connected event to listeners , connectionId=1764667847730_116.147.66.195_10440
+2025-12-02T17:30:48.653+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-03T11:47:56.098+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T11:47:56.116+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-a4797771-209c-4d15-96c7-fb87896f45a7)
+2025-12-03T11:47:56.116+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-03T11:47:56.116+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-03T11:47:56.116+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-03T11:47:56.116+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-a4797771-209c-4d15-96c7-fb87896f45a7 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-03T11:47:56.116+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-03T11:47:56.116+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-03T11:47:56.116+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-03T11:47:56.131+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-03T11:47:56.312+0800	INFO	rpc/rpc_client.go:337	config-0-a4797771-209c-4d15-96c7-fb87896f45a7 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764733676222_116.147.66.195_9549
+2025-12-03T11:47:56.312+0800	INFO	rpc/rpc_client.go:487	config-0-a4797771-209c-4d15-96c7-fb87896f45a7 notify connected event to listeners , connectionId=1764733676222_116.147.66.195_9549
+2025-12-03T11:47:56.312+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-03T11:47:56.418+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T11:47:56.462+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T11:47:56.523+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-12-03T12:51:07.098+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T12:51:07.138+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-5344aadb-2dcd-484c-a237-90c3b0a30d47)
+2025-12-03T12:51:07.138+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-03T12:51:07.138+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-03T12:51:07.138+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-03T12:51:07.138+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-5344aadb-2dcd-484c-a237-90c3b0a30d47 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-03T12:51:07.138+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-03T12:51:07.138+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-03T12:51:07.138+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-03T12:51:07.161+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-03T12:51:07.353+0800	INFO	rpc/rpc_client.go:337	config-0-5344aadb-2dcd-484c-a237-90c3b0a30d47 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764737467248_116.147.66.195_9259
+2025-12-03T12:51:07.354+0800	INFO	rpc/rpc_client.go:487	config-0-5344aadb-2dcd-484c-a237-90c3b0a30d47 notify connected event to listeners , connectionId=1764737467248_116.147.66.195_9259
+2025-12-03T12:51:07.354+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-03T12:51:07.458+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T12:51:07.542+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T12:51:07.724+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist
+2025-12-03T14:45:43.673+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T14:45:43.673+0800	INFO	rpc/rpc_client.go:157	init rpc client for name %!(EXTRA string=config-0-5062d3f6-d078-46df-814c-0e678a5b1918)
+2025-12-03T14:45:43.673+0800	INFO	rpc/rpc_client.go:166	get app conn labels from client config map[] 
+2025-12-03T14:45:43.673+0800	INFO	rpc/rpc_client.go:168	get app conn labels from env map[] 
+2025-12-03T14:45:43.673+0800	INFO	rpc/rpc_client.go:171	final app conn labels : map[] 
+2025-12-03T14:45:43.673+0800	INFO	rpc/rpc_client.go:327	[RpcClient.Start] config-0-5062d3f6-d078-46df-814c-0e678a5b1918 try to connect to server on start up, server: {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848}
+2025-12-03T14:45:43.673+0800	INFO	rpc/grpc_client.go:175	check tls config %!(EXTRA *constant.TLSConfig=&{false false false    })
+2025-12-03T14:45:43.673+0800	INFO	rpc/grpc_client.go:180	try to get tls config from env
+2025-12-03T14:45:43.673+0800	INFO	rpc/grpc_client.go:189	 tls config from env is not enable
+2025-12-03T14:45:43.694+0800	INFO	util/common.go:96	Local IP:192.168.0.108
+2025-12-03T14:45:43.868+0800	INFO	rpc/rpc_client.go:337	config-0-5062d3f6-d078-46df-814c-0e678a5b1918 success to connect to server {serverIp:120.26.29.194 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1764744343767_116.147.66.195_11211
+2025-12-03T14:45:43.868+0800	INFO	rpc/rpc_client.go:487	config-0-5062d3f6-d078-46df-814c-0e678a5b1918 notify connected event to listeners , connectionId=1764744343767_116.147.66.195_11211
+2025-12-03T14:45:43.868+0800	INFO	config_client/config_connection_event_listener.go:38	[ConfigConnectionEventListener] connect to config server for taskId: 0
+2025-12-03T14:45:43.940+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T14:45:43.972+0800	WARN	cache/disk_cache.go:193	read Config Content failed. cause file doesn't exist, file path: tmp/nacos/cache\config\code-templates.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58_failover.
+2025-12-03T14:45:44.002+0800	WARN	cache/disk_cache.go:155	read cache file Config Encrypted Data Key failed. cause file doesn't exist, file path: tmp/nacos/cache\config\encrypted-data-key\code.yaml@@dev@@adc722cd-9c3b-40a7-80fa-b25535bdbe58.: file not exist

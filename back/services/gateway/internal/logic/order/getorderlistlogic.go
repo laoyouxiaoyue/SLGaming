@@ -34,17 +34,8 @@ func (l *GetOrderListLogic) GetOrderList(req *types.GetOrderListRequest) (resp *
 		return nil, fmt.Errorf("order rpc client not initialized")
 	}
 
-	// 当前登录用户
-	userID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || userID == 0 {
-		l.Errorf("get user id from context failed: %v", getUserErr)
-		return &types.GetOrderListResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-		}, nil
-	}
+	// 当前登录用户（由网关鉴权中间件注入）
+	userID, _ := middleware.GetUserID(l.ctx)
 
 	var bossId, companionId uint64
 	if req.Role == "companion" {

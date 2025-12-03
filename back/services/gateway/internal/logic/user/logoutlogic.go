@@ -5,6 +5,7 @@ package user
 
 import (
 	"context"
+	"time"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -28,35 +29,53 @@ func NewLogoutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LogoutLogi
 }
 
 func (l *LogoutLogic) Logout(req *types.LogoutRequest) (resp *types.LogoutResponse, err error) {
-	// 从 context 获取用户ID（从 Access Token 中解析的）
-	userID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || userID == 0 {
-		return &types.LogoutResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-		}, nil
-	}
+	// 从 context 获取用户ID（由网关鉴权中间件注入）
+	userID, _ := middleware.GetUserID(l.ctx)
 
-	// 撤销用户的所有 Refresh Token（设置用户级别黑名单）
 	if l.svcCtx.TokenStore != nil {
-		refreshTokenDuration := l.svcCtx.JWT.GetRefreshTokenDuration()
-		if err := l.svcCtx.TokenStore.RevokeAllUserTokens(l.ctx, userID, refreshTokenDuration); err != nil {
-			l.Errorf("revoke all user tokens failed: %v", err)
-			return &types.LogoutResponse{
-				BaseResp: types.BaseResp{
-					Code: 500,
-					Msg:  "撤销 Token 失败",
-				},
-			}, nil
+		// 1. 撤销当前的 Access Token
+		accessToken, tokenErr := middleware.GetAccessToken(l.ctx)
+		if tokenErr == nil && accessToken != "" {
+			// 解析 Access Token 获取过期时间
+			claims, parseErr := l.svcCtx.JWT.VerifyToken(accessToken)
+			if parseErr == nil {
+				// 计算剩余有效期
+				now := time.Now()
+				tokenExpiration := claims.ExpiresAt.Time
+				remainingTTL := tokenExpiration.Sub(now)
+				if remainingTTL > 0 {
+					if err := l.svcCtx.TokenStore.RevokeAccessToken(l.ctx, userID, accessToken, remainingTTL); err != nil {
+						l.Errorf("revoke access token failed: %v", err)
+						// 继续执行，不因为单个 token 撤销失败而中断
+					}
+				}
+			}
+		}
+
+		// 2. 撤销当前的 Refresh Token（如果存在）
+		refreshToken, refreshErr := middleware.GetRefreshToken(l.ctx)
+		if refreshErr == nil && refreshToken != "" {
+			// 解析 Refresh Token 获取过期时间
+			claims, parseErr := l.svcCtx.JWT.VerifyToken(refreshToken)
+			if parseErr == nil {
+				// 计算剩余有效期
+				now := time.Now()
+				tokenExpiration := claims.ExpiresAt.Time
+				remainingTTL := tokenExpiration.Sub(now)
+				if remainingTTL > 0 {
+					if err := l.svcCtx.TokenStore.RevokeRefreshToken(l.ctx, userID, refreshToken, remainingTTL); err != nil {
+						l.Errorf("revoke refresh token failed: %v", err)
+						// 继续执行，不因为单个 token 撤销失败而中断
+					}
+				}
+			}
 		}
 	}
 
 	return &types.LogoutResponse{
 		BaseResp: types.BaseResp{
 			Code: 0,
-			Msg:  "success",
+			Msg:  "登出成功",
 		},
 		Data: types.LogoutData{
 			Success: true,

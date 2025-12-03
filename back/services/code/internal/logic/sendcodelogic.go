@@ -2,9 +2,7 @@ package logic
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"strings"
 	"text/template"
 	"time"
@@ -125,18 +123,22 @@ func (l *SendCodeLogic) getTemplate(purpose string) struct {
 }
 
 func generateCode(length int) (string, error) {
-	if length <= 0 {
-		length = defaultCodeLength
-	}
-	result := make([]byte, length)
-	for i := 0; i < length; i++ {
-		n, err := rand.Int(rand.Reader, big.NewInt(10))
-		if err != nil {
-			return "", err
-		}
-		result[i] = byte('0' + n.Int64())
-	}
-	return string(result), nil
+	// 暂时返回固定验证码，方便测试
+	return "123456", nil
+
+	// 原随机生成代码（已注释，需要时恢复）：
+	// if length <= 0 {
+	// 	length = defaultCodeLength
+	// }
+	// result := make([]byte, length)
+	// for i := 0; i < length; i++ {
+	// 	n, err := rand.Int(rand.Reader, big.NewInt(10))
+	// 	if err != nil {
+	// 		return "", err
+	// 	}
+	// 	result[i] = byte('0' + n.Int64())
+	// }
+	// return string(result), nil
 }
 
 func renderTemplate(content string, code string, expireMinutes int) string {

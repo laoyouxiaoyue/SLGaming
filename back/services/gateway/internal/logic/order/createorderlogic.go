@@ -31,17 +31,8 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderRequest) (resp *typ
 		return nil, fmt.Errorf("order rpc client not initialized")
 	}
 
-	// 从 context 中获取当前登录用户 ID（老板）
-	bossID, getUserErr := middleware.GetUserID(l.ctx)
-	if getUserErr != nil || bossID == 0 {
-		l.Errorf("get user id from context failed: %v", getUserErr)
-		return &types.CreateOrderResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未授权",
-			},
-		}, nil
-	}
+	// 从 context 中获取当前登录用户 ID（老板，由网关鉴权中间件注入）
+	bossID, _ := middleware.GetUserID(l.ctx)
 
 	rpcReq := &orderclient.CreateOrderRequest{
 		BossId:          bossID,
