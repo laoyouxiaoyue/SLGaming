@@ -3,11 +3,13 @@ package svc
 import (
 	"log"
 
+	"SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/order/internal/config"
 	orderioc "SLGaming/back/services/order/internal/ioc"
 
 	"SLGaming/back/services/user/userclient"
 
+	rocketmq "github.com/apache/rocketmq-client-go/v2"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -20,6 +22,9 @@ type ServiceContext struct {
 	DB      *gorm.DB
 	Redis   *redis.Redis
 	UserRPC userclient.User
+
+	// RocketMQ 生产者（用于发送订单领域事件）
+	OrderEventProducer rocketmq.Producer
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -39,6 +44,23 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config: c,
 		DB:     db,
 		Redis:  redisClient,
+	}
+
+	// 初始化 RocketMQ Producer（如果配置了）
+	if len(c.RocketMQ.NameServers) > 0 {
+		mqCfg := &ioc.RocketMQConfigAdapter{
+			NameServers: c.RocketMQ.NameServers,
+			Namespace:   c.RocketMQ.Namespace,
+			AccessKey:   c.RocketMQ.AccessKey,
+			SecretKey:   c.RocketMQ.SecretKey,
+		}
+		producer, err := ioc.InitRocketMQProducer(mqCfg, "order-event-producer")
+		if err != nil {
+			logx.Errorf("init rocketmq producer failed: %v", err)
+		} else {
+			ctx.OrderEventProducer = producer
+			logx.Infof("init rocketmq producer success, nameservers=%v", c.RocketMQ.NameServers)
+		}
 	}
 
 	// 初始化 User RPC 客户端（通过 Consul 服务发现）
@@ -69,4 +91,3 @@ func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client
 	logx.Infof("create rpc client success: service=%s, endpoints=%v", serviceName, endpoints)
 	return client, nil
 }
-

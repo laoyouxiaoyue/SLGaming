@@ -21,6 +21,9 @@ type Config struct {
 	Nacos  NacosConf  `json:",optional"` // Nacos 配置
 	Mysql  MysqlConf  `json:",optional"` // Mysql 配置
 	Consul ConsulConf `json:",optional"`
+
+	// RocketMQ 消息队列配置（用于钱包变动、订单结算等异步处理）
+	RocketMQ RocketMQConf `json:",optional"`
 }
 
 // MysqlConf MySQL 数据库配置
@@ -45,4 +48,15 @@ type ConsulServiceConf struct {
 	Tags          []string `json:",optional"`
 	CheckInterval string   `json:",optional"`
 	CheckTimeout  string   `json:",optional"`
+}
+
+// RocketMQConf RocketMQ 配置结构
+type RocketMQConf struct {
+	// NameServer 地址列表，如 ["127.0.0.1:9876"]
+	NameServers []string `json:",optional"`
+	// 可选：命名空间，用于环境/租户隔离
+	Namespace string `json:",optional"`
+	// 可选：访问凭证（如果开启 ACL）
+	AccessKey string `json:",optional"`
+	SecretKey string `json:",optional"`
 }

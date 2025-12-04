@@ -59,10 +59,10 @@ type WalletTransaction struct {
 	AfterBalance int64 `gorm:"not null;comment:变动后余额" json:"after_balance"`
 
 	// 变动类型：RECHARGE(充值) / CONSUME(消费) / REFUND(退款) / ADJUST(人工调整) 等
-	Type string `gorm:"size:32;index;not null;comment:变动类型" json:"type"`
+	Type string `gorm:"size:32;not null;uniqueIndex:idx_trx_type_biz_order;comment:变动类型" json:"type"`
 
 	// 业务关联单号：例如订单号、充值单号等，用于追踪来源
-	BizOrderID string `gorm:"size:64;index;comment:关联业务订单号" json:"biz_order_id"`
+	BizOrderID string `gorm:"size:64;uniqueIndex:idx_trx_type_biz_order;comment:关联业务订单号" json:"biz_order_id"`
 
 	// 备注信息（可选）
 	Remark string `gorm:"size:255;comment:备注" json:"remark"`

@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 
+	"SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/order/internal/config"
 	orderioc "SLGaming/back/services/order/internal/ioc"
+	"SLGaming/back/services/order/internal/job"
 	"SLGaming/back/services/order/internal/server"
 	"SLGaming/back/services/order/internal/svc"
 	"SLGaming/back/services/order/order"
@@ -38,6 +41,13 @@ func main() {
 	}
 
 	ctx := svc.NewServiceContext(c)
+
+	// 启动订单领域事件 Outbox 分发任务 & 退款成功事件 Consumer & 支付状态事件 Consumer
+	rootCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	job.StartOutboxDispatcher(rootCtx, ctx)
+	job.StartRefundSucceededConsumer(rootCtx, ctx)
+	job.StartPaymentStatusConsumer(rootCtx, ctx)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		order.RegisterOrderServer(grpcServer, server.NewOrderServer(ctx))

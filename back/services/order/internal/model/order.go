@@ -16,6 +16,9 @@ const (
 	OrderStatusCompleted = 5 // 已完成
 	OrderStatusCancelled = 6 // 已取消
 	OrderStatusRated     = 7 // 已评价
+
+	// 取消中，等待退款完成（仅用于已支付/已接单但尚未退款完成的订单）
+	OrderStatusCancelRefunding = 8 // 取消中（退款处理中）
 )
 
 // BaseModel 基础模型（与 user 服务风格保持一致）

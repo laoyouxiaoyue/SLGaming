@@ -50,39 +50,37 @@ pipeline {
 
 
 
-        stage('Build Services') {
-                stage('Build Gateway') {
-                    steps {
-                        echo 'Building Gateway service...'
-                        dir("${PROJECT_PATH}") {
-                            sh '''
-                                CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${WORKSPACE}/${BUILD_DIR}/gateway ./services/gateway/gateway.go
-                            '''
-                        }
-                    }
+        stage('Build Gateway') {
+            steps {
+                echo 'Building Gateway service...'
+                dir("${PROJECT_PATH}") {
+                    sh '''
+                        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${WORKSPACE}/${BUILD_DIR}/gateway ./services/gateway/gateway.go
+                    '''
                 }
+            }
+        }
 
-                stage('Build Code Service') {
-                    steps {
-                        echo 'Building Code service...'
-                        dir("${PROJECT_PATH}") {
-                            sh '''
-                                CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${WORKSPACE}/${BUILD_DIR}/code ./services/code/code.go
-                            '''
-                        }
-                    }
+        stage('Build Code Service') {
+            steps {
+                echo 'Building Code service...'
+                dir("${PROJECT_PATH}") {
+                    sh '''
+                        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${WORKSPACE}/${BUILD_DIR}/code ./services/code/code.go
+                    '''
                 }
+            }
+        }
 
-                stage('Build User Service') {
-                    steps {
-                        echo 'Building User service...'
-                        dir("${PROJECT_PATH}") {
-                            sh '''
-                                CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${WORKSPACE}/${BUILD_DIR}/user ./services/user/user.go
-                            '''
-                        }
-                    }
+        stage('Build User Service') {
+            steps {
+                echo 'Building User service...'
+                dir("${PROJECT_PATH}") {
+                    sh '''
+                        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${WORKSPACE}/${BUILD_DIR}/user ./services/user/user.go
+                    '''
                 }
+            }
         }
 
         stage('Package') {

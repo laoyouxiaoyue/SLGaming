@@ -1,0 +1,1348 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "订单服务 API",
+    "description": "订单相关的接口文档，包括订单创建、查询、状态流转和评价功能",
+    "version": "1.0.0"
+  },
+  "host": "api.example.com",
+  "basePath": "/api",
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Bearer Token 认证，格式: Bearer {accessToken}"
+    }
+  },
+  "paths": {
+    "/order": {
+      "post": {
+        "tags": ["订单管理"],
+        "summary": "创建订单",
+        "description": "老板创建订单（需登录，老板角色）",
+        "operationId": "createOrder",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/CreateOrderResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "创建成功",
+                "data": {
+                  "id": 1,
+                  "orderNo": "ORD202401010001",
+                  "bossId": 1,
+                  "companionId": 2,
+                  "gameName": "王者荣耀",
+                  "gameMode": "排位赛-王者段位",
+                  "duration": 60,
+                  "pricePerHour": 50,
+                  "totalAmount": 50,
+                  "status": 1,
+                  "createdAt": 1704067200,
+                  "paidAt": 0,
+                  "acceptedAt": 0,
+                  "startAt": 0,
+                  "completedAt": 0,
+                  "cancelledAt": 0,
+                  "rating": 0,
+                  "comment": "",
+                  "cancelReason": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "请求参数错误"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，当前用户不是老板角色",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "权限不足"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "创建订单失败"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["订单管理"],
+        "summary": "获取订单详情",
+        "description": "根据订单ID或订单号获取订单详情（需登录，老板/陪玩角色）",
+        "operationId": "getOrder",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "integer",
+            "format": "int64",
+            "description": "订单ID"
+          },
+          {
+            "name": "orderNo",
+            "in": "query",
+            "type": "string",
+            "description": "订单号"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetOrderResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "获取成功",
+                "data": {
+                  "id": 1,
+                  "orderNo": "ORD202401010001",
+                  "bossId": 1,
+                  "companionId": 2,
+                  "gameName": "王者荣耀",
+                  "gameMode": "排位赛-王者段位",
+                  "duration": 60,
+                  "pricePerHour": 50,
+                  "totalAmount": 50,
+                  "status": 3,
+                  "createdAt": 1704067200,
+                  "paidAt": 1704067300,
+                  "acceptedAt": 1704067400,
+                  "startAt": 0,
+                  "completedAt": 0,
+                  "cancelledAt": 0,
+                  "rating": 0,
+                  "comment": "",
+                  "cancelReason": ""
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "订单不存在"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "获取订单失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": ["订单管理"],
+        "summary": "获取订单列表",
+        "description": "获取订单列表，支持按角色和状态筛选（需登录，老板/陪玩角色）",
+        "operationId": "getOrderList",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "type": "string",
+            "description": "角色：boss / companion（默认 boss）",
+            "enum": ["boss", "companion"]
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "integer",
+            "format": "int32",
+            "description": "状态筛选：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "format": "int32",
+            "description": "页码（从1开始）"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "format": "int32",
+            "description": "每页数量"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetOrderListResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "获取成功",
+                "data": {
+                  "orders": [
+                    {
+                      "id": 1,
+                      "orderNo": "ORD202401010001",
+                      "bossId": 1,
+                      "companionId": 2,
+                      "gameName": "王者荣耀",
+                      "gameMode": "排位赛-王者段位",
+                      "duration": 60,
+                      "pricePerHour": 50,
+                      "totalAmount": 50,
+                      "status": 3,
+                      "createdAt": 1704067200,
+                      "paidAt": 1704067300,
+                      "acceptedAt": 1704067400,
+                      "startAt": 0,
+                      "completedAt": 0,
+                      "cancelledAt": 0,
+                      "rating": 0,
+                      "comment": "",
+                      "cancelReason": ""
+                    }
+                  ],
+                  "total": 10,
+                  "page": 1,
+                  "pageSize": 10
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "获取订单列表失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/accept": {
+      "post": {
+        "tags": ["订单状态流转"],
+        "summary": "陪玩接单",
+        "description": "陪玩接受订单（需登录，陪玩角色）",
+        "operationId": "acceptOrder",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AcceptOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "接单成功",
+            "schema": {
+              "$ref": "#/definitions/AcceptOrderResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "接单成功",
+                "data": {
+                  "id": 1,
+                  "orderNo": "ORD202401010001",
+                  "bossId": 1,
+                  "companionId": 2,
+                  "gameName": "王者荣耀",
+                  "gameMode": "排位赛-王者段位",
+                  "duration": 60,
+                  "pricePerHour": 50,
+                  "totalAmount": 50,
+                  "status": 3,
+                  "createdAt": 1704067200,
+                  "paidAt": 1704067300,
+                  "acceptedAt": 1704067400,
+                  "startAt": 0,
+                  "completedAt": 0,
+                  "cancelledAt": 0,
+                  "rating": 0,
+                  "comment": "",
+                  "cancelReason": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或订单状态不允许接单",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "订单状态不允许接单"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，当前用户不是陪玩角色",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "权限不足"
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "订单不存在"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "接单失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/start": {
+      "post": {
+        "tags": ["订单状态流转"],
+        "summary": "陪玩开始服务",
+        "description": "陪玩开始服务（需登录，陪玩角色）",
+        "operationId": "startOrder",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StartOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "开始服务成功",
+            "schema": {
+              "$ref": "#/definitions/StartOrderResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "开始服务成功",
+                "data": {
+                  "id": 1,
+                  "orderNo": "ORD202401010001",
+                  "bossId": 1,
+                  "companionId": 2,
+                  "gameName": "王者荣耀",
+                  "gameMode": "排位赛-王者段位",
+                  "duration": 60,
+                  "pricePerHour": 50,
+                  "totalAmount": 50,
+                  "status": 4,
+                  "createdAt": 1704067200,
+                  "paidAt": 1704067300,
+                  "acceptedAt": 1704067400,
+                  "startAt": 1704067500,
+                  "completedAt": 0,
+                  "cancelledAt": 0,
+                  "rating": 0,
+                  "comment": "",
+                  "cancelReason": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或订单状态不允许开始服务",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "订单状态不允许开始服务"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，当前用户不是陪玩角色",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "权限不足"
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "订单不存在"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "开始服务失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/complete": {
+      "post": {
+        "tags": ["订单状态流转"],
+        "summary": "完成订单",
+        "description": "完成订单（需登录，陪玩/系统）",
+        "operationId": "completeOrder",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompleteOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "完成订单成功",
+            "schema": {
+              "$ref": "#/definitions/CompleteOrderResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "完成订单成功",
+                "data": {
+                  "id": 1,
+                  "orderNo": "ORD202401010001",
+                  "bossId": 1,
+                  "companionId": 2,
+                  "gameName": "王者荣耀",
+                  "gameMode": "排位赛-王者段位",
+                  "duration": 60,
+                  "pricePerHour": 50,
+                  "totalAmount": 50,
+                  "status": 5,
+                  "createdAt": 1704067200,
+                  "paidAt": 1704067300,
+                  "acceptedAt": 1704067400,
+                  "startAt": 1704067500,
+                  "completedAt": 1704067800,
+                  "cancelledAt": 0,
+                  "rating": 0,
+                  "comment": "",
+                  "cancelReason": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或订单状态不允许完成",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "订单状态不允许完成"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "订单不存在"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "完成订单失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/cancel": {
+      "post": {
+        "tags": ["订单状态流转"],
+        "summary": "取消订单",
+        "description": "取消订单（需登录，老板/陪玩角色）",
+        "operationId": "cancelOrder",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CancelOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取消订单成功",
+            "schema": {
+              "$ref": "#/definitions/CancelOrderResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "取消订单成功",
+                "data": {
+                  "id": 1,
+                  "orderNo": "ORD202401010001",
+                  "bossId": 1,
+                  "companionId": 2,
+                  "gameName": "王者荣耀",
+                  "gameMode": "排位赛-王者段位",
+                  "duration": 60,
+                  "pricePerHour": 50,
+                  "totalAmount": 50,
+                  "status": 6,
+                  "createdAt": 1704067200,
+                  "paidAt": 1704067300,
+                  "acceptedAt": 0,
+                  "startAt": 0,
+                  "completedAt": 0,
+                  "cancelledAt": 1704067600,
+                  "rating": 0,
+                  "comment": "",
+                  "cancelReason": "临时有事"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或订单状态不允许取消",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "订单状态不允许取消"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，只有订单的老板或陪玩可以取消",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "权限不足"
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "订单不存在"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "取消订单失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/rate": {
+      "post": {
+        "tags": ["订单评价"],
+        "summary": "评价订单",
+        "description": "老板评价订单（需登录）",
+        "operationId": "rateOrder",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RateOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "评价成功",
+            "schema": {
+              "$ref": "#/definitions/RateOrderResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "评价成功",
+                "data": {
+                  "id": 1,
+                  "orderNo": "ORD202401010001",
+                  "bossId": 1,
+                  "companionId": 2,
+                  "gameName": "王者荣耀",
+                  "gameMode": "排位赛-王者段位",
+                  "duration": 60,
+                  "pricePerHour": 50,
+                  "totalAmount": 50,
+                  "status": 7,
+                  "createdAt": 1704067200,
+                  "paidAt": 1704067300,
+                  "acceptedAt": 1704067400,
+                  "startAt": 1704067500,
+                  "completedAt": 1704067800,
+                  "cancelledAt": 0,
+                  "rating": 4.8,
+                  "comment": "服务很好，技术很棒！",
+                  "cancelReason": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或订单状态不允许评价",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "评分必须在0-5之间"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，只有订单的老板可以评价",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "权限不足"
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "订单不存在"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "评价失败"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BaseResp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "响应码，0表示成功"
+        },
+        "msg": {
+          "type": "string",
+          "description": "响应消息"
+        }
+      },
+      "required": ["code", "msg"]
+    },
+    "OrderInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单ID"
+        },
+        "orderNo": {
+          "type": "string",
+          "description": "订单号"
+        },
+        "bossId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "老板ID"
+        },
+        "companionId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "陪玩ID"
+        },
+        "gameName": {
+          "type": "string",
+          "description": "游戏名称"
+        },
+        "gameMode": {
+          "type": "string",
+          "description": "游戏模式/段位"
+        },
+        "duration": {
+          "type": "integer",
+          "format": "int32",
+          "description": "时长（分钟）"
+        },
+        "pricePerHour": {
+          "type": "integer",
+          "format": "int64",
+          "description": "每小时价格（帅币）"
+        },
+        "totalAmount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单总价（帅币）"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "description": "状态：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED"
+        },
+        "createdAt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "创建时间（时间戳）"
+        },
+        "paidAt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "支付时间（时间戳）"
+        },
+        "acceptedAt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "接单时间（时间戳）"
+        },
+        "startAt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "开始服务时间（时间戳）"
+        },
+        "completedAt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "完成时间（时间戳）"
+        },
+        "cancelledAt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "取消时间（时间戳）"
+        },
+        "rating": {
+          "type": "number",
+          "format": "double",
+          "description": "评分（0-5）"
+        },
+        "comment": {
+          "type": "string",
+          "description": "评价内容"
+        },
+        "cancelReason": {
+          "type": "string",
+          "description": "取消原因"
+        }
+      }
+    },
+    "CreateOrderRequest": {
+      "type": "object",
+      "required": ["companionId", "gameName", "durationMinutes"],
+      "properties": {
+        "companionId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "陪玩ID",
+          "example": 2
+        },
+        "gameName": {
+          "type": "string",
+          "description": "游戏名称",
+          "example": "王者荣耀"
+        },
+        "gameMode": {
+          "type": "string",
+          "description": "游戏模式/段位（可选）",
+          "example": "排位赛-王者段位"
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "description": "服务时长（分钟）",
+          "example": 60
+        }
+      },
+      "example": {
+        "companionId": 2,
+        "gameName": "王者荣耀",
+        "gameMode": "排位赛-王者段位",
+        "durationMinutes": 60
+      }
+    },
+    "CreateOrderResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        }
+      ]
+    },
+    "GetOrderRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单ID"
+        },
+        "orderNo": {
+          "type": "string",
+          "description": "订单号"
+        }
+      }
+    },
+    "GetOrderResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        }
+      ]
+    },
+    "GetOrderListRequest": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "角色：boss / companion（默认 boss）",
+          "enum": ["boss", "companion"]
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "description": "状态筛选：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "页码（从1开始）"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "每页数量"
+        }
+      }
+    },
+    "GetOrderListData": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderInfo"
+          },
+          "description": "订单列表"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "总数"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "当前页码"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "每页数量"
+        }
+      }
+    },
+    "GetOrderListResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/GetOrderListData"
+            }
+          }
+        }
+      ]
+    },
+    "AcceptOrderRequest": {
+      "type": "object",
+      "required": ["orderId"],
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单ID",
+          "example": 1
+        }
+      },
+      "example": {
+        "orderId": 1
+      }
+    },
+    "AcceptOrderResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        }
+      ]
+    },
+    "StartOrderRequest": {
+      "type": "object",
+      "required": ["orderId"],
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单ID",
+          "example": 1
+        }
+      },
+      "example": {
+        "orderId": 1
+      }
+    },
+    "StartOrderResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        }
+      ]
+    },
+    "CompleteOrderRequest": {
+      "type": "object",
+      "required": ["orderId"],
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单ID",
+          "example": 1
+        }
+      },
+      "example": {
+        "orderId": 1
+      }
+    },
+    "CompleteOrderResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        }
+      ]
+    },
+    "CancelOrderRequest": {
+      "type": "object",
+      "required": ["orderId"],
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单ID",
+          "example": 1
+        },
+        "reason": {
+          "type": "string",
+          "description": "取消原因（可选）",
+          "example": "临时有事"
+        }
+      },
+      "example": {
+        "orderId": 1,
+        "reason": "临时有事"
+      }
+    },
+    "CancelOrderResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        }
+      ]
+    },
+    "RateOrderRequest": {
+      "type": "object",
+      "required": ["orderId", "rating"],
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单ID",
+          "example": 1
+        },
+        "rating": {
+          "type": "number",
+          "format": "double",
+          "description": "评分（0-5）",
+          "example": 4.8
+        },
+        "comment": {
+          "type": "string",
+          "description": "评价内容（可选）",
+          "example": "服务很好，技术很棒！"
+        }
+      },
+      "example": {
+        "orderId": 1,
+        "rating": 4.8,
+        "comment": "服务很好，技术很棒！"
+      }
+    },
+    "RateOrderResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+

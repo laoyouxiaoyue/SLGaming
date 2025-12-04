@@ -61,5 +61,18 @@ type Config struct {
 	Consul   ConsulConf   `json:",optional"` // Consul 配置
 	Redis    RedisConf    `json:",optional"` // Redis 配置（如需在订单服务中使用缓存）
 	Upstream UpstreamConf `json:",optional"` // 上游服务（User 等）
+
+	// RocketMQ 消息队列配置（用于订单事件异步处理，例如退款、状态同步等）
+	RocketMQ RocketMQConf `json:",optional"`
 }
 
+// RocketMQConf RocketMQ 配置结构
+type RocketMQConf struct {
+	// NameServer 地址列表，如 ["127.0.0.1:9876"]
+	NameServers []string `json:",optional"`
+	// 可选：命名空间，用于环境/租户隔离
+	Namespace string `json:",optional"`
+	// 可选：访问凭证（如果开启 ACL）
+	AccessKey string `json:",optional"`
+	SecretKey string `json:",optional"`
+}

@@ -18,10 +18,11 @@ func main() {
 		log.Panicf("database connection failed: %v", err)
 	}
 
-	if err := db.AutoMigrate(&model.Order{}); err != nil {
+	if err := db.AutoMigrate(
+		&model.Order{},
+		&model.OrderEventOutbox{},
+	); err != nil {
 		log.Panicf("database migration failed: %v", err)
 		return
 	}
 }
-
-

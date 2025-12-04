@@ -1,0 +1,42 @@
+package model
+
+import (
+	"SLGaming/back/pkg/snowflake"
+	"time"
+
+	"gorm.io/gorm"
+)
+
+// OrderEventOutbox 订单领域事件 Outbox 表
+// 用于保证订单状态变更事件可靠投递到消息队列（RocketMQ）
+type OrderEventOutbox struct {
+	ID uint64 `gorm:"primaryKey;autoIncrement:false" json:"id,string"`
+
+	// 事件类型，如：ORDER_CANCELLED, ORDER_REFUND_SUCCEEDED 等
+	EventType string `gorm:"size:64;index;not null;comment:事件类型" json:"event_type"`
+
+	// 事件负载，JSON 字符串，包含 orderId / userId / amount / bizOrderId 等信息
+	Payload string `gorm:"type:text;not null;comment:事件负载(JSON)" json:"payload"`
+
+	// 状态：PENDING / SENT / FAILED
+	Status string `gorm:"size:32;index;not null;default:'PENDING';comment:发送状态" json:"status"`
+
+	// 可选：最后一次错误信息，便于排查
+	LastError string `gorm:"type:text;comment:最后一次发送错误" json:"last_error"`
+
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+}
+
+func (e *OrderEventOutbox) TableName() string {
+	return "order_event_outbox"
+}
+
+// BeforeCreate 钩子：生成雪花主键
+func (e *OrderEventOutbox) BeforeCreate(tx *gorm.DB) error {
+	if e.ID == 0 {
+		e.ID = uint64(snowflake.GenID())
+	}
+	return nil
+}

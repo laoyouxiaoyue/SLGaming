@@ -2,9 +2,10 @@ package main
 
 import (
 	"SLGaming/back/services/user/internal/model"
+	"log"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
 func main() {
@@ -13,7 +14,13 @@ func main() {
 	if err != nil {
 		log.Panicf("database connection failed: %v", err)
 	}
-	err = db.AutoMigrate(&model.User{}, &model.UserWallet{}, &model.WalletTransaction{}, &model.CompanionProfile{})
+	err = db.AutoMigrate(
+		&model.User{},
+		&model.UserWallet{},
+		&model.WalletTransaction{},
+		&model.CompanionProfile{},
+		&model.UserEventOutbox{},
+	)
 	if err != nil {
 		log.Panicf("database migration failed: %v", err)
 		return

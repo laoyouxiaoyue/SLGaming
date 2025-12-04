@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"strings"
 
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
+	"SLGaming/back/services/user/internal/job"
 	"SLGaming/back/services/user/internal/server"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -85,6 +87,12 @@ func main() {
 			logx.Errorf("listen nacos config failed: %v", err)
 		}
 	}
+
+	// 启动订单退款事件 Consumer 与用户领域事件 Outbox 分发任务
+	rootCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	job.StartOrderRefundConsumer(rootCtx, ctx)
+	job.StartUserOutboxDispatcher(rootCtx, ctx)
 
 	s := zrpc.MustNewServer(cfg.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))

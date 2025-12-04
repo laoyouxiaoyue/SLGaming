@@ -40,3 +40,14 @@ type MySQLConfig interface {
 	GetConnMaxLifetime() time.Duration
 	GetConnMaxIdleTime() time.Duration
 }
+
+// RocketMQConfig 定义 RocketMQ 配置接口
+type RocketMQConfig interface {
+	// NameServer 地址列表，如 []string{"127.0.0.1:9876"}
+	GetNameServers() []string
+	// 可选：命名空间，用于多租户隔离
+	GetNamespace() string
+	// 可选：访问凭证（如果开启 ACL）
+	GetAccessKey() string
+	GetSecretKey() string
+}

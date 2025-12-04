@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 
 	"SLGaming/back/services/order/internal/model"
 	"SLGaming/back/services/order/internal/svc"
@@ -13,6 +14,15 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
+
+// orderPaymentPendingEventPayload 订单支付待处理事件负载结构
+type orderPaymentPendingEventPayload struct {
+	OrderID    uint64 `json:"order_id"`
+	OrderNo    string `json:"order_no"`
+	BossID     uint64 `json:"boss_id"`
+	Amount     int64  `json:"amount"`
+	BizOrderID string `json:"biz_order_id"`
+}
 
 type CreateOrderLogic struct {
 	ctx    context.Context
@@ -72,36 +82,48 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 		DurationMinutes: in.GetDurationMinutes(),
 		PricePerHour:    pricePerHour,
 		TotalAmount:     totalAmount,
-		Status:          model.OrderStatusPaid,
+		Status:          model.OrderStatusCreated, // 先创建为待支付状态
 	}
 	o.OrderNo = generateOrderNo(o.BossID)
 
-	// 2. 先创建订单记录，再调用钱包扣款
+	// 2. 在一个事务中：创建订单 + 写入 ORDER_PAYMENT_PENDING 事件到 Outbox
+	// 使用 Outbox 模式确保订单创建和支付事件的原子性
 	if err := db.Transaction(func(tx *gorm.DB) error {
+		// 创建订单记录
 		if err := tx.Create(o).Error; err != nil {
 			return err
 		}
+
+		// 构造支付事件负载
+		payload := orderPaymentPendingEventPayload{
+			OrderID:    o.ID,
+			OrderNo:    o.OrderNo,
+			BossID:     o.BossID,
+			Amount:     o.TotalAmount,
+			BizOrderID: o.OrderNo,
+		}
+		payloadJSON, err := json.Marshal(payload)
+		if err != nil {
+			l.Errorf("marshal payment pending payload failed: %v", err)
+			return status.Error(codes.Internal, "marshal payment event failed")
+		}
+
+		// 写入 ORDER_PAYMENT_PENDING 事件到 outbox
+		evt := &model.OrderEventOutbox{
+			EventType: "ORDER_PAYMENT_PENDING",
+			Payload:   string(payloadJSON),
+			Status:    "PENDING",
+		}
+
+		if err := tx.Create(evt).Error; err != nil {
+			l.Errorf("create payment pending event outbox failed: %v", err)
+			return status.Error(codes.Internal, "create payment event failed")
+		}
+
 		return nil
 	}); err != nil {
-		l.Errorf("create order failed: %v", err)
-		return nil, status.Error(codes.Internal, "create order failed")
-	}
-
-	// 3. 调用 user 服务扣减老板钱包（消费帅币）
-	_, err = l.svcCtx.UserRPC.Consume(l.ctx, &userclient.ConsumeRequest{
-		UserId:     in.GetBossId(),
-		Amount:     totalAmount,
-		BizOrderId: o.OrderNo,
-		Remark:     "order payment",
-	})
-	if err != nil {
-		// 如果是业务错误（例如余额不足），直接透传
-		if st, ok := status.FromError(err); ok {
-			l.Errorf("consume wallet failed: code=%v, msg=%s", st.Code(), st.Message())
-			return nil, err
-		}
-		l.Errorf("consume wallet failed: %v", err)
-		return nil, status.Error(codes.Internal, "consume wallet failed")
+		l.Errorf("create order with payment event failed: %v", err)
+		return nil, err
 	}
 
 	return &order.CreateOrderResponse{

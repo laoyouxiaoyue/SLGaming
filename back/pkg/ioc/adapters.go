@@ -110,3 +110,27 @@ func (m *MySQLConfigAdapter) GetConnMaxLifetime() time.Duration {
 func (m *MySQLConfigAdapter) GetConnMaxIdleTime() time.Duration {
 	return m.ConnMaxIdleTime
 }
+
+// RocketMQConfigAdapter RocketMQ 配置适配器
+type RocketMQConfigAdapter struct {
+	NameServers []string
+	Namespace   string
+	AccessKey   string
+	SecretKey   string
+}
+
+func (r *RocketMQConfigAdapter) GetNameServers() []string {
+	return r.NameServers
+}
+
+func (r *RocketMQConfigAdapter) GetNamespace() string {
+	return r.Namespace
+}
+
+func (r *RocketMQConfigAdapter) GetAccessKey() string {
+	return r.AccessKey
+}
+
+func (r *RocketMQConfigAdapter) GetSecretKey() string {
+	return r.SecretKey
+}

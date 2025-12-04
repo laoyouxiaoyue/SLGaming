@@ -3,9 +3,11 @@ package svc
 import (
 	"sync"
 
+	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
 
+	rocketmq "github.com/apache/rocketmq-client-go/v2"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
 )
@@ -14,6 +16,9 @@ type ServiceContext struct {
 	mu     sync.RWMutex
 	config config.Config
 	db     *gorm.DB
+
+	// RocketMQ 生产者（用于发送订单相关事件，如 ORDER_REFUND_SUCCEEDED）
+	EventProducer rocketmq.Producer
 }
 
 // NewServiceContext 根据配置初始化所有依赖。
@@ -23,10 +28,29 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		panic(err)
 	}
 
-	return &ServiceContext{
+	ctx := &ServiceContext{
 		config: c,
 		db:     db,
 	}
+
+	// 初始化 RocketMQ Producer（如果配置了）
+	if len(c.RocketMQ.NameServers) > 0 {
+		mqCfg := &pkgIoc.RocketMQConfigAdapter{
+			NameServers: c.RocketMQ.NameServers,
+			Namespace:   c.RocketMQ.Namespace,
+			AccessKey:   c.RocketMQ.AccessKey,
+			SecretKey:   c.RocketMQ.SecretKey,
+		}
+		producer, err := pkgIoc.InitRocketMQProducer(mqCfg, "user-event-producer")
+		if err != nil {
+			logx.Errorf("init rocketmq producer failed: %v", err)
+		} else {
+			ctx.EventProducer = producer
+			logx.Infof("init rocketmq producer success, nameservers=%v", c.RocketMQ.NameServers)
+		}
+	}
+
+	return ctx
 }
 
 // Config returns the latest configuration snapshot.
