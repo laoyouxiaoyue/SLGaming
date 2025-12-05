@@ -70,49 +70,117 @@ func (l *CancelOrderLogic) CancelOrder(in *order.CancelOrderRequest) (*order.Can
 		if err == gorm.ErrRecordNotFound {
 			return nil, status.Error(codes.NotFound, "order not found")
 		}
-		l.Errorf("get order failed: %v", err)
+		l.Errorf("cancel order failed: get order failed, order_id=%d, error=%v", in.GetOrderId(), err)
 		return nil, status.Error(codes.Internal, "get order failed")
 	}
 
 	// 已完成或已取消的订单不能再次取消
 	if o.Status == model.OrderStatusCompleted || o.Status == model.OrderStatusCancelled {
+		l.Infof("cancel order failed: order already finished or cancelled, order_id=%d, status=%d",
+			o.ID, o.Status)
 		return nil, status.Error(codes.FailedPrecondition, "order is already finished or cancelled")
 	}
 
-	// 仅允许从已支付/已接单进入“取消并退款”流程
-	if o.Status != model.OrderStatusPaid && o.Status != model.OrderStatusAccepted {
-		return nil, status.Error(codes.FailedPrecondition, "order status not allowed to cancel with refund")
+	// 正在取消中的订单不能重复取消
+	if o.Status == model.OrderStatusCancelRefunding {
+		l.Infof("cancel order failed: order is already in cancelling, order_id=%d", o.ID)
+		return nil, status.Error(codes.FailedPrecondition, "order is already in cancelling process")
+	}
+
+	// 服务中的订单不能取消（需要先完成或走仲裁流程）
+	if o.Status == model.OrderStatusInService {
+		l.Infof("cancel order failed: order is in service, order_id=%d", o.ID)
+		return nil, status.Error(codes.FailedPrecondition, "order is in service, cannot cancel")
+	}
+
+	// 权限验证：根据订单状态决定谁可以取消
+	operatorID := in.GetOperatorId()
+	if o.Status == model.OrderStatusAccepted {
+		// 已接单状态：只有陪玩可以取消订单
+		if operatorID != o.CompanionID {
+			l.Errorf("cancel order failed: permission denied, only companion can cancel accepted order, order_id=%d, operator_id=%d, companion_id=%d",
+				o.ID, operatorID, o.CompanionID)
+			return nil, status.Error(codes.PermissionDenied, "only the companion can cancel an accepted order")
+		}
+	} else if o.Status == model.OrderStatusCreated || o.Status == model.OrderStatusPaid {
+		// 已创建或已支付但未接单状态：只有老板可以取消订单
+		if operatorID != o.BossID {
+			l.Errorf("cancel order failed: permission denied, only boss can cancel unpaid/unaccepted order, order_id=%d, operator_id=%d, boss_id=%d",
+				o.ID, operatorID, o.BossID)
+			return nil, status.Error(codes.PermissionDenied, "only the boss can cancel an unpaid or unaccepted order")
+		}
+	} else {
+		// 其他状态：理论上不应该到达这里，但为了安全起见，检查是否为订单相关方
+		if operatorID != o.BossID && operatorID != o.CompanionID {
+			l.Errorf("cancel order failed: permission denied, order_id=%d, operator_id=%d, boss_id=%d, companion_id=%d",
+				o.ID, operatorID, o.BossID, o.CompanionID)
+			return nil, status.Error(codes.PermissionDenied, "only the boss or companion of this order can cancel it")
+		}
 	}
 
 	now := time.Now()
 
-	// 在一个事务中：更新订单状态为 CANCEL_REFUNDING + 写一条 ORDER_CANCELLED outbox 事件
+	// 根据订单状态决定是否需要退款
+	needRefund := o.Status == model.OrderStatusPaid || o.Status == model.OrderStatusAccepted
+
+	l.Infof("cancelling order: order_id=%d, order_no=%s, current_status=%d, operator_id=%d, need_refund=%v",
+		o.ID, o.OrderNo, o.Status, in.GetOperatorId(), needRefund)
+
+	// 在一个事务中处理取消逻辑
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		// 更新订单状态为取消中（等待退款）
-		o.Status = model.OrderStatusCancelRefunding
-		o.CancelledAt = &now
-		o.CancelReason = in.GetReason()
+		if needRefund {
+			// 已支付或已接单的订单：需要退款
+			// 更新订单状态为取消中（等待退款）
+			o.Status = model.OrderStatusCancelRefunding
+			o.CancelledAt = &now
+			o.CancelReason = in.GetReason()
 
-		if err := tx.Save(&o).Error; err != nil {
-			l.Errorf("update order status to cancel_refunding failed: %v", err)
-			return status.Error(codes.Internal, "cancel order failed")
-		}
+			if err := tx.Save(&o).Error; err != nil {
+				l.Errorf("cancel order failed: update order status to cancel_refunding failed, order_id=%d, error=%v",
+					o.ID, err)
+				return status.Error(codes.Internal, "cancel order failed")
+			}
 
-		// 写一条 ORDER_CANCELLED 事件到 outbox，由后台任务异步发送到 MQ
-		evt := &model.OrderEventOutbox{
-			EventType: "ORDER_CANCELLED",
-			Payload:   buildOrderCancelledPayload(&o),
-			Status:    "PENDING",
-		}
+			// 写一条 ORDER_CANCELLED 事件到 outbox，由后台任务异步发送到 MQ，触发退款
+			evt := &model.OrderEventOutbox{
+				EventType: "ORDER_CANCELLED",
+				Payload:   buildOrderCancelledPayload(&o),
+				Status:    "PENDING",
+			}
 
-		if err := tx.Create(evt).Error; err != nil {
-			l.Errorf("create order event outbox failed: %v", err)
-			return status.Error(codes.Internal, "cancel order failed")
+			if err := tx.Create(evt).Error; err != nil {
+				l.Errorf("cancel order failed: create order event outbox failed, order_id=%d, error=%v",
+					o.ID, err)
+				return status.Error(codes.Internal, "cancel order failed")
+			}
+
+			l.Infof("order cancelled with refund: order_id=%d, order_no=%s, amount=%d",
+				o.ID, o.OrderNo, o.TotalAmount)
+		} else {
+			// 已创建但未支付的订单：直接取消，不需要退款
+			// 更新订单状态为已取消
+			o.Status = model.OrderStatusCancelled
+			o.CancelledAt = &now
+			o.CancelReason = in.GetReason()
+
+			if err := tx.Save(&o).Error; err != nil {
+				l.Errorf("cancel order failed: update order status to cancelled failed, order_id=%d, error=%v",
+					o.ID, err)
+				return status.Error(codes.Internal, "cancel order failed")
+			}
+
+			l.Infof("order cancelled without refund: order_id=%d, order_no=%s (order was not paid)",
+				o.ID, o.OrderNo)
 		}
 
 		return nil
 	}); err != nil {
-		return nil, err
+		// 如果是我们在事务中返回的 gRPC status error，直接透传
+		if s, ok := status.FromError(err); ok {
+			return nil, s.Err()
+		}
+		l.Errorf("cancel order transaction failed: order_id=%d, error=%v", o.ID, err)
+		return nil, status.Error(codes.Internal, "cancel order failed")
 	}
 
 	return &order.CancelOrderResponse{
