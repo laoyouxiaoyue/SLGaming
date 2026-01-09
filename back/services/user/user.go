@@ -88,7 +88,7 @@ func main() {
 		}
 	}
 
-	// 启动订单退款事件 Consumer 与用户领域事件 Outbox 分发任务
+	// 启动订单退款事件 Consumer、用户领域事件 Outbox 分发任务
 	rootCtx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	job.StartOrderRefundConsumer(rootCtx, ctx)

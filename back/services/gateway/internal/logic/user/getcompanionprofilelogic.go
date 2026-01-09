@@ -31,7 +31,25 @@ func NewGetCompanionProfileLogic(ctx context.Context, svcCtx *svc.ServiceContext
 
 func (l *GetCompanionProfileLogic) GetCompanionProfile() (resp *types.GetCompanionProfileResponse, err error) {
 	// 从 context 中获取当前登录用户 ID（由网关鉴权中间件注入）
-	userID, _ := middleware.GetUserID(l.ctx)
+	userID, err := middleware.GetUserID(l.ctx)
+	if err != nil {
+		l.Errorf("GetUserID from context failed: %v", err)
+		return &types.GetCompanionProfileResponse{
+			BaseResp: types.BaseResp{
+				Code: 401,
+				Msg:  "未登录或认证失败: " + err.Error(),
+			},
+		}, nil
+	}
+	if userID == 0 {
+		l.Errorf("userID is 0, authentication may have failed")
+		return &types.GetCompanionProfileResponse{
+			BaseResp: types.BaseResp{
+				Code: 401,
+				Msg:  "未登录或认证失败",
+			},
+		}, nil
+	}
 
 	if l.svcCtx.UserRPC == nil {
 		return nil, fmt.Errorf("user rpc client not initialized")

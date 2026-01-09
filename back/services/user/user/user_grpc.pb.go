@@ -19,19 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_Register_FullMethodName               = "/user.User/Register"
-	User_Login_FullMethodName                  = "/user.User/Login"
-	User_GetUser_FullMethodName                = "/user.User/GetUser"
-	User_UpdateUser_FullMethodName             = "/user.User/UpdateUser"
-	User_LoginByCode_FullMethodName            = "/user.User/LoginByCode"
-	User_ForgetPassword_FullMethodName         = "/user.User/ForgetPassword"
-	User_GetWallet_FullMethodName              = "/user.User/GetWallet"
-	User_Recharge_FullMethodName               = "/user.User/Recharge"
-	User_Consume_FullMethodName                = "/user.User/Consume"
-	User_GetCompanionProfile_FullMethodName    = "/user.User/GetCompanionProfile"
-	User_UpdateCompanionProfile_FullMethodName = "/user.User/UpdateCompanionProfile"
-	User_UpdateCompanionStats_FullMethodName   = "/user.User/UpdateCompanionStats"
-	User_GetCompanionList_FullMethodName       = "/user.User/GetCompanionList"
+	User_Register_FullMethodName                  = "/user.User/Register"
+	User_Login_FullMethodName                     = "/user.User/Login"
+	User_GetUser_FullMethodName                   = "/user.User/GetUser"
+	User_UpdateUser_FullMethodName                = "/user.User/UpdateUser"
+	User_LoginByCode_FullMethodName               = "/user.User/LoginByCode"
+	User_ForgetPassword_FullMethodName            = "/user.User/ForgetPassword"
+	User_GetWallet_FullMethodName                 = "/user.User/GetWallet"
+	User_Recharge_FullMethodName                  = "/user.User/Recharge"
+	User_Consume_FullMethodName                   = "/user.User/Consume"
+	User_GetCompanionProfile_FullMethodName       = "/user.User/GetCompanionProfile"
+	User_UpdateCompanionProfile_FullMethodName    = "/user.User/UpdateCompanionProfile"
+	User_UpdateCompanionStats_FullMethodName      = "/user.User/UpdateCompanionStats"
+	User_GetCompanionList_FullMethodName          = "/user.User/GetCompanionList"
+	User_GetCompanionRatingRanking_FullMethodName = "/user.User/GetCompanionRatingRanking"
+	User_GetCompanionOrdersRanking_FullMethodName = "/user.User/GetCompanionOrdersRanking"
 )
 
 // UserClient is the client API for User service.
@@ -53,6 +55,9 @@ type UserClient interface {
 	UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
 	UpdateCompanionStats(ctx context.Context, in *UpdateCompanionStatsRequest, opts ...grpc.CallOption) (*UpdateCompanionStatsResponse, error)
 	GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error)
+	// 陪玩排名相关接口
+	GetCompanionRatingRanking(ctx context.Context, in *GetCompanionRatingRankingRequest, opts ...grpc.CallOption) (*GetCompanionRatingRankingResponse, error)
+	GetCompanionOrdersRanking(ctx context.Context, in *GetCompanionOrdersRankingRequest, opts ...grpc.CallOption) (*GetCompanionOrdersRankingResponse, error)
 }
 
 type userClient struct {
@@ -193,6 +198,26 @@ func (c *userClient) GetCompanionList(ctx context.Context, in *GetCompanionListR
 	return out, nil
 }
 
+func (c *userClient) GetCompanionRatingRanking(ctx context.Context, in *GetCompanionRatingRankingRequest, opts ...grpc.CallOption) (*GetCompanionRatingRankingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCompanionRatingRankingResponse)
+	err := c.cc.Invoke(ctx, User_GetCompanionRatingRanking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetCompanionOrdersRanking(ctx context.Context, in *GetCompanionOrdersRankingRequest, opts ...grpc.CallOption) (*GetCompanionOrdersRankingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCompanionOrdersRankingResponse)
+	err := c.cc.Invoke(ctx, User_GetCompanionOrdersRanking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -212,6 +237,9 @@ type UserServer interface {
 	UpdateCompanionProfile(context.Context, *UpdateCompanionProfileRequest) (*UpdateCompanionProfileResponse, error)
 	UpdateCompanionStats(context.Context, *UpdateCompanionStatsRequest) (*UpdateCompanionStatsResponse, error)
 	GetCompanionList(context.Context, *GetCompanionListRequest) (*GetCompanionListResponse, error)
+	// 陪玩排名相关接口
+	GetCompanionRatingRanking(context.Context, *GetCompanionRatingRankingRequest) (*GetCompanionRatingRankingResponse, error)
+	GetCompanionOrdersRanking(context.Context, *GetCompanionOrdersRankingRequest) (*GetCompanionOrdersRankingResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -260,6 +288,12 @@ func (UnimplementedUserServer) UpdateCompanionStats(context.Context, *UpdateComp
 }
 func (UnimplementedUserServer) GetCompanionList(context.Context, *GetCompanionListRequest) (*GetCompanionListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCompanionList not implemented")
+}
+func (UnimplementedUserServer) GetCompanionRatingRanking(context.Context, *GetCompanionRatingRankingRequest) (*GetCompanionRatingRankingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCompanionRatingRanking not implemented")
+}
+func (UnimplementedUserServer) GetCompanionOrdersRanking(context.Context, *GetCompanionOrdersRankingRequest) (*GetCompanionOrdersRankingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCompanionOrdersRanking not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -516,6 +550,42 @@ func _User_GetCompanionList_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetCompanionRatingRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCompanionRatingRankingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetCompanionRatingRanking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetCompanionRatingRanking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetCompanionRatingRanking(ctx, req.(*GetCompanionRatingRankingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetCompanionOrdersRanking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCompanionOrdersRankingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetCompanionOrdersRanking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetCompanionOrdersRanking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetCompanionOrdersRanking(ctx, req.(*GetCompanionOrdersRankingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -574,6 +644,14 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCompanionList",
 			Handler:    _User_GetCompanionList_Handler,
+		},
+		{
+			MethodName: "GetCompanionRatingRanking",
+			Handler:    _User_GetCompanionRatingRanking_Handler,
+		},
+		{
+			MethodName: "GetCompanionOrdersRanking",
+			Handler:    _User_GetCompanionOrdersRanking_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

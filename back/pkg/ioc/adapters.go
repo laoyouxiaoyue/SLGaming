@@ -134,3 +134,27 @@ func (r *RocketMQConfigAdapter) GetAccessKey() string {
 func (r *RocketMQConfigAdapter) GetSecretKey() string {
 	return r.SecretKey
 }
+
+// RedisConfigAdapter Redis 配置适配器
+type RedisConfigAdapter struct {
+	Host string
+	Type string
+	Pass string
+	Tls  bool
+}
+
+func (r *RedisConfigAdapter) GetHost() string {
+	return r.Host
+}
+
+func (r *RedisConfigAdapter) GetType() string {
+	return r.Type
+}
+
+func (r *RedisConfigAdapter) GetPass() string {
+	return r.Pass
+}
+
+func (r *RedisConfigAdapter) GetTls() bool {
+	return r.Tls
+}

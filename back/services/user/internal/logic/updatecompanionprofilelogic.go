@@ -92,11 +92,14 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(in *user.UpdateComp
 	}
 
 	if len(updates) > 0 {
-		if err := db.Model(&profile).Updates(updates).Error; err != nil {
+		// 使用明确的 WHERE 条件更新，避免 GORM 报错
+		if err := db.Model(&model.CompanionProfile{}).Where("user_id = ?", userID).Updates(updates).Error; err != nil {
+			l.Errorf("update companion profile failed: user_id=%d, error=%v", userID, err)
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 		// 重新查询获取最新数据
 		if err := db.Where("user_id = ?", userID).First(&profile).Error; err != nil {
+			l.Errorf("query updated companion profile failed: user_id=%d, error=%v", userID, err)
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}

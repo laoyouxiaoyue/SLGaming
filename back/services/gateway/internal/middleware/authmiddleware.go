@@ -120,6 +120,9 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 			ctx := SetUserID(r.Context(), claims.UserID)
 			ctx = SetAccessToken(ctx, tokenString)
 
+			// 调试日志：记录提取的用户 ID
+			logx.Infof("JWT middleware: extracted user_id=%d from token for path=%s", claims.UserID, r.URL.Path)
+
 			// 继续处理请求
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}

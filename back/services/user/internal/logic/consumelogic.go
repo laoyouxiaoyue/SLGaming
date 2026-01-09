@@ -92,7 +92,7 @@ func (l *ConsumeLogic) Consume(in *user.ConsumeRequest) (*user.ConsumeResponse, 
 
 		// 3. 余额检查
 		if wallet.Balance < amount {
-			l.Warnf("consume failed: insufficient balance, user_id=%d, current_balance=%d, required_amount=%d, biz_order_id=%s",
+			l.Infof("consume failed: insufficient balance, user_id=%d, current_balance=%d, required_amount=%d, biz_order_id=%s",
 				userID, wallet.Balance, amount, bizOrderID)
 			return status.Error(codes.ResourceExhausted,
 				"insufficient handsome coins, current balance is insufficient for this transaction")

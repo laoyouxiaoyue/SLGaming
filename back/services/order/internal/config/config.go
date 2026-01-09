@@ -3,7 +3,6 @@ package config
 import (
 	"time"
 
-	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -44,9 +43,6 @@ type ConsulServiceConf struct {
 }
 
 // RedisConf Redis 配置
-type RedisConf struct {
-	redis.RedisConf
-}
 
 // UpstreamConf 上游服务配置
 type UpstreamConf struct {
@@ -59,7 +55,6 @@ type Config struct {
 	Nacos    NacosConf    `json:",optional"` // Nacos 配置
 	Mysql    MysqlConf    `json:",optional"` // Mysql 配置
 	Consul   ConsulConf   `json:",optional"` // Consul 配置
-	Redis    RedisConf    `json:",optional"` // Redis 配置（如需在订单服务中使用缓存）
 	Upstream UpstreamConf `json:",optional"` // 上游服务（User 等）
 
 	// RocketMQ 消息队列配置（用于订单事件异步处理，例如退款、状态同步等）

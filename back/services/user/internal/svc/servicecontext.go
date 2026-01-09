@@ -9,6 +9,7 @@ import (
 
 	rocketmq "github.com/apache/rocketmq-client-go/v2"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,9 @@ type ServiceContext struct {
 	mu     sync.RWMutex
 	config config.Config
 	db     *gorm.DB
+
+	// Redis 客户端（用于排名 ZSet）
+	Redis *redis.Redis
 
 	// RocketMQ 生产者（用于发送订单相关事件，如 ORDER_REFUND_SUCCEEDED）
 	EventProducer rocketmq.Producer
@@ -31,6 +35,25 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	ctx := &ServiceContext{
 		config: c,
 		db:     db,
+	}
+
+	// 初始化 Redis（使用 zrpc.RpcServerConf 中的 Redis 配置）
+	if c.Redis.Host != "" {
+		redisAdapter := &pkgIoc.RedisConfigAdapter{
+			Host: c.Redis.Host,
+			Type: c.Redis.Type,
+			Pass: c.Redis.Pass,
+			Tls:  c.Redis.Tls,
+		}
+		redisClient, err := pkgIoc.InitRedis(redisAdapter)
+		if err != nil {
+			logx.Errorf("init redis failed: %v", err)
+		} else {
+			ctx.Redis = redisClient
+			logx.Infof("Redis 已初始化")
+		}
+	} else {
+		logx.Infof("Redis 未配置，排名功能不可用")
 	}
 
 	// 初始化 RocketMQ Producer（如果配置了）

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"SLGaming/back/pkg/ioc"
+	"SLGaming/back/pkg/lock"
 	"SLGaming/back/services/order/internal/config"
 	orderioc "SLGaming/back/services/order/internal/ioc"
 
@@ -23,6 +24,9 @@ type ServiceContext struct {
 	Redis   *redis.Redis
 	UserRPC userclient.User
 
+	// 分布式锁（用于订单创建、取消等并发控制）
+	DistributedLock *lock.DistributedLock
+
 	// RocketMQ 生产者（用于发送订单领域事件）
 	OrderEventProducer rocketmq.Producer
 }
@@ -36,14 +40,20 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	// 初始化 Redis（如果配置了）
 	var redisClient *redis.Redis
+	var distributedLock *lock.DistributedLock
 	if c.Redis.Host != "" {
 		redisClient = redis.MustNewRedis(c.Redis.RedisConf)
+		distributedLock = lock.NewDistributedLock(redisClient)
+		logx.Infof("分布式锁已初始化")
+	} else {
+		logx.Warnf("Redis 未配置，分布式锁功能不可用")
 	}
 
 	ctx := &ServiceContext{
-		Config: c,
-		DB:     db,
-		Redis:  redisClient,
+		Config:          c,
+		DB:              db,
+		Redis:           redisClient,
+		DistributedLock: distributedLock,
 	}
 
 	// 初始化 RocketMQ Producer（如果配置了）

@@ -142,3 +142,86 @@ func ShutdownRocketMQConsumer(c rocketmq.PushConsumer) {
 	}
 	_ = c.Shutdown()
 }
+
+// InitRocketMQTransactionProducer 根据配置初始化一个 RocketMQ TransactionProducer（用于半消息机制）
+// group 为生产者分组名称，通常按业务划分，例如 "user-transaction-producer"
+// localTransactionChecker 为本地事务检查器，用于处理事务回查
+func InitRocketMQTransactionProducer(
+	cfg RocketMQConfig,
+	group string,
+	localTransactionChecker func(ctx context.Context, msg *primitive.Message) primitive.LocalTransactionState,
+) (rocketmq.TransactionProducer, error) {
+	if cfg == nil {
+		return nil, fmt.Errorf("rocketmq config is nil")
+	}
+
+	nameServers := cfg.GetNameServers()
+	if len(nameServers) == 0 {
+		return nil, fmt.Errorf("rocketmq nameservers is empty")
+	}
+	if group == "" {
+		return nil, fmt.Errorf("rocketmq group is empty")
+	}
+
+	opts := []producer.Option{
+		producer.WithNameServer(nameServers),
+		producer.WithGroupName(group),
+	}
+
+	// 可选的 namespace
+	if ns := cfg.GetNamespace(); ns != "" {
+		opts = append(opts, producer.WithNamespace(ns))
+	}
+
+	// 可选的访问凭证
+	if ak := cfg.GetAccessKey(); ak != "" {
+		opts = append(opts, producer.WithCredentials(primitive.Credentials{
+			AccessKey: ak,
+			SecretKey: cfg.GetSecretKey(),
+		}))
+	}
+
+	// 创建事务监听器
+	listener := &transactionListener{
+		checker: localTransactionChecker,
+	}
+
+	p, err := rocketmq.NewTransactionProducer(listener, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("new rocketmq transaction producer: %w", err)
+	}
+
+	if err := p.Start(); err != nil {
+		return nil, fmt.Errorf("start rocketmq transaction producer: %w", err)
+	}
+
+	return p, nil
+}
+
+// transactionListener 实现 TransactionListener 接口
+type transactionListener struct {
+	checker func(ctx context.Context, msg *primitive.Message) primitive.LocalTransactionState
+}
+
+// ExecuteLocalTransaction 执行本地事务
+func (l *transactionListener) ExecuteLocalTransaction(msg *primitive.Message) primitive.LocalTransactionState {
+	// 这里返回 UNKNOW，让 RocketMQ 进行回查
+	// 实际的本地事务在业务代码中执行
+	return primitive.UnknowState
+}
+
+// CheckLocalTransaction 检查本地事务状态（回查）
+func (l *transactionListener) CheckLocalTransaction(msg *primitive.MessageExt) primitive.LocalTransactionState {
+	if l.checker != nil {
+		return l.checker(context.Background(), &msg.Message)
+	}
+	// 如果没有提供检查器，默认返回 UNKNOW，让 RocketMQ 继续回查
+	return primitive.UnknowState
+}
+
+// ShutdownRocketMQTransactionProducer 优雅关闭 TransactionProducer
+func ShutdownRocketMQTransactionProducer(p rocketmq.TransactionProducer) {
+	if p != nil {
+		_ = p.Shutdown()
+	}
+}

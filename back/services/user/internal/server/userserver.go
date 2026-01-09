@@ -89,3 +89,14 @@ func (s *UserServer) GetCompanionList(ctx context.Context, in *user.GetCompanion
 	l := logic.NewGetCompanionListLogic(ctx, s.svcCtx)
 	return l.GetCompanionList(in)
 }
+
+// 陪玩排名相关接口
+func (s *UserServer) GetCompanionRatingRanking(ctx context.Context, in *user.GetCompanionRatingRankingRequest) (*user.GetCompanionRatingRankingResponse, error) {
+	l := logic.NewGetCompanionRatingRankingLogic(ctx, s.svcCtx)
+	return l.GetCompanionRatingRanking(in)
+}
+
+func (s *UserServer) GetCompanionOrdersRanking(ctx context.Context, in *user.GetCompanionOrdersRankingRequest) (*user.GetCompanionOrdersRankingResponse, error) {
+	l := logic.NewGetCompanionOrdersRankingLogic(ctx, s.svcCtx)
+	return l.GetCompanionOrdersRanking(in)
+}

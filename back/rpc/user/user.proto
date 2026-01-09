@@ -182,6 +182,45 @@ message GetCompanionListResponse {
   int32 page_size = 4;                   // 每页数量
 }
 
+// ---------------- 陪玩排名相关 ----------------
+
+// 陪玩排名项
+message CompanionRankingItem {
+  uint64 user_id = 1;        // 用户ID
+  string nickname = 2;       // 昵称
+  string avatar_url = 3;     // 头像URL
+  double rating = 4;         // 评分（用于评分排名）
+  int64  total_orders = 5;   // 总接单数（用于接单数排名）
+  int32  rank = 6;          // 排名（从1开始）
+  bool   is_verified = 7;    // 是否认证
+}
+
+// 查询陪玩评分排名
+message GetCompanionRatingRankingRequest {
+  int32 page = 1;           // 页码（从1开始）
+  int32 page_size = 2;      // 每页数量（默认10，最大100）
+}
+
+message GetCompanionRatingRankingResponse {
+  repeated CompanionRankingItem rankings = 1; // 排名列表
+  int32 total = 2;                            // 总数
+  int32 page = 3;                             // 当前页码
+  int32 page_size = 4;                        // 每页数量
+}
+
+// 查询陪玩总接单数排名
+message GetCompanionOrdersRankingRequest {
+  int32 page = 1;           // 页码（从1开始）
+  int32 page_size = 2;      // 每页数量（默认10，最大100）
+}
+
+message GetCompanionOrdersRankingResponse {
+  repeated CompanionRankingItem rankings = 1; // 排名列表
+  int32 total = 2;                            // 总数
+  int32 page = 3;                             // 当前页码
+  int32 page_size = 4;                        // 每页数量
+}
+
 service User {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
@@ -200,4 +239,8 @@ service User {
   rpc UpdateCompanionProfile(UpdateCompanionProfileRequest) returns (UpdateCompanionProfileResponse);
   rpc UpdateCompanionStats(UpdateCompanionStatsRequest) returns (UpdateCompanionStatsResponse);
   rpc GetCompanionList(GetCompanionListRequest) returns (GetCompanionListResponse);
+  
+  // 陪玩排名相关接口
+  rpc GetCompanionRatingRanking(GetCompanionRatingRankingRequest) returns (GetCompanionRatingRankingResponse);
+  rpc GetCompanionOrdersRanking(GetCompanionOrdersRankingRequest) returns (GetCompanionOrdersRankingResponse);
 }

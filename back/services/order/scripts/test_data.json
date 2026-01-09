@@ -1,0 +1,19 @@
+{
+  "bossLogin": {"phone":"13800001001","password":"Test123456"},
+  "companionLogin": {"phone":"13800002001","password":"Test123456"},
+  "companionProfile": {"gameSkills":"[\"Game1\"]","pricePerHour":100,"status":1},
+  "createOrder": {"companionId":1996807922838933504,"gameName":"Game1","durationMinutes":60},
+  "cancelOrder": {"orderId":0,"reason":"Test cancel"}
+}
+
+
+
+
+
+
+
+
+
+
+
+

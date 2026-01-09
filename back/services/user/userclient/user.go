@@ -14,35 +14,40 @@ import (
 )
 
 type (
-	CompanionInfo                  = user.CompanionInfo
-	ConsumeRequest                 = user.ConsumeRequest
-	ConsumeResponse                = user.ConsumeResponse
-	ForgetPasswordRequest          = user.ForgetPasswordRequest
-	ForgetPasswordResponse         = user.ForgetPasswordResponse
-	GetCompanionListRequest        = user.GetCompanionListRequest
-	GetCompanionListResponse       = user.GetCompanionListResponse
-	GetCompanionProfileRequest     = user.GetCompanionProfileRequest
-	GetCompanionProfileResponse    = user.GetCompanionProfileResponse
-	GetUserRequest                 = user.GetUserRequest
-	GetUserResponse                = user.GetUserResponse
-	GetWalletRequest               = user.GetWalletRequest
-	GetWalletResponse              = user.GetWalletResponse
-	LoginByCodeRequest             = user.LoginByCodeRequest
-	LoginByCodeResponse            = user.LoginByCodeResponse
-	LoginRequest                   = user.LoginRequest
-	LoginResponse                  = user.LoginResponse
-	RechargeRequest                = user.RechargeRequest
-	RechargeResponse               = user.RechargeResponse
-	RegisterRequest                = user.RegisterRequest
-	RegisterResponse               = user.RegisterResponse
-	UpdateCompanionProfileRequest  = user.UpdateCompanionProfileRequest
-	UpdateCompanionProfileResponse = user.UpdateCompanionProfileResponse
-	UpdateCompanionStatsRequest    = user.UpdateCompanionStatsRequest
-	UpdateCompanionStatsResponse   = user.UpdateCompanionStatsResponse
-	UpdateUserRequest              = user.UpdateUserRequest
-	UpdateUserResponse             = user.UpdateUserResponse
-	UserInfo                       = user.UserInfo
-	WalletInfo                     = user.WalletInfo
+	CompanionInfo                     = user.CompanionInfo
+	CompanionRankingItem              = user.CompanionRankingItem
+	ConsumeRequest                    = user.ConsumeRequest
+	ConsumeResponse                   = user.ConsumeResponse
+	ForgetPasswordRequest             = user.ForgetPasswordRequest
+	ForgetPasswordResponse            = user.ForgetPasswordResponse
+	GetCompanionListRequest           = user.GetCompanionListRequest
+	GetCompanionListResponse          = user.GetCompanionListResponse
+	GetCompanionOrdersRankingRequest  = user.GetCompanionOrdersRankingRequest
+	GetCompanionOrdersRankingResponse = user.GetCompanionOrdersRankingResponse
+	GetCompanionProfileRequest        = user.GetCompanionProfileRequest
+	GetCompanionProfileResponse       = user.GetCompanionProfileResponse
+	GetCompanionRatingRankingRequest  = user.GetCompanionRatingRankingRequest
+	GetCompanionRatingRankingResponse = user.GetCompanionRatingRankingResponse
+	GetUserRequest                    = user.GetUserRequest
+	GetUserResponse                   = user.GetUserResponse
+	GetWalletRequest                  = user.GetWalletRequest
+	GetWalletResponse                 = user.GetWalletResponse
+	LoginByCodeRequest                = user.LoginByCodeRequest
+	LoginByCodeResponse               = user.LoginByCodeResponse
+	LoginRequest                      = user.LoginRequest
+	LoginResponse                     = user.LoginResponse
+	RechargeRequest                   = user.RechargeRequest
+	RechargeResponse                  = user.RechargeResponse
+	RegisterRequest                   = user.RegisterRequest
+	RegisterResponse                  = user.RegisterResponse
+	UpdateCompanionProfileRequest     = user.UpdateCompanionProfileRequest
+	UpdateCompanionProfileResponse    = user.UpdateCompanionProfileResponse
+	UpdateCompanionStatsRequest       = user.UpdateCompanionStatsRequest
+	UpdateCompanionStatsResponse      = user.UpdateCompanionStatsResponse
+	UpdateUserRequest                 = user.UpdateUserRequest
+	UpdateUserResponse                = user.UpdateUserResponse
+	UserInfo                          = user.UserInfo
+	WalletInfo                        = user.WalletInfo
 
 	User interface {
 		Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
@@ -60,6 +65,9 @@ type (
 		UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
 		UpdateCompanionStats(ctx context.Context, in *UpdateCompanionStatsRequest, opts ...grpc.CallOption) (*UpdateCompanionStatsResponse, error)
 		GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error)
+		// 陪玩排名相关接口
+		GetCompanionRatingRanking(ctx context.Context, in *GetCompanionRatingRankingRequest, opts ...grpc.CallOption) (*GetCompanionRatingRankingResponse, error)
+		GetCompanionOrdersRanking(ctx context.Context, in *GetCompanionOrdersRankingRequest, opts ...grpc.CallOption) (*GetCompanionOrdersRankingResponse, error)
 	}
 
 	defaultUser struct {
@@ -138,4 +146,15 @@ func (m *defaultUser) UpdateCompanionStats(ctx context.Context, in *UpdateCompan
 func (m *defaultUser) GetCompanionList(ctx context.Context, in *GetCompanionListRequest, opts ...grpc.CallOption) (*GetCompanionListResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetCompanionList(ctx, in, opts...)
+}
+
+// 陪玩排名相关接口
+func (m *defaultUser) GetCompanionRatingRanking(ctx context.Context, in *GetCompanionRatingRankingRequest, opts ...grpc.CallOption) (*GetCompanionRatingRankingResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetCompanionRatingRanking(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetCompanionOrdersRanking(ctx context.Context, in *GetCompanionOrdersRankingRequest, opts ...grpc.CallOption) (*GetCompanionOrdersRankingResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetCompanionOrdersRanking(ctx, in, opts...)
 }
