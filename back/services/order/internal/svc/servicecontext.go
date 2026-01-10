@@ -46,7 +46,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		distributedLock = lock.NewDistributedLock(redisClient)
 		logx.Infof("分布式锁已初始化")
 	} else {
-		logx.Warnf("Redis 未配置，分布式锁功能不可用")
+		logx.Infof("Redis 未配置，分布式锁功能不可用")
 	}
 
 	ctx := &ServiceContext{

@@ -154,7 +154,7 @@ func (dl *DistributedLock) Unlock(ctx context.Context, key, value string) error 
 	if result == 1 {
 		logx.Infof("lock released: key=%s, value=%s", lockKey, value)
 	} else {
-		logx.Warnf("unlock failed: key=%s, value=%s, lock not found or value mismatch", lockKey, value)
+		// logx.Warnf("unlock failed: key=%s, value=%s, lock not found or value mismatch", lockKey, value)
 		return fmt.Errorf("unlock failed: lock not found or value mismatch")
 	}
 

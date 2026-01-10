@@ -9,7 +9,7 @@ pipeline {
 
     environment {
         // Go 版本（标记用）
-        GO_VERSION   = '1.23.4'
+        GO_VERSION   = '1.25.5'
         // 项目路径
         PROJECT_PATH = 'back'
         // 构建输出目录

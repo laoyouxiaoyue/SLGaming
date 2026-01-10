@@ -73,7 +73,7 @@ func (l *CancelOrderLogic) CancelOrder(in *order.CancelOrderRequest) (*order.Can
 
 	// 如果分布式锁未初始化，直接执行（降级处理）
 	if l.svcCtx.DistributedLock == nil {
-		l.Warnf("distributed lock not initialized, skipping lock for order cancellation")
+		l.Infof("distributed lock not initialized, skipping lock for order cancellation")
 		return l.doCancelOrder(in)
 	}
 
@@ -82,7 +82,7 @@ func (l *CancelOrderLogic) CancelOrder(in *order.CancelOrderRequest) (*order.Can
 	var cancelErr error
 
 	lockOptions := &lock.LockOptions{
-		TTL:           30,                    // 锁过期时间 30 秒
+		TTL:           30,                     // 锁过期时间 30 秒
 		RetryInterval: 100 * time.Millisecond, // 重试间隔 100ms
 		MaxWaitTime:   5 * time.Second,        // 最大等待时间 5 秒
 	}
@@ -169,7 +169,6 @@ func (l *CancelOrderLogic) doCancelOrder(in *order.CancelOrderRequest) (*order.C
 		o.ID, o.OrderNo, o.Status, in.GetOperatorId(), needRefund)
 
 	// 在一个事务中处理取消逻辑
-	db := l.svcCtx.DB.WithContext(l.ctx)
 	if err := db.Transaction(func(tx *gorm.DB) error {
 		if needRefund {
 			// 已支付或已接单的订单：需要退款
