@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -72,6 +73,6 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile(in *user.GetCompanionProf
 	}
 
 	return &user.GetCompanionProfileResponse{
-		Profile: toCompanionInfo(&profile),
+		Profile: helper.ToCompanionInfo(&profile),
 	}, nil
 }

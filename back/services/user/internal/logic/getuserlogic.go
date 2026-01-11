@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -52,6 +53,6 @@ func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, 
 	}
 
 	return &user.GetUserResponse{
-		User: toUserInfo(&u),
+		User: helper.ToUserInfo(&u),
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -76,26 +77,16 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// 分页
-	page := int(in.GetPage())
-	if page < 1 {
-		page = 1
-	}
-	pageSize := int(in.GetPageSize())
-	if pageSize < 1 {
-		pageSize = 20 // 默认每页20条
-	}
-	if pageSize > 100 {
-		pageSize = 100 // 最大100条
-	}
-	offset := (page - 1) * pageSize
+	// 规范化分页参数（默认每页20条）
+	pagination := helper.NormalizePaginationWithDefault(in.GetPage(), in.GetPageSize(), 20)
+	offset := (pagination.Page - 1) * pagination.PageSize
 
 	// 查询列表
 	var profiles []model.CompanionProfile
 	if err := query.Select("companion_profiles.*").
 		Order("companion_profiles.rating DESC, companion_profiles.total_orders DESC").
 		Offset(offset).
-		Limit(pageSize).
+		Limit(pagination.PageSize).
 		Find(&profiles).Error; err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -103,14 +94,14 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 	// 转换为响应格式
 	companions := make([]*user.CompanionInfo, 0, len(profiles))
 	for i := range profiles {
-		companions = append(companions, toCompanionInfo(&profiles[i]))
+		companions = append(companions, helper.ToCompanionInfo(&profiles[i]))
 	}
 
 	return &user.GetCompanionListResponse{
 		Companions: companions,
 		Total:      int32(total),
-		Page:       int32(page),
-		PageSize:   int32(pageSize),
+		Page:       int32(pagination.Page),
+		PageSize:   int32(pagination.PageSize),
 	}, nil
 }
 

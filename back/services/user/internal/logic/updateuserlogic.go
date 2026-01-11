@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -61,7 +62,7 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUs
 	}
 
 	if password := strings.TrimSpace(in.GetPassword()); password != "" {
-		hashed, err := hashPassword(password)
+		hashed, err := helper.HashPassword(password)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -97,6 +98,6 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUs
 	}
 
 	return &user.UpdateUserResponse{
-		User: toUserInfo(&u),
+		User: helper.ToUserInfo(&u),
 	}, nil
 }

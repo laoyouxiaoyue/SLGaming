@@ -6,7 +6,6 @@ pipeline {
     // 并在环境变量中设置了 GOROOT / GOPATH / PATH
     // 所以这里直接使用节点自带的 go，不再额外启动 golang:1.23 容器
     agent any
-
     environment {
         // Go 版本（标记用）
         GO_VERSION   = '1.25.5'

@@ -1,4 +1,4 @@
-package logic
+package helper
 
 import (
 	"strings"
@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func hashPassword(password string) (string, error) {
+func HashPassword(password string) (string, error) {
 	if password == "" {
 		password = "123456"
 	}
@@ -20,11 +20,11 @@ func hashPassword(password string) (string, error) {
 	return string(hashed), nil
 }
 
-func verifyPassword(hashed, password string) error {
+func VerifyPassword(hashed, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
 }
 
-func ensureNickname(nickname, phone string) string {
+func EnsureNickname(nickname, phone string) string {
 	nickname = strings.TrimSpace(nickname)
 	if nickname != "" {
 		return nickname
@@ -35,7 +35,7 @@ func ensureNickname(nickname, phone string) string {
 	return "新用户"
 }
 
-func toUserInfo(u *model.User) *user.UserInfo {
+func ToUserInfo(u *model.User) *user.UserInfo {
 	if u == nil {
 		return nil
 	}
@@ -50,7 +50,7 @@ func toUserInfo(u *model.User) *user.UserInfo {
 	}
 }
 
-func toCompanionInfo(p *model.CompanionProfile) *user.CompanionInfo {
+func ToCompanionInfo(p *model.CompanionProfile) *user.CompanionInfo {
 	if p == nil {
 		return nil
 	}

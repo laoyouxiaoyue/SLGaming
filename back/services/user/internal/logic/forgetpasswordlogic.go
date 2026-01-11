@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -46,7 +47,7 @@ func (l *ForgetPasswordLogic) ForgetPassword(in *user.ForgetPasswordRequest) (*u
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	hashed, err := hashPassword(newPassword)
+	hashed, err := helper.HashPassword(newPassword)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

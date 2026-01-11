@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -44,9 +45,14 @@ func (l *UpdateCompanionStatsLogic) UpdateCompanionStats(in *user.UpdateCompanio
 	var p model.CompanionProfile
 	if err := db.Where("user_id = ?", in.GetUserId()).First(&p).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
+			helper.LogWarning(l.Logger, helper.OpUpdateCompanionStats, "companion profile not found", map[string]interface{}{
+				"user_id": in.GetUserId(),
+			})
 			return nil, status.Error(codes.NotFound, "companion profile not found")
 		}
-		l.Errorf("get companion profile failed: %v", err)
+		helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "get companion profile failed", err, map[string]interface{}{
+			"user_id": in.GetUserId(),
+		})
 		return nil, status.Error(codes.Internal, "get companion profile failed")
 	}
 
@@ -59,7 +65,9 @@ func (l *UpdateCompanionStatsLogic) UpdateCompanionStats(in *user.UpdateCompanio
 	}
 
 	if err := db.Save(&p).Error; err != nil {
-		l.Errorf("update companion stats failed: %v", err)
+		helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "update companion stats failed", err, map[string]interface{}{
+			"user_id": p.UserID,
+		})
 		return nil, status.Error(codes.Internal, "update companion stats failed")
 	}
 
@@ -72,17 +80,30 @@ func (l *UpdateCompanionStatsLogic) UpdateCompanionStats(in *user.UpdateCompanio
 		ratingScore := int64(p.Rating * 10000)
 		_, err := l.svcCtx.Redis.Zadd("ranking:rating", ratingScore, userIDStr)
 		if err != nil {
-			l.Errorf("update rating ranking failed: user_id=%d, rating=%f, err=%v", p.UserID, p.Rating, err)
+			helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "update rating ranking failed", err, map[string]interface{}{
+				"user_id": p.UserID,
+				"rating":  p.Rating,
+			})
 		}
 
 		// 更新接单数排名 ZSet
 		_, err = l.svcCtx.Redis.Zadd("ranking:orders", p.TotalOrders, userIDStr)
 		if err != nil {
-			l.Errorf("update orders ranking failed: user_id=%d, total_orders=%d, err=%v", p.UserID, p.TotalOrders, err)
+			helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "update orders ranking failed", err, map[string]interface{}{
+				"user_id":     p.UserID,
+				"total_orders": p.TotalOrders,
+			})
 		}
 	}
 
+	// 记录成功日志
+	helper.LogSuccess(l.Logger, helper.OpUpdateCompanionStats, map[string]interface{}{
+		"user_id":      p.UserID,
+		"new_rating":   p.Rating,
+		"total_orders": p.TotalOrders,
+	})
+
 	return &user.UpdateCompanionStatsResponse{
-		Profile: toCompanionInfo(&p),
+		Profile: helper.ToCompanionInfo(&p),
 	}, nil
 }

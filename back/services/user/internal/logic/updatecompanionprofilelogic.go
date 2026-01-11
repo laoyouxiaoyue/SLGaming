@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -105,6 +106,6 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(in *user.UpdateComp
 	}
 
 	return &user.UpdateCompanionProfileResponse{
-		Profile: toCompanionInfo(&profile),
+		Profile: helper.ToCompanionInfo(&profile),
 	}, nil
 }
