@@ -63,13 +63,11 @@ jobs:
         run: |
           mkdir -p ${{ env.BUILD_DIR }}/deploy
 
-          # 可执行文件
           cp ${{ env.BUILD_DIR }}/gateway ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/user    ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/order   ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/code    ${{ env.BUILD_DIR }}/deploy/
 
-          # 配置文件
           cp -r ${{ env.PROJECT_PATH }}/services/gateway/etc ${{ env.BUILD_DIR }}/deploy/gateway-etc
           cp -r ${{ env.PROJECT_PATH }}/services/user/etc    ${{ env.BUILD_DIR }}/deploy/user-etc
           cp -r ${{ env.PROJECT_PATH }}/services/order/etc   ${{ env.BUILD_DIR }}/deploy/order-etc
@@ -112,44 +110,42 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          timeout: 60s
-          command_timeout: 5m
-          script_stop: false   # ✅ 关键：防止 exit 143 / SIGTERM
+          script_stop: false
           script: |
             set -e
-            cd ${{ secrets.DEPLOY_PATH }}
 
-            echo "=== Stopping old services ==="
+            # ⚠️ 关键点：真正的程序在 build 目录里
+            cd ${{ secrets.DEPLOY_PATH }}/build
+
+            echo "=== Current dir ==="
+            pwd
+            echo "=== Files ==="
+            ls -lh
+
+            echo "=== Stop old services ==="
             pkill -f "gateway -f" || true
-            pkill -f "code -f" || true
             pkill -f "user -f" || true
             pkill -f "order -f" || true
-            sleep 3
+            pkill -f "code -f" || true
+            sleep 2
 
-            echo "=== Starting new services ==="
-            chmod +x gateway code user order 2>/dev/null || true
+            echo "=== Start services ==="
+            chmod +x gateway user order code
 
             nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 </dev/null &
-            echo "Gateway PID: $!"
+            nohup ./user    -f user-etc/user.yaml       > user.log    2>&1 </dev/null &
+            nohup ./order   -f order-etc/order.yaml     > order.log   2>&1 </dev/null &
+            nohup ./code    -f code-etc/code.yaml       > code.log    2>&1 </dev/null &
 
-            nohup ./code -f code-etc/code.yaml > code.log 2>&1 </dev/null &
-            echo "Code PID: $!"
+            sleep 2
 
-            nohup ./user -f user-etc/user.yaml > user.log 2>&1 </dev/null &
-            echo "User PID: $!"
+            echo "=== Process check ==="
+            ps aux | grep -E "(gateway|user|order|code)" | grep -v grep
 
-            nohup ./order -f order-etc/order.yaml > order.log 2>&1 </dev/null &
-            echo "Order PID: $!"
+            echo "=== Logs ==="
+            tail -5 gateway.log || true
+            tail -5 user.log || true
+            tail -5 order.log || true
+            tail -5 code.log || true
 
-            sleep 3
-
-            echo "=== Checking service status ==="
-            ps aux | grep -E "(gateway|code|user|order)" | grep -v grep || true
-
-            echo "=== Service logs (last 10 lines) ==="
-            tail -10 gateway.log || true
-            tail -10 code.log || true
-            tail -10 user.log || true
-            tail -10 order.log || true
-
-            echo "✅ Services deployment completed"
+            echo "✅ Deploy finished"
