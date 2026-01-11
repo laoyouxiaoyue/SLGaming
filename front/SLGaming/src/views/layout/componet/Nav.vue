@@ -3,6 +3,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
 import { getInfoAPI } from "@/api/user/info";
 import { ref, onMounted } from "vue";
+import { getlogoutAPI } from "@/api/user/logout";
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -11,6 +12,7 @@ const confirm = () => {
   // 退出登录业务逻辑实现
   // 1.清除用户信息 触发action
   userStore.clearUserInfo();
+  getlogoutAPI();
   // 2.跳转到登录页
   router.push("/login");
 };
