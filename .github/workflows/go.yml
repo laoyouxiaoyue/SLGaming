@@ -93,6 +93,28 @@ jobs:
           name: docker-images
           path: docker-images/
 
+      - name: Verify Downloaded Files
+        run: |
+          echo "=== Verifying Downloaded Files ==="
+          ls -lh docker-images/ || true
+          if [ ! -f "docker-images/gateway.tar.gz" ]; then
+            echo "❌ Error: gateway.tar.gz not found after download"
+            exit 1
+          fi
+          if [ ! -f "docker-images/user.tar.gz" ]; then
+            echo "❌ Error: user.tar.gz not found after download"
+            exit 1
+          fi
+          if [ ! -f "docker-images/order.tar.gz" ]; then
+            echo "❌ Error: order.tar.gz not found after download"
+            exit 1
+          fi
+          if [ ! -f "docker-images/code.tar.gz" ]; then
+            echo "❌ Error: code.tar.gz not found after download"
+            exit 1
+          fi
+          echo "✅ All files downloaded successfully"
+
       - name: Load Docker Images on Server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -100,8 +122,37 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          source: "docker-images/*"
+          source: "docker-images/*.tar.gz"
           target: "${{ secrets.DEPLOY_PATH }}/docker-images"
+          strip_components: 1
+
+      - name: Verify Files Transferred
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            echo "=== Verifying Transferred Files ==="
+            ls -lh ${{ secrets.DEPLOY_PATH }}/docker-images/ || true
+            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/gateway.tar.gz" ]; then
+              echo "❌ Error: gateway.tar.gz not found after transfer"
+              exit 1
+            fi
+            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/user.tar.gz" ]; then
+              echo "❌ Error: user.tar.gz not found after transfer"
+              exit 1
+            fi
+            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/order.tar.gz" ]; then
+              echo "❌ Error: order.tar.gz not found after transfer"
+              exit 1
+            fi
+            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/code.tar.gz" ]; then
+              echo "❌ Error: code.tar.gz not found after transfer"
+              exit 1
+            fi
+            echo "✅ All files transferred successfully"
 
       - name: Deploy Services with Docker
         uses: appleboy/ssh-action@v1.0.3
@@ -115,13 +166,37 @@ jobs:
           script: |
             set -euo pipefail
             
+            echo "=== Checking Docker Images Directory ==="
+            mkdir -p ${{ secrets.DEPLOY_PATH }}/docker-images
             cd ${{ secrets.DEPLOY_PATH }}/docker-images
+            pwd
+            ls -lh || true
             
             echo "=== Loading Docker Images ==="
-            docker load -i gateway.tar.gz || true
-            docker load -i user.tar.gz || true
-            docker load -i order.tar.gz || true
-            docker load -i code.tar.gz || true
+            if [ ! -f gateway.tar.gz ]; then
+              echo "❌ Error: gateway.tar.gz not found"
+              exit 1
+            fi
+            if [ ! -f user.tar.gz ]; then
+              echo "❌ Error: user.tar.gz not found"
+              exit 1
+            fi
+            if [ ! -f order.tar.gz ]; then
+              echo "❌ Error: order.tar.gz not found"
+              exit 1
+            fi
+            if [ ! -f code.tar.gz ]; then
+              echo "❌ Error: code.tar.gz not found"
+              exit 1
+            fi
+            
+            docker load -i gateway.tar.gz
+            docker load -i user.tar.gz
+            docker load -i order.tar.gz
+            docker load -i code.tar.gz
+            
+            echo "=== Verifying Images Loaded ==="
+            docker images | grep slgaming || true
             
             echo "=== Stopping Old Containers ==="
             docker stop slgaming-gateway slgaming-user slgaming-order slgaming-code 2>/dev/null || true
@@ -129,41 +204,59 @@ jobs:
             
             echo "=== Starting New Containers ==="
             
+            # 检查镜像是否存在
+            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/code"; then
+              echo "❌ Error: slgaming/code image not found"
+              exit 1
+            fi
+            
             # 启动 Code Service (端口 8085)
             docker run -d \
               --name slgaming-code \
               --restart unless-stopped \
               -p 8085:8085 \
               -v ${{ secrets.DEPLOY_PATH }}/configs/code:/app/etc:ro \
-              ${{ env.IMAGE_PREFIX }}/code:latest || true
+              ${{ env.IMAGE_PREFIX }}/code:latest
             
             # 启动 User Service (端口 8086)
+            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/user"; then
+              echo "❌ Error: slgaming/user image not found"
+              exit 1
+            fi
             docker run -d \
               --name slgaming-user \
               --restart unless-stopped \
               -p 8086:8086 \
               -v ${{ secrets.DEPLOY_PATH }}/configs/user:/app/etc:ro \
-              ${{ env.IMAGE_PREFIX }}/user:latest || true
+              ${{ env.IMAGE_PREFIX }}/user:latest
             
             # 启动 Order Service (端口 8087)
+            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/order"; then
+              echo "❌ Error: slgaming/order image not found"
+              exit 1
+            fi
             docker run -d \
               --name slgaming-order \
               --restart unless-stopped \
               -p 8087:8087 \
               -v ${{ secrets.DEPLOY_PATH }}/configs/order:/app/etc:ro \
-              ${{ env.IMAGE_PREFIX }}/order:latest || true
+              ${{ env.IMAGE_PREFIX }}/order:latest
             
             # 等待后端服务启动
             echo "=== Waiting for backend services to start ==="
             sleep 30
             
             # 启动 Gateway (端口 8888)
+            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/gateway"; then
+              echo "❌ Error: slgaming/gateway image not found"
+              exit 1
+            fi
             docker run -d \
               --name slgaming-gateway \
               --restart unless-stopped \
               -p 8888:8888 \
               -v ${{ secrets.DEPLOY_PATH }}/configs/gateway:/app/etc:ro \
-              ${{ env.IMAGE_PREFIX }}/gateway:latest || true
+              ${{ env.IMAGE_PREFIX }}/gateway:latest
             
             sleep 5
             
