@@ -31,3 +31,36 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/gateway \
             ./services/gateway/gateway.go
+            
+    - name: Build User Service
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/user \
+            ./services/user/user.go
+            
+    - name: Build Order Service
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/order \
+            ./services/order/order.go
+            
+    - name: Build Code Service
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/code \
+            ./services/code/code.go
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v6.0.0
+      with:
+          name: microservices-binaries
+          path: ${{ env.BUILD_DIR }}/
+          retention-days: 7
