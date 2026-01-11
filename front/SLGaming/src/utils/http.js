@@ -3,7 +3,7 @@ import { useUserStore } from "@/stores/userStore";
 
 // 创建axios实例（相当于造了一个专属的"请求工具"）
 const http = axios.create({
-  baseURL: "http://120.26.29.194:8888/api",
+  baseURL: "/api",
   timeout: 5000, // 请求超过5秒没响应就报错
 });
 
