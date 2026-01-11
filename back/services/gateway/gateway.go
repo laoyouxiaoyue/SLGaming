@@ -39,6 +39,9 @@ func main() {
 	// 创建服务上下文
 	ctx := svc.NewServiceContext(c)
 
+	// 全局应用 CORS 中间件（必须在其他中间件之前）
+	server.Use(middleware.CORSMiddleware(middleware.DefaultCORSConfig()))
+
 	// 全局应用鉴权中间件（公开接口会在中间件中自动跳过）
 	server.Use(middleware.AuthMiddleware(ctx))
 
