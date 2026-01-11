@@ -1,10 +1,9 @@
 <script setup>
 import { RouterView } from "vue-router";
+import Nav from "./componet/Nav.vue";
 </script>
 
 <template>
-  <h1>
-    <RouterLink to="/login">点击登录</RouterLink>
-  </h1>
+  <Nav />
   <RouterView />
 </template>
