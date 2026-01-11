@@ -147,7 +147,7 @@ jobs:
             nohup ./order -f order-etc/order.yaml  > order.log 2>&1 </dev/null &
 
             # 给后端一点启动时间
-            sleep 2
+            sleep 30
 
             # ✅ 最后启动 gateway
             nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 </dev/null &
