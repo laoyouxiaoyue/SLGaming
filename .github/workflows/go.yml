@@ -2,8 +2,7 @@ name: Go
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 env:
   GO_VERSION: '1.25.5'
@@ -23,7 +22,6 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
-          cache-dependency-path: back/go.sum
 
       - name: Build Gateway Service
         working-directory: ${{ env.PROJECT_PATH }}
@@ -33,7 +31,6 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/gateway \
             ./services/gateway/gateway.go
-
       - name: Build User Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
@@ -42,7 +39,6 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/user \
             ./services/user/user.go
-
       - name: Build Order Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
@@ -51,7 +47,6 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/order \
             ./services/order/order.go
-
       - name: Build Code Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
@@ -60,23 +55,19 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/code \
             ./services/code/code.go
-
       - name: Package deployment files
         run: |
           mkdir -p ${{ env.BUILD_DIR }}/deploy
-
           # 可执行文件
           cp ${{ env.BUILD_DIR }}/gateway ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/user    ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/order   ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/code    ${{ env.BUILD_DIR }}/deploy/
-
           # 配置文件
           cp -r ${{ env.PROJECT_PATH }}/services/gateway/etc ${{ env.BUILD_DIR }}/deploy/gateway-etc
           cp -r ${{ env.PROJECT_PATH }}/services/user/etc    ${{ env.BUILD_DIR }}/deploy/user-etc
           cp -r ${{ env.PROJECT_PATH }}/services/order/etc   ${{ env.BUILD_DIR }}/deploy/order-etc
           cp -r ${{ env.PROJECT_PATH }}/services/code/etc    ${{ env.BUILD_DIR }}/deploy/code-etc
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -104,9 +95,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          source: "${{ env.BUILD_DIR }}/deploy/*"
+          source: "${{ env.BUILD_DIR }}/*"
           target: ${{ secrets.DEPLOY_PATH }}
-          strip_components: 1
 
       - name: Restart services
         uses: appleboy/ssh-action@v1.0.3
@@ -120,38 +110,198 @@ jobs:
           script: |
             set -e
             cd ${{ secrets.DEPLOY_PATH }}
-
+            
             echo "=== Stopping old services ==="
             pkill -f "gateway -f" || true
             pkill -f "code -f" || true
             pkill -f "user -f" || true
             pkill -f "order -f" || true
             sleep 3
-
+            
             echo "=== Starting new services ==="
+            # 确保文件可执行
             chmod +x gateway code user order 2>/dev/null || true
-
+            
+            # 启动服务并记录 PID
             nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 &
-            echo "Gateway PID: $!"
-
+            GATEWAY_PID=$!
+            echo "Gateway started with PID: $GATEWAY_PID"
+            
             nohup ./code -f code-etc/code.yaml > code.log 2>&1 &
-            echo "Code PID: $!"
-
+            CODE_PID=$!
+            echo "Code service started with PID: $CODE_PID"
+            
             nohup ./user -f user-etc/user.yaml > user.log 2>&1 &
-            echo "User PID: $!"
-
+            USER_PID=$!
+            echo "User service started with PID: $USER_PID"
+            
             nohup ./order -f order-etc/order.yaml > order.log 2>&1 &
-            echo "Order PID: $!"
-
+            ORDER_PID=$!
+            echo "Order service started with PID: $ORDER_PID"
+            
+            # 等待服务启动
             sleep 3
-
+            
             echo "=== Checking service status ==="
             ps aux | grep -E "(gateway|code|user|order)" | grep -v grep || true
-
+            
             echo "=== Service logs (last 10 lines) ==="
-            tail -10 gateway.log || true
-            tail -10 code.log || true
-            tail -10 user.log || true
-            tail -10 order.log || true
+            tail -10 gateway.log 2>/dev/null || echo "Gateway log not available"
+            tail -10 code.log 2>/dev/null || echo "Code log not available"
+            tail -10 user.log 2>/dev/null || echo "User log not available"
+            tail -10 order.log 2>/dev/null || echo "Order log not available"
+            
+            echo "✅ Services deployment completed"name: Go
 
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  GO_VERSION: '1.25.5'
+  PROJECT_PATH: 'back'
+  BUILD_DIR: 'build'
+
+jobs:
+  build:
+    name: Build Microservices
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build Gateway Service
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/gateway \
+            ./services/gateway/gateway.go
+      - name: Build User Service
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/user \
+            ./services/user/user.go
+      - name: Build Order Service
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/order \
+            ./services/order/order.go
+      - name: Build Code Service
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/code \
+            ./services/code/code.go
+      - name: Package deployment files
+        run: |
+          mkdir -p ${{ env.BUILD_DIR }}/deploy
+          # 可执行文件
+          cp ${{ env.BUILD_DIR }}/gateway ${{ env.BUILD_DIR }}/deploy/
+          cp ${{ env.BUILD_DIR }}/user    ${{ env.BUILD_DIR }}/deploy/
+          cp ${{ env.BUILD_DIR }}/order   ${{ env.BUILD_DIR }}/deploy/
+          cp ${{ env.BUILD_DIR }}/code    ${{ env.BUILD_DIR }}/deploy/
+          # 配置文件
+          cp -r ${{ env.PROJECT_PATH }}/services/gateway/etc ${{ env.BUILD_DIR }}/deploy/gateway-etc
+          cp -r ${{ env.PROJECT_PATH }}/services/user/etc    ${{ env.BUILD_DIR }}/deploy/user-etc
+          cp -r ${{ env.PROJECT_PATH }}/services/order/etc   ${{ env.BUILD_DIR }}/deploy/order-etc
+          cp -r ${{ env.PROJECT_PATH }}/services/code/etc    ${{ env.BUILD_DIR }}/deploy/code-etc
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: microservices-binaries
+          path: ${{ env.BUILD_DIR }}/deploy/
+          retention-days: 7
+
+  deploy:
+    name: Deploy Microservices
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: microservices-binaries
+          path: ${{ env.BUILD_DIR }}/
+
+      - name: Upload files to server via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: "${{ env.BUILD_DIR }}/*"
+          target: ${{ secrets.DEPLOY_PATH }}
+
+      - name: Restart services
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          timeout: 60s
+          command_timeout: 5m
+          script: |
+            set -e
+            cd ${{ secrets.DEPLOY_PATH }}
+            
+            echo "=== Stopping old services ==="
+            pkill -f "gateway -f" || true
+            pkill -f "code -f" || true
+            pkill -f "user -f" || true
+            pkill -f "order -f" || true
+            sleep 3
+            
+            echo "=== Starting new services ==="
+            # 确保文件可执行
+            chmod +x gateway code user order 2>/dev/null || true
+            
+            # 启动服务并记录 PID
+            nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 &
+            GATEWAY_PID=$!
+            echo "Gateway started with PID: $GATEWAY_PID"
+            
+            nohup ./code -f code-etc/code.yaml > code.log 2>&1 &
+            CODE_PID=$!
+            echo "Code service started with PID: $CODE_PID"
+            
+            nohup ./user -f user-etc/user.yaml > user.log 2>&1 &
+            USER_PID=$!
+            echo "User service started with PID: $USER_PID"
+            
+            nohup ./order -f order-etc/order.yaml > order.log 2>&1 &
+            ORDER_PID=$!
+            echo "Order service started with PID: $ORDER_PID"
+            
+            # 等待服务启动
+            sleep 3
+            
+            echo "=== Checking service status ==="
+            ps aux | grep -E "(gateway|code|user|order)" | grep -v grep || true
+            
+            echo "=== Service logs (last 10 lines) ==="
+            tail -10 gateway.log 2>/dev/null || echo "Gateway log not available"
+            tail -10 code.log 2>/dev/null || echo "Code log not available"
+            tail -10 user.log 2>/dev/null || echo "User log not available"
+            tail -10 order.log 2>/dev/null || echo "Order log not available"
+            
             echo "✅ Services deployment completed"
