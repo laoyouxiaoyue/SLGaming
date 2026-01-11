@@ -1,4 +1,4 @@
-name: Go
+name: Build and Deploy with Docker
 
 on:
   push:
@@ -7,121 +7,103 @@ on:
 env:
   GO_VERSION: "1.25.5"
   PROJECT_PATH: "back"
-  BUILD_DIR: "build"
+  IMAGE_PREFIX: "slgaming"      # 镜像前缀（本地构建，不需要推送到仓库）
 
 jobs:
   build:
-    name: Build Microservices
+    name: Build Docker Images
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Gateway Docker Image
+        uses: docker/build-push-action@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
-          cache: true
-          cache-dependency-path: ${{ env.PROJECT_PATH }}/go.sum
+          context: ${{ env.PROJECT_PATH }}
+          file: ${{ env.PROJECT_PATH }}/services/gateway/Dockerfile
+          push: false
+          tags: ${{ env.IMAGE_PREFIX }}/gateway:latest,${{ env.IMAGE_PREFIX }}/gateway:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
 
-      - name: Build Gateway Service
-        working-directory: ${{ env.PROJECT_PATH }}
+      - name: Build User Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.PROJECT_PATH }}
+          file: ${{ env.PROJECT_PATH }}/services/user/Dockerfile
+          push: false
+          tags: ${{ env.IMAGE_PREFIX }}/user:latest,${{ env.IMAGE_PREFIX }}/user:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Build Order Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.PROJECT_PATH }}
+          file: ${{ env.PROJECT_PATH }}/services/order/Dockerfile
+          push: false
+          tags: ${{ env.IMAGE_PREFIX }}/order:latest,${{ env.IMAGE_PREFIX }}/order:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Build Code Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.PROJECT_PATH }}
+          file: ${{ env.PROJECT_PATH }}/services/code/Dockerfile
+          push: false
+          tags: ${{ env.IMAGE_PREFIX }}/code:latest,${{ env.IMAGE_PREFIX }}/code:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Save Docker Images
         run: |
-          mkdir -p ../${{ env.BUILD_DIR }}
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-            -ldflags="-w -s" \
-            -o ../${{ env.BUILD_DIR }}/gateway \
-            ./services/gateway/gateway.go
+          mkdir -p docker-images
+          docker save ${{ env.IMAGE_PREFIX }}/gateway:latest | gzip > docker-images/gateway.tar.gz
+          docker save ${{ env.IMAGE_PREFIX }}/user:latest | gzip > docker-images/user.tar.gz
+          docker save ${{ env.IMAGE_PREFIX }}/order:latest | gzip > docker-images/order.tar.gz
+          docker save ${{ env.IMAGE_PREFIX }}/code:latest | gzip > docker-images/code.tar.gz
 
-      - name: Build User Service
-        working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          mkdir -p ../${{ env.BUILD_DIR }}
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-            -ldflags="-w -s" \
-            -o ../${{ env.BUILD_DIR }}/user \
-            ./services/user/user.go
-
-      - name: Build Order Service
-        working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          mkdir -p ../${{ env.BUILD_DIR }}
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-            -ldflags="-w -s" \
-            -o ../${{ env.BUILD_DIR }}/order \
-            ./services/order/order.go
-
-      - name: Build Code Service
-        working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          mkdir -p ../${{ env.BUILD_DIR }}
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-            -ldflags="-w -s" \
-            -o ../${{ env.BUILD_DIR }}/code \
-            ./services/code/code.go
-
-      - name: Package deployment files
-        run: |
-          mkdir -p ${{ env.BUILD_DIR }}/deploy
-
-          # binaries
-          cp ${{ env.BUILD_DIR }}/gateway ${{ env.BUILD_DIR }}/deploy/
-          cp ${{ env.BUILD_DIR }}/user    ${{ env.BUILD_DIR }}/deploy/
-          cp ${{ env.BUILD_DIR }}/order   ${{ env.BUILD_DIR }}/deploy/
-          cp ${{ env.BUILD_DIR }}/code    ${{ env.BUILD_DIR }}/deploy/
-
-          # configs
-          cp -r ${{ env.PROJECT_PATH }}/services/gateway/etc ${{ env.BUILD_DIR }}/deploy/gateway-etc
-          cp -r ${{ env.PROJECT_PATH }}/services/user/etc    ${{ env.BUILD_DIR }}/deploy/user-etc
-          cp -r ${{ env.PROJECT_PATH }}/services/order/etc   ${{ env.BUILD_DIR }}/deploy/order-etc
-          cp -r ${{ env.PROJECT_PATH }}/services/code/etc    ${{ env.BUILD_DIR }}/deploy/code-etc
-
-      - name: Upload build artifacts
+      - name: Upload Docker Images
         uses: actions/upload-artifact@v4
         with:
-          name: microservices-binaries
-          path: ${{ env.BUILD_DIR }}/deploy/
+          name: docker-images
+          path: docker-images/
           retention-days: 7
 
   deploy:
-    name: Deploy Microservices
+    name: Deploy Docker Containers
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Download build artifacts
+      - name: Download Docker Images
         uses: actions/download-artifact@v4
         with:
-          name: microservices-binaries
-          path: ${{ env.BUILD_DIR }}/deploy/
+          name: docker-images
+          path: docker-images/
 
-      # 关键：先在服务器创建目标目录，避免 scp 传不上/传到奇怪位置
-      - name: Ensure remote build dir exists
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script: |
-            set -e
-            mkdir -p ${{ secrets.DEPLOY_PATH }}/build
-
-      # 关键：把 deploy 目录内容“平铺”到服务器的 DEPLOY_PATH/build 下
-      - name: Upload files to server via SCP
+      - name: Load Docker Images on Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          source: "${{ env.BUILD_DIR }}/deploy/*"
-          target: "${{ secrets.DEPLOY_PATH }}/build"
-          strip_components: 2
+          source: "docker-images/*"
+          target: "${{ secrets.DEPLOY_PATH }}/docker-images"
 
-      - name: Restart services
+      - name: Deploy Services with Docker
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -129,47 +111,89 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           timeout: 60s
-          command_timeout: 5m
+          command_timeout: 10m
           script: |
             set -euo pipefail
-            cd ${{ secrets.DEPLOY_PATH }}/build
-
-            echo "=== Deploy dir ==="
-            pwd
-            ls -lh
-
-            echo "=== Start services (nohup) ==="
-            chmod +x gateway code user order
-
-            # ✅ 先启动后端服务
-            nohup ./code  -f code-etc/code.yaml    > code.log  2>&1 </dev/null &
-            nohup ./user  -f user-etc/user.yaml    > user.log  2>&1 </dev/null &
-            nohup ./order -f order-etc/order.yaml  > order.log 2>&1 </dev/null &
-
-            # 给后端一点启动时间
+            
+            cd ${{ secrets.DEPLOY_PATH }}/docker-images
+            
+            echo "=== Loading Docker Images ==="
+            docker load -i gateway.tar.gz || true
+            docker load -i user.tar.gz || true
+            docker load -i order.tar.gz || true
+            docker load -i code.tar.gz || true
+            
+            echo "=== Stopping Old Containers ==="
+            docker stop slgaming-gateway slgaming-user slgaming-order slgaming-code 2>/dev/null || true
+            docker rm slgaming-gateway slgaming-user slgaming-order slgaming-code 2>/dev/null || true
+            
+            echo "=== Starting New Containers ==="
+            
+            # 启动 Code Service (端口 8085)
+            docker run -d \
+              --name slgaming-code \
+              --restart unless-stopped \
+              -p 8085:8085 \
+              -v ${{ secrets.DEPLOY_PATH }}/configs/code:/app/etc:ro \
+              ${{ env.IMAGE_PREFIX }}/code:latest || true
+            
+            # 启动 User Service (端口 8086)
+            docker run -d \
+              --name slgaming-user \
+              --restart unless-stopped \
+              -p 8086:8086 \
+              -v ${{ secrets.DEPLOY_PATH }}/configs/user:/app/etc:ro \
+              ${{ env.IMAGE_PREFIX }}/user:latest || true
+            
+            # 启动 Order Service (端口 8087)
+            docker run -d \
+              --name slgaming-order \
+              --restart unless-stopped \
+              -p 8087:8087 \
+              -v ${{ secrets.DEPLOY_PATH }}/configs/order:/app/etc:ro \
+              ${{ env.IMAGE_PREFIX }}/order:latest || true
+            
+            # 等待后端服务启动
+            echo "=== Waiting for backend services to start ==="
             sleep 30
-
-            # ✅ 最后启动 gateway
-            nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 </dev/null &
-
-            sleep 2
-
-            echo "=== Process check ==="
-            ps aux | grep -E "(./gateway -f|./code -f|./user -f|./order -f)" | grep -v grep || true
-
+            
+            # 启动 Gateway (端口 8888)
+            docker run -d \
+              --name slgaming-gateway \
+              --restart unless-stopped \
+              -p 8888:8888 \
+              -v ${{ secrets.DEPLOY_PATH }}/configs/gateway:/app/etc:ro \
+              ${{ env.IMAGE_PREFIX }}/gateway:latest || true
+            
+            sleep 5
+            
+            echo "=== Container Status ==="
+            docker ps -a | grep slgaming || true
+            
+            echo "=== Checking Container Logs ==="
+            docker logs --tail 50 slgaming-gateway || true
+            docker logs --tail 50 slgaming-code || true
+            docker logs --tail 50 slgaming-user || true
+            docker logs --tail 50 slgaming-order || true
+            
+            echo "=== Verifying Services ==="
             ok=1
-            ps aux | grep -E "./gateway -f" | grep -v grep >/dev/null || ok=0
-            ps aux | grep -E "./code -f"    | grep -v grep >/dev/null || ok=0
-            ps aux | grep -E "./user -f"    | grep -v grep >/dev/null || ok=0
-            ps aux | grep -E "./order -f"   | grep -v grep >/dev/null || ok=0
-
+            docker ps | grep slgaming-gateway >/dev/null || ok=0
+            docker ps | grep slgaming-code >/dev/null || ok=0
+            docker ps | grep slgaming-user >/dev/null || ok=0
+            docker ps | grep slgaming-order >/dev/null || ok=0
+            
             if [ "$ok" -ne 1 ]; then
-              echo "❌ One or more services failed to start. Logs:"
-              echo "----- gateway.log -----"; tail -200 gateway.log || true
-              echo "----- code.log -----";    tail -200 code.log || true
-              echo "----- user.log -----";    tail -200 user.log || true
-              echo "----- order.log -----";   tail -200 order.log || true
+              echo "❌ One or more containers failed to start"
+              echo "Gateway logs:"
+              docker logs --tail 100 slgaming-gateway || true
+              echo "Code logs:"
+              docker logs --tail 100 slgaming-code || true
+              echo "User logs:"
+              docker logs --tail 100 slgaming-user || true
+              echo "Order logs:"
+              docker logs --tail 100 slgaming-order || true
               exit 1
             fi
-
-            echo "✅ Services deployment completed"
+            
+            echo "✅ All services deployed successfully"
