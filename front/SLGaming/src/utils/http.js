@@ -1,9 +1,13 @@
 import axios from "axios";
 import { useUserStore } from "@/stores/userStore";
 
+import { ElMessage } from "element-plus";
+import "element-plus/theme-chalk/el-message.css";
+
 // 创建axios实例（相当于造了一个专属的"请求工具"）
 const http = axios.create({
   baseURL: "/api",
+  // baseURL: "http://120.26.29.194:8888/api",
   timeout: 5000, // 请求超过5秒没响应就报错
 });
 
@@ -41,8 +45,9 @@ http.interceptors.response.use(
   },
   // 第二个函数：响应失败（比如404、500、超时）时执行
   (e) => {
-    console.log("请求失败了", e);
     // 可以在这里统一处理错误，比如401跳登录、500提示服务器错误
+    const errorMsg = e.response?.data || "请求失败，请稍后重试";
+    ElMessage.error(errorMsg);
     return Promise.reject(e); // 把错误抛出去，让外面能捕获
   }
 );

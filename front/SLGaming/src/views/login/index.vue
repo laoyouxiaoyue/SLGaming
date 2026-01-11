@@ -35,9 +35,10 @@ const doLogin = () => {
     if (valid) {
       // TODO LOGIN
       await userStore.getUserInfo({ phone, password });
-      // 1. 提示用户
+      // console.log(userStore.userInfo);
+      // // 1. 提示用户
       ElMessage({ type: "success", message: "登录成功" });
-      // 2. 跳转首页
+      // // 2. 跳转首页
       router.replace({ path: "/" });
     }
   });
@@ -134,16 +135,18 @@ const doLogin = () => {
 }
 
 .login-section {
-  background: url("@/assets/images/login-bg.png") no-repeat center / cover;
-  height: 500px;
+  background: linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),
+    url("@/assets/images/login-bg.png") no-repeat center / cover;
+  height: 783px;
   position: relative;
 
   .wrapper {
+    // height: 300px;
     width: 380px;
     background: #fff;
     position: absolute;
-    left: 50%;
-    top: 54px;
+    left: 44%;
+    top: 200px;
     transform: translate3d(100px, 0, 0);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 
