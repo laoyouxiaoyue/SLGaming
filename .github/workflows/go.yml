@@ -141,10 +141,16 @@ jobs:
             echo "=== Start services (nohup) ==="
             chmod +x gateway code user order
 
+            # ✅ 先启动后端服务
+            nohup ./code  -f code-etc/code.yaml    > code.log  2>&1 </dev/null &
+            nohup ./user  -f user-etc/user.yaml    > user.log  2>&1 </dev/null &
+            nohup ./order -f order-etc/order.yaml  > order.log 2>&1 </dev/null &
+
+            # 给后端一点启动时间
+            sleep 2
+
+            # ✅ 最后启动 gateway
             nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 </dev/null &
-            nohup ./code    -f code-etc/code.yaml       > code.log    2>&1 </dev/null &
-            nohup ./user    -f user-etc/user.yaml       > user.log    2>&1 </dev/null &
-            nohup ./order   -f order-etc/order.yaml     > order.log   2>&1 </dev/null &
 
             sleep 2
 
