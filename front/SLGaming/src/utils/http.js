@@ -1,8 +1,9 @@
 import axios from "axios";
+import { useUserStore } from "@/stores/userStore";
 
 // 创建axios实例（相当于造了一个专属的"请求工具"）
 const http = axios.create({
-  baseURL: "http://120.26.29.194:8888",
+  baseURL: "http://120.26.29.194:8888/api",
   timeout: 5000, // 请求超过5秒没响应就报错
 });
 
@@ -13,6 +14,13 @@ http.interceptors.request.use(
     // config就是你的请求配置（比如请求地址、请求头、参数等）
     // 这里可以修改config，比如给所有请求加token、加请求头
     // console.log("请求要发出去啦！我可以在这里加东西", config);
+    // 1. 从pinia获取token数据
+    const userStore = useUserStore();
+    // 2. 按照后端的要求拼接token数据
+    const token = userStore.userInfo.accessToken;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config; // 必须返回config，请求才能继续发出去
   },
   // 第二个函数：请求准备阶段出错时执行（比如参数格式错）
