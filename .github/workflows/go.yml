@@ -138,13 +138,6 @@ jobs:
             pwd
             ls -lh
 
-            echo "=== Stop old services ==="
-            pkill -f "gateway -f" || true
-            pkill -f "code -f" || true
-            pkill -f "user -f" || true
-            pkill -f "order -f" || true
-            sleep 2
-
             echo "=== Start services (nohup) ==="
             chmod +x gateway code user order
 
