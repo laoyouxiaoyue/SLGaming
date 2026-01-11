@@ -31,6 +31,7 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/gateway \
             ./services/gateway/gateway.go
+
       - name: Build User Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
@@ -39,6 +40,7 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/user \
             ./services/user/user.go
+
       - name: Build Order Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
@@ -47,6 +49,7 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/order \
             ./services/order/order.go
+
       - name: Build Code Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
@@ -55,19 +58,23 @@ jobs:
             -ldflags="-w -s" \
             -o ../${{ env.BUILD_DIR }}/code \
             ./services/code/code.go
+
       - name: Package deployment files
         run: |
           mkdir -p ${{ env.BUILD_DIR }}/deploy
+
           # 可执行文件
           cp ${{ env.BUILD_DIR }}/gateway ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/user    ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/order   ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/code    ${{ env.BUILD_DIR }}/deploy/
+
           # 配置文件
           cp -r ${{ env.PROJECT_PATH }}/services/gateway/etc ${{ env.BUILD_DIR }}/deploy/gateway-etc
           cp -r ${{ env.PROJECT_PATH }}/services/user/etc    ${{ env.BUILD_DIR }}/deploy/user-etc
           cp -r ${{ env.PROJECT_PATH }}/services/order/etc   ${{ env.BUILD_DIR }}/deploy/order-etc
           cp -r ${{ env.PROJECT_PATH }}/services/code/etc    ${{ env.BUILD_DIR }}/deploy/code-etc
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -107,48 +114,42 @@ jobs:
           port: ${{ secrets.SSH_PORT || 22 }}
           timeout: 60s
           command_timeout: 5m
+          script_stop: false   # ✅ 关键：防止 exit 143 / SIGTERM
           script: |
             set -e
             cd ${{ secrets.DEPLOY_PATH }}
-            
+
             echo "=== Stopping old services ==="
             pkill -f "gateway -f" || true
             pkill -f "code -f" || true
             pkill -f "user -f" || true
             pkill -f "order -f" || true
             sleep 3
-            
+
             echo "=== Starting new services ==="
-            # 确保文件可执行
             chmod +x gateway code user order 2>/dev/null || true
-            
-            # 启动服务并记录 PID
-            nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 &
-            GATEWAY_PID=$!
-            echo "Gateway started with PID: $GATEWAY_PID"
-            
-            nohup ./code -f code-etc/code.yaml > code.log 2>&1 &
-            CODE_PID=$!
-            echo "Code service started with PID: $CODE_PID"
-            
-            nohup ./user -f user-etc/user.yaml > user.log 2>&1 &
-            USER_PID=$!
-            echo "User service started with PID: $USER_PID"
-            
-            nohup ./order -f order-etc/order.yaml > order.log 2>&1 &
-            ORDER_PID=$!
-            echo "Order service started with PID: $ORDER_PID"
-            
-            # 等待服务启动
+
+            nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 </dev/null &
+            echo "Gateway PID: $!"
+
+            nohup ./code -f code-etc/code.yaml > code.log 2>&1 </dev/null &
+            echo "Code PID: $!"
+
+            nohup ./user -f user-etc/user.yaml > user.log 2>&1 </dev/null &
+            echo "User PID: $!"
+
+            nohup ./order -f order-etc/order.yaml > order.log 2>&1 </dev/null &
+            echo "Order PID: $!"
+
             sleep 3
-            
+
             echo "=== Checking service status ==="
             ps aux | grep -E "(gateway|code|user|order)" | grep -v grep || true
-            
+
             echo "=== Service logs (last 10 lines) ==="
-            tail -10 gateway.log 2>/dev/null || echo "Gateway log not available"
-            tail -10 code.log 2>/dev/null || echo "Code log not available"
-            tail -10 user.log 2>/dev/null || echo "User log not available"
-            tail -10 order.log 2>/dev/null || echo "Order log not available"
-            
+            tail -10 gateway.log || true
+            tail -10 code.log || true
+            tail -10 user.log || true
+            tail -10 order.log || true
+
             echo "✅ Services deployment completed"
