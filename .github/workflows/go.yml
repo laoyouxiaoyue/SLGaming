@@ -27,6 +27,7 @@ jobs:
       - name: Build Gateway Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
+          set -e
           mkdir -p ../${{ env.BUILD_DIR }}
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
             -ldflags="-w -s" \
@@ -36,6 +37,7 @@ jobs:
       - name: Build User Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
+          set -e
           mkdir -p ../${{ env.BUILD_DIR }}
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
             -ldflags="-w -s" \
@@ -45,6 +47,7 @@ jobs:
       - name: Build Order Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
+          set -e
           mkdir -p ../${{ env.BUILD_DIR }}
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
             -ldflags="-w -s" \
@@ -54,6 +57,7 @@ jobs:
       - name: Build Code Service
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
+          set -e
           mkdir -p ../${{ env.BUILD_DIR }}
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
             -ldflags="-w -s" \
@@ -62,7 +66,34 @@ jobs:
 
       - name: Package deployment files
         run: |
+          set -e
+
           mkdir -p ${{ env.BUILD_DIR }}/deploy
+
+          # 确保所有二进制存在（如果不存在则立即失败）
+          if [ ! -f "${{ env.BUILD_DIR }}/gateway" ]; then
+            echo "ERROR: gateway binary not found at ${{ env.BUILD_DIR }}/gateway"
+            ls -la ${{ env.BUILD_DIR }} || true
+            exit 1
+          fi
+
+          if [ ! -f "${{ env.BUILD_DIR }}/user" ]; then
+            echo "ERROR: user binary not found at ${{ env.BUILD_DIR }}/user"
+            ls -la ${{ env.BUILD_DIR }} || true
+            exit 1
+          fi
+
+          if [ ! -f "${{ env.BUILD_DIR }}/order" ]; then
+            echo "ERROR: order binary not found at ${{ env.BUILD_DIR }}/order"
+            ls -la ${{ env.BUILD_DIR }} || true
+            exit 1
+          fi
+
+          if [ ! -f "${{ env.BUILD_DIR }}/code" ]; then
+            echo "ERROR: code binary not found at ${{ env.BUILD_DIR }}/code"
+            ls -la ${{ env.BUILD_DIR }} || true
+            exit 1
+          fi
 
           # 可执行文件
           cp ${{ env.BUILD_DIR }}/gateway ${{ env.BUILD_DIR }}/deploy/
@@ -75,6 +106,10 @@ jobs:
           cp -r ${{ env.PROJECT_PATH }}/services/user/etc    ${{ env.BUILD_DIR }}/deploy/user-etc
           cp -r ${{ env.PROJECT_PATH }}/services/order/etc   ${{ env.BUILD_DIR }}/deploy/order-etc
           cp -r ${{ env.PROJECT_PATH }}/services/code/etc    ${{ env.BUILD_DIR }}/deploy/code-etc
+
+          # 列出打包目录，便于调试
+          echo "Deploy dir contents:"
+          ls -la ${{ env.BUILD_DIR }}/deploy || true
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -96,6 +131,23 @@ jobs:
           name: microservices-binaries
           path: ${{ env.BUILD_DIR }}/
 
+      - name: Debug: show downloaded artifact contents
+        run: |
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "Listing top-level workspace:"
+          ls -la
+          echo "Listing build dir:"
+          ls -la ${{ env.BUILD_DIR }} || true
+          echo "Listing deploy dir:"
+          ls -la ${{ env.BUILD_DIR }}/deploy || true
+
+      - name: Fail if deploy dir empty
+        run: |
+          if [ -z "$(ls -A ${{ env.BUILD_DIR }}/deploy 2>/dev/null)" ]; then
+            echo "ERROR: ${{ env.BUILD_DIR }}/deploy is empty or missing. Aborting."
+            exit 1
+          fi
+
       - name: Upload files to server via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -103,7 +155,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          source: "${{ env.BUILD_DIR }}/deploy/*"
+          # 使用递归 glob 或直接目录，避免空 glob 导致 tar: empty archive
+          source: "${{ env.BUILD_DIR }}/deploy/**"
           target: ${{ secrets.DEPLOY_PATH }}
           strip_components: 1
 
