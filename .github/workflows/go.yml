@@ -1,0 +1,33 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+env:
+  GO_VERSION: '1.25.5'
+  PROJECT_PATH: 'back'
+  BUILD_DIR: 'build'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.25.5'
+
+    - name: Build Gateway Service
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+          mkdir -p ../${{ env.BUILD_DIR }}
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s" \
+            -o ../${{ env.BUILD_DIR }}/gateway \
+            ./services/gateway/gateway.go
