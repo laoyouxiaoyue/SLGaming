@@ -2,12 +2,12 @@ name: Go
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
-  GO_VERSION: '1.25.5'
-  PROJECT_PATH: 'back'
-  BUILD_DIR: 'build'
+  GO_VERSION: "1.25.5"
+  PROJECT_PATH: "back"
+  BUILD_DIR: "build"
 
 jobs:
   build:
@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: ${{ env.PROJECT_PATH }}/go.sum
 
       - name: Build Gateway Service
         working-directory: ${{ env.PROJECT_PATH }}
@@ -63,11 +65,13 @@ jobs:
         run: |
           mkdir -p ${{ env.BUILD_DIR }}/deploy
 
+          # binaries
           cp ${{ env.BUILD_DIR }}/gateway ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/user    ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/order   ${{ env.BUILD_DIR }}/deploy/
           cp ${{ env.BUILD_DIR }}/code    ${{ env.BUILD_DIR }}/deploy/
 
+          # configs
           cp -r ${{ env.PROJECT_PATH }}/services/gateway/etc ${{ env.BUILD_DIR }}/deploy/gateway-etc
           cp -r ${{ env.PROJECT_PATH }}/services/user/etc    ${{ env.BUILD_DIR }}/deploy/user-etc
           cp -r ${{ env.PROJECT_PATH }}/services/order/etc   ${{ env.BUILD_DIR }}/deploy/order-etc
@@ -91,8 +95,21 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: microservices-binaries
-          path: ${{ env.BUILD_DIR }}/
+          path: ${{ env.BUILD_DIR }}/deploy/
 
+      # 关键：先在服务器创建目标目录，避免 scp 传不上/传到奇怪位置
+      - name: Ensure remote build dir exists
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -e
+            mkdir -p ${{ secrets.DEPLOY_PATH }}/build
+
+      # 关键：把 deploy 目录内容“平铺”到服务器的 DEPLOY_PATH/build 下
       - name: Upload files to server via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -100,8 +117,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          source: "${{ env.BUILD_DIR }}/*"
-          target: ${{ secrets.DEPLOY_PATH }}
+          source: "${{ env.BUILD_DIR }}/deploy/*"
+          target: "${{ secrets.DEPLOY_PATH }}/build"
+          strip_components: 2
 
       - name: Restart services
         uses: appleboy/ssh-action@v1.0.3
@@ -110,42 +128,49 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          script_stop: false
+          timeout: 60s
+          command_timeout: 5m
           script: |
-            set -e
-
-            # ⚠️ 关键点：真正的程序在 build 目录里
+            set -euo pipefail
             cd ${{ secrets.DEPLOY_PATH }}/build
 
-            echo "=== Current dir ==="
+            echo "=== Deploy dir ==="
             pwd
-            echo "=== Files ==="
             ls -lh
 
             echo "=== Stop old services ==="
             pkill -f "gateway -f" || true
+            pkill -f "code -f" || true
             pkill -f "user -f" || true
             pkill -f "order -f" || true
-            pkill -f "code -f" || true
             sleep 2
 
-            echo "=== Start services ==="
-            chmod +x gateway user order code
+            echo "=== Start services (nohup) ==="
+            chmod +x gateway code user order
 
             nohup ./gateway -f gateway-etc/gateway.yaml > gateway.log 2>&1 </dev/null &
+            nohup ./code    -f code-etc/code.yaml       > code.log    2>&1 </dev/null &
             nohup ./user    -f user-etc/user.yaml       > user.log    2>&1 </dev/null &
             nohup ./order   -f order-etc/order.yaml     > order.log   2>&1 </dev/null &
-            nohup ./code    -f code-etc/code.yaml       > code.log    2>&1 </dev/null &
 
             sleep 2
 
             echo "=== Process check ==="
-            ps aux | grep -E "(gateway|user|order|code)" | grep -v grep
+            ps aux | grep -E "(./gateway -f|./code -f|./user -f|./order -f)" | grep -v grep || true
 
-            echo "=== Logs ==="
-            tail -5 gateway.log || true
-            tail -5 user.log || true
-            tail -5 order.log || true
-            tail -5 code.log || true
+            ok=1
+            ps aux | grep -E "./gateway -f" | grep -v grep >/dev/null || ok=0
+            ps aux | grep -E "./code -f"    | grep -v grep >/dev/null || ok=0
+            ps aux | grep -E "./user -f"    | grep -v grep >/dev/null || ok=0
+            ps aux | grep -E "./order -f"   | grep -v grep >/dev/null || ok=0
 
-            echo "✅ Deploy finished"
+            if [ "$ok" -ne 1 ]; then
+              echo "❌ One or more services failed to start. Logs:"
+              echo "----- gateway.log -----"; tail -200 gateway.log || true
+              echo "----- code.log -----";    tail -200 code.log || true
+              echo "----- user.log -----";    tail -200 user.log || true
+              echo "----- order.log -----";   tail -200 order.log || true
+              exit 1
+            fi
+
+            echo "✅ Services deployment completed"
