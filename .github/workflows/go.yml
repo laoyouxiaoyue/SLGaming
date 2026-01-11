@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: back/go.sum
 
       - name: Build Gateway Service
         working-directory: ${{ env.PROJECT_PATH }}
@@ -102,8 +103,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          source: "${{ env.BUILD_DIR }}/*"
+          source: "${{ env.BUILD_DIR }}/deploy/*"
           target: ${{ secrets.DEPLOY_PATH }}
+          strip_components: 1
 
       - name: Restart services
         uses: appleboy/ssh-action@v1.0.3
