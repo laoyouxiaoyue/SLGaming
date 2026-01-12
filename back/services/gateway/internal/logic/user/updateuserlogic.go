@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/user/userclient"
@@ -29,6 +30,42 @@ func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 }
 
 func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.UpdateUserResponse, err error) {
+	// 从 context 中获取当前登录用户 ID
+	currentUserID, err := middleware.GetUserID(l.ctx)
+	if err != nil {
+		return &types.UpdateUserResponse{
+			BaseResp: types.BaseResp{
+				Code: 401,
+				Msg:  "未登录或登录已过期",
+			},
+		}, nil
+	}
+
+	// 如果请求中没有指定 ID，使用当前登录用户的 ID
+	if req.Id == 0 {
+		req.Id = currentUserID
+	} else {
+		// 如果指定了 ID，必须与当前登录用户的 ID 一致（防止用户修改他人信息）
+		if req.Id != currentUserID {
+			return &types.UpdateUserResponse{
+				BaseResp: types.BaseResp{
+					Code: 403,
+					Msg:  "无权修改其他用户的信息",
+				},
+			}, nil
+		}
+	}
+
+	// 普通用户不允许修改角色，只有管理员可以（这里先禁止所有角色修改）
+	if req.Role != 0 {
+		return &types.UpdateUserResponse{
+			BaseResp: types.BaseResp{
+				Code: 403,
+				Msg:  "无权修改用户角色",
+			},
+		}, nil
+	}
+
 	if l.svcCtx.UserRPC == nil {
 		return nil, fmt.Errorf("user rpc client not initialized")
 	}
