@@ -4,11 +4,13 @@
 package svc
 
 import (
+	"fmt"
+	"sync"
 	"time"
 
+	"SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/config"
-	"SLGaming/back/services/gateway/internal/ioc"
 	"SLGaming/back/services/gateway/internal/jwt"
 	"SLGaming/back/services/order/orderclient"
 	"SLGaming/back/services/user/userclient"
@@ -16,6 +18,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
+	"google.golang.org/grpc"
 )
 
 type ServiceContext struct {
@@ -33,33 +36,33 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config: c,
 	}
 
-	// 初始化 Code RPC 客户端
+	// 初始化 Code RPC 客户端（支持动态服务发现和负载均衡）
 	if c.Upstream.CodeService != "" {
 		if cli, err := newRPCClient(c.Consul, c.Upstream.CodeService); err != nil {
 			logx.Errorf("初始化 Code RPC 客户端失败: service=%s, error=%v", c.Upstream.CodeService, err)
 		} else {
 			ctx.CodeRPC = codeclient.NewCode(cli)
-			logx.Infof("成功初始化 Code RPC 客户端: service=%s", c.Upstream.CodeService)
+			logx.Infof("成功初始化 Code RPC 客户端: service=%s (支持动态服务发现)", c.Upstream.CodeService)
 		}
 	}
 
-	// 初始化 User RPC 客户端
+	// 初始化 User RPC 客户端（支持动态服务发现和负载均衡）
 	if c.Upstream.UserService != "" {
 		if cli, err := newRPCClient(c.Consul, c.Upstream.UserService); err != nil {
 			logx.Errorf("初始化 User RPC 客户端失败: service=%s, error=%v", c.Upstream.UserService, err)
 		} else {
 			ctx.UserRPC = userclient.NewUser(cli)
-			logx.Infof("成功初始化 User RPC 客户端: service=%s", c.Upstream.UserService)
+			logx.Infof("成功初始化 User RPC 客户端: service=%s (支持动态服务发现)", c.Upstream.UserService)
 		}
 	}
 
-	// 初始化 Order RPC 客户端
+	// 初始化 Order RPC 客户端（支持动态服务发现和负载均衡）
 	if c.Upstream.OrderService != "" {
 		if cli, err := newRPCClient(c.Consul, c.Upstream.OrderService); err != nil {
 			logx.Errorf("初始化 Order RPC 客户端失败: service=%s, error=%v", c.Upstream.OrderService, err)
 		} else {
 			ctx.OrderRPC = orderclient.NewOrder(cli)
-			logx.Infof("成功初始化 Order RPC 客户端: service=%s", c.Upstream.OrderService)
+			logx.Infof("成功初始化 Order RPC 客户端: service=%s (支持动态服务发现)", c.Upstream.OrderService)
 		}
 	}
 
@@ -91,8 +94,135 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return ctx
 }
 
+// DynamicRPCClient 支持动态更新的 RPC 客户端包装器
+type DynamicRPCClient struct {
+	mu          sync.RWMutex
+	client      zrpc.Client
+	watcher     *ioc.ConsulWatcher
+	serviceName string
+	endpoints   []string // 记录当前 endpoints，用于日志
+}
+
+// GetClient 获取当前的 RPC 客户端
+func (d *DynamicRPCClient) GetClient() zrpc.Client {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	return d.client
+}
+
+// GetEndpoints 获取当前的 endpoints（用于日志）
+func (d *DynamicRPCClient) GetEndpoints() []string {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	return d.endpoints
+}
+
+// updateClient 更新 RPC 客户端（当服务端点变化时）
+func (d *DynamicRPCClient) updateClient(endpoints []string) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	// 记录旧的 endpoints（用于日志）
+	oldEndpoints := d.endpoints
+
+	// 创建新客户端，使用新的 endpoints
+	// go-zero 的 zrpc.Client 会创建新的 gRPC 连接
+	d.client = zrpc.MustNewClient(zrpc.RpcClientConf{
+		Endpoints: endpoints,
+		NonBlock:  true,
+	})
+
+	// 更新 endpoints 记录
+	d.endpoints = endpoints
+
+	logx.Infof("[dynamic_rpc] 更新客户端: service=%s, old_endpoints=%v, new_endpoints=%v",
+		d.serviceName, oldEndpoints, endpoints)
+}
+
+// Stop 停止监听
+func (d *DynamicRPCClient) Stop() {
+	if d.watcher != nil {
+		d.watcher.Stop()
+	}
+	// go-zero 的 zrpc.Client 会在服务停止时自动关闭连接
+}
+
 func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
-	endpoints, err := ioc.ResolveServiceEndpoints(consulConf, serviceName)
+	// 如果配置了 Consul，使用动态监听
+	if consulConf.Address != "" {
+		return newConsulDynamicRPCClient(consulConf, serviceName)
+	}
+
+	// 否则使用静态解析（不支持动态更新）
+	return newConsulStaticRPCClient(consulConf, serviceName)
+}
+
+// newConsulDynamicRPCClient 使用 Consul Watch 创建动态更新的 RPC 客户端
+func newConsulDynamicRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
+	adapter := &ioc.ConsulConfigAdapter{
+		Address: consulConf.Address,
+		Token:   consulConf.Token,
+	}
+
+	// 初始解析一次
+	endpoints, err := ioc.ResolveServiceEndpoints(adapter, serviceName)
+	if err != nil {
+		return nil, fmt.Errorf("initial resolve endpoints failed: %w", err)
+	}
+
+	// 创建初始客户端
+	client := zrpc.MustNewClient(zrpc.RpcClientConf{
+		Endpoints: endpoints,
+		NonBlock:  true,
+	})
+
+	// 创建动态客户端包装器
+	dynamicClient := &DynamicRPCClient{
+		client:      client,
+		serviceName: serviceName,
+		endpoints:   endpoints,
+	}
+
+	// 启动监听，当端点变化时更新客户端
+	watcher, err := ioc.NewConsulWatcher(adapter, serviceName, func(newEndpoints []string) {
+		dynamicClient.updateClient(newEndpoints)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("create consul watcher failed: %w", err)
+	}
+
+	dynamicClient.watcher = watcher
+	logx.Infof("成功创建动态 Consul RPC 客户端: service=%s, initial_endpoints=%v (支持动态更新和负载均衡)", serviceName, endpoints)
+
+	// 返回一个包装器，实现 zrpc.Client 接口
+	return &dynamicRPCClientWrapper{client: dynamicClient}, nil
+}
+
+// dynamicRPCClientWrapper 包装 DynamicRPCClient 实现 zrpc.Client 接口
+type dynamicRPCClientWrapper struct {
+	client *DynamicRPCClient
+}
+
+func (w *dynamicRPCClientWrapper) Conn() *grpc.ClientConn {
+	// 每次调用都获取最新的客户端，确保使用最新的 endpoints
+	// GetClient() 会加锁并返回最新的 d.client
+	// 这样每次 RPC 调用都会使用最新的连接和 endpoints
+	return w.client.GetClient().Conn()
+}
+
+func (w *dynamicRPCClientWrapper) Close() error {
+	w.client.Stop()
+	return nil
+}
+
+// newConsulStaticRPCClient 使用 Consul 静态解析创建 RPC 客户端（不支持动态更新）
+func newConsulStaticRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
+	adapter := &ioc.ConsulConfigAdapter{
+		Address: consulConf.Address,
+		Token:   consulConf.Token,
+	}
+
+	endpoints, err := ioc.ResolveServiceEndpoints(adapter, serviceName)
 	if err != nil {
 		logx.Errorf("解析服务端点失败: service=%s, error=%v", serviceName, err)
 		return nil, err
@@ -103,6 +233,6 @@ func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client
 		NonBlock:  true,
 	})
 
-	logx.Infof("成功创建 RPC 客户端: service=%s, endpoints=%v", serviceName, endpoints)
+	logx.Infof("成功创建静态 Consul RPC 客户端: service=%s, endpoints=%v", serviceName, endpoints)
 	return client, nil
 }

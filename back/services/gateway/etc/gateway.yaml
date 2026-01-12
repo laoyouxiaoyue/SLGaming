@@ -27,10 +27,10 @@ Consul:
     CheckInterval: 10s
     CheckTimeout: 5s
 
-# 上游服务配置（用于服务发现）
+# 上游服务配置（用于 Consul 服务发现）
 Upstream:
-  CodeService: code-rpc  # Consul 中的验证码服务名称
-  UserService: user-rpc  # Consul 中的用户服务名称
+  CodeService: code-rpc   # Consul 中的验证码服务名称
+  UserService: user-rpc   # Consul 中的用户服务名称
   OrderService: order-rpc # Consul 中的订单服务名称
 
 # Redis 配置（用于存储 Refresh Token）
