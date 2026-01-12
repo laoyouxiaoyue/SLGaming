@@ -4,6 +4,7 @@
 package user
 
 import (
+	"SLGaming/back/services/gateway/internal/middleware"
 	"context"
 	"fmt"
 
@@ -31,6 +32,20 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (resp *types.GetUserResponse, err error) {
 	if l.svcCtx.UserRPC == nil {
 		return nil, fmt.Errorf("user rpc client not initialized")
+	}
+
+	// 如果所有查询条件都为空，使用当前登录用户的 UID 作为默认值
+	if req.Id == 0 && req.Uid == 0 && req.Phone == "" {
+		uid, err := middleware.GetUserID(l.ctx)
+		if err != nil {
+			return &types.GetUserResponse{
+				BaseResp: types.BaseResp{
+					Code: 401,
+					Msg:  "未登录或登录已过期",
+				},
+			}, nil
+		}
+		req.Uid = uid
 	}
 
 	// 调用用户服务的 RPC
