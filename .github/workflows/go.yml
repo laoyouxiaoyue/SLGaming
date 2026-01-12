@@ -215,7 +215,6 @@ jobs:
               --name slgaming-code \
               --restart unless-stopped \
               -p 8085:8085 \
-              -v ${{ secrets.DEPLOY_PATH }}/configs/code:/app/etc:ro \
               ${{ env.IMAGE_PREFIX }}/code:latest
             
             # 启动 User Service (端口 8086)
@@ -227,7 +226,6 @@ jobs:
               --name slgaming-user \
               --restart unless-stopped \
               -p 8086:8086 \
-              -v ${{ secrets.DEPLOY_PATH }}/configs/user:/app/etc:ro \
               ${{ env.IMAGE_PREFIX }}/user:latest
             
             # 启动 Order Service (端口 8087)
@@ -239,7 +237,6 @@ jobs:
               --name slgaming-order \
               --restart unless-stopped \
               -p 8087:8087 \
-              -v ${{ secrets.DEPLOY_PATH }}/configs/order:/app/etc:ro \
               ${{ env.IMAGE_PREFIX }}/order:latest
             
             # 等待后端服务启动
@@ -255,7 +252,6 @@ jobs:
               --name slgaming-gateway \
               --restart unless-stopped \
               -p 8888:8888 \
-              -v ${{ secrets.DEPLOY_PATH }}/configs/gateway:/app/etc:ro \
               ${{ env.IMAGE_PREFIX }}/gateway:latest
             
             sleep 5
