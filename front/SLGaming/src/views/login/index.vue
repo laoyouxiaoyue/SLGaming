@@ -5,11 +5,15 @@ import "element-plus/theme-chalk/el-message.css";
 import { useRouter } from "vue-router";
 
 import { useUserStore } from "@/stores/userStore";
+import { codeAPI } from "@/api/user/code";
 const userStore = useUserStore();
+
+const loginType = ref("account"); // 'account' or 'code'
 
 const form = ref({
   phone: "13800138000",
   password: "password123",
+  code: "",
 });
 
 const rules = {
@@ -21,20 +25,49 @@ const rules = {
     { required: true, message: "密码不能为空", trigger: "blur" },
     { min: 6, max: 14, message: "密码长度为6-14个字符", trigger: "blur" },
   ],
+  code: [
+    { required: true, message: "验证码不能为空", trigger: "blur" },
+    { pattern: /^\d{6}$/, message: "验证码必须是6位数字", trigger: "blur" },
+  ],
 };
 
 const formRef = ref(null);
 const router = useRouter();
+const countdown = ref(0);
+
+const sendCode = async () => {
+  if (countdown.value > 0) return;
+  const { phone } = form.value;
+  if (!phone || !/^\d{11}$/.test(phone)) {
+    ElMessage({ type: "error", message: "请输入正确的手机号" });
+    return;
+  }
+  try {
+    await codeAPI({ phone, purpose: "login" });
+    ElMessage({ type: "success", message: "验证码发送成功" });
+    countdown.value = 60;
+    const timer = setInterval(() => {
+      countdown.value--;
+      if (countdown.value <= 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+  } catch (error) {
+    ElMessage({ type: "error", message: "验证码发送失败" });
+  }
+};
 const doLogin = () => {
-  const { phone, password } = form.value;
+  const { phone, password, code } = form.value;
   // 调用实例方法
   formRef.value.validate(async (valid) => {
     // valid: 所有表单都通过校验  才为true
-    console.log(valid);
     // 以valid做为判断条件 如果通过校验才执行登录逻辑
     if (valid) {
-      // TODO LOGIN
-      await userStore.getUserInfo({ phone, password });
+      if (loginType.value === "account") {
+        await userStore.getUserInfo({ phone, password });
+      } else {
+        await userStore.getUserInfoByCode({ phone, code });
+      }
       // console.log(userStore.userInfo);
       // // 1. 提示用户
       ElMessage({ type: "success", message: "登录成功" });
@@ -62,7 +95,18 @@ const doLogin = () => {
     <section class="login-section">
       <div class="wrapper">
         <nav>
-          <a href="javascript:;">账户登录</a>
+          <a
+            href="javascript:;"
+            :class="{ active: loginType === 'account' }"
+            @click="loginType = 'account'"
+            >账户登录</a
+          >
+          <a
+            href="javascript:;"
+            :class="{ active: loginType === 'code' }"
+            @click="loginType = 'code'"
+            >验证码登录</a
+          >
         </nav>
         <div class="account-box">
           <div class="form">
@@ -77,9 +121,23 @@ const doLogin = () => {
               <el-form-item prop="phone" label="账户">
                 <el-input v-model="form.phone" />
               </el-form-item>
-              <el-form-item prop="password" label="密码">
-                <el-input v-model="form.password" />
-              </el-form-item>
+              <template v-if="loginType === 'account'">
+                <el-form-item prop="password" label="密码">
+                  <el-input v-model="form.password" />
+                </el-form-item>
+              </template>
+              <template v-else>
+                <el-form-item prop="code" label="验证码">
+                  <el-input v-model="form.code" style="width: 60%" />
+                  <el-button
+                    :disabled="countdown > 0"
+                    @click="sendCode"
+                    style="width: 35%; margin-left: 5%"
+                  >
+                    {{ countdown > 0 ? `${countdown}s` : "发送验证码" }}
+                  </el-button>
+                </el-form-item>
+              </template>
               <el-button size="large" class="subBtn" @click="doLogin">点击登录</el-button>
             </el-form>
           </div>
@@ -167,6 +225,12 @@ const doLogin = () => {
         font-size: 18px;
         position: relative;
         text-align: center;
+        cursor: pointer;
+
+        &.active {
+          color: $xtxColor;
+          border-bottom: 2px solid $xtxColor;
+        }
       }
     }
   }

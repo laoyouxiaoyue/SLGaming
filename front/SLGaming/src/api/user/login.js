@@ -7,3 +7,11 @@ export const loginAPI = (data) => {
     data,
   });
 };
+
+export const codeLoginAPI = (data) => {
+  return http({
+    url: "/user/login-by-code",
+    method: "POST",
+    data,
+  });
+};

@@ -22,7 +22,6 @@ http.interceptors.request.use(
     const userStore = useUserStore();
     // 2. 按照后端的要求拼接token数据
     if (userStore.userInfo.accessToken) {
-      console.log(userStore.userInfo.accessToken);
       config.headers.Authorization = `Bearer ${userStore.userInfo.accessToken}`;
     }
     return config; // 必须返回config，请求才能继续发出去
@@ -46,9 +45,9 @@ http.interceptors.response.use(
   // 第二个函数：响应失败（比如404、500、超时）时执行
   (e) => {
     // 可以在这里统一处理错误，比如401跳登录、500提示服务器错误
-    const errorMsg = e.response?.data || "请求失败，请稍后重试";
+    const errorMsg = e.response?.data.msg || "请求失败，请稍后重试";
     ElMessage.error(errorMsg);
-    return Promise.reject(e); // 把错误抛出去，让外面能捕获
+    // return Promise.reject(e); // 把错误抛出去，让外面能捕获
   }
 );
 
