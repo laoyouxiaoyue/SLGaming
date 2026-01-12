@@ -19,6 +19,7 @@ export const useUserStore = defineStore(
     return {
       userInfo,
       getUserInfo,
+      clearUserInfo,
     };
   },
   {

@@ -23,8 +23,9 @@ const getInfo = async () => {
   info.value = res.data;
 };
 onMounted(() => {
-  getInfo();
-  console.log(info.value);
+  if (userStore.userInfo?.accessToken) {
+    getInfo();
+  }
 });
 </script>
 
@@ -34,9 +35,9 @@ onMounted(() => {
       <ul>
         <!-- 多模版渲染 区分登录状态和非登录状态 -->
         <!-- 适配思路: 登录时显示第一块 非登录时显示第二块  是否有token -->
-        <template v-if="userStore.userInfo.accessToken">
+        <template v-if="userStore.userInfo?.accessToken">
           <li>
-            <a href="javascript:;"><i class="iconfont icon-user"></i>用户名字 </a>
+            <a href="javascript:;"><i class="iconfont icon-user"></i>{{ info.nickname }} </a>
           </li>
           <li>
             <el-popconfirm

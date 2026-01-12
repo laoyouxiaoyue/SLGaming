@@ -21,9 +21,9 @@ http.interceptors.request.use(
     // 1. 从pinia获取token数据
     const userStore = useUserStore();
     // 2. 按照后端的要求拼接token数据
-    const token = userStore.userInfo.accessToken;
-    if (token) {
-      config.headers.Authorization = `${token}`;
+    if (userStore.userInfo.accessToken) {
+      console.log(userStore.userInfo.accessToken);
+      config.headers.Authorization = `Bearer ${userStore.userInfo.accessToken}`;
     }
     return config; // 必须返回config，请求才能继续发出去
   },
