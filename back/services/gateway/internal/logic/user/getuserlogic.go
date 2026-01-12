@@ -34,9 +34,9 @@ func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (resp *types.GetUserRe
 		return nil, fmt.Errorf("user rpc client not initialized")
 	}
 
-	// 如果所有查询条件都为空，使用当前登录用户的 UID 作为默认值
+	// 如果所有查询条件都为空，使用当前登录用户的 ID 作为默认值
 	if req.Id == 0 && req.Uid == 0 && req.Phone == "" {
-		uid, err := middleware.GetUserID(l.ctx)
+		userID, err := middleware.GetUserID(l.ctx)
 		if err != nil {
 			return &types.GetUserResponse{
 				BaseResp: types.BaseResp{
@@ -45,7 +45,7 @@ func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (resp *types.GetUserRe
 				},
 			}, nil
 		}
-		req.Uid = uid
+		req.Id = userID
 	}
 
 	// 调用用户服务的 RPC
