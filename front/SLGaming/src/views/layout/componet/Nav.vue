@@ -7,12 +7,11 @@ import { getlogoutAPI } from "@/api/user/logout";
 
 const userStore = useUserStore();
 const router = useRouter();
-const confirm = () => {
-  console.log("用户要退出登录了");
+const confirm = async () => {
   // 退出登录业务逻辑实现
   // 1.清除用户信息 触发action
+  await getlogoutAPI();
   userStore.clearUserInfo();
-  getlogoutAPI();
   // 2.跳转到登录页
   router.push("/login");
 };
