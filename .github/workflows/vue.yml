@@ -1,0 +1,55 @@
+name: vue
+
+on:
+  push:
+    branches:
+      - front_daisy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: front/SLGaming/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd front/SLGaming
+          npm ci
+
+      - name: Build project
+        run: |
+          cd front/SLGaming
+          npm run build
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          cd front/SLGaming
+          docker build -t slgaming-vue:latest .
+
+      - name: Save Docker image
+        run: |
+          mkdir -p docker-images
+          docker save slgaming-vue:latest | gzip > docker-images/slgaming-vue.tar.gz
+
+      - name: Load Docker Images on Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: "docker-images/*.tar.gz"
+          target: "${{ secrets.DEPLOY_PATH }}/docker-images/vue"
+          strip_components: 1
