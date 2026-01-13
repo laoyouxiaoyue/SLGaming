@@ -52,4 +52,3 @@ jobs:
           port: ${{ secrets.SSH_PORT || 22 }}
           source: "docker-images/*.tar.gz"
           target: "${{ secrets.DEPLOY_PATH }}/docker-images/vue"
-          strip_components: 1
