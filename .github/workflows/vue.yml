@@ -60,4 +60,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           source: "docker-images/*.tar.gz"
-          target: "${{ secrets.DEPLOY_PATH }}/docker-images/vue"
+          target: "${{ secrets.DEPLOY_PATH }}/vue"
