@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -20,11 +21,11 @@ type CORSConfig struct {
 
 // DefaultCORSConfig 返回默认的 CORS 配置
 // 注意：如果 AllowCredentials 为 true，AllowedOrigins 不能包含 "*"
-// 默认配置允许所有源，但允许凭证，这在浏览器中会被忽略
+// 默认配置允许所有源、所有方法、所有请求头（最宽松配置）
 // 生产环境建议明确指定允许的源列表
 func DefaultCORSConfig() *CORSConfig {
 	return &CORSConfig{
-		AllowedOrigins: []string{"*"}, // 默认允许所有源（生产环境建议限制）
+		AllowedOrigins: []string{"*"}, // 允许所有源
 		AllowedMethods: []string{
 			http.MethodGet,
 			http.MethodPost,
@@ -32,18 +33,15 @@ func DefaultCORSConfig() *CORSConfig {
 			http.MethodDelete,
 			http.MethodPatch,
 			http.MethodOptions,
+			http.MethodHead,
 		},
-		AllowedHeaders: []string{
-			"Content-Type",
-			"Authorization",
-			"X-Refresh-Token",
-			"X-Requested-With",
-		},
+		AllowedHeaders: []string{"*"}, // 允许所有请求头
 		ExposedHeaders: []string{
 			"Authorization",
 			"X-Refresh-Token",
+			"Content-Type",
 		},
-		AllowCredentials: false, // 默认不允许凭证，因为使用了 "*" 源
+		AllowCredentials: false, // 不允许凭证，因为使用了 "*" 源
 		MaxAge:           86400, // 24 小时
 	}
 }
@@ -69,7 +67,7 @@ func CORSMiddleware(config *CORSConfig) rest.Middleware {
 						}
 					} else {
 						// 不允许凭证时，可以使用 "*"
-						if config.AllowedOrigins[0] == "*" {
+						if isWildcardOrigin(config.AllowedOrigins) {
 							w.Header().Set("Access-Control-Allow-Origin", "*")
 						} else if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
 							w.Header().Set("Access-Control-Allow-Origin", origin)
@@ -87,9 +85,19 @@ func CORSMiddleware(config *CORSConfig) rest.Middleware {
 				if requestHeaders != "" {
 					// 如果客户端请求了特定头部，检查是否允许
 					if len(config.AllowedHeaders) > 0 {
-						if config.AllowedHeaders[0] == "*" {
+						// 检查是否允许所有请求头
+						hasWildcard := false
+						for _, header := range config.AllowedHeaders {
+							if header == "*" {
+								hasWildcard = true
+								break
+							}
+						}
+						if hasWildcard {
+							// 允许所有请求头，直接返回客户端请求的头部
 							w.Header().Set("Access-Control-Allow-Headers", requestHeaders)
 						} else {
+							// 返回配置的允许头部列表
 							w.Header().Set("Access-Control-Allow-Headers", strings.Join(config.AllowedHeaders, ", "))
 						}
 					}
@@ -130,7 +138,7 @@ func CORSMiddleware(config *CORSConfig) rest.Middleware {
 					}
 				} else {
 					// 不允许凭证时，可以使用 "*"
-					if config.AllowedOrigins[0] == "*" {
+					if isWildcardOrigin(config.AllowedOrigins) {
 						w.Header().Set("Access-Control-Allow-Origin", "*")
 					} else if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
 						w.Header().Set("Access-Control-Allow-Origin", origin)
@@ -157,8 +165,22 @@ func CORSMiddleware(config *CORSConfig) rest.Middleware {
 	}
 }
 
+// isWildcardOrigin 检查是否允许所有源（包含 "*"）
+func isWildcardOrigin(allowedOrigins []string) bool {
+	for _, allowed := range allowedOrigins {
+		if allowed == "*" {
+			return true
+		}
+	}
+	return false
+}
+
 // isOriginAllowed 检查源是否在允许列表中
 func isOriginAllowed(origin string, allowedOrigins []string) bool {
+	if origin == "" {
+		return false
+	}
+
 	for _, allowed := range allowedOrigins {
 		if allowed == "*" {
 			return true
@@ -166,12 +188,17 @@ func isOriginAllowed(origin string, allowedOrigins []string) bool {
 		if allowed == origin {
 			return true
 		}
-		// 支持通配符匹配（例如：*.example.com）
+		// 支持通配符匹配（例如：*.example.com 或 https://*.example.com）
 		if strings.Contains(allowed, "*") {
+			// 将通配符模式转换为正则表达式
+			// 例如：*.example.com -> .*\.example\.com
+			// 例如：https://*.example.com -> https://.*\.example\.com
 			pattern := strings.ReplaceAll(allowed, ".", "\\.")
 			pattern = strings.ReplaceAll(pattern, "*", ".*")
-			// 这里可以使用正则表达式，但为了简单，我们只做简单的字符串匹配
-			if strings.HasPrefix(origin, strings.TrimSuffix(allowed, "*")) {
+			pattern = "^" + pattern + "$"
+
+			matched, err := regexp.MatchString(pattern, origin)
+			if err == nil && matched {
 				return true
 			}
 		}
