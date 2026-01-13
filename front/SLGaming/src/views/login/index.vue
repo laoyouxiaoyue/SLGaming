@@ -52,7 +52,7 @@ const sendCode = async () => {
         clearInterval(timer);
       }
     }, 1000);
-  } catch (error) {
+  } catch {
     ElMessage({ type: "error", message: "验证码发送失败" });
   }
 };
