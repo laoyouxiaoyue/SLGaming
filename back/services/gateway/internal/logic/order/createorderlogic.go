@@ -7,6 +7,7 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/order/orderclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -44,11 +45,11 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderRequest) (resp *typ
 
 	rpcResp, err := l.svcCtx.OrderRPC.CreateOrder(l.ctx, rpcReq)
 	if err != nil {
-		l.Errorf("call OrderRPC.CreateOrder failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "CreateOrder")
 		return &types.CreateOrderResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "创建订单失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

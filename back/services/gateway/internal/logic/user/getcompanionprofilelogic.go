@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -33,11 +34,11 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile() (resp *types.GetCompani
 	// 从 context 中获取当前登录用户 ID（由网关鉴权中间件注入）
 	userID, err := middleware.GetUserID(l.ctx)
 	if err != nil {
-		l.Errorf("GetUserID from context failed: %v", err)
+		code, msg := utils.HandleError(err, l.Logger, "GetUserID")
 		return &types.GetCompanionProfileResponse{
 			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未登录或认证失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -60,11 +61,11 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile() (resp *types.GetCompani
 		UserId: userID,
 	})
 	if err != nil {
-		l.Errorf("UserRPC.GetCompanionProfile failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "GetCompanionProfile")
 		return &types.GetCompanionProfileResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "获取陪玩信息失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -92,6 +93,8 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile() (resp *types.GetCompani
 			Rating:       profile.Rating,
 			TotalOrders:  profile.TotalOrders,
 			IsVerified:   profile.IsVerified,
+			AvatarUrl:    profile.AvatarUrl,
+			Bio:          profile.Bio,
 		},
 	}, nil
 }

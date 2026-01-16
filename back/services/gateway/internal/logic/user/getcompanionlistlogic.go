@@ -9,6 +9,7 @@ import (
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,6 +35,8 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 	}
 
 	// 调用 User RPC 的 GetCompanionList 接口
+	// 注意：如果 status 为 0，RPC 层会将其视为"未指定"并使用默认值（在线）
+	// 如果用户明确想查询 status=0（离线），需要确保 gateway 层正确传递
 	rpcResp, err := l.svcCtx.UserRPC.GetCompanionList(l.ctx, &userclient.GetCompanionListRequest{
 		GameSkills: req.GameSkills,
 		MinPrice:   int32(req.MinPrice),
@@ -44,11 +47,11 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 		PageSize:   int32(req.PageSize),
 	})
 	if err != nil {
-		l.Errorf("UserRPC.GetCompanionList failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "GetCompanionList")
 		return &types.GetCompanionListResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "获取陪玩列表失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -64,6 +67,8 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 			Rating:       cp.Rating,
 			TotalOrders:  cp.TotalOrders,
 			IsVerified:   cp.IsVerified,
+			AvatarUrl:    cp.AvatarUrl,
+			Bio:          cp.Bio,
 		})
 	}
 

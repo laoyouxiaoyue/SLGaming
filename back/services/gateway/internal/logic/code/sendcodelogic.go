@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -39,11 +40,11 @@ func (l *SendCodeLogic) SendCode(req *types.SendCodeRequest) (resp *types.SendCo
 		Purpose: req.Purpose,
 	})
 	if err != nil {
-		l.Errorf("call code rpc failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "SendCode")
 		return &types.SendCodeResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "发送验证码失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

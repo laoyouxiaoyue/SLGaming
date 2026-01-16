@@ -130,6 +130,8 @@ message CompanionInfo {
   double rating = 5;          // 评分（0-5分）
   int64  total_orders = 6;    // 总接单数
   bool   is_verified = 7;    // 是否认证
+  string avatar_url = 8;     // 头像URL
+  string bio = 9;            // 个人简介
 }
 
 // 获取陪玩信息

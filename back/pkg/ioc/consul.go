@@ -140,8 +140,8 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 
 	// 确定服务注册地址
 	serviceAddr := cfg.GetServiceAddress()
-	if strings.TrimSpace(serviceAddr) == "" || serviceAddr == "0.0.0.0" || serviceAddr == "127.0.0.1" {
-		// 如果配置为空、0.0.0.0 或 127.0.0.1，优先获取公网 IP
+	if strings.TrimSpace(serviceAddr) == "" || serviceAddr == "0.0.0.0" {
+		// 如果配置为空或 0.0.0.0，优先获取公网 IP
 		if host == "" || host == "0.0.0.0" {
 			// 优先尝试获取公网 IP，失败则回退到内网 IP
 			ip, err := getPublicIPWithFallback()
@@ -154,6 +154,9 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 		} else {
 			serviceAddr = host
 		}
+	} else if serviceAddr == "127.0.0.1" {
+		// 如果明确配置为 127.0.0.1，直接使用，不自动获取公网 IP
+		serviceAddr = "127.0.0.1"
 	}
 
 	serviceID := cfg.GetServiceID()

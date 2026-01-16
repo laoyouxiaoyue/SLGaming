@@ -10,10 +10,10 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/order/orderclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"google.golang.org/grpc/status"
 )
 
 type CancelOrderLogic struct {
@@ -44,15 +44,11 @@ func (l *CancelOrderLogic) CancelOrder(req *types.CancelOrderRequest) (resp *typ
 		Reason:     req.Reason,
 	})
 	if err != nil {
-		if st, ok := status.FromError(err); ok {
-			l.Errorf("call OrderRPC.CancelOrder failed: code=%v, msg=%s", st.Code(), st.Message())
-		} else {
-			l.Errorf("call OrderRPC.CancelOrder failed: %v", err)
-		}
+		code, msg := utils.HandleRPCError(err, l.Logger, "CancelOrder")
 		return &types.CancelOrderResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "取消订单失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

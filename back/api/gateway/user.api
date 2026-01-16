@@ -138,6 +138,8 @@ type CompanionInfo {
     Rating       float64 `json:"rating"`        // 评分（0-5分）
     TotalOrders  int64   `json:"totalOrders"`   // 总接单数
     IsVerified   bool    `json:"isVerified"`    // 是否认证
+    AvatarUrl    string  `json:"avatarUrl"`     // 头像URL
+    Bio          string  `json:"bio"`           // 个人简介
 }
 
 type GetCompanionProfileResponse {

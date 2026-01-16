@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"SLGaming/back/pkg/snowflake"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -56,6 +57,9 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile(in *user.GetCompanionProf
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 如果陪玩信息不存在，创建一个默认的
 			profile = model.CompanionProfile{
+				BaseModel: model.BaseModel{
+					ID: uint64(snowflake.GenID()),
+				},
 				UserID:       userID,
 				GameSkills:   "[]",
 				PricePerHour: 0,
@@ -73,6 +77,6 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile(in *user.GetCompanionProf
 	}
 
 	return &user.GetCompanionProfileResponse{
-		Profile: helper.ToCompanionInfo(&profile),
+		Profile: helper.ToCompanionInfoWithUser(&profile, &u),
 	}, nil
 }

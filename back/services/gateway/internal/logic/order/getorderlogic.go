@@ -6,6 +6,7 @@ import (
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/order/orderclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -35,11 +36,11 @@ func (l *GetOrderLogic) GetOrder(req *types.GetOrderRequest) (resp *types.GetOrd
 		OrderNo: req.OrderNo,
 	})
 	if err != nil {
-		l.Errorf("call OrderRPC.GetOrder failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "GetOrder")
 		return &types.GetOrderResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "获取订单详情失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

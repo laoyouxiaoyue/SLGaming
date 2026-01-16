@@ -9,6 +9,7 @@ import (
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -39,11 +40,11 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 		Password: req.Password,
 	})
 	if err != nil {
-		l.Errorf("call user rpc failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "Login")
 		return &types.LoginResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "登录失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -51,10 +52,11 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 	// 生成 Access Token 和 Refresh Token
 	tokenData, err := generateTokens(l.ctx, l.svcCtx, rpcResp.Id, l.Logger)
 	if err != nil {
+		code, msg := utils.HandleError(err, l.Logger, "GenerateTokens")
 		return &types.LoginResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "生成 token 失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -42,11 +43,11 @@ func (l *ForgetPasswordLogic) ForgetPassword(req *types.ForgetPasswordRequest) (
 			Code:    req.Code,
 		})
 		if err != nil {
-			l.Errorf("verify code failed: %v", err)
+			code, msg := utils.HandleRPCError(err, l.Logger, "VerifyCode")
 			return &types.ForgetPasswordResponse{
 				BaseResp: types.BaseResp{
-					Code: 400,
-					Msg:  "验证码验证失败: " + err.Error(),
+					Code: code,
+					Msg:  msg,
 				},
 			}, nil
 		}
@@ -66,11 +67,11 @@ func (l *ForgetPasswordLogic) ForgetPassword(req *types.ForgetPasswordRequest) (
 		Password: req.Password,
 	})
 	if err != nil {
-		l.Errorf("call user rpc failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "ForgetPassword")
 		return &types.ForgetPasswordResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "重置密码失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -78,10 +79,11 @@ func (l *ForgetPasswordLogic) ForgetPassword(req *types.ForgetPasswordRequest) (
 	// 生成 Access Token 和 Refresh Token
 	tokenData, err := generateTokens(l.ctx, l.svcCtx, rpcResp.Id, l.Logger)
 	if err != nil {
+		code, msg := utils.HandleError(err, l.Logger, "GenerateTokens")
 		return &types.ForgetPasswordResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "生成 token 失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

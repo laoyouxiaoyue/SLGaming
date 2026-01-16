@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,11 +35,11 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(req *types.UpdateCo
 	l.Infof("UpdateCompanionProfile: attempting to get userID from context")
 	userID, err := middleware.GetUserID(l.ctx)
 	if err != nil {
-		l.Errorf("GetUserID from context failed: %v", err)
+		code, msg := utils.HandleError(err, l.Logger, "GetUserID")
 		return &types.UpdateCompanionProfileResponse{
 			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未登录或认证失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -67,11 +68,11 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(req *types.UpdateCo
 	})
 	l.Infof("UpdateCompanionProfile: RPC call completed, err=%v", err)
 	if err != nil {
-		l.Errorf("UserRPC.UpdateCompanionProfile failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "UpdateCompanionProfile")
 		return &types.UpdateCompanionProfileResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "更新陪玩信息失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

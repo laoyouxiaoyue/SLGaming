@@ -9,6 +9,7 @@ import (
 	"SLGaming/back/services/gateway/internal/jwt"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -48,10 +49,11 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenRequest) (resp *
 				},
 			}, nil
 		}
+		code, msg := utils.HandleError(err, l.Logger, "VerifyToken")
 		return &types.RefreshTokenResponse{
 			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "Refresh Token 无效: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -83,10 +85,11 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenRequest) (resp *
 	// 只生成新的 Access Token，Refresh Token 保持不变
 	accessToken, err := l.svcCtx.JWT.GenerateAccessToken(claims.UserID)
 	if err != nil {
+		code, msg := utils.HandleError(err, l.Logger, "GenerateAccessToken")
 		return &types.RefreshTokenResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "生成 Access Token 失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

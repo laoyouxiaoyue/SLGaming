@@ -51,10 +51,16 @@ func ToUserInfo(u *model.User) *user.UserInfo {
 }
 
 func ToCompanionInfo(p *model.CompanionProfile) *user.CompanionInfo {
+	return ToCompanionInfoWithUser(p, nil)
+}
+
+// ToCompanionInfoWithUser 将 CompanionProfile 和 User 转换为 CompanionInfo
+// 如果 u 为 nil，则只填充陪玩信息，不填充 bio 和 avatar_url
+func ToCompanionInfoWithUser(p *model.CompanionProfile, u *model.User) *user.CompanionInfo {
 	if p == nil {
 		return nil
 	}
-	return &user.CompanionInfo{
+	info := &user.CompanionInfo{
 		UserId:       p.UserID,
 		GameSkills:   p.GameSkills,
 		PricePerHour: p.PricePerHour,
@@ -63,4 +69,10 @@ func ToCompanionInfo(p *model.CompanionProfile) *user.CompanionInfo {
 		TotalOrders:  p.TotalOrders,
 		IsVerified:   p.IsVerified,
 	}
+	// 如果提供了用户信息，填充 bio 和 avatar_url
+	if u != nil {
+		info.AvatarUrl = u.AvatarURL
+		info.Bio = u.Bio
+	}
+	return info
 }

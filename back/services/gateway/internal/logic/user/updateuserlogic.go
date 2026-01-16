@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -81,11 +82,11 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.
 		Bio:       req.Bio,
 	})
 	if err != nil {
-		l.Errorf("call user rpc failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "UpdateUser")
 		return &types.UpdateUserResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "更新用户信息失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

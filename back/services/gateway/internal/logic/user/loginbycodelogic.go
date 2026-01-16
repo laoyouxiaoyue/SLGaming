@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -42,11 +43,11 @@ func (l *LoginByCodeLogic) LoginByCode(req *types.LoginByCodeRequest) (resp *typ
 			Code:    req.Code,
 		})
 		if err != nil {
-			l.Errorf("verify code failed: %v", err)
+			code, msg := utils.HandleRPCError(err, l.Logger, "VerifyCode")
 			return &types.LoginByCodeResponse{
 				BaseResp: types.BaseResp{
-					Code: 400,
-					Msg:  "验证码验证失败: " + err.Error(),
+					Code: code,
+					Msg:  msg,
 				},
 			}, nil
 		}
@@ -65,11 +66,11 @@ func (l *LoginByCodeLogic) LoginByCode(req *types.LoginByCodeRequest) (resp *typ
 		Phone: req.Phone,
 	})
 	if err != nil {
-		l.Errorf("call user rpc failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "LoginByCode")
 		return &types.LoginByCodeResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "登录失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}
@@ -77,10 +78,11 @@ func (l *LoginByCodeLogic) LoginByCode(req *types.LoginByCodeRequest) (resp *typ
 	// 生成 Access Token 和 Refresh Token
 	tokenData, err := generateTokens(l.ctx, l.svcCtx, rpcResp.Id, l.Logger)
 	if err != nil {
+		code, msg := utils.HandleError(err, l.Logger, "GenerateTokens")
 		return &types.LoginByCodeResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "生成 token 失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

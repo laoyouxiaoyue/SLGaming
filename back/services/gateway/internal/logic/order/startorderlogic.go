@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/order/orderclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -42,11 +43,11 @@ func (l *StartOrderLogic) StartOrder(req *types.StartOrderRequest) (resp *types.
 		CompanionId: companionID,
 	})
 	if err != nil {
-		l.Errorf("call OrderRPC.StartOrder failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "StartOrder")
 		return &types.StartOrderResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "开始订单服务失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

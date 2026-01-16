@@ -39,11 +39,13 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 		Where("users.deleted_at IS NULL")
 
 	// 状态筛选（默认只返回在线）
+	// 如果 status <= 0，表示未指定或无效值，使用默认值（在线）
 	statusFilter := int(in.GetStatus())
-	if statusFilter < 0 {
+	if statusFilter <= 0 {
 		statusFilter = model.CompanionStatusOnline // 默认只返回在线
 	}
 	query = query.Where("companion_profiles.status = ?", statusFilter)
+	l.Infof("[GetCompanionList] status filter: %d", statusFilter)
 
 	// 价格筛选
 	if in.GetMinPrice() > 0 {
@@ -60,6 +62,7 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 
 	// 游戏技能筛选
 	if len(in.GetGameSkills()) > 0 {
+		l.Infof("[GetCompanionList] game skills filter: %v", in.GetGameSkills())
 		// 这里简化处理，实际可能需要更复杂的 JSON 查询
 		// 如果 game_skills 是 JSON 数组，需要根据数据库类型使用不同的查询方式
 		// MySQL 可以使用 JSON_CONTAINS 或 JSON_SEARCH
@@ -74,8 +77,10 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 	// 获取总数
 	var total int64
 	if err := query.Count(&total).Error; err != nil {
+		l.Errorf("[GetCompanionList] count failed: %v", err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	l.Infof("[GetCompanionList] total count: %d", total)
 
 	// 规范化分页参数（默认每页20条）
 	pagination := helper.NormalizePaginationWithDefault(in.GetPage(), in.GetPageSize(), 20)
@@ -91,14 +96,43 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// 转换为响应格式
-	companions := make([]*user.CompanionInfo, 0, len(profiles))
-	for i := range profiles {
-		companions = append(companions, helper.ToCompanionInfo(&profiles[i]))
+	// 收集所有用户ID，批量查询用户的 bio 和 avatar_url
+	if len(profiles) > 0 {
+		userIDs := make([]uint64, 0, len(profiles))
+		for i := range profiles {
+			userIDs = append(userIDs, profiles[i].UserID)
+		}
+
+		var users []model.User
+		if err := db.Select("id, avatar_url, bio").Where("id IN ?", userIDs).Find(&users).Error; err != nil {
+			l.Errorf("[GetCompanionList] query users failed: %v", err)
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		// 创建 user_id -> User 的映射
+		userMap := make(map[uint64]*model.User)
+		for i := range users {
+			userMap[users[i].ID] = &users[i]
+		}
+
+		// 转换为响应格式
+		companions := make([]*user.CompanionInfo, 0, len(profiles))
+		for i := range profiles {
+			u := userMap[profiles[i].UserID]
+			companions = append(companions, helper.ToCompanionInfoWithUser(&profiles[i], u))
+		}
+
+		return &user.GetCompanionListResponse{
+			Companions: companions,
+			Total:      int32(total),
+			Page:       int32(pagination.Page),
+			PageSize:   int32(pagination.PageSize),
+		}, nil
 	}
 
+	// 如果没有数据，返回空列表
 	return &user.GetCompanionListResponse{
-		Companions: companions,
+		Companions: []*user.CompanionInfo{},
 		Total:      int32(total),
 		Page:       int32(pagination.Page),
 		PageSize:   int32(pagination.PageSize),

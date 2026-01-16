@@ -9,6 +9,7 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -37,11 +38,11 @@ func (l *GetWalletLogic) GetWallet() (resp *types.GetWalletResponse, err error) 
 		UserId: userID,
 	})
 	if err != nil {
-		l.Errorf("UserRPC.GetWallet failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "GetWallet")
 		return &types.GetWalletResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "获取钱包失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 			Data: types.WalletInfo{},
 		}, nil

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"SLGaming/back/pkg/snowflake"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -57,6 +58,9 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(in *user.UpdateComp
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 如果不存在，创建新的
 			profile = model.CompanionProfile{
+				BaseModel: model.BaseModel{
+					ID: uint64(snowflake.GenID()),
+				},
 				UserID:       userID,
 				GameSkills:   "[]",
 				PricePerHour: 0,

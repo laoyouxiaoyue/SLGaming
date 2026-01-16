@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 	"SLGaming/back/services/order/orderclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -42,11 +43,11 @@ func (l *CompleteOrderLogic) CompleteOrder(req *types.CompleteOrderRequest) (res
 		OperatorId: operatorID,
 	})
 	if err != nil {
-		l.Errorf("call OrderRPC.CompleteOrder failed: %v", err)
+		code, msg := utils.HandleRPCError(err, l.Logger, "CompleteOrder")
 		return &types.CompleteOrderResponse{
 			BaseResp: types.BaseResp{
-				Code: 500,
-				Msg:  "完成订单失败: " + err.Error(),
+				Code: code,
+				Msg:  msg,
 			},
 		}, nil
 	}

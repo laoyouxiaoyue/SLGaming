@@ -8,7 +8,9 @@ import (
 
 	"SLGaming/back/services/gateway/internal/jwt"
 	"SLGaming/back/services/gateway/internal/svc"
+	"SLGaming/back/services/gateway/internal/types"
 
+	jwtv4 "github.com/golang-jwt/jwt/v4"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -43,7 +45,10 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 			// 从请求头获取 token
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
-				httpx.ErrorCtx(r.Context(), w, errors.New("未提供认证令牌"))
+				httpx.WriteJsonCtx(r.Context(), w, http.StatusUnauthorized, &types.BaseResp{
+					Code: 401,
+					Msg:  "未提供认证令牌",
+				})
 				return
 			}
 
@@ -55,7 +60,10 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 			}
 
 			if tokenString == "" {
-				httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌格式错误"))
+				httpx.WriteJsonCtx(r.Context(), w, http.StatusUnauthorized, &types.BaseResp{
+					Code: 401,
+					Msg:  "认证令牌格式错误",
+				})
 				return
 			}
 
@@ -68,7 +76,10 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 					refreshToken := r.Header.Get("X-Refresh-Token")
 					if refreshToken == "" {
 						// 如果没有 Refresh Token，返回错误
-						httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌已过期"))
+						httpx.WriteJsonCtx(r.Context(), w, http.StatusUnauthorized, &types.BaseResp{
+							Code: 401,
+							Msg:  "认证令牌已过期，请重新登录",
+						})
 						return
 					}
 
@@ -76,7 +87,10 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 					newAccessToken, newRefreshToken, userID, refreshErr := tryAutoRefreshToken(r.Context(), svcCtx, refreshToken)
 					if refreshErr != nil {
 						logx.Errorf("auto refresh token failed: %v", refreshErr)
-						httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌已过期，刷新失败"))
+						httpx.WriteJsonCtx(r.Context(), w, http.StatusUnauthorized, &types.BaseResp{
+							Code: 401,
+							Msg:  "认证令牌已过期，刷新失败，请重新登录",
+						})
 						return
 					}
 
@@ -95,9 +109,13 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 					return
 				}
 
-				// 其他错误（无效 token）
+				// 其他错误：根据错误类型返回更详细的错误信息
 				logx.Errorf("jwt verify failed: %v", err)
-				httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌无效"))
+				errMsg := getTokenErrorMessage(err)
+				httpx.WriteJsonCtx(r.Context(), w, http.StatusUnauthorized, &types.BaseResp{
+					Code: 401,
+					Msg:  errMsg,
+				})
 				return
 			}
 
@@ -107,11 +125,17 @@ func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 				valid, err := svcCtx.TokenStore.VerifyAccessToken(r.Context(), claims.UserID, tokenString, tokenExpiration)
 				if err != nil {
 					logx.Errorf("verify access token failed: %v", err)
-					httpx.ErrorCtx(r.Context(), w, errors.New("验证认证令牌失败"))
+					httpx.WriteJsonCtx(r.Context(), w, http.StatusUnauthorized, &types.BaseResp{
+						Code: 401,
+						Msg:  "验证认证令牌失败",
+					})
 					return
 				}
 				if !valid {
-					httpx.ErrorCtx(r.Context(), w, errors.New("认证令牌已被撤销"))
+					httpx.WriteJsonCtx(r.Context(), w, http.StatusUnauthorized, &types.BaseResp{
+						Code: 401,
+						Msg:  "认证令牌已被撤销",
+					})
 					return
 				}
 			}
@@ -163,4 +187,40 @@ func tryAutoRefreshToken(ctx context.Context, svcCtx *svc.ServiceContext, refres
 
 	// Refresh Token 不刷新，保持原样返回
 	return accessToken, refreshToken, claims.UserID, nil
+}
+
+// getTokenErrorMessage 根据 JWT 验证错误返回用户友好的错误信息
+func getTokenErrorMessage(err error) string {
+	if err == nil {
+		return "认证令牌验证失败"
+	}
+
+	// 检查是否是 JWT ValidationError
+	if ve, ok := err.(*jwtv4.ValidationError); ok {
+		if ve.Errors&jwtv4.ValidationErrorMalformed != 0 {
+			return "认证令牌格式错误，请检查令牌是否正确"
+		}
+		if ve.Errors&jwtv4.ValidationErrorUnverifiable != 0 {
+			return "认证令牌无法验证，可能是签名算法不匹配"
+		}
+		if ve.Errors&jwtv4.ValidationErrorSignatureInvalid != 0 {
+			return "认证令牌签名无效，令牌可能被篡改"
+		}
+		if ve.Errors&jwtv4.ValidationErrorNotValidYet != 0 {
+			return "认证令牌尚未生效，请稍后再试"
+		}
+		if ve.Errors&jwtv4.ValidationErrorExpired != 0 {
+			return "认证令牌已过期，请重新登录"
+		}
+		// 其他验证错误
+		return "认证令牌验证失败，请重新登录"
+	}
+
+	// 如果是自定义错误
+	if err == jwt.ErrInvalidToken {
+		return "认证令牌无效，请重新登录"
+	}
+
+	// 默认错误信息
+	return "认证令牌验证失败，请重新登录"
 }
