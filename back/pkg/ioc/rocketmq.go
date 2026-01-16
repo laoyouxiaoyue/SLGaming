@@ -144,11 +144,13 @@ func ShutdownRocketMQConsumer(c rocketmq.PushConsumer) {
 }
 
 // InitRocketMQTransactionProducer 根据配置初始化一个 RocketMQ TransactionProducer（用于半消息机制）
-// group 为生产者分组名称，通常按业务划分，例如 "user-transaction-producer"
-// localTransactionChecker 为本地事务检查器，用于处理事务回查
+// group 为生产者分组名称，通常按业务划分，例如 "order-transaction-producer"
+// localTransactionExecutor 为本地事务执行器（发送半消息后会回调该函数，用于执行本地事务并返回 COMMIT/ROLLBACK）
+// localTransactionChecker 为本地事务检查器（事务回查），用于处理 UNKNOW 场景下的状态确认
 func InitRocketMQTransactionProducer(
 	cfg RocketMQConfig,
 	group string,
+	localTransactionExecutor func(ctx context.Context, msg *primitive.Message) primitive.LocalTransactionState,
 	localTransactionChecker func(ctx context.Context, msg *primitive.Message) primitive.LocalTransactionState,
 ) (rocketmq.TransactionProducer, error) {
 	if cfg == nil {
@@ -183,7 +185,8 @@ func InitRocketMQTransactionProducer(
 
 	// 创建事务监听器
 	listener := &transactionListener{
-		checker: localTransactionChecker,
+		executor: localTransactionExecutor,
+		checker:  localTransactionChecker,
 	}
 
 	p, err := rocketmq.NewTransactionProducer(listener, opts...)
@@ -200,13 +203,16 @@ func InitRocketMQTransactionProducer(
 
 // transactionListener 实现 TransactionListener 接口
 type transactionListener struct {
-	checker func(ctx context.Context, msg *primitive.Message) primitive.LocalTransactionState
+	executor func(ctx context.Context, msg *primitive.Message) primitive.LocalTransactionState
+	checker  func(ctx context.Context, msg *primitive.Message) primitive.LocalTransactionState
 }
 
 // ExecuteLocalTransaction 执行本地事务
 func (l *transactionListener) ExecuteLocalTransaction(msg *primitive.Message) primitive.LocalTransactionState {
-	// 这里返回 UNKNOW，让 RocketMQ 进行回查
-	// 实际的本地事务在业务代码中执行
+	if l.executor != nil {
+		return l.executor(context.Background(), msg)
+	}
+	// 如果没有提供执行器，返回 UNKNOW，让 RocketMQ 进行回查
 	return primitive.UnknowState
 }
 

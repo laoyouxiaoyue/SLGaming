@@ -8,9 +8,12 @@ import (
 
 	"SLGaming/back/pkg/lock"
 	"SLGaming/back/services/order/internal/model"
+	orderMQ "SLGaming/back/services/order/internal/mq"
 	"SLGaming/back/services/order/internal/svc"
+	"SLGaming/back/services/order/internal/tx"
 	"SLGaming/back/services/order/order"
 
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/google/uuid"
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
@@ -30,35 +33,6 @@ func NewCancelOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Cance
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
-}
-
-// orderCancelledEventPayload 订单取消事件负载结构
-type orderCancelledEventPayload struct {
-	OrderID     uint64 `json:"order_id"`
-	OrderNo     string `json:"order_no"`
-	BossID      uint64 `json:"boss_id"`
-	CompanionID uint64 `json:"companion_id"`
-	Amount      int64  `json:"amount"`
-	// 这里使用订单号作为业务幂等键，钱包侧可据此做幂等控制
-	BizOrderID string `json:"biz_order_id"`
-}
-
-// buildOrderCancelledPayload 构造 ORDER_CANCELLED 事件的 JSON 负载
-func buildOrderCancelledPayload(o *model.Order) string {
-	payload := orderCancelledEventPayload{
-		OrderID:     o.ID,
-		OrderNo:     o.OrderNo,
-		BossID:      o.BossID,
-		CompanionID: o.CompanionID,
-		Amount:      o.TotalAmount,
-		BizOrderID:  o.OrderNo,
-	}
-	b, err := json.Marshal(payload)
-	if err != nil {
-		// 理论上不应该失败，失败时返回空字符串，上层会记录错误
-		return ""
-	}
-	return string(b)
 }
 
 func (l *CancelOrderLogic) CancelOrder(in *order.CancelOrderRequest) (*order.CancelOrderResponse, error) {
@@ -160,72 +134,56 @@ func (l *CancelOrderLogic) doCancelOrder(in *order.CancelOrderRequest) (*order.C
 		}
 	}
 
-	now := time.Now()
-
 	// 根据订单状态决定是否需要退款
 	needRefund := o.Status == model.OrderStatusPaid || o.Status == model.OrderStatusAccepted
 
 	l.Infof("cancelling order: order_id=%d, order_no=%s, current_status=%d, operator_id=%d, need_refund=%v",
 		o.ID, o.OrderNo, o.Status, in.GetOperatorId(), needRefund)
 
-	// 在一个事务中处理取消逻辑
-	if err := db.Transaction(func(tx *gorm.DB) error {
-		if needRefund {
-			// 已支付或已接单的订单：需要退款
-			// 更新订单状态为取消中（等待退款）
-			o.Status = model.OrderStatusCancelRefunding
-			o.CancelledAt = &now
-			o.CancelReason = in.GetReason()
+	// 使用 RocketMQ 事务消息发送 ORDER_CANCELLED，并在本地事务中更新订单状态
+	if l.svcCtx.OrderEventTxProducer == nil {
+		return nil, status.Error(codes.FailedPrecondition, "order transaction producer not initialized")
+	}
 
-			if err := tx.Save(&o).Error; err != nil {
-				l.Errorf("cancel order failed: update order status to cancel_refunding failed, order_id=%d, error=%v",
-					o.ID, err)
-				return status.Error(codes.Internal, "cancel order failed")
-			}
+	payload := &tx.OrderCancelledPayload{
+		OrderID:      o.ID,
+		OrderNo:      o.OrderNo,
+		BossID:       o.BossID,
+		CompanionID:  o.CompanionID,
+		Amount:       o.TotalAmount,
+		BizOrderID:   o.OrderNo,
+		NeedRefund:   needRefund,
+		CancelReason: in.GetReason(),
+	}
 
-			// 写一条 ORDER_CANCELLED 事件到 outbox，由后台任务异步发送到 MQ，触发退款
-			evt := &model.OrderEventOutbox{
-				EventType: "ORDER_CANCELLED",
-				Payload:   buildOrderCancelledPayload(&o),
-				Status:    "PENDING",
-			}
+	// 构造事务消息
+	msgBody, err := json.Marshal(payload)
+	if err != nil {
+		l.Errorf("marshal cancelled payload failed: %v", err)
+		return nil, status.Error(codes.Internal, "marshal cancelled event failed")
+	}
+	msg := primitive.NewMessage(orderMQ.OrderEventTopic(), msgBody)
+	msg.WithTag(orderMQ.EventTypeCancelled())
 
-			if err := tx.Create(evt).Error; err != nil {
-				l.Errorf("cancel order failed: create order event outbox failed, order_id=%d, error=%v",
-					o.ID, err)
-				return status.Error(codes.Internal, "cancel order failed")
-			}
+	txRes, err := l.svcCtx.OrderEventTxProducer.SendMessageInTransaction(l.ctx, msg)
+	if err != nil {
+		l.Errorf("send transactional message failed: %v, result=%+v", err, txRes)
+		return nil, status.Error(codes.Internal, "cancel order failed")
+	}
 
-			l.Infof("order cancelled with refund: order_id=%d, order_no=%s, amount=%d",
-				o.ID, o.OrderNo, o.TotalAmount)
-		} else {
-			// 已创建但未支付的订单：直接取消，不需要退款
-			// 更新订单状态为已取消
-			o.Status = model.OrderStatusCancelled
-			o.CancelledAt = &now
-			o.CancelReason = in.GetReason()
-
-			if err := tx.Save(&o).Error; err != nil {
-				l.Errorf("cancel order failed: update order status to cancelled failed, order_id=%d, error=%v",
-					o.ID, err)
-				return status.Error(codes.Internal, "cancel order failed")
-			}
-
-			l.Infof("order cancelled without refund: order_id=%d, order_no=%s (order was not paid)",
-				o.ID, o.OrderNo)
+	// 此时本地事务（ExecuteOrderTx -> ExecuteCancelOrderTx）已经执行完成，
+	// 但是否成功需要通过查询订单确认
+	var updatedOrder model.Order
+	if err := db.Where("order_no = ?", o.OrderNo).First(&updatedOrder).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			l.Errorf("cancel order transaction rolled back, order not found, order_no=%s", o.OrderNo)
+			return nil, status.Error(codes.Internal, "cancel order transaction rolled back")
 		}
-
-		return nil
-	}); err != nil {
-		// 如果是我们在事务中返回的 gRPC status error，直接透传
-		if s, ok := status.FromError(err); ok {
-			return nil, s.Err()
-		}
-		l.Errorf("cancel order transaction failed: order_id=%d, error=%v", o.ID, err)
+		l.Errorf("query order after transactional message failed: %v", err)
 		return nil, status.Error(codes.Internal, "cancel order failed")
 	}
 
 	return &order.CancelOrderResponse{
-		Order: toOrderInfo(&o),
+		Order: toOrderInfo(&updatedOrder),
 	}, nil
 }

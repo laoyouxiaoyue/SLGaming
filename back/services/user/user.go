@@ -88,11 +88,10 @@ func main() {
 		}
 	}
 
-	// 启动订单退款事件 Consumer、用户领域事件 Outbox 分发任务
+	// 启动订单退款事件 Consumer
 	rootCtx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	job.StartOrderRefundConsumer(rootCtx, ctx)
-	job.StartUserOutboxDispatcher(rootCtx, ctx)
 
 	s := zrpc.MustNewServer(cfg.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))

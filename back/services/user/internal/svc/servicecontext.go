@@ -1,13 +1,16 @@
 package svc
 
 import (
+	"context"
 	"sync"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
+	userMQ "SLGaming/back/services/user/internal/mq"
 
 	rocketmq "github.com/apache/rocketmq-client-go/v2"
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"gorm.io/gorm"
@@ -21,8 +24,11 @@ type ServiceContext struct {
 	// Redis 客户端（用于排名 ZSet）
 	Redis *redis.Redis
 
-	// RocketMQ 生产者（用于发送订单相关事件，如 ORDER_REFUND_SUCCEEDED）
+	// RocketMQ 普通生产者（用于发送非事务事件）
 	EventProducer rocketmq.Producer
+
+	// RocketMQ 事务生产者（用于用户领域事件的半消息，如 ORDER_REFUND_SUCCEEDED）
+	EventTxProducer rocketmq.TransactionProducer
 }
 
 // NewServiceContext 根据配置初始化所有依赖。
@@ -64,12 +70,29 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			AccessKey:   c.RocketMQ.AccessKey,
 			SecretKey:   c.RocketMQ.SecretKey,
 		}
-		producer, err := pkgIoc.InitRocketMQProducer(mqCfg, "user-event-producer")
-		if err != nil {
+		// 普通 Producer
+		if producer, err := pkgIoc.InitRocketMQProducer(mqCfg, "user-event-producer"); err != nil {
 			logx.Errorf("init rocketmq producer failed: %v", err)
 		} else {
 			ctx.EventProducer = producer
 			logx.Infof("init rocketmq producer success, nameservers=%v", c.RocketMQ.NameServers)
+		}
+
+		// 事务 Producer：用于用户领域事件（目前主要是 ORDER_REFUND_SUCCEEDED）
+		if txProducer, err := pkgIoc.InitRocketMQTransactionProducer(
+			mqCfg,
+			"user-transaction-producer",
+			func(cctx context.Context, msg *primitive.Message) primitive.LocalTransactionState {
+				return userMQ.ExecuteUserEventTx(cctx, db, msg)
+			},
+			func(cctx context.Context, msg *primitive.Message) primitive.LocalTransactionState {
+				return userMQ.CheckUserEventTx(cctx, db, msg)
+			},
+		); err != nil {
+			logx.Errorf("init rocketmq transaction producer failed: %v", err)
+		} else {
+			ctx.EventTxProducer = txProducer
+			logx.Infof("init rocketmq transaction producer success, nameservers=%v", c.RocketMQ.NameServers)
 		}
 	}
 

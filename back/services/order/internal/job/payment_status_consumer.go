@@ -7,6 +7,7 @@ import (
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/order/internal/model"
+	orderMQ "SLGaming/back/services/order/internal/mq"
 	"SLGaming/back/services/order/internal/svc"
 
 	"github.com/apache/rocketmq-client-go/v2/primitive"
@@ -56,7 +57,7 @@ func StartPaymentStatusConsumer(ctx context.Context, svcCtx *svc.ServiceContext)
 	consumer, err := pkgIoc.InitRocketMQConsumer(
 		mqCfg,
 		"order-payment-status-consumer",
-		[]string{orderEventTopic},
+		[]string{orderMQ.OrderEventTopic()},
 		func(c context.Context, msg *primitive.MessageExt) error {
 			return handlePaymentStatusEvent(c, svcCtx, msg)
 		},
@@ -71,7 +72,7 @@ func StartPaymentStatusConsumer(ctx context.Context, svcCtx *svc.ServiceContext)
 		pkgIoc.ShutdownRocketMQConsumer(consumer)
 	}()
 
-	logx.Infof("payment status consumer started, topic=%s", orderEventTopic)
+	logx.Infof("payment status consumer started, topic=%s", orderMQ.OrderEventTopic())
 }
 
 func handlePaymentStatusEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {

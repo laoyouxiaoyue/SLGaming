@@ -28,6 +28,7 @@ const (
 )
 
 // orderCancelledEventPayload 与订单服务中构造的 payload 对应
+// 注意：扩展字段（NeedRefund, CancelReason）由订单服务使用，user 服务只使用基础字段
 type orderCancelledEventPayload struct {
 	OrderID     uint64 `json:"order_id"`
 	OrderNo     string `json:"order_no"`
@@ -35,6 +36,10 @@ type orderCancelledEventPayload struct {
 	CompanionID uint64 `json:"companion_id"`
 	Amount      int64  `json:"amount"`
 	BizOrderID  string `json:"biz_order_id"`
+
+	// 扩展字段：用于订单服务的本地事务（user 服务忽略）
+	NeedRefund   bool   `json:"need_refund"`
+	CancelReason string `json:"cancel_reason"`
 }
 
 // orderCompletedEventPayload 订单完成事件负载（与订单服务中构造的 payload 对应）
@@ -48,12 +53,20 @@ type orderCompletedEventPayload struct {
 }
 
 // orderPaymentPendingEventPayload 订单支付待处理事件负载（与订单服务中构造的 payload 对应）
+// 注意：扩展字段（CompanionID, GameName 等）由订单服务使用，user 服务只使用基础字段
 type orderPaymentPendingEventPayload struct {
 	OrderID    uint64 `json:"order_id"`
 	OrderNo    string `json:"order_no"`
 	BossID     uint64 `json:"boss_id"`
 	Amount     int64  `json:"amount"`
 	BizOrderID string `json:"biz_order_id"`
+
+	// 扩展字段：用于订单服务的本地事务（user 服务忽略）
+	CompanionID     uint64 `json:"companion_id"`
+	GameName        string `json:"game_name"`
+	GameMode        string `json:"game_mode"`
+	DurationMinutes int32  `json:"duration_minutes"`
+	PricePerHour    int64  `json:"price_per_hour"`
 }
 
 // StartOrderRefundConsumer 启动消费订单取消事件的 RocketMQ Consumer
@@ -109,6 +122,7 @@ func handleOrderEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *prim
 }
 
 // handleOrderCancelled 处理 ORDER_CANCELLED 事件，执行钱包退款
+// 注意：只有当 NeedRefund=true 时才执行退款（已创建但未支付的订单不需要退款）
 func handleOrderCancelled(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
 	var payload orderCancelledEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
@@ -121,7 +135,15 @@ func handleOrderCancelled(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 		return nil
 	}
 
-	// 使用退款逻辑进行幂等退款（Amount 为正数，BizOrderID 用于幂等控制），并写入 Outbox
+	// 只有当 NeedRefund=true 时才执行退款
+	// 如果订单未支付（NeedRefund=false），则不需要退款，直接返回成功
+	if !payload.NeedRefund {
+		logx.Infof("order cancelled without refund: order_no=%s, boss_id=%d (order was not paid)",
+			payload.OrderNo, payload.BossID)
+		return nil
+	}
+
+	// 使用退款逻辑进行幂等退款（Amount 为正数，BizOrderID 用于幂等控制），通过 RocketMQ 事务消息发送退款成功事件
 	l := logic.NewRefundLogic(ctx, svcCtx)
 	if err := l.Refund(payload.BossID, payload.Amount, payload.BizOrderID, payload.OrderNo, "order refund"); err != nil {
 		logx.Errorf("refund wallet failed for order %s, user=%d, amount=%d, err=%v",
@@ -165,7 +187,7 @@ func handleOrderCompleted(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 }
 
 // handlePaymentPending 处理 ORDER_PAYMENT_PENDING 事件，执行扣款
-// 在一个事务中：扣款 + 写入支付结果事件到 Outbox，保证原子性
+// 扣款成功后，通过 RocketMQ 事务消息发送支付结果事件
 func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
 	var payload orderPaymentPendingEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
@@ -181,18 +203,21 @@ func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 
 	db := svcCtx.DB().WithContext(ctx)
 	var wallet model.UserWallet
+	var paymentSucceeded bool
+	var paymentFailedReason string
 
-	// 在一个事务中：扣款 + 写入支付结果事件到 Outbox，保证原子性
-	return db.Transaction(func(tx *gorm.DB) error {
+	// 扣款操作
+	err := db.Transaction(func(tx *gorm.DB) error {
 		// 0. 幂等检查：如果已经存在 CONSUME + biz_order_id 的流水，说明已经扣过款了
 		var existedTr model.WalletTransaction
 		if err := tx.
 			Where("type = ? AND biz_order_id = ?", "CONSUME", payload.BizOrderID).
 			First(&existedTr).Error; err == nil {
-			// 已经扣过款了，直接写入成功事件（幂等）
+			// 已经扣过款了，直接返回成功（幂等）
 			logx.Infof("payment already consumed for order %s, biz_order_id=%s, skip duplicate consume",
 				payload.OrderNo, payload.BizOrderID)
-			return writePaymentSucceededEvent(tx, &payload)
+			paymentSucceeded = true
+			return nil
 		} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
@@ -204,15 +229,17 @@ func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 			First(&wallet).Error
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// 钱包不存在，扣款失败，写入失败事件（不返回错误，让事务提交）
-			return writePaymentFailedEvent(tx, &payload, "wallet not found")
+			// 钱包不存在，扣款失败
+			paymentFailedReason = "wallet not found"
+			return nil // 不返回错误，让事务提交
 		} else if err != nil {
 			return err
 		}
 
 		if wallet.Balance < payload.Amount {
-			// 余额不足，扣款失败，写入失败事件（不返回错误，让事务提交）
-			return writePaymentFailedEvent(tx, &payload, "insufficient handsome coins")
+			// 余额不足，扣款失败
+			paymentFailedReason = "insufficient handsome coins"
+			return nil // 不返回错误，让事务提交
 		}
 
 		// 执行扣款
@@ -240,13 +267,31 @@ func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 			return err
 		}
 
-		// 2. 扣款成功，写入 ORDER_PAYMENT_SUCCEEDED 事件到 Outbox（同一事务）
-		return writePaymentSucceededEvent(tx, &payload)
+		// 扣款成功
+		paymentSucceeded = true
+		return nil
 	})
+
+	if err != nil {
+		logx.Errorf("payment transaction failed for order %s: %v", payload.OrderNo, err)
+		return err
+	}
+
+	// 事务提交后，发送支付结果事件（使用普通 Producer，非事务消息）
+	if paymentSucceeded {
+		return sendPaymentSucceededEvent(ctx, svcCtx, &payload)
+	} else {
+		return sendPaymentFailedEvent(ctx, svcCtx, &payload, paymentFailedReason)
+	}
 }
 
-// writePaymentSucceededEvent 写入支付成功事件到 Outbox（在事务中调用）
-func writePaymentSucceededEvent(tx *gorm.DB, payload *orderPaymentPendingEventPayload) error {
+// sendPaymentSucceededEvent 发送支付成功事件（事务提交后调用）
+func sendPaymentSucceededEvent(ctx context.Context, svcCtx *svc.ServiceContext, payload *orderPaymentPendingEventPayload) error {
+	if svcCtx.EventProducer == nil {
+		logx.Errorf("event producer not initialized, cannot send payment succeeded event")
+		return nil // 不返回错误，避免影响主流程
+	}
+
 	succeededPayload := map[string]any{
 		"order_id":     payload.OrderID,
 		"order_no":     payload.OrderNo,
@@ -257,17 +302,15 @@ func writePaymentSucceededEvent(tx *gorm.DB, payload *orderPaymentPendingEventPa
 	succeededPayloadJSON, err := json.Marshal(succeededPayload)
 	if err != nil {
 		logx.Errorf("marshal payment succeeded payload failed: %v", err)
-		return err
+		return nil // 不返回错误，避免影响主流程
 	}
 
-	evt := &model.UserEventOutbox{
-		EventType: eventTypePaymentSucceeded,
-		Payload:   string(succeededPayloadJSON),
-		Status:    "PENDING",
-	}
-	if err := tx.Create(evt).Error; err != nil {
-		logx.Errorf("create payment succeeded event outbox failed: %v", err)
-		return err
+	msg := primitive.NewMessage(orderEventTopic, succeededPayloadJSON)
+	msg.WithTag(eventTypePaymentSucceeded)
+
+	if _, err := svcCtx.EventProducer.SendSync(ctx, msg); err != nil {
+		logx.Errorf("send payment succeeded event failed: order_no=%s, err=%v", payload.OrderNo, err)
+		return nil // 不返回错误，避免影响主流程（消息发送失败不影响扣款结果）
 	}
 
 	logx.Infof("payment succeeded for order %s, boss=%d, amount=%d",
@@ -275,8 +318,13 @@ func writePaymentSucceededEvent(tx *gorm.DB, payload *orderPaymentPendingEventPa
 	return nil
 }
 
-// writePaymentFailedEvent 写入支付失败事件到 Outbox（在事务中调用）
-func writePaymentFailedEvent(tx *gorm.DB, payload *orderPaymentPendingEventPayload, reason string) error {
+// sendPaymentFailedEvent 发送支付失败事件（事务提交后调用）
+func sendPaymentFailedEvent(ctx context.Context, svcCtx *svc.ServiceContext, payload *orderPaymentPendingEventPayload, reason string) error {
+	if svcCtx.EventProducer == nil {
+		logx.Errorf("event producer not initialized, cannot send payment failed event")
+		return nil // 不返回错误，避免影响主流程
+	}
+
 	failedPayload := map[string]any{
 		"order_id":     payload.OrderID,
 		"order_no":     payload.OrderNo,
@@ -285,16 +333,18 @@ func writePaymentFailedEvent(tx *gorm.DB, payload *orderPaymentPendingEventPaylo
 		"biz_order_id": payload.BizOrderID,
 		"reason":       reason,
 	}
-	failedPayloadJSON, _ := json.Marshal(failedPayload)
-
-	evt := &model.UserEventOutbox{
-		EventType: eventTypePaymentFailed,
-		Payload:   string(failedPayloadJSON),
-		Status:    "PENDING",
+	failedPayloadJSON, err := json.Marshal(failedPayload)
+	if err != nil {
+		logx.Errorf("marshal payment failed payload failed: %v", err)
+		return nil // 不返回错误，避免影响主流程
 	}
-	if err := tx.Create(evt).Error; err != nil {
-		logx.Errorf("create payment failed event outbox failed: %v", err)
-		return err
+
+	msg := primitive.NewMessage(orderEventTopic, failedPayloadJSON)
+	msg.WithTag(eventTypePaymentFailed)
+
+	if _, err := svcCtx.EventProducer.SendSync(ctx, msg); err != nil {
+		logx.Errorf("send payment failed event failed: order_no=%s, err=%v", payload.OrderNo, err)
+		return nil // 不返回错误，避免影响主流程
 	}
 
 	logx.Errorf("consume wallet failed for order %s, boss=%d, amount=%d, reason=%s",

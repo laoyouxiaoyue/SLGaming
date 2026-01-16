@@ -3,12 +3,14 @@ package logic
 import (
 	"context"
 	"encoding/json"
-	"time"
 
 	"SLGaming/back/services/order/internal/model"
+	orderMQ "SLGaming/back/services/order/internal/mq"
 	"SLGaming/back/services/order/internal/svc"
+	"SLGaming/back/services/order/internal/tx"
 	"SLGaming/back/services/order/order"
 
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,35 +29,6 @@ func NewCompleteOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Com
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
-}
-
-// orderCompletedEventPayload 订单完成事件负载结构
-type orderCompletedEventPayload struct {
-	OrderID     uint64 `json:"order_id"`
-	OrderNo     string `json:"order_no"`
-	BossID      uint64 `json:"boss_id"`
-	CompanionID uint64 `json:"companion_id"`
-	Amount      int64  `json:"amount"`
-	// 这里使用订单号作为业务幂等键，钱包侧可据此做幂等控制
-	BizOrderID string `json:"biz_order_id"`
-}
-
-// buildOrderCompletedPayload 构造 ORDER_COMPLETED 事件的 JSON 负载
-func buildOrderCompletedPayload(o *model.Order) string {
-	payload := orderCompletedEventPayload{
-		OrderID:     o.ID,
-		OrderNo:     o.OrderNo,
-		BossID:      o.BossID,
-		CompanionID: o.CompanionID,
-		Amount:      o.TotalAmount,
-		BizOrderID:  o.OrderNo,
-	}
-	b, err := json.Marshal(payload)
-	if err != nil {
-		// 理论上不应该失败，失败时返回空字符串，上层会记录错误
-		return ""
-	}
-	return string(b)
 }
 
 func (l *CompleteOrderLogic) CompleteOrder(in *order.CompleteOrderRequest) (*order.CompleteOrderResponse, error) {
@@ -78,38 +51,48 @@ func (l *CompleteOrderLogic) CompleteOrder(in *order.CompleteOrderRequest) (*ord
 		return nil, status.Error(codes.FailedPrecondition, "order is not in progress")
 	}
 
-	now := time.Now()
+	// 使用 RocketMQ 事务消息发送 ORDER_COMPLETED，并在本地事务中更新订单状态
+	if l.svcCtx.OrderEventTxProducer == nil {
+		return nil, status.Error(codes.FailedPrecondition, "order transaction producer not initialized")
+	}
 
-	// 在一个事务中：更新订单状态为 COMPLETED + 写一条 ORDER_COMPLETED outbox 事件
-	if err := db.Transaction(func(tx *gorm.DB) error {
-		// 更新订单状态为已完成
-		o.Status = model.OrderStatusCompleted
-		o.CompletedAt = &now
+	payload := &tx.OrderCompletedPayload{
+		OrderID:     o.ID,
+		OrderNo:     o.OrderNo,
+		BossID:      o.BossID,
+		CompanionID: o.CompanionID,
+		Amount:      o.TotalAmount,
+		BizOrderID:  o.OrderNo,
+	}
 
-		if err := tx.Save(&o).Error; err != nil {
-			l.Errorf("update order status to completed failed: %v", err)
-			return status.Error(codes.Internal, "complete order failed")
+	// 构造事务消息
+	msgBody, err := json.Marshal(payload)
+	if err != nil {
+		l.Errorf("marshal completed payload failed: %v", err)
+		return nil, status.Error(codes.Internal, "marshal completed event failed")
+	}
+	msg := primitive.NewMessage(orderMQ.OrderEventTopic(), msgBody)
+	msg.WithTag(orderMQ.EventTypeCompleted())
+
+	txRes, err := l.svcCtx.OrderEventTxProducer.SendMessageInTransaction(l.ctx, msg)
+	if err != nil {
+		l.Errorf("send transactional message failed: %v, result=%+v", err, txRes)
+		return nil, status.Error(codes.Internal, "complete order failed")
+	}
+
+	// 此时本地事务（ExecuteOrderTx -> ExecuteCompleteOrderTx）已经执行完成，
+	// 但是否成功需要通过查询订单确认
+	var updatedOrder model.Order
+	if err := db.Where("order_no = ?", o.OrderNo).First(&updatedOrder).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			l.Errorf("complete order transaction rolled back, order not found, order_no=%s", o.OrderNo)
+			return nil, status.Error(codes.Internal, "complete order transaction rolled back")
 		}
-
-		// 写一条 ORDER_COMPLETED 事件到 outbox，由后台任务异步发送到 MQ
-		// 用户服务会消费这个事件，给陪玩充值
-		evt := &model.OrderEventOutbox{
-			EventType: "ORDER_COMPLETED",
-			Payload:   buildOrderCompletedPayload(&o),
-			Status:    "PENDING",
-		}
-
-		if err := tx.Create(evt).Error; err != nil {
-			l.Errorf("create order event outbox failed: %v", err)
-			return status.Error(codes.Internal, "complete order failed")
-		}
-
-		return nil
-	}); err != nil {
-		return nil, err
+		l.Errorf("query order after transactional message failed: %v", err)
+		return nil, status.Error(codes.Internal, "complete order failed")
 	}
 
 	return &order.CompleteOrderResponse{
-		Order: toOrderInfo(&o),
+		Order: toOrderInfo(&updatedOrder),
 	}, nil
 }

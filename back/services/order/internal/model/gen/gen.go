@@ -31,7 +31,6 @@ func main() {
 	log.Println("开始迁移数据库表...")
 	if err := db.AutoMigrate(
 		&model.Order{},
-		&model.OrderEventOutbox{},
 	); err != nil {
 		log.Panicf("数据库迁移失败: %v", err)
 		return
@@ -39,7 +38,6 @@ func main() {
 
 	log.Println("数据库迁移成功！已创建/更新以下表：")
 	log.Println("  - orders")
-	log.Println("  - order_event_outbox")
 }
 
 // maskDSN 隐藏 DSN 中的密码（用于日志输出）

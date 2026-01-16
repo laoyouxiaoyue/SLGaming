@@ -8,25 +8,19 @@ import (
 
 	"SLGaming/back/pkg/lock"
 	"SLGaming/back/services/order/internal/model"
+	orderMQ "SLGaming/back/services/order/internal/mq"
 	"SLGaming/back/services/order/internal/svc"
+	"SLGaming/back/services/order/internal/tx"
 	"SLGaming/back/services/order/order"
 	"SLGaming/back/services/user/userclient"
 
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/google/uuid"
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
-
-// orderPaymentPendingEventPayload 订单支付待处理事件负载结构
-type orderPaymentPendingEventPayload struct {
-	OrderID    uint64 `json:"order_id"`
-	OrderNo    string `json:"order_no"`
-	BossID     uint64 `json:"boss_id"`
-	Amount     int64  `json:"amount"`
-	BizOrderID string `json:"biz_order_id"`
-}
 
 type CreateOrderLogic struct {
 	ctx    context.Context
@@ -100,8 +94,6 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 
 // doCreateOrder 执行实际的订单创建逻辑（不加锁）
 func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
-	db := l.svcCtx.DB.WithContext(l.ctx)
-
 	// 1. 查询陪玩当前价格
 	cpResp, err := l.svcCtx.UserRPC.GetCompanionProfile(l.ctx, &userclient.GetCompanionProfileRequest{
 		UserId: in.GetCompanionId(),
@@ -144,59 +136,66 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 			"insufficient handsome coins, current balance is insufficient for this order")
 	}
 
-	o := &model.Order{
+	orderNo := generateOrderNo(in.GetBossId())
+
+	// 3. 使用 RocketMQ 事务消息发送 ORDER_PAYMENT_PENDING，并在本地事务中创建订单
+	if l.svcCtx.OrderEventTxProducer == nil {
+		// 不提供降级方案，事务 Producer 必须初始化成功
+		return nil, status.Error(codes.FailedPrecondition, "order transaction producer not initialized")
+	}
+
+	payload := &tx.OrderPaymentPendingPayload{
+		OrderNo:         orderNo,
 		BossID:          in.GetBossId(),
+		Amount:          totalAmount,
+		BizOrderID:      orderNo,
 		CompanionID:     in.GetCompanionId(),
 		GameName:        in.GetGameName(),
 		GameMode:        in.GetGameMode(),
 		DurationMinutes: in.GetDurationMinutes(),
 		PricePerHour:    pricePerHour,
-		TotalAmount:     totalAmount,
-		Status:          model.OrderStatusCreated, // 先创建为待支付状态
-	}
-	o.OrderNo = generateOrderNo(o.BossID)
-
-	// 3. 在一个事务中：创建订单 + 写入 ORDER_PAYMENT_PENDING 事件到 Outbox
-	// 使用 Outbox 模式确保订单创建和支付事件的原子性
-	if err := db.Transaction(func(tx *gorm.DB) error {
-		// 创建订单记录
-		if err := tx.Create(o).Error; err != nil {
-			return err
-		}
-
-		// 构造支付事件负载
-		payload := orderPaymentPendingEventPayload{
-			OrderID:    o.ID,
-			OrderNo:    o.OrderNo,
-			BossID:     o.BossID,
-			Amount:     o.TotalAmount,
-			BizOrderID: o.OrderNo,
-		}
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			l.Errorf("marshal payment pending payload failed: %v", err)
-			return status.Error(codes.Internal, "marshal payment event failed")
-		}
-
-		// 写入 ORDER_PAYMENT_PENDING 事件到 outbox
-		evt := &model.OrderEventOutbox{
-			EventType: "ORDER_PAYMENT_PENDING",
-			Payload:   string(payloadJSON),
-			Status:    "PENDING",
-		}
-
-		if err := tx.Create(evt).Error; err != nil {
-			l.Errorf("create payment pending event outbox failed: %v", err)
-			return status.Error(codes.Internal, "create payment event failed")
-		}
-
-		return nil
-	}); err != nil {
-		l.Errorf("create order with payment event failed: %v", err)
-		return nil, err
 	}
 
-	return &order.CreateOrderResponse{
-		Order: toOrderInfo(o),
-	}, nil
+	// 构造事务消息
+	msgBody, err := json.Marshal(payload)
+	if err != nil {
+		l.Errorf("marshal payment pending payload failed: %v", err)
+		return nil, status.Error(codes.Internal, "marshal payment event failed")
+	}
+	msg := primitive.NewMessage(orderMQ.OrderEventTopic(), msgBody)
+	msg.WithTag(orderMQ.EventTypePaymentPending())
+
+	// 发送 RocketMQ 事务消息
+	// 注意：SendMessageInTransaction 会同步执行 ExecuteLocalTransaction（即 ExecuteCreateOrderTx）
+	// 如果 ExecuteCreateOrderTx 返回 error，本地事务会回滚，消息也会回滚
+	// 如果返回 nil error，说明半消息发送成功，但本地事务是否成功需要通过查询订单确认
+	txRes, err := l.svcCtx.OrderEventTxProducer.SendMessageInTransaction(l.ctx, msg)
+	if err != nil {
+		// SendMessageInTransaction 返回 error 可能有两种情况：
+		// 1. 发送半消息失败（网络问题、Broker 不可用等）
+		// 2. 本地事务执行失败（ExecuteCreateOrderTx 返回 error）
+		// 无论哪种情况，订单都不会创建，直接返回错误
+		l.Errorf("send transactional message failed: %v, result=%+v, order_no=%s", err, txRes, orderNo)
+		return nil, status.Error(codes.Internal, "create order failed: transaction message send failed")
+	}
+
+	// 此时本地事务（ExecuteOrderTx -> ExecuteCreateOrderTx）已经执行完成
+	// 但 SendMessageInTransaction 返回 nil error 只表示半消息发送成功，
+	// 本地事务是否成功需要通过查询订单确认（因为 ExecuteLocalTransaction 可能返回 RollbackMessageState）
+	db := l.svcCtx.DB.WithContext(l.ctx)
+	var o model.Order
+	if err := db.Where("order_no = ?", orderNo).First(&o).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 订单不存在，说明本地事务回滚了（ExecuteCreateOrderTx 返回了 error）
+			// 可能的原因：数据库错误、数据校验失败、幂等检查发现重复等
+			l.Errorf("create order transaction rolled back, order not found after tx message, order_no=%s, tx_result=%+v",
+				orderNo, txRes)
+			return nil, status.Error(codes.Internal, "create order failed: local transaction rolled back")
+		}
+		// 数据库查询错误（非记录不存在）
+		l.Errorf("query order after transactional message failed: %v, order_no=%s", err, orderNo)
+		return nil, status.Error(codes.Internal, "create order failed: query order error")
+	}
+
+	return &order.CreateOrderResponse{Order: toOrderInfo(&o)}, nil
 }

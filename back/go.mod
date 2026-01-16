@@ -25,6 +25,7 @@ require (
 )
 
 require (
+	github.com/go-redsync/redsync/v4 v4.15.0 // indirect
 	github.com/volcengine/volc-sdk-golang v1.0.199 // indirect
 	github.com/volcengine/volcengine-go-sdk v1.1.49 // indirect
 )
@@ -166,7 +167,7 @@ require (
 	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 // indirect
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/term v0.36.0 // indirect
 	golang.org/x/text v0.30.0 // indirect

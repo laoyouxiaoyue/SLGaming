@@ -6,6 +6,7 @@ import (
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/order/internal/model"
+	orderMQ "SLGaming/back/services/order/internal/mq"
 	"SLGaming/back/services/order/internal/svc"
 
 	"github.com/apache/rocketmq-client-go/v2/primitive"
@@ -40,7 +41,7 @@ func StartRefundSucceededConsumer(ctx context.Context, svcCtx *svc.ServiceContex
 	consumer, err := pkgIoc.InitRocketMQConsumer(
 		mqCfg,
 		"order-refund-consumer",
-		[]string{orderEventTopic},
+		[]string{orderMQ.OrderEventTopic()},
 		func(c context.Context, msg *primitive.MessageExt) error {
 			// 只处理 ORDER_REFUND_SUCCEEDED 事件
 			if msg.GetTags() != eventTypeRefundSucceeded {
@@ -59,7 +60,7 @@ func StartRefundSucceededConsumer(ctx context.Context, svcCtx *svc.ServiceContex
 		pkgIoc.ShutdownRocketMQConsumer(consumer)
 	}()
 
-	logx.Infof("refund succeeded consumer started, topic=%s", orderEventTopic)
+	logx.Infof("refund succeeded consumer started, topic=%s", orderMQ.OrderEventTopic())
 }
 
 func handleRefundSucceeded(ctx context.Context, db *gorm.DB, msg *primitive.MessageExt) error {
