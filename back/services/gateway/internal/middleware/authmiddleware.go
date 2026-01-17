@@ -36,6 +36,12 @@ func isPublicPath(path string) bool {
 func AuthMiddleware(svcCtx *svc.ServiceContext) rest.Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
+			// OPTIONS 预检请求直接跳过鉴权（CORS 中间件已处理）
+			if r.Method == http.MethodOptions {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			// 检查是否是公开接口，如果是则直接跳过鉴权
 			if isPublicPath(r.URL.Path) {
 				next.ServeHTTP(w, r)

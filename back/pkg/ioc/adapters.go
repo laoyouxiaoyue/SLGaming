@@ -158,3 +158,27 @@ func (r *RedisConfigAdapter) GetPass() string {
 func (r *RedisConfigAdapter) GetTls() bool {
 	return r.Tls
 }
+
+// MilvusConfigAdapter Milvus 配置适配器
+type MilvusConfigAdapter struct {
+	Address  string
+	Username string
+	Password string
+	DBName   string
+}
+
+func (m *MilvusConfigAdapter) GetAddress() string {
+	return m.Address
+}
+
+func (m *MilvusConfigAdapter) GetUsername() string {
+	return m.Username
+}
+
+func (m *MilvusConfigAdapter) GetPassword() string {
+	return m.Password
+}
+
+func (m *MilvusConfigAdapter) GetDBName() string {
+	return m.DBName
+}

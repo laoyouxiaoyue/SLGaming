@@ -1,6 +1,43 @@
 Name: agent.rpc
 ListenOn: 0.0.0.0:8080
-Etcd:
-  Hosts:
-  - 127.0.0.1:2379
-  Key: agent.rpc
+# Etcd 配置（可选，如果不需要服务发现可以注释掉）
+# Etcd:
+#   Hosts:
+#   - 127.0.0.1:2379
+#   Key: agent.rpc
+
+# Nacos 配置（可选）
+#Nacos:
+#  Hosts:
+#    - 127.0.0.1:8848
+#  Namespace: ""
+#  Group: DEFAULT_GROUP
+#  DataId: agent.yaml
+#  Username: "nacos"
+#  Password: "nacos"
+
+# Consul 配置（可选）
+#Consul:
+#  Address: 127.0.0.1:8500
+#  Token: ""
+#  Service:
+#    Name: agent-rpc
+#    ID: agent-rpc-1
+#    Address: 127.0.0.1
+#    Tags:
+#      - rpc
+#      - agent
+#    CheckInterval: 10s
+#    CheckTimeout: 5s
+
+# 大模型配置
+LLM:
+  APIKey: "4080e00c-d706-474e-a68c-cbee598c9001"  # 大模型 API Key
+  Model: "doubao-seed-1-8-251228"                 # 豆包模型名称
+
+# Milvus 向量数据库配置
+Milvus:
+  Address: "127.0.0.1:19530"  # Milvus 服务地址
+  Username: "root"            # 用户名（如果开启认证）
+  Password: "Milvus"          # 密码（如果开启认证）
+  DBName: "default"           # 数据库名称
