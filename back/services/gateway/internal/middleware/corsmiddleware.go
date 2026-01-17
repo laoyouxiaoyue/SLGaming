@@ -59,26 +59,27 @@ func CORSMiddleware(config *CORSConfig) rest.Middleware {
 			// 处理预检请求（OPTIONS）
 			if r.Method == http.MethodOptions {
 				// 设置允许的源（必须设置，即使 origin 为空）
-				if len(config.AllowedOrigins) > 0 {
-					// 如果允许凭证，不能使用 "*"，必须指定具体源
-					if config.AllowCredentials {
-						if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
-							w.Header().Set("Access-Control-Allow-Origin", origin)
-						}
-					} else {
-						// 不允许凭证时，可以使用 "*"
-						if isWildcardOrigin(config.AllowedOrigins) {
-							w.Header().Set("Access-Control-Allow-Origin", "*")
-						} else if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
-							w.Header().Set("Access-Control-Allow-Origin", origin)
-						} else if origin == "" {
-							// 如果没有 Origin 头，也设置 "*" 以支持所有源
-							w.Header().Set("Access-Control-Allow-Origin", "*")
+				// 优先处理：如果允许凭证，不能使用 "*"，必须指定具体源
+				if config.AllowCredentials {
+					if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
+						w.Header().Set("Access-Control-Allow-Origin", origin)
+					} else if len(config.AllowedOrigins) > 0 && !isWildcardOrigin(config.AllowedOrigins) {
+						// 如果配置了具体源但没有匹配，不设置（浏览器会拒绝）
+						// 但为了兼容性，如果 origin 为空，也设置第一个允许的源
+						if origin == "" && len(config.AllowedOrigins) > 0 {
+							w.Header().Set("Access-Control-Allow-Origin", config.AllowedOrigins[0])
 						}
 					}
 				} else {
-					// 如果没有配置允许的源，默认允许所有源
-					w.Header().Set("Access-Control-Allow-Origin", "*")
+					// 不允许凭证时，可以使用 "*"
+					if isWildcardOrigin(config.AllowedOrigins) {
+						w.Header().Set("Access-Control-Allow-Origin", "*")
+					} else if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
+						w.Header().Set("Access-Control-Allow-Origin", origin)
+					} else {
+						// 默认允许所有源（包括 origin 为空的情况）
+						w.Header().Set("Access-Control-Allow-Origin", "*")
+					}
 				}
 
 				// 设置允许的方法
@@ -136,26 +137,27 @@ func CORSMiddleware(config *CORSConfig) rest.Middleware {
 
 			// 处理实际请求（非 OPTIONS）
 			// 设置允许的源（必须设置）
-			if len(config.AllowedOrigins) > 0 {
-				// 如果允许凭证，不能使用 "*"，必须指定具体源
-				if config.AllowCredentials {
-					if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
-						w.Header().Set("Access-Control-Allow-Origin", origin)
-					}
-				} else {
-					// 不允许凭证时，可以使用 "*"
-					if isWildcardOrigin(config.AllowedOrigins) {
-						w.Header().Set("Access-Control-Allow-Origin", "*")
-					} else if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
-						w.Header().Set("Access-Control-Allow-Origin", origin)
-					} else if origin == "" {
-						// 如果没有 Origin 头，也设置 "*" 以支持所有源
-						w.Header().Set("Access-Control-Allow-Origin", "*")
+			// 优先处理：如果允许凭证，不能使用 "*"，必须指定具体源
+			if config.AllowCredentials {
+				if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
+					w.Header().Set("Access-Control-Allow-Origin", origin)
+				} else if len(config.AllowedOrigins) > 0 && !isWildcardOrigin(config.AllowedOrigins) {
+					// 如果配置了具体源但没有匹配，不设置（浏览器会拒绝）
+					// 但为了兼容性，如果 origin 为空，也设置第一个允许的源
+					if origin == "" && len(config.AllowedOrigins) > 0 {
+						w.Header().Set("Access-Control-Allow-Origin", config.AllowedOrigins[0])
 					}
 				}
 			} else {
-				// 如果没有配置允许的源，默认允许所有源
-				w.Header().Set("Access-Control-Allow-Origin", "*")
+				// 不允许凭证时，可以使用 "*"
+				if isWildcardOrigin(config.AllowedOrigins) {
+					w.Header().Set("Access-Control-Allow-Origin", "*")
+				} else if origin != "" && isOriginAllowed(origin, config.AllowedOrigins) {
+					w.Header().Set("Access-Control-Allow-Origin", origin)
+				} else {
+					// 默认允许所有源（包括 origin 为空的情况）
+					w.Header().Set("Access-Control-Allow-Origin", "*")
+				}
 			}
 
 			// 设置暴露的响应头
