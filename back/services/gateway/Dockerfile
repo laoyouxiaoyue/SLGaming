@@ -15,6 +15,9 @@ COPY services/ ./services/
 COPY pkg/ ./pkg/
 COPY rpc/ ./rpc/
 
+# 确保所有依赖（包括子包）都被下载
+RUN go mod download
+
 # 构建应用
 WORKDIR /build/services/gateway
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
