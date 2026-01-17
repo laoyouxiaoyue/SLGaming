@@ -15,8 +15,8 @@ COPY services/ ./services/
 COPY pkg/ ./pkg/
 COPY rpc/ ./rpc/
 
-# 确保所有依赖（包括子包）都被下载
-RUN go mod download
+# 解析所有导入并下载缺失的依赖
+RUN go mod tidy
 
 # 构建应用
 WORKDIR /build/services/gateway
