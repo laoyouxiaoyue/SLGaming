@@ -15,6 +15,9 @@ COPY services/ ./services/
 COPY pkg/ ./pkg/
 COPY rpc/ ./rpc/
 
+# 解析所有导入并下载缺失的依赖
+RUN go mod tidy
+
 # 构建应用
 WORKDIR /build/services/code
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
