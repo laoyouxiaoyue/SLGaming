@@ -61,7 +61,7 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile(in *user.GetCompanionProf
 					ID: uint64(snowflake.GenID()),
 				},
 				UserID:       userID,
-				GameSkills:   "[]",
+				GameSkills:   "",
 				PricePerHour: 0,
 				Status:       model.CompanionStatusOffline,
 				Rating:       0,

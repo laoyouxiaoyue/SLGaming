@@ -62,7 +62,7 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(req *types.UpdateCo
 	l.Infof("UpdateCompanionProfile: calling RPC with userID=%d, pricePerHour=%d, status=%d", userID, req.PricePerHour, req.Status)
 	rpcResp, err := l.svcCtx.UserRPC.UpdateCompanionProfile(l.ctx, &userclient.UpdateCompanionProfileRequest{
 		UserId:       userID,
-		GameSkills:   req.GameSkills,
+		GameSkill:    req.GameSkill,
 		PricePerHour: req.PricePerHour,
 		Status:       int32(req.Status),
 	})
@@ -94,7 +94,7 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(req *types.UpdateCo
 		},
 		Data: types.CompanionInfo{
 			UserId:       profile.UserId,
-			GameSkills:   profile.GameSkills,
+			GameSkill:    profile.GameSkill,
 			PricePerHour: profile.PricePerHour,
 			Status:       int(profile.Status),
 			Rating:       profile.Rating,

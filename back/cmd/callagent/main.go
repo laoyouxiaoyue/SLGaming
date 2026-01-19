@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	endpoint      = flag.String("endpoint", "127.0.0.1:8080", "agent rpc endpoint")
+	endpoint      = flag.String("endpoint", "127.0.0.1:8090", "agent rpc endpoint")
 	action        = flag.String("action", "add", "action: add|recommend")
 	userID        = flag.Uint64("user_id", 1001, "user id")
 	gender        = flag.String("gender", "male", "gender: male/female/other")
@@ -32,7 +32,7 @@ func main() {
 		NonBlock:  true,
 	}))
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 
 	switch *action {

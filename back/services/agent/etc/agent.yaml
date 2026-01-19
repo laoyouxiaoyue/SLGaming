@@ -1,39 +1,42 @@
 Name: agent.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:8090
+Timeout: 180000  # 超时时间（毫秒），180秒，用于处理向量化等耗时操作
 # Etcd 配置（可选，如果不需要服务发现可以注释掉）
 # Etcd:
 #   Hosts:
 #   - 127.0.0.1:2379
 #   Key: agent.rpc
 
-# Nacos 配置（可选）
-#Nacos:
-#  Hosts:
-#    - 127.0.0.1:8848
-#  Namespace: ""
-#  Group: DEFAULT_GROUP
-#  DataId: agent.yaml
-#  Username: "nacos"
-#  Password: "nacos"
+ #Nacos 配置（可选）
+Nacos:
+  Hosts:
+    - 127.0.0.1:8848
+  Namespace: ""
+  Group: DEFAULT_GROUP
+  DataId: agent.yaml
+  Username: "nacos"
+  Password: "nacos"
 
-# Consul 配置（可选）
-#Consul:
-#  Address: 127.0.0.1:8500
-#  Token: ""
-#  Service:
-#    Name: agent-rpc
-#    ID: agent-rpc-1
-#    Address: 127.0.0.1
-#    Tags:
-#      - rpc
-#      - agent
-#    CheckInterval: 10s
-#    CheckTimeout: 5s
+ #Consul 配置（可选）
+Consul:
+  Address: 127.0.0.1:8500
+  Token: ""
+  Service:
+    Name: agent-rpc
+    ID: agent-rpc-1
+    Address: 127.0.0.1
+    Tags:
+      - rpc
+      - agent
+    CheckInterval: 10s
+    CheckTimeout: 5s
 
 # 大模型配置
 LLM:
-  APIKey: "4080e00c-d706-474e-a68c-cbee598c9001"  # 大模型 API Key
-  Model: "doubao-seed-1-8-251228"                 # 豆包模型名称
+  APIKey: "sk-2eecb60baed14341866890bf5ce40265"  # DashScope API Key
+  Model: "text-embedding-v4"                      # DashScope 嵌入模型名称（用于向量化）
+  ChatModel: "qwen-plus"                          # 千问对话模型名称（用于格式化过滤条件）
+  ChatAPIKey: ""                                   # 对话模型 API Key（如果与嵌入模型不同，留空则使用 APIKey）
 
 # Milvus 向量数据库配置
 Milvus:

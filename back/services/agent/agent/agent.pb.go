@@ -21,27 +21,29 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 健康检查
-type PingRequest struct {
+// 推荐陪玩请求
+type RecommendCompanionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserInput     string                 `protobuf:"bytes,1,opt,name=user_input,json=userInput,proto3" json:"user_input,omitempty"` // 用户输入内容（如："我想要一个王者荣耀的陪玩"）
+	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`         // 用户ID（可选，用于个性化推荐）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PingRequest) Reset() {
-	*x = PingRequest{}
+func (x *RecommendCompanionRequest) Reset() {
+	*x = RecommendCompanionRequest{}
 	mi := &file_agent_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PingRequest) String() string {
+func (x *RecommendCompanionRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PingRequest) ProtoMessage() {}
+func (*RecommendCompanionRequest) ProtoMessage() {}
 
-func (x *PingRequest) ProtoReflect() protoreflect.Message {
+func (x *RecommendCompanionRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,32 +55,54 @@ func (x *PingRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PingRequest.ProtoReflect.Descriptor instead.
-func (*PingRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RecommendCompanionRequest.ProtoReflect.Descriptor instead.
+func (*RecommendCompanionRequest) Descriptor() ([]byte, []int) {
 	return file_agent_proto_rawDescGZIP(), []int{0}
 }
 
-type PingResponse struct {
+func (x *RecommendCompanionRequest) GetUserInput() string {
+	if x != nil {
+		return x.UserInput
+	}
+	return ""
+}
+
+func (x *RecommendCompanionRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+// 陪玩推荐结果
+type CompanionRecommendation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"` // 返回 "pong" 或自定义信息
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                     // 陪玩用户ID
+	GameSkill     string                 `protobuf:"bytes,2,opt,name=game_skill,json=gameSkill,proto3" json:"game_skill,omitempty"`             // 游戏技能
+	Gender        string                 `protobuf:"bytes,3,opt,name=gender,proto3" json:"gender,omitempty"`                                    // 性别
+	Age           int32                  `protobuf:"varint,4,opt,name=age,proto3" json:"age,omitempty"`                                         // 年龄
+	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`                          // 描述
+	PricePerHour  int64                  `protobuf:"varint,6,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"` // 每小时价格
+	Rating        float64                `protobuf:"fixed64,7,opt,name=rating,proto3" json:"rating,omitempty"`                                  // 评分
+	Similarity    float64                `protobuf:"fixed64,8,opt,name=similarity,proto3" json:"similarity,omitempty"`                          // 相似度分数（0-1）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PingResponse) Reset() {
-	*x = PingResponse{}
+func (x *CompanionRecommendation) Reset() {
+	*x = CompanionRecommendation{}
 	mi := &file_agent_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PingResponse) String() string {
+func (x *CompanionRecommendation) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PingResponse) ProtoMessage() {}
+func (*CompanionRecommendation) ProtoMessage() {}
 
-func (x *PingResponse) ProtoReflect() protoreflect.Message {
+func (x *CompanionRecommendation) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -90,625 +114,316 @@ func (x *PingResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PingResponse.ProtoReflect.Descriptor instead.
-func (*PingResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CompanionRecommendation.ProtoReflect.Descriptor instead.
+func (*CompanionRecommendation) Descriptor() ([]byte, []int) {
 	return file_agent_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *PingResponse) GetMessage() string {
+func (x *CompanionRecommendation) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *CompanionRecommendation) GetGameSkill() string {
+	if x != nil {
+		return x.GameSkill
+	}
+	return ""
+}
+
+func (x *CompanionRecommendation) GetGender() string {
+	if x != nil {
+		return x.Gender
+	}
+	return ""
+}
+
+func (x *CompanionRecommendation) GetAge() int32 {
+	if x != nil {
+		return x.Age
+	}
+	return 0
+}
+
+func (x *CompanionRecommendation) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CompanionRecommendation) GetPricePerHour() int64 {
+	if x != nil {
+		return x.PricePerHour
+	}
+	return 0
+}
+
+func (x *CompanionRecommendation) GetRating() float64 {
+	if x != nil {
+		return x.Rating
+	}
+	return 0
+}
+
+func (x *CompanionRecommendation) GetSimilarity() float64 {
+	if x != nil {
+		return x.Similarity
+	}
+	return 0
+}
+
+// 推荐陪玩响应
+type RecommendCompanionResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Companions    []*CompanionRecommendation `protobuf:"bytes,1,rep,name=companions,proto3" json:"companions,omitempty"`   // 推荐的陪玩列表
+	Explanation   string                     `protobuf:"bytes,2,opt,name=explanation,proto3" json:"explanation,omitempty"` // 推荐理由说明
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecommendCompanionResponse) Reset() {
+	*x = RecommendCompanionResponse{}
+	mi := &file_agent_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecommendCompanionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecommendCompanionResponse) ProtoMessage() {}
+
+func (x *RecommendCompanionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecommendCompanionResponse.ProtoReflect.Descriptor instead.
+func (*RecommendCompanionResponse) Descriptor() ([]byte, []int) {
+	return file_agent_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RecommendCompanionResponse) GetCompanions() []*CompanionRecommendation {
+	if x != nil {
+		return x.Companions
+	}
+	return nil
+}
+
+func (x *RecommendCompanionResponse) GetExplanation() string {
+	if x != nil {
+		return x.Explanation
+	}
+	return ""
+}
+
+// 添加陪玩信息到向量数据库请求
+type AddCompanionToVectorDBRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                     // 用户ID（必填）
+	Gender        string                 `protobuf:"bytes,2,opt,name=gender,proto3" json:"gender,omitempty"`                                    // 性别：male/female/other
+	Age           int32                  `protobuf:"varint,3,opt,name=age,proto3" json:"age,omitempty"`                                         // 年龄
+	GameSkill     string                 `protobuf:"bytes,4,opt,name=game_skill,json=gameSkill,proto3" json:"game_skill,omitempty"`             // 游戏技能（单个游戏名称）
+	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`                          // 陪玩描述文本（用于向量化）
+	PricePerHour  int64                  `protobuf:"varint,6,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"` // 每小时价格（帅币）
+	Rating        float64                `protobuf:"fixed64,7,opt,name=rating,proto3" json:"rating,omitempty"`                                  // 评分（0-5分）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddCompanionToVectorDBRequest) Reset() {
+	*x = AddCompanionToVectorDBRequest{}
+	mi := &file_agent_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddCompanionToVectorDBRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddCompanionToVectorDBRequest) ProtoMessage() {}
+
+func (x *AddCompanionToVectorDBRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddCompanionToVectorDBRequest.ProtoReflect.Descriptor instead.
+func (*AddCompanionToVectorDBRequest) Descriptor() ([]byte, []int) {
+	return file_agent_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *AddCompanionToVectorDBRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *AddCompanionToVectorDBRequest) GetGender() string {
+	if x != nil {
+		return x.Gender
+	}
+	return ""
+}
+
+func (x *AddCompanionToVectorDBRequest) GetAge() int32 {
+	if x != nil {
+		return x.Age
+	}
+	return 0
+}
+
+func (x *AddCompanionToVectorDBRequest) GetGameSkill() string {
+	if x != nil {
+		return x.GameSkill
+	}
+	return ""
+}
+
+func (x *AddCompanionToVectorDBRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *AddCompanionToVectorDBRequest) GetPricePerHour() int64 {
+	if x != nil {
+		return x.PricePerHour
+	}
+	return 0
+}
+
+func (x *AddCompanionToVectorDBRequest) GetRating() float64 {
+	if x != nil {
+		return x.Rating
+	}
+	return 0
+}
+
+// 添加陪玩信息到向量数据库响应
+type AddCompanionToVectorDBResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CompanionId   uint64                 `protobuf:"varint,1,opt,name=companion_id,json=companionId,proto3" json:"companion_id,omitempty"` // 陪玩ID（Milvus中的ID）
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`                            // 是否成功
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`                             // 提示信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddCompanionToVectorDBResponse) Reset() {
+	*x = AddCompanionToVectorDBResponse{}
+	mi := &file_agent_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddCompanionToVectorDBResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddCompanionToVectorDBResponse) ProtoMessage() {}
+
+func (x *AddCompanionToVectorDBResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddCompanionToVectorDBResponse.ProtoReflect.Descriptor instead.
+func (*AddCompanionToVectorDBResponse) Descriptor() ([]byte, []int) {
+	return file_agent_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AddCompanionToVectorDBResponse) GetCompanionId() uint64 {
+	if x != nil {
+		return x.CompanionId
+	}
+	return 0
+}
+
+func (x *AddCompanionToVectorDBResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *AddCompanionToVectorDBResponse) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-// 发送消息请求
-type SendMessageRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`                                                        // 会话 ID，客户端可复用；为空则服务端可生成
-	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                                                                // 业务用户 ID（用于权限/画像）
-	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                                                                             // 用户输入内容
-	Metadata      map[string]string      `protobuf:"bytes,4,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // 额外元数据（可选）
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SendMessageRequest) Reset() {
-	*x = SendMessageRequest{}
-	mi := &file_agent_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SendMessageRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SendMessageRequest) ProtoMessage() {}
-
-func (x *SendMessageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendMessageRequest.ProtoReflect.Descriptor instead.
-func (*SendMessageRequest) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *SendMessageRequest) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
-func (x *SendMessageRequest) GetUserId() uint64 {
-	if x != nil {
-		return x.UserId
-	}
-	return 0
-}
-
-func (x *SendMessageRequest) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-func (x *SendMessageRequest) GetMetadata() map[string]string {
-	if x != nil {
-		return x.Metadata
-	}
-	return nil
-}
-
-// 发送消息响应
-type SendMessageResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // 确认会话 ID（如果服务端生成）
-	Answer        string                 `protobuf:"bytes,2,opt,name=answer,proto3" json:"answer,omitempty"`                        // Agent 的回复
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SendMessageResponse) Reset() {
-	*x = SendMessageResponse{}
-	mi := &file_agent_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SendMessageResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SendMessageResponse) ProtoMessage() {}
-
-func (x *SendMessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendMessageResponse.ProtoReflect.Descriptor instead.
-func (*SendMessageResponse) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *SendMessageResponse) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
-func (x *SendMessageResponse) GetAnswer() string {
-	if x != nil {
-		return x.Answer
-	}
-	return ""
-}
-
-// 获取会话列表请求
-type GetSessionListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`       // 用户 ID
-	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`                         // 页码，从1开始
-	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 每页数量，默认20
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetSessionListRequest) Reset() {
-	*x = GetSessionListRequest{}
-	mi := &file_agent_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetSessionListRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetSessionListRequest) ProtoMessage() {}
-
-func (x *GetSessionListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetSessionListRequest.ProtoReflect.Descriptor instead.
-func (*GetSessionListRequest) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *GetSessionListRequest) GetUserId() uint64 {
-	if x != nil {
-		return x.UserId
-	}
-	return 0
-}
-
-func (x *GetSessionListRequest) GetPage() int32 {
-	if x != nil {
-		return x.Page
-	}
-	return 0
-}
-
-func (x *GetSessionListRequest) GetPageSize() int32 {
-	if x != nil {
-		return x.PageSize
-	}
-	return 0
-}
-
-// 会话信息
-type SessionInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`           // 会话 ID
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`                                    // 会话标题（通常是第一条消息的摘要）
-	CreatedAt     int64                  `protobuf:"varint,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`          // 创建时间戳（Unix时间戳，秒）
-	UpdatedAt     int64                  `protobuf:"varint,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`          // 更新时间戳（Unix时间戳，秒）
-	MessageCount  int32                  `protobuf:"varint,5,opt,name=message_count,json=messageCount,proto3" json:"message_count,omitempty"` // 消息数量
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SessionInfo) Reset() {
-	*x = SessionInfo{}
-	mi := &file_agent_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SessionInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SessionInfo) ProtoMessage() {}
-
-func (x *SessionInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SessionInfo.ProtoReflect.Descriptor instead.
-func (*SessionInfo) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *SessionInfo) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
-func (x *SessionInfo) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *SessionInfo) GetCreatedAt() int64 {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return 0
-}
-
-func (x *SessionInfo) GetUpdatedAt() int64 {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return 0
-}
-
-func (x *SessionInfo) GetMessageCount() int32 {
-	if x != nil {
-		return x.MessageCount
-	}
-	return 0
-}
-
-// 获取会话列表响应
-type GetSessionListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sessions      []*SessionInfo         `protobuf:"bytes,1,rep,name=sessions,proto3" json:"sessions,omitempty"`                  // 会话列表
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`                       // 总会话数
-	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`                         // 当前页码
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 每页数量
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetSessionListResponse) Reset() {
-	*x = GetSessionListResponse{}
-	mi := &file_agent_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetSessionListResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetSessionListResponse) ProtoMessage() {}
-
-func (x *GetSessionListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetSessionListResponse.ProtoReflect.Descriptor instead.
-func (*GetSessionListResponse) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *GetSessionListResponse) GetSessions() []*SessionInfo {
-	if x != nil {
-		return x.Sessions
-	}
-	return nil
-}
-
-func (x *GetSessionListResponse) GetTotal() int32 {
-	if x != nil {
-		return x.Total
-	}
-	return 0
-}
-
-func (x *GetSessionListResponse) GetPage() int32 {
-	if x != nil {
-		return x.Page
-	}
-	return 0
-}
-
-func (x *GetSessionListResponse) GetPageSize() int32 {
-	if x != nil {
-		return x.PageSize
-	}
-	return 0
-}
-
-// 获取消息历史请求
-type GetMessageHistoryRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // 会话 ID
-	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`         // 用户 ID（用于权限验证）
-	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`                           // 页码，从1开始（可选，用于分页加载）
-	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`   // 每页数量，默认50（可选）
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetMessageHistoryRequest) Reset() {
-	*x = GetMessageHistoryRequest{}
-	mi := &file_agent_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetMessageHistoryRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetMessageHistoryRequest) ProtoMessage() {}
-
-func (x *GetMessageHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetMessageHistoryRequest.ProtoReflect.Descriptor instead.
-func (*GetMessageHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *GetMessageHistoryRequest) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
-func (x *GetMessageHistoryRequest) GetUserId() uint64 {
-	if x != nil {
-		return x.UserId
-	}
-	return 0
-}
-
-func (x *GetMessageHistoryRequest) GetPage() int32 {
-	if x != nil {
-		return x.Page
-	}
-	return 0
-}
-
-func (x *GetMessageHistoryRequest) GetPageSize() int32 {
-	if x != nil {
-		return x.PageSize
-	}
-	return 0
-}
-
-// 消息信息
-type MessageInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                // 消息 ID
-	Role          string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`                             // 角色："user" 或 "assistant"
-	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                       // 消息内容
-	CreatedAt     int64                  `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // 创建时间戳（Unix时间戳，秒）
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *MessageInfo) Reset() {
-	*x = MessageInfo{}
-	mi := &file_agent_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MessageInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MessageInfo) ProtoMessage() {}
-
-func (x *MessageInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MessageInfo.ProtoReflect.Descriptor instead.
-func (*MessageInfo) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *MessageInfo) GetId() int64 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *MessageInfo) GetRole() string {
-	if x != nil {
-		return x.Role
-	}
-	return ""
-}
-
-func (x *MessageInfo) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-func (x *MessageInfo) GetCreatedAt() int64 {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return 0
-}
-
-// 获取消息历史响应
-type GetMessageHistoryResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // 会话 ID
-	Messages      []*MessageInfo         `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"`                    // 消息列表（按时间正序）
-	Total         int32                  `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`                         // 总消息数
-	Page          int32                  `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`                           // 当前页码
-	PageSize      int32                  `protobuf:"varint,5,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`   // 每页数量
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetMessageHistoryResponse) Reset() {
-	*x = GetMessageHistoryResponse{}
-	mi := &file_agent_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetMessageHistoryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetMessageHistoryResponse) ProtoMessage() {}
-
-func (x *GetMessageHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetMessageHistoryResponse.ProtoReflect.Descriptor instead.
-func (*GetMessageHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *GetMessageHistoryResponse) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
-func (x *GetMessageHistoryResponse) GetMessages() []*MessageInfo {
-	if x != nil {
-		return x.Messages
-	}
-	return nil
-}
-
-func (x *GetMessageHistoryResponse) GetTotal() int32 {
-	if x != nil {
-		return x.Total
-	}
-	return 0
-}
-
-func (x *GetMessageHistoryResponse) GetPage() int32 {
-	if x != nil {
-		return x.Page
-	}
-	return 0
-}
-
-func (x *GetMessageHistoryResponse) GetPageSize() int32 {
-	if x != nil {
-		return x.PageSize
-	}
-	return 0
-}
-
 var File_agent_proto protoreflect.FileDescriptor
 
 const file_agent_proto_rawDesc = "" +
 	"\n" +
-	"\vagent.proto\x12\x05agent\"\r\n" +
-	"\vPingRequest\"(\n" +
-	"\fPingResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"\xe8\x01\n" +
-	"\x12SendMessageRequest\x12\x1d\n" +
+	"\vagent.proto\x12\x05agent\"S\n" +
+	"\x19RecommendCompanionRequest\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\x12C\n" +
-	"\bmetadata\x18\x04 \x03(\v2'.agent.SendMessageRequest.MetadataEntryR\bmetadata\x1a;\n" +
-	"\rMetadataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"L\n" +
-	"\x13SendMessageResponse\x12\x1d\n" +
+	"user_input\x18\x01 \x01(\tR\tuserInput\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x04R\x06userId\"\xfb\x01\n" +
+	"\x17CompanionRecommendation\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x16\n" +
-	"\x06answer\x18\x02 \x01(\tR\x06answer\"a\n" +
-	"\x15GetSessionListRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x12\n" +
-	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\"\xa5\x01\n" +
-	"\vSessionInfo\x12\x1d\n" +
+	"game_skill\x18\x02 \x01(\tR\tgameSkill\x12\x16\n" +
+	"\x06gender\x18\x03 \x01(\tR\x06gender\x12\x10\n" +
+	"\x03age\x18\x04 \x01(\x05R\x03age\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\x12$\n" +
+	"\x0eprice_per_hour\x18\x06 \x01(\x03R\fpricePerHour\x12\x16\n" +
+	"\x06rating\x18\a \x01(\x01R\x06rating\x12\x1e\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1d\n" +
+	"similarity\x18\b \x01(\x01R\n" +
+	"similarity\"~\n" +
+	"\x1aRecommendCompanionResponse\x12>\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"companions\x18\x01 \x03(\v2\x1e.agent.CompanionRecommendationR\n" +
+	"companions\x12 \n" +
+	"\vexplanation\x18\x02 \x01(\tR\vexplanation\"\xe1\x01\n" +
+	"\x1dAddCompanionToVectorDBRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x16\n" +
+	"\x06gender\x18\x02 \x01(\tR\x06gender\x12\x10\n" +
+	"\x03age\x18\x03 \x01(\x05R\x03age\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x04 \x01(\x03R\tupdatedAt\x12#\n" +
-	"\rmessage_count\x18\x05 \x01(\x05R\fmessageCount\"\x8f\x01\n" +
-	"\x16GetSessionListResponse\x12.\n" +
-	"\bsessions\x18\x01 \x03(\v2\x12.agent.SessionInfoR\bsessions\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\x83\x01\n" +
-	"\x18GetMessageHistoryRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"j\n" +
-	"\vMessageInfo\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
-	"\x04role\x18\x02 \x01(\tR\x04role\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\x04 \x01(\x03R\tcreatedAt\"\xb1\x01\n" +
-	"\x19GetMessageHistoryResponse\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12.\n" +
-	"\bmessages\x18\x02 \x03(\v2\x12.agent.MessageInfoR\bmessages\x12\x14\n" +
-	"\x05total\x18\x03 \x01(\x05R\x05total\x12\x12\n" +
-	"\x04page\x18\x04 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x05 \x01(\x05R\bpageSize2\xa5\x02\n" +
-	"\x05Agent\x12/\n" +
-	"\x04Ping\x12\x12.agent.PingRequest\x1a\x13.agent.PingResponse\x12D\n" +
-	"\vSendMessage\x12\x19.agent.SendMessageRequest\x1a\x1a.agent.SendMessageResponse\x12M\n" +
-	"\x0eGetSessionList\x12\x1c.agent.GetSessionListRequest\x1a\x1d.agent.GetSessionListResponse\x12V\n" +
-	"\x11GetMessageHistory\x12\x1f.agent.GetMessageHistoryRequest\x1a .agent.GetMessageHistoryResponseB\tZ\a./agentb\x06proto3"
+	"game_skill\x18\x04 \x01(\tR\tgameSkill\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\x12$\n" +
+	"\x0eprice_per_hour\x18\x06 \x01(\x03R\fpricePerHour\x12\x16\n" +
+	"\x06rating\x18\a \x01(\x01R\x06rating\"w\n" +
+	"\x1eAddCompanionToVectorDBResponse\x12!\n" +
+	"\fcompanion_id\x18\x01 \x01(\x04R\vcompanionId\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage2\xc9\x01\n" +
+	"\x05Agent\x12Y\n" +
+	"\x12RecommendCompanion\x12 .agent.RecommendCompanionRequest\x1a!.agent.RecommendCompanionResponse\x12e\n" +
+	"\x16AddCompanionToVectorDB\x12$.agent.AddCompanionToVectorDBRequest\x1a%.agent.AddCompanionToVectorDBResponseB\tZ\a./agentb\x06proto3"
 
 var (
 	file_agent_proto_rawDescOnce sync.Once
@@ -722,37 +437,25 @@ func file_agent_proto_rawDescGZIP() []byte {
 	return file_agent_proto_rawDescData
 }
 
-var file_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_agent_proto_goTypes = []any{
-	(*PingRequest)(nil),               // 0: agent.PingRequest
-	(*PingResponse)(nil),              // 1: agent.PingResponse
-	(*SendMessageRequest)(nil),        // 2: agent.SendMessageRequest
-	(*SendMessageResponse)(nil),       // 3: agent.SendMessageResponse
-	(*GetSessionListRequest)(nil),     // 4: agent.GetSessionListRequest
-	(*SessionInfo)(nil),               // 5: agent.SessionInfo
-	(*GetSessionListResponse)(nil),    // 6: agent.GetSessionListResponse
-	(*GetMessageHistoryRequest)(nil),  // 7: agent.GetMessageHistoryRequest
-	(*MessageInfo)(nil),               // 8: agent.MessageInfo
-	(*GetMessageHistoryResponse)(nil), // 9: agent.GetMessageHistoryResponse
-	nil,                               // 10: agent.SendMessageRequest.MetadataEntry
+	(*RecommendCompanionRequest)(nil),      // 0: agent.RecommendCompanionRequest
+	(*CompanionRecommendation)(nil),        // 1: agent.CompanionRecommendation
+	(*RecommendCompanionResponse)(nil),     // 2: agent.RecommendCompanionResponse
+	(*AddCompanionToVectorDBRequest)(nil),  // 3: agent.AddCompanionToVectorDBRequest
+	(*AddCompanionToVectorDBResponse)(nil), // 4: agent.AddCompanionToVectorDBResponse
 }
 var file_agent_proto_depIdxs = []int32{
-	10, // 0: agent.SendMessageRequest.metadata:type_name -> agent.SendMessageRequest.MetadataEntry
-	5,  // 1: agent.GetSessionListResponse.sessions:type_name -> agent.SessionInfo
-	8,  // 2: agent.GetMessageHistoryResponse.messages:type_name -> agent.MessageInfo
-	0,  // 3: agent.Agent.Ping:input_type -> agent.PingRequest
-	2,  // 4: agent.Agent.SendMessage:input_type -> agent.SendMessageRequest
-	4,  // 5: agent.Agent.GetSessionList:input_type -> agent.GetSessionListRequest
-	7,  // 6: agent.Agent.GetMessageHistory:input_type -> agent.GetMessageHistoryRequest
-	1,  // 7: agent.Agent.Ping:output_type -> agent.PingResponse
-	3,  // 8: agent.Agent.SendMessage:output_type -> agent.SendMessageResponse
-	6,  // 9: agent.Agent.GetSessionList:output_type -> agent.GetSessionListResponse
-	9,  // 10: agent.Agent.GetMessageHistory:output_type -> agent.GetMessageHistoryResponse
-	7,  // [7:11] is the sub-list for method output_type
-	3,  // [3:7] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	1, // 0: agent.RecommendCompanionResponse.companions:type_name -> agent.CompanionRecommendation
+	0, // 1: agent.Agent.RecommendCompanion:input_type -> agent.RecommendCompanionRequest
+	3, // 2: agent.Agent.AddCompanionToVectorDB:input_type -> agent.AddCompanionToVectorDBRequest
+	2, // 3: agent.Agent.RecommendCompanion:output_type -> agent.RecommendCompanionResponse
+	4, // 4: agent.Agent.AddCompanionToVectorDB:output_type -> agent.AddCompanionToVectorDBResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_agent_proto_init() }
@@ -766,7 +469,7 @@ func file_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_proto_rawDesc), len(file_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

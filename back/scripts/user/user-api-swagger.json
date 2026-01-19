@@ -2,14 +2,36 @@
   "swagger": "2.0",
   "info": {
     "title": "用户服务 API",
-    "description": "用户相关的接口文档，包括注册、登录、用户信息管理、钱包和陪玩功能",
-    "version": "1.0.0"
+    "description": "用户相关的接口文档，包括注册、登录、用户信息管理、钱包和陪玩功能\n\n## 认证说明\n\n大部分接口需要 Bearer Token 认证，请在请求头中添加：\n```\nAuthorization: Bearer {accessToken}\n```\n\n## 错误响应格式\n\n所有错误响应都遵循统一格式：\n```json\n{\n  \"code\": 401,\n  \"msg\": \"错误信息\"\n}\n```\n\n## 角色说明\n\n- **1**: 老板（下单方）\n- **2**: 陪玩（服务提供方）\n- **3**: 管理员",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com"
+    }
   },
   "host": "api.example.com",
   "basePath": "/api",
   "schemes": ["http", "https"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
+  "tags": [
+    {
+      "name": "用户认证",
+      "description": "用户注册、登录、登出、刷新Token等认证相关接口"
+    },
+    {
+      "name": "用户信息",
+      "description": "用户信息查询和更新接口"
+    },
+    {
+      "name": "钱包",
+      "description": "帅币钱包相关接口"
+    },
+    {
+      "name": "陪玩信息",
+      "description": "陪玩信息查询、更新和列表接口"
+    }
+  ],
   "securityDefinitions": {
     "BearerAuth": {
       "type": "apiKey",
@@ -447,6 +469,18 @@
               }
             }
           },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "请求参数错误"
+              }
+            }
+          },
           "401": {
             "description": "Refresh Token无效或已过期",
             "schema": {
@@ -456,6 +490,18 @@
               "application/json": {
                 "code": 401,
                 "msg": "Refresh Token无效或已过期"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "刷新Token失败"
               }
             }
           }
@@ -564,7 +610,7 @@
       "get": {
         "tags": ["陪玩信息"],
         "summary": "获取陪玩信息",
-        "description": "获取当前用户的陪玩信息（需要登录）",
+        "description": "获取当前登录用户的陪玩信息（需要登录，仅陪玩角色）。返回完整的陪玩信息，包括游戏技能、价格、状态、评分、接单数、认证状态，以及用户的头像和简介。",
         "operationId": "getCompanionProfile",
         "security": [
           {
@@ -588,7 +634,9 @@
                   "status": 1,
                   "rating": 4.8,
                   "totalOrders": 128,
-                  "isVerified": true
+                  "isVerified": true,
+                  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                  "bio": "专业陪玩，技术过硬，带你上分！"
                 }
               }
             }
@@ -634,7 +682,7 @@
       "put": {
         "tags": ["陪玩信息"],
         "summary": "更新陪玩信息",
-        "description": "更新当前用户的陪玩信息（需要登录，仅陪玩角色）",
+        "description": "更新当前登录用户的陪玩信息（需要登录，仅陪玩角色）。可以更新游戏技能、每小时价格、在线状态。注意：头像和简介需要通过更新用户信息接口修改。",
         "operationId": "updateCompanionProfile",
         "security": [
           {
@@ -668,7 +716,9 @@
                   "status": 1,
                   "rating": 4.8,
                   "totalOrders": 128,
-                  "isVerified": true
+                  "isVerified": true,
+                  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                  "bio": "专业陪玩，技术过硬，带你上分！"
                 }
               }
             }
@@ -716,7 +766,7 @@
       "get": {
         "tags": ["陪玩信息"],
         "summary": "获取陪玩列表",
-        "description": "获取陪玩列表（公开接口，用于订单匹配）",
+        "description": "获取陪玩列表（公开接口，用于订单匹配）。支持多种筛选条件：游戏技能、价格区间、在线状态、认证状态等。返回结果包含陪玩的个人信息（头像、简介）和陪玩信息（技能、价格、评分等）。",
         "operationId": "getCompanionList",
         "parameters": [
           {
@@ -727,27 +777,34 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "游戏技能筛选"
+            "description": "游戏技能筛选（可传多个，如：gameSkills=王者荣耀&gameSkills=和平精英）",
+            "example": ["王者荣耀", "和平精英"]
           },
           {
             "name": "minPrice",
             "in": "query",
             "type": "integer",
             "format": "int64",
-            "description": "最低价格"
+            "description": "最低价格（帅币/小时）",
+            "minimum": 0,
+            "example": 10
           },
           {
             "name": "maxPrice",
             "in": "query",
             "type": "integer",
             "format": "int64",
-            "description": "最高价格"
+            "description": "最高价格（帅币/小时）",
+            "minimum": 0,
+            "example": 100
           },
           {
             "name": "status",
             "in": "query",
             "type": "integer",
-            "description": "状态筛选：0=离线, 1=在线, 2=忙碌（默认1）"
+            "description": "状态筛选：0=离线, 1=在线, 2=忙碌（默认1）",
+            "enum": [0, 1, 2],
+            "default": 1
           },
           {
             "name": "isVerified",
@@ -759,13 +816,20 @@
             "name": "page",
             "in": "query",
             "type": "integer",
-            "description": "页码（从1开始）"
+            "description": "页码（从1开始）",
+            "minimum": 1,
+            "default": 1,
+            "example": 1
           },
           {
             "name": "pageSize",
             "in": "query",
             "type": "integer",
-            "description": "每页数量"
+            "description": "每页数量（默认20）",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "example": 20
           }
         ],
         "responses": {
@@ -787,7 +851,9 @@
                       "status": 1,
                       "rating": 4.8,
                       "totalOrders": 128,
-                      "isVerified": true
+                      "isVerified": true,
+                      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                      "bio": "专业陪玩，技术过硬，带你上分！"
                     },
                     {
                       "userId": 3,
@@ -796,7 +862,9 @@
                       "status": 1,
                       "rating": 4.6,
                       "totalOrders": 95,
-                      "isVerified": true
+                      "isVerified": true,
+                      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000002",
+                      "bio": "游戏经验丰富，性格开朗，陪你一起游戏！"
                     }
                   ],
                   "total": 25,
@@ -1277,32 +1345,52 @@
         },
         "gameSkills": {
           "type": "string",
-          "description": "游戏技能列表（JSON格式）"
+          "description": "游戏技能列表（JSON格式）",
+          "example": "[\"王者荣耀\", \"和平精英\", \"原神\"]"
         },
         "pricePerHour": {
           "type": "integer",
           "format": "int64",
-          "description": "每小时价格（帅币）"
+          "description": "每小时价格（帅币）",
+          "example": 50
         },
         "status": {
           "type": "integer",
-          "description": "状态：0=离线, 1=在线, 2=忙碌"
+          "description": "状态：0=离线, 1=在线, 2=忙碌",
+          "enum": [0, 1, 2],
+          "example": 1
         },
         "rating": {
           "type": "number",
           "format": "double",
-          "description": "评分（0-5分）"
+          "description": "评分（0-5分）",
+          "minimum": 0,
+          "maximum": 5,
+          "example": 4.8
         },
         "totalOrders": {
           "type": "integer",
           "format": "int64",
-          "description": "总接单数"
+          "description": "总接单数",
+          "example": 128
         },
         "isVerified": {
           "type": "boolean",
-          "description": "是否认证"
+          "description": "是否认证",
+          "example": true
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "头像URL",
+          "example": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001"
+        },
+        "bio": {
+          "type": "string",
+          "description": "个人简介",
+          "example": "专业陪玩，技术过硬，带你上分！"
         }
-      }
+      },
+      "required": ["userId", "gameSkills", "pricePerHour", "status", "rating", "totalOrders", "isVerified"]
     },
     "GetCompanionProfileResponse": {
       "type": "object",

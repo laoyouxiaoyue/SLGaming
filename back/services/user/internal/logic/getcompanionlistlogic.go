@@ -61,17 +61,10 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 	}
 
 	// 游戏技能筛选
-	if len(in.GetGameSkills()) > 0 {
-		l.Infof("[GetCompanionList] game skills filter: %v", in.GetGameSkills())
-		// 这里简化处理，实际可能需要更复杂的 JSON 查询
-		// 如果 game_skills 是 JSON 数组，需要根据数据库类型使用不同的查询方式
-		// MySQL 可以使用 JSON_CONTAINS 或 JSON_SEARCH
-		for _, skill := range in.GetGameSkills() {
-			if skill != "" {
-				// 使用 LIKE 简单匹配（实际项目中建议使用 JSON 函数）
-				query = query.Where("companion_profiles.game_skills LIKE ?", "%"+skill+"%")
-			}
-		}
+	if gameSkill := strings.TrimSpace(in.GetGameSkill()); gameSkill != "" {
+		l.Infof("[GetCompanionList] game skill filter: %s", gameSkill)
+		// 匹配单个游戏技能
+		query = query.Where("companion_profiles.game_skills = ?", gameSkill)
 	}
 
 	// 获取总数

@@ -4,88 +4,54 @@ package agent;
 
 option go_package = "./agent";
 
-// 对话 Agent 服务
+// 陪玩推荐 Agent 服务
 service Agent {
-  // 健康检查
-  rpc Ping(PingRequest) returns (PingResponse);
+  // 根据用户输入推荐陪玩
+  rpc RecommendCompanion(RecommendCompanionRequest) returns (RecommendCompanionResponse);
 
-  // 发送用户消息，返回 Agent 回复
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-
-  // 获取会话列表
-  rpc GetSessionList(GetSessionListRequest) returns (GetSessionListResponse);
-
-  // 获取会话消息历史
-  rpc GetMessageHistory(GetMessageHistoryRequest) returns (GetMessageHistoryResponse);
+  // 添加陪玩信息到向量数据库
+  rpc AddCompanionToVectorDB(AddCompanionToVectorDBRequest) returns (AddCompanionToVectorDBResponse);
 }
 
-// 健康检查
-message PingRequest {}
-
-message PingResponse {
-  string message = 1; // 返回 "pong" 或自定义信息
+// 推荐陪玩请求
+message RecommendCompanionRequest {
+  string user_input = 1;  // 用户输入内容（如："我想要一个王者荣耀的陪玩"）
+  uint64 user_id    = 2;  // 用户ID（可选，用于个性化推荐）
 }
 
-// 发送消息请求
-message SendMessageRequest {
-  string session_id = 1;  // 会话 ID，客户端可复用；为空则服务端可生成
-  uint64 user_id    = 2;  // 业务用户 ID（用于权限/画像）
-  string content    = 3;  // 用户输入内容
-  map<string, string> metadata = 4; // 额外元数据（可选）
+// 陪玩推荐结果
+message CompanionRecommendation {
+  uint64 user_id       = 1;  // 陪玩用户ID
+  string game_skill    = 2;  // 游戏技能
+  string gender        = 3;  // 性别
+  int32  age           = 4;  // 年龄
+  string description   = 5;  // 描述
+  int64  price_per_hour = 6; // 每小时价格
+  double rating        = 7;  // 评分
+  double similarity    = 8;  // 相似度分数（0-1）
 }
 
-// 发送消息响应
-message SendMessageResponse {
-  string session_id = 1; // 确认会话 ID（如果服务端生成）
-  string answer     = 2; // Agent 的回复
+// 推荐陪玩响应
+message RecommendCompanionResponse {
+  repeated CompanionRecommendation companions = 1; // 推荐的陪玩列表
+  string explanation = 2; // 推荐理由说明
 }
 
-// 获取会话列表请求
-message GetSessionListRequest {
-  uint64 user_id = 1;     // 用户 ID
-  int32  page    = 2;     // 页码，从1开始
-  int32  page_size = 3;   // 每页数量，默认20
+// 添加陪玩信息到向量数据库请求
+message AddCompanionToVectorDBRequest {
+  uint64 user_id       = 1;  // 用户ID（必填）
+  string gender        = 2;  // 性别：male/female/other
+  int32  age           = 3;  // 年龄
+  string game_skill     = 4;  // 游戏技能（单个游戏名称）
+  string description    = 5;  // 陪玩描述文本（用于向量化）
+  int64  price_per_hour = 6; // 每小时价格（帅币）
+  double rating        = 7;  // 评分（0-5分）
 }
 
-// 会话信息
-message SessionInfo {
-  string session_id = 1;  // 会话 ID
-  string title      = 2;  // 会话标题（通常是第一条消息的摘要）
-  int64  created_at = 3;  // 创建时间戳（Unix时间戳，秒）
-  int64  updated_at = 4;  // 更新时间戳（Unix时间戳，秒）
-  int32  message_count = 5; // 消息数量
-}
-
-// 获取会话列表响应
-message GetSessionListResponse {
-  repeated SessionInfo sessions = 1; // 会话列表
-  int32 total = 2;                  // 总会话数
-  int32 page = 3;                   // 当前页码
-  int32 page_size = 4;             // 每页数量
-}
-
-// 获取消息历史请求
-message GetMessageHistoryRequest {
-  string session_id = 1;  // 会话 ID
-  uint64 user_id    = 2;  // 用户 ID（用于权限验证）
-  int32  page       = 3;  // 页码，从1开始（可选，用于分页加载）
-  int32  page_size  = 4;  // 每页数量，默认50（可选）
-}
-
-// 消息信息
-message MessageInfo {
-  int64  id         = 1;  // 消息 ID
-  string role       = 2;  // 角色："user" 或 "assistant"
-  string content    = 3;  // 消息内容
-  int64  created_at = 4;  // 创建时间戳（Unix时间戳，秒）
-}
-
-// 获取消息历史响应
-message GetMessageHistoryResponse {
-  string session_id = 1;           // 会话 ID
-  repeated MessageInfo messages = 2; // 消息列表（按时间正序）
-  int32 total = 3;                 // 总消息数
-  int32 page = 4;                  // 当前页码
-  int32 page_size = 5;            // 每页数量
+// 添加陪玩信息到向量数据库响应
+message AddCompanionToVectorDBResponse {
+  uint64 companion_id = 1;  // 陪玩ID（Milvus中的ID）
+  bool   success      = 2;  // 是否成功
+  string message      = 3;  // 提示信息
 }
 

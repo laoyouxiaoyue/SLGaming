@@ -80,8 +80,8 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(in *user.UpdateComp
 	// 更新字段
 	updates := map[string]any{}
 
-	if gameSkills := strings.TrimSpace(in.GetGameSkills()); gameSkills != "" {
-		updates["game_skills"] = gameSkills
+	if gameSkill := strings.TrimSpace(in.GetGameSkill()); gameSkill != "" {
+		updates["game_skills"] = gameSkill
 	}
 
 	if in.GetPricePerHour() > 0 {

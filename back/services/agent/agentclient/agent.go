@@ -14,26 +14,17 @@ import (
 )
 
 type (
-	GetMessageHistoryRequest  = agent.GetMessageHistoryRequest
-	GetMessageHistoryResponse = agent.GetMessageHistoryResponse
-	GetSessionListRequest     = agent.GetSessionListRequest
-	GetSessionListResponse    = agent.GetSessionListResponse
-	MessageInfo               = agent.MessageInfo
-	PingRequest               = agent.PingRequest
-	PingResponse              = agent.PingResponse
-	SendMessageRequest        = agent.SendMessageRequest
-	SendMessageResponse       = agent.SendMessageResponse
-	SessionInfo               = agent.SessionInfo
+	AddCompanionToVectorDBRequest  = agent.AddCompanionToVectorDBRequest
+	AddCompanionToVectorDBResponse = agent.AddCompanionToVectorDBResponse
+	CompanionRecommendation        = agent.CompanionRecommendation
+	RecommendCompanionRequest      = agent.RecommendCompanionRequest
+	RecommendCompanionResponse     = agent.RecommendCompanionResponse
 
 	Agent interface {
-		// 健康检查
-		Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-		// 发送用户消息，返回 Agent 回复
-		SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error)
-		// 获取会话列表
-		GetSessionList(ctx context.Context, in *GetSessionListRequest, opts ...grpc.CallOption) (*GetSessionListResponse, error)
-		// 获取会话消息历史
-		GetMessageHistory(ctx context.Context, in *GetMessageHistoryRequest, opts ...grpc.CallOption) (*GetMessageHistoryResponse, error)
+		// 根据用户输入推荐陪玩
+		RecommendCompanion(ctx context.Context, in *RecommendCompanionRequest, opts ...grpc.CallOption) (*RecommendCompanionResponse, error)
+		// 添加陪玩信息到向量数据库
+		AddCompanionToVectorDB(ctx context.Context, in *AddCompanionToVectorDBRequest, opts ...grpc.CallOption) (*AddCompanionToVectorDBResponse, error)
 	}
 
 	defaultAgent struct {
@@ -47,26 +38,14 @@ func NewAgent(cli zrpc.Client) Agent {
 	}
 }
 
-// 健康检查
-func (m *defaultAgent) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
+// 根据用户输入推荐陪玩
+func (m *defaultAgent) RecommendCompanion(ctx context.Context, in *RecommendCompanionRequest, opts ...grpc.CallOption) (*RecommendCompanionResponse, error) {
 	client := agent.NewAgentClient(m.cli.Conn())
-	return client.Ping(ctx, in, opts...)
+	return client.RecommendCompanion(ctx, in, opts...)
 }
 
-// 发送用户消息，返回 Agent 回复
-func (m *defaultAgent) SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error) {
+// 添加陪玩信息到向量数据库
+func (m *defaultAgent) AddCompanionToVectorDB(ctx context.Context, in *AddCompanionToVectorDBRequest, opts ...grpc.CallOption) (*AddCompanionToVectorDBResponse, error) {
 	client := agent.NewAgentClient(m.cli.Conn())
-	return client.SendMessage(ctx, in, opts...)
-}
-
-// 获取会话列表
-func (m *defaultAgent) GetSessionList(ctx context.Context, in *GetSessionListRequest, opts ...grpc.CallOption) (*GetSessionListResponse, error) {
-	client := agent.NewAgentClient(m.cli.Conn())
-	return client.GetSessionList(ctx, in, opts...)
-}
-
-// 获取会话消息历史
-func (m *defaultAgent) GetMessageHistory(ctx context.Context, in *GetMessageHistoryRequest, opts ...grpc.CallOption) (*GetMessageHistoryResponse, error) {
-	client := agent.NewAgentClient(m.cli.Conn())
-	return client.GetMessageHistory(ctx, in, opts...)
+	return client.AddCompanionToVectorDB(ctx, in, opts...)
 }

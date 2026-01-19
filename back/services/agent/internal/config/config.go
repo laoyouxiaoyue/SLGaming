@@ -29,8 +29,10 @@ type ConsulServiceConf struct {
 
 // LLMConf 大模型配置
 type LLMConf struct {
-	APIKey string `json:",optional"` // API Key，用于调用大模型服务
-	Model  string `json:",optional"` // 模型名称，如 "gpt-4", "gpt-3.5-turbo", "claude-3", "qwen-plus" 等
+	APIKey     string `json:",optional"` // API Key，用于调用大模型服务
+	Model      string `json:",optional"` // 嵌入模型名称，如 "text-embedding-v4"
+	ChatModel  string `json:",optional"` // 对话模型名称，用于格式化过滤条件，如 "qwen-plus", "qwen-turbo" 等
+	ChatAPIKey string `json:",optional"` // 对话模型 API Key（如果与嵌入模型不同）
 }
 
 // MilvusConf Milvus 向量数据库配置

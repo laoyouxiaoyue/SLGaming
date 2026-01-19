@@ -19,26 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Agent_Ping_FullMethodName              = "/agent.Agent/Ping"
-	Agent_SendMessage_FullMethodName       = "/agent.Agent/SendMessage"
-	Agent_GetSessionList_FullMethodName    = "/agent.Agent/GetSessionList"
-	Agent_GetMessageHistory_FullMethodName = "/agent.Agent/GetMessageHistory"
+	Agent_RecommendCompanion_FullMethodName     = "/agent.Agent/RecommendCompanion"
+	Agent_AddCompanionToVectorDB_FullMethodName = "/agent.Agent/AddCompanionToVectorDB"
 )
 
 // AgentClient is the client API for Agent service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// 对话 Agent 服务
+// 陪玩推荐 Agent 服务
 type AgentClient interface {
-	// 健康检查
-	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	// 发送用户消息，返回 Agent 回复
-	SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error)
-	// 获取会话列表
-	GetSessionList(ctx context.Context, in *GetSessionListRequest, opts ...grpc.CallOption) (*GetSessionListResponse, error)
-	// 获取会话消息历史
-	GetMessageHistory(ctx context.Context, in *GetMessageHistoryRequest, opts ...grpc.CallOption) (*GetMessageHistoryResponse, error)
+	// 根据用户输入推荐陪玩
+	RecommendCompanion(ctx context.Context, in *RecommendCompanionRequest, opts ...grpc.CallOption) (*RecommendCompanionResponse, error)
+	// 添加陪玩信息到向量数据库
+	AddCompanionToVectorDB(ctx context.Context, in *AddCompanionToVectorDBRequest, opts ...grpc.CallOption) (*AddCompanionToVectorDBResponse, error)
 }
 
 type agentClient struct {
@@ -49,40 +43,20 @@ func NewAgentClient(cc grpc.ClientConnInterface) AgentClient {
 	return &agentClient{cc}
 }
 
-func (c *agentClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
+func (c *agentClient) RecommendCompanion(ctx context.Context, in *RecommendCompanionRequest, opts ...grpc.CallOption) (*RecommendCompanionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PingResponse)
-	err := c.cc.Invoke(ctx, Agent_Ping_FullMethodName, in, out, cOpts...)
+	out := new(RecommendCompanionResponse)
+	err := c.cc.Invoke(ctx, Agent_RecommendCompanion_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error) {
+func (c *agentClient) AddCompanionToVectorDB(ctx context.Context, in *AddCompanionToVectorDBRequest, opts ...grpc.CallOption) (*AddCompanionToVectorDBResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SendMessageResponse)
-	err := c.cc.Invoke(ctx, Agent_SendMessage_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentClient) GetSessionList(ctx context.Context, in *GetSessionListRequest, opts ...grpc.CallOption) (*GetSessionListResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetSessionListResponse)
-	err := c.cc.Invoke(ctx, Agent_GetSessionList_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentClient) GetMessageHistory(ctx context.Context, in *GetMessageHistoryRequest, opts ...grpc.CallOption) (*GetMessageHistoryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetMessageHistoryResponse)
-	err := c.cc.Invoke(ctx, Agent_GetMessageHistory_FullMethodName, in, out, cOpts...)
+	out := new(AddCompanionToVectorDBResponse)
+	err := c.cc.Invoke(ctx, Agent_AddCompanionToVectorDB_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -93,16 +67,12 @@ func (c *agentClient) GetMessageHistory(ctx context.Context, in *GetMessageHisto
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility.
 //
-// 对话 Agent 服务
+// 陪玩推荐 Agent 服务
 type AgentServer interface {
-	// 健康检查
-	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	// 发送用户消息，返回 Agent 回复
-	SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error)
-	// 获取会话列表
-	GetSessionList(context.Context, *GetSessionListRequest) (*GetSessionListResponse, error)
-	// 获取会话消息历史
-	GetMessageHistory(context.Context, *GetMessageHistoryRequest) (*GetMessageHistoryResponse, error)
+	// 根据用户输入推荐陪玩
+	RecommendCompanion(context.Context, *RecommendCompanionRequest) (*RecommendCompanionResponse, error)
+	// 添加陪玩信息到向量数据库
+	AddCompanionToVectorDB(context.Context, *AddCompanionToVectorDBRequest) (*AddCompanionToVectorDBResponse, error)
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -113,17 +83,11 @@ type AgentServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAgentServer struct{}
 
-func (UnimplementedAgentServer) Ping(context.Context, *PingRequest) (*PingResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Ping not implemented")
+func (UnimplementedAgentServer) RecommendCompanion(context.Context, *RecommendCompanionRequest) (*RecommendCompanionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecommendCompanion not implemented")
 }
-func (UnimplementedAgentServer) SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method SendMessage not implemented")
-}
-func (UnimplementedAgentServer) GetSessionList(context.Context, *GetSessionListRequest) (*GetSessionListResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetSessionList not implemented")
-}
-func (UnimplementedAgentServer) GetMessageHistory(context.Context, *GetMessageHistoryRequest) (*GetMessageHistoryResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetMessageHistory not implemented")
+func (UnimplementedAgentServer) AddCompanionToVectorDB(context.Context, *AddCompanionToVectorDBRequest) (*AddCompanionToVectorDBResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AddCompanionToVectorDB not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 func (UnimplementedAgentServer) testEmbeddedByValue()               {}
@@ -146,74 +110,38 @@ func RegisterAgentServer(s grpc.ServiceRegistrar, srv AgentServer) {
 	s.RegisterService(&Agent_ServiceDesc, srv)
 }
 
-func _Agent_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PingRequest)
+func _Agent_RecommendCompanion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecommendCompanionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).Ping(ctx, in)
+		return srv.(AgentServer).RecommendCompanion(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Agent_Ping_FullMethodName,
+		FullMethod: Agent_RecommendCompanion_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).Ping(ctx, req.(*PingRequest))
+		return srv.(AgentServer).RecommendCompanion(ctx, req.(*RecommendCompanionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SendMessageRequest)
+func _Agent_AddCompanionToVectorDB_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCompanionToVectorDBRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).SendMessage(ctx, in)
+		return srv.(AgentServer).AddCompanionToVectorDB(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Agent_SendMessage_FullMethodName,
+		FullMethod: Agent_AddCompanionToVectorDB_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).SendMessage(ctx, req.(*SendMessageRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Agent_GetSessionList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSessionListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServer).GetSessionList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Agent_GetSessionList_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).GetSessionList(ctx, req.(*GetSessionListRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Agent_GetMessageHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetMessageHistoryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServer).GetMessageHistory(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Agent_GetMessageHistory_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).GetMessageHistory(ctx, req.(*GetMessageHistoryRequest))
+		return srv.(AgentServer).AddCompanionToVectorDB(ctx, req.(*AddCompanionToVectorDBRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -226,20 +154,12 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AgentServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Ping",
-			Handler:    _Agent_Ping_Handler,
+			MethodName: "RecommendCompanion",
+			Handler:    _Agent_RecommendCompanion_Handler,
 		},
 		{
-			MethodName: "SendMessage",
-			Handler:    _Agent_SendMessage_Handler,
-		},
-		{
-			MethodName: "GetSessionList",
-			Handler:    _Agent_GetSessionList_Handler,
-		},
-		{
-			MethodName: "GetMessageHistory",
-			Handler:    _Agent_GetMessageHistory_Handler,
+			MethodName: "AddCompanionToVectorDB",
+			Handler:    _Agent_AddCompanionToVectorDB_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

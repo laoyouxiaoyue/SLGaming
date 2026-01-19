@@ -29,7 +29,7 @@ type CancelOrderResponse struct {
 
 type CompanionInfo struct {
 	UserId       uint64  `json:"userId"`       // 用户ID
-	GameSkills   string  `json:"gameSkills"`   // 游戏技能列表（JSON格式）
+	GameSkill    string  `json:"gameSkill"`    // 游戏技能（单个游戏名称）
 	PricePerHour int64   `json:"pricePerHour"` // 每小时价格（帅币）
 	Status       int     `json:"status"`       // 状态：0=离线, 1=在线, 2=忙碌
 	Rating       float64 `json:"rating"`       // 评分（0-5分）
@@ -79,13 +79,13 @@ type GetCompanionListData struct {
 }
 
 type GetCompanionListRequest struct {
-	GameSkills []string `form:"gameSkills,optional"` // 游戏技能筛选
-	MinPrice   int      `form:"minPrice,optional"`   // 最低价格
-	MaxPrice   int      `form:"maxPrice,optional"`   // 最高价格
-	Status     int      `form:"status,optional"`     // 状态筛选：0=离线, 1=在线, 2=忙碌（默认1）
-	IsVerified bool     `form:"isVerified,optional"` // 是否只返回认证陪玩
-	Page       int      `form:"page,optional"`       // 页码（从1开始）
-	PageSize   int      `form:"pageSize,optional"`   // 每页数量
+	GameSkill  string `form:"gameSkill,optional"`  // 游戏技能筛选（单个游戏名称）
+	MinPrice   int    `form:"minPrice,optional"`   // 最低价格
+	MaxPrice   int    `form:"maxPrice,optional"`   // 最高价格
+	Status     int    `form:"status,optional"`     // 状态筛选：0=离线, 1=在线, 2=忙碌（默认1）
+	IsVerified bool   `form:"isVerified,optional"` // 是否只返回认证陪玩
+	Page       int    `form:"page,optional"`       // 页码（从1开始）
+	PageSize   int    `form:"pageSize,optional"`   // 每页数量
 }
 
 type GetCompanionListResponse struct {
@@ -266,7 +266,7 @@ type StartOrderResponse struct {
 }
 
 type UpdateCompanionProfileRequest struct {
-	GameSkills   string `json:"gameSkills,optional"`   // 游戏技能列表（JSON格式）
+	GameSkill    string `json:"gameSkill,optional"`    // 游戏技能（单个游戏名称）
 	PricePerHour int64  `json:"pricePerHour,optional"` // 每小时价格（帅币）
 	Status       int    `json:"status,optional"`       // 状态：0=离线, 1=在线, 2=忙碌
 }

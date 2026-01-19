@@ -1157,7 +1157,7 @@ func (x *ConsumeResponse) GetWallet() *WalletInfo {
 type CompanionInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                     // 用户ID
-	GameSkills    string                 `protobuf:"bytes,2,opt,name=game_skills,json=gameSkills,proto3" json:"game_skills,omitempty"`          // 游戏技能列表（JSON格式）
+	GameSkill     string                 `protobuf:"bytes,2,opt,name=game_skill,json=gameSkill,proto3" json:"game_skill,omitempty"`             // 游戏技能（单个游戏名称）
 	PricePerHour  int64                  `protobuf:"varint,3,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"` // 每小时价格（帅币）
 	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                                   // 状态：0=离线, 1=在线, 2=忙碌
 	Rating        float64                `protobuf:"fixed64,5,opt,name=rating,proto3" json:"rating,omitempty"`                                  // 评分（0-5分）
@@ -1206,9 +1206,9 @@ func (x *CompanionInfo) GetUserId() uint64 {
 	return 0
 }
 
-func (x *CompanionInfo) GetGameSkills() string {
+func (x *CompanionInfo) GetGameSkill() string {
 	if x != nil {
-		return x.GameSkills
+		return x.GameSkill
 	}
 	return ""
 }
@@ -1355,7 +1355,7 @@ func (x *GetCompanionProfileResponse) GetProfile() *CompanionInfo {
 type UpdateCompanionProfileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                     // 用户ID（必填）
-	GameSkills    string                 `protobuf:"bytes,2,opt,name=game_skills,json=gameSkills,proto3" json:"game_skills,omitempty"`          // 可选，游戏技能列表（JSON格式）
+	GameSkill     string                 `protobuf:"bytes,2,opt,name=game_skill,json=gameSkill,proto3" json:"game_skill,omitempty"`             // 可选，游戏技能（单个游戏名称）
 	PricePerHour  int64                  `protobuf:"varint,3,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"` // 可选，每小时价格（帅币）
 	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                                   // 可选，状态：0=离线, 1=在线, 2=忙碌
 	unknownFields protoimpl.UnknownFields
@@ -1399,9 +1399,9 @@ func (x *UpdateCompanionProfileRequest) GetUserId() uint64 {
 	return 0
 }
 
-func (x *UpdateCompanionProfileRequest) GetGameSkills() string {
+func (x *UpdateCompanionProfileRequest) GetGameSkill() string {
 	if x != nil {
-		return x.GameSkills
+		return x.GameSkill
 	}
 	return ""
 }
@@ -1572,7 +1572,7 @@ func (x *UpdateCompanionStatsResponse) GetProfile() *CompanionInfo {
 // 获取陪玩列表（用于订单匹配）
 type GetCompanionListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	GameSkills    []string               `protobuf:"bytes,1,rep,name=game_skills,json=gameSkills,proto3" json:"game_skills,omitempty"`  // 可选，游戏技能筛选
+	GameSkill     string                 `protobuf:"bytes,1,opt,name=game_skill,json=gameSkill,proto3" json:"game_skill,omitempty"`     // 可选，游戏技能筛选（单个游戏名称）
 	MinPrice      int32                  `protobuf:"varint,2,opt,name=min_price,json=minPrice,proto3" json:"min_price,omitempty"`       // 可选，最低价格
 	MaxPrice      int32                  `protobuf:"varint,3,opt,name=max_price,json=maxPrice,proto3" json:"max_price,omitempty"`       // 可选，最高价格
 	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`                           // 可选，状态筛选：0=离线, 1=在线, 2=忙碌（默认只返回在线）
@@ -1613,11 +1613,11 @@ func (*GetCompanionListRequest) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{27}
 }
 
-func (x *GetCompanionListRequest) GetGameSkills() []string {
+func (x *GetCompanionListRequest) GetGameSkill() string {
 	if x != nil {
-		return x.GameSkills
+		return x.GameSkill
 	}
-	return nil
+	return ""
 }
 
 func (x *GetCompanionListRequest) GetMinPrice() int32 {
@@ -2146,11 +2146,11 @@ const file_user_proto_rawDesc = "" +
 	"bizOrderId\x12\x16\n" +
 	"\x06remark\x18\x04 \x01(\tR\x06remark\";\n" +
 	"\x0fConsumeResponse\x12(\n" +
-	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet\"\x94\x02\n" +
+	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet\"\x92\x02\n" +
 	"\rCompanionInfo\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1f\n" +
-	"\vgame_skills\x18\x02 \x01(\tR\n" +
-	"gameSkills\x12$\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
+	"\n" +
+	"game_skill\x18\x02 \x01(\tR\tgameSkill\x12$\n" +
 	"\x0eprice_per_hour\x18\x03 \x01(\x03R\fpricePerHour\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x16\n" +
 	"\x06rating\x18\x05 \x01(\x01R\x06rating\x12!\n" +
@@ -2163,11 +2163,11 @@ const file_user_proto_rawDesc = "" +
 	"\x1aGetCompanionProfileRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\"L\n" +
 	"\x1bGetCompanionProfileResponse\x12-\n" +
-	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"\x97\x01\n" +
+	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"\x95\x01\n" +
 	"\x1dUpdateCompanionProfileRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1f\n" +
-	"\vgame_skills\x18\x02 \x01(\tR\n" +
-	"gameSkills\x12$\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
+	"\n" +
+	"game_skill\x18\x02 \x01(\tR\tgameSkill\x12$\n" +
 	"\x0eprice_per_hour\x18\x03 \x01(\x03R\fpricePerHour\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\x05R\x06status\"O\n" +
 	"\x1eUpdateCompanionProfileResponse\x12-\n" +
@@ -2178,10 +2178,10 @@ const file_user_proto_rawDesc = "" +
 	"\n" +
 	"new_rating\x18\x03 \x01(\x01R\tnewRating\"M\n" +
 	"\x1cUpdateCompanionStatsResponse\x12-\n" +
-	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"\xde\x01\n" +
-	"\x17GetCompanionListRequest\x12\x1f\n" +
-	"\vgame_skills\x18\x01 \x03(\tR\n" +
-	"gameSkills\x12\x1b\n" +
+	"\aprofile\x18\x01 \x01(\v2\x13.user.CompanionInfoR\aprofile\"\xdc\x01\n" +
+	"\x17GetCompanionListRequest\x12\x1d\n" +
+	"\n" +
+	"game_skill\x18\x01 \x01(\tR\tgameSkill\x12\x1b\n" +
 	"\tmin_price\x18\x02 \x01(\x05R\bminPrice\x12\x1b\n" +
 	"\tmax_price\x18\x03 \x01(\x05R\bmaxPrice\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x1f\n" +

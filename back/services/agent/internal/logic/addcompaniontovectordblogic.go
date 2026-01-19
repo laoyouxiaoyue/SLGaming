@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"time"
 
 	"SLGaming/back/services/agent/agent"
 	"SLGaming/back/services/agent/internal/svc"
 
-	"github.com/cloudwego/eino-ext/components/embedding/ark"
-	"github.com/cloudwego/eino-ext/components/indexer/milvus"
-	"github.com/cloudwego/eino/schema"
+	"SLGaming/back/services/agent/internal/embedder"
+
 	"github.com/milvus-io/milvus-sdk-go/v2/entity"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -54,6 +52,33 @@ func (l *AddCompanionToVectorDBLogic) AddCompanionToVectorDB(in *agent.AddCompan
 		}, fmt.Errorf("llm config incomplete")
 	}
 
+	// 初始化自定义 DashScope 嵌入器
+	emb, err := embedder.NewDashScopeEmbedder(l.ctx, cfg.LLM.APIKey, cfg.LLM.Model)
+	if err != nil {
+		l.Errorf("create dashscope embedder failed: %v", err)
+		return &agent.AddCompanionToVectorDBResponse{
+			Success: false,
+			Message: fmt.Sprintf("创建 DashScope 嵌入器失败: %v", err),
+		}, err
+	}
+
+	// 对描述文本进行向量化
+	vectors, err := emb.EmbedStrings(l.ctx, []string{in.Description})
+	if err != nil {
+		l.Errorf("embedding failed: %v", err)
+		return &agent.AddCompanionToVectorDBResponse{
+			Success: false,
+			Message: fmt.Sprintf("向量化失败: %v", err),
+		}, err
+	}
+
+	if len(vectors) == 0 || len(vectors[0]) == 0 {
+		return &agent.AddCompanionToVectorDBResponse{
+			Success: false,
+			Message: "向量化结果为空",
+		}, fmt.Errorf("empty embedding result")
+	}
+
 	// 确保 Collection 存在
 	if err := l.ensureCollection(); err != nil {
 		l.Errorf("ensure collection failed: %v", err)
@@ -63,173 +88,50 @@ func (l *AddCompanionToVectorDBLogic) AddCompanionToVectorDB(in *agent.AddCompan
 		}, err
 	}
 
-	// 初始化嵌入器
-	timeout := 30 * time.Second
-	embedder, err := ark.NewEmbedder(l.ctx, &ark.EmbeddingConfig{
-		APIKey:  cfg.LLM.APIKey,
-		Model:   cfg.LLM.Model,
-		Timeout: &timeout,
-	})
+	// 将 float64 向量转换为 BinaryVector
+	vectorBytes := l.float64ToBinaryVector(vectors[0])
+
+	// 准备插入数据（id 字段由 Milvus 自动生成，不传入）
+	gender := l.genderToInt16(in.Gender)
+	age := int16(in.Age)
+	pricePerHour := int16(in.PricePerHour)
+	rating := float32(in.Rating)
+
+	data := []entity.Column{
+		entity.NewColumnBinaryVector("vector", vectorDim, [][]byte{vectorBytes}),
+		entity.NewColumnInt64("companion_id", []int64{int64(in.UserId)}),
+		entity.NewColumnInt16("gender", []int16{gender}),
+		entity.NewColumnFloat("rating", []float32{rating}),
+		entity.NewColumnInt16("age", []int16{age}),
+		entity.NewColumnVarChar("game", []string{in.GameSkill}),
+		entity.NewColumnVarChar("description", []string{in.Description}),
+		entity.NewColumnInt16("price_per_hour", []int16{pricePerHour}),
+	}
+
+	// 插入数据（id 字段由 Milvus 自动生成）
+	_, err = l.svcCtx.MilvusClient.Insert(l.ctx, collectionName, "", data...)
 	if err != nil {
-		l.Errorf("create embedder failed: %v", err)
+		l.Errorf("insert data failed: %v", err)
 		return &agent.AddCompanionToVectorDBResponse{
 			Success: false,
-			Message: fmt.Sprintf("创建嵌入器失败: %v", err),
+			Message: fmt.Sprintf("插入数据失败: %v", err),
 		}, err
 	}
 
-	// 定义 Collection 字段
-	fields := l.getCollectionFields()
-
-	// 创建 Indexer
-	indexer, err := milvus.NewIndexer(l.ctx, &milvus.IndexerConfig{
-		Client:            l.svcCtx.MilvusClient,
-		Collection:        collectionName,
-		Fields:            fields,
-		Embedding:         embedder,
-		DocumentConverter: l.companionDocumentConverter,
-	})
+	// 刷新数据，确保立即可查询
+	err = l.svcCtx.MilvusClient.Flush(l.ctx, collectionName, false)
 	if err != nil {
-		l.Errorf("create indexer failed: %v", err)
-		return &agent.AddCompanionToVectorDBResponse{
-			Success: false,
-			Message: fmt.Sprintf("创建索引器失败: %v", err),
-		}, err
+		l.Errorf("flush collection failed: %v", err)
 	}
 
-	// 创建 Document
-	doc := &schema.Document{
-		ID:      strconv.FormatUint(in.UserId, 10), // 使用 user_id 作为文档 ID
-		Content: in.Description,                    // 描述文本用于向量化
-		MetaData: map[string]any{
-			"user_id":        in.UserId,
-			"companion_id":   int16(in.UserId), // 转换为 Int16
-			"gender":         l.genderToInt16(in.Gender),
-			"age":            int16(in.Age),
-			"game":           in.GameSkill,
-			"description":    in.Description,
-			"price_per_hour": int16(in.PricePerHour),
-			"rating":         in.Rating,
-		},
-	}
-
-	// 使用 indexer.Store 存储文档
-	ids, err := indexer.Store(l.ctx, []*schema.Document{doc})
-	if err != nil {
-		l.Errorf("store document failed: %v", err)
-		return &agent.AddCompanionToVectorDBResponse{
-			Success: false,
-			Message: fmt.Sprintf("存储文档失败: %v", err),
-		}, err
-	}
-
-	if len(ids) == 0 {
-		return &agent.AddCompanionToVectorDBResponse{
-			Success: false,
-			Message: "存储失败，未返回 ID",
-		}, fmt.Errorf("no id returned")
-	}
-
-	// 解析返回的 ID
-	companionID := uint64(in.UserId)
-	if idStr := ids[0]; idStr != "" {
-		if id, err := strconv.ParseUint(idStr, 10, 64); err == nil {
-			companionID = id
-		}
-	}
-
-	l.Infof("成功存储陪玩信息到向量数据库, id=%s, companion_id=%d", ids[0], companionID)
+	companionIDUint := uint64(in.UserId)
+	l.Infof("成功存储陪玩信息到向量数据库, companion_id=%d (user_id)", companionIDUint)
 
 	return &agent.AddCompanionToVectorDBResponse{
-		CompanionId: companionID,
+		CompanionId: companionIDUint, // 返回 UserID 作为 companion_id
 		Success:     true,
 		Message:     "成功添加陪玩信息到向量数据库",
 	}, nil
-}
-
-// companionDocumentConverter 将 Document 转换为 Milvus 数据格式
-// 注意：indexer 会自动处理向量嵌入，这里只需要转换元数据
-func (l *AddCompanionToVectorDBLogic) companionDocumentConverter(ctx context.Context, docs []*schema.Document, vectors [][]float64) ([]interface{}, error) {
-	if len(docs) == 0 {
-		return nil, fmt.Errorf("empty documents")
-	}
-
-	results := make([]interface{}, len(docs))
-	for i, doc := range docs {
-		// 解析元数据
-		userID, ok := doc.MetaData["user_id"].(uint64)
-		if !ok {
-			if idFloat, ok := doc.MetaData["user_id"].(float64); ok {
-				userID = uint64(idFloat)
-			} else {
-				return nil, fmt.Errorf("invalid user_id in metadata")
-			}
-		}
-
-		companionID, _ := doc.MetaData["companion_id"].(int16)
-		if companionID == 0 {
-			if idFloat, ok := doc.MetaData["companion_id"].(float64); ok {
-				companionID = int16(idFloat)
-			}
-		}
-
-		gender, _ := doc.MetaData["gender"].(int16)
-		if gender == 0 {
-			if genderFloat, ok := doc.MetaData["gender"].(float64); ok {
-				gender = int16(genderFloat)
-			}
-		}
-
-		age, _ := doc.MetaData["age"].(int16)
-		if age == 0 {
-			if ageFloat, ok := doc.MetaData["age"].(float64); ok {
-				age = int16(ageFloat)
-			}
-		}
-
-		game, _ := doc.MetaData["game"].(string)
-		description, _ := doc.MetaData["description"].(string)
-		if description == "" {
-			description = doc.Content
-		}
-
-		pricePerHour, _ := doc.MetaData["price_per_hour"].(int16)
-		if pricePerHour == 0 {
-			if priceFloat, ok := doc.MetaData["price_per_hour"].(float64); ok {
-				pricePerHour = int16(priceFloat)
-			}
-		}
-
-		rating, _ := doc.MetaData["rating"].(float64)
-		if rating == 0 {
-			if ratingFloat, ok := doc.MetaData["rating"].(float32); ok {
-				rating = float64(ratingFloat)
-			}
-		}
-
-		// 将 float64 向量转换为 BinaryVector
-		var vectorBytes []byte
-		if i < len(vectors) && len(vectors[i]) > 0 {
-			vectorBytes = l.float64ToBinaryVector(vectors[i])
-		}
-
-		// 构建返回的数据结构（根据 Milvus 表结构）
-		result := map[string]interface{}{
-			"id":             int64(userID),
-			"vector":         vectorBytes,
-			"companion_id":   companionID,
-			"gender":         gender,
-			"rating":         float32(rating),
-			"age":            age,
-			"game":           game,
-			"description":    description,
-			"price_per_hour": pricePerHour,
-		}
-
-		results[i] = result
-	}
-
-	return results, nil
 }
 
 // float64ToBinaryVector 将 float64 向量转换为 BinaryVector (byte 数组)
@@ -279,6 +181,8 @@ func (l *AddCompanionToVectorDBLogic) ensureCollection() error {
 	}
 
 	if has {
+		// 如果 Collection 已存在，先尝试使用
+		// 如果后续插入时出现字段不匹配错误，可以手动删除 Collection 重新创建
 		l.Infof("Collection %s already exists", collectionName)
 		return nil
 	}
@@ -288,7 +192,7 @@ func (l *AddCompanionToVectorDBLogic) ensureCollection() error {
 	schema := &entity.Schema{
 		CollectionName: collectionName,
 		Description:    "Companion information collection for recommendation service",
-		AutoID:         false,
+		AutoID:         true, // id 字段自动生成
 		Fields:         fields,
 	}
 
@@ -300,8 +204,9 @@ func (l *AddCompanionToVectorDBLogic) ensureCollection() error {
 
 	l.Infof("Collection %s created successfully", collectionName)
 
-	// 创建索引（BinaryVector 使用 BIN_FLAT 或 BIN_IVF_FLAT）
-	index, err := entity.NewIndexBinFlat(entity.HAMMING, 0)
+	// 创建索引（BinaryVector 使用 BIN_FLAT）
+	// BIN_FLAT 的 nlist 参数对于 FLAT 索引会被忽略，但必须提供有效值 [1, 65536]
+	index, err := entity.NewIndexBinFlat(entity.HAMMING, 1024)
 	if err != nil {
 		return fmt.Errorf("create index failed: %w", err)
 	}
@@ -322,7 +227,7 @@ func (l *AddCompanionToVectorDBLogic) getCollectionFields() []*entity.Field {
 			Name:       "id",
 			DataType:   entity.FieldTypeInt64,
 			PrimaryKey: true,
-			AutoID:     false,
+			AutoID:     true, // id 字段自动生成
 		},
 		{
 			Name:     "vector",
@@ -333,7 +238,7 @@ func (l *AddCompanionToVectorDBLogic) getCollectionFields() []*entity.Field {
 		},
 		{
 			Name:     "companion_id",
-			DataType: entity.FieldTypeInt16,
+			DataType: entity.FieldTypeInt64, // 存储 UserID，使用 Int64
 		},
 		{
 			Name:     "gender",

@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"sync"
+	"time"
 
 	"SLGaming/back/services/agent/internal/config"
 	"SLGaming/back/services/agent/internal/ioc"
@@ -22,9 +23,12 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		config: c,
 	}
 
-	// 初始化 Milvus 客户端（如果配置了）
+	// 初始化 Milvus 客户端和 Indexer（如果配置了）
 	if c.Milvus.Address != "" {
-		milvusClient, err := ioc.InitMilvus(context.Background(), c.Milvus)
+		// 使用带超时的 context，避免阻塞启动
+		initCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		milvusClient, err := ioc.InitMilvus(initCtx, c.Milvus)
 		if err != nil {
 			logx.Errorf("init milvus failed: %v", err)
 		} else {

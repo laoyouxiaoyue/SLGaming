@@ -62,7 +62,7 @@ func ToCompanionInfoWithUser(p *model.CompanionProfile, u *model.User) *user.Com
 	}
 	info := &user.CompanionInfo{
 		UserId:       p.UserID,
-		GameSkills:   p.GameSkills,
+		GameSkill:    p.GameSkills,
 		PricePerHour: p.PricePerHour,
 		Status:       int32(p.Status),
 		Rating:       p.Rating,

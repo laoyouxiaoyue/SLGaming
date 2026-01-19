@@ -23,26 +23,14 @@ func NewAgentServer(svcCtx *svc.ServiceContext) *AgentServer {
 	}
 }
 
-// 健康检查
-func (s *AgentServer) Ping(ctx context.Context, in *agent.PingRequest) (*agent.PingResponse, error) {
-	l := logic.NewPingLogic(ctx, s.svcCtx)
-	return l.Ping(in)
+// 根据用户输入推荐陪玩
+func (s *AgentServer) RecommendCompanion(ctx context.Context, in *agent.RecommendCompanionRequest) (*agent.RecommendCompanionResponse, error) {
+	l := logic.NewRecommendCompanionLogic(ctx, s.svcCtx)
+	return l.RecommendCompanion(in)
 }
 
-// 发送用户消息，返回 Agent 回复
-func (s *AgentServer) SendMessage(ctx context.Context, in *agent.SendMessageRequest) (*agent.SendMessageResponse, error) {
-	l := logic.NewSendMessageLogic(ctx, s.svcCtx)
-	return l.SendMessage(in)
-}
-
-// 获取会话列表
-func (s *AgentServer) GetSessionList(ctx context.Context, in *agent.GetSessionListRequest) (*agent.GetSessionListResponse, error) {
-	l := logic.NewGetSessionListLogic(ctx, s.svcCtx)
-	return l.GetSessionList(in)
-}
-
-// 获取会话消息历史
-func (s *AgentServer) GetMessageHistory(ctx context.Context, in *agent.GetMessageHistoryRequest) (*agent.GetMessageHistoryResponse, error) {
-	l := logic.NewGetMessageHistoryLogic(ctx, s.svcCtx)
-	return l.GetMessageHistory(in)
+// 添加陪玩信息到向量数据库
+func (s *AgentServer) AddCompanionToVectorDB(ctx context.Context, in *agent.AddCompanionToVectorDBRequest) (*agent.AddCompanionToVectorDBResponse, error) {
+	l := logic.NewAddCompanionToVectorDBLogic(ctx, s.svcCtx)
+	return l.AddCompanionToVectorDB(in)
 }

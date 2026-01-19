@@ -87,7 +87,7 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile() (resp *types.GetCompani
 		},
 		Data: types.CompanionInfo{
 			UserId:       profile.UserId,
-			GameSkills:   profile.GameSkills,
+			GameSkill:    profile.GameSkill,
 			PricePerHour: profile.PricePerHour,
 			Status:       int(profile.Status),
 			Rating:       profile.Rating,

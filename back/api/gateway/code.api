@@ -3,23 +3,24 @@ syntax = "v1"
 import "base.api"
 
 type SendCodeRequest {
-    Phone   string `json:"phone"`
-    Purpose string `json:"purpose"`
+	Phone   string `json:"phone"`
+	Purpose string `json:"purpose"`
 }
 
 type SendCodeResponse {
-    BaseResp
-    Data SendCodeData `json:"data"`
+	BaseResp
+	Data SendCodeData `json:"data"`
 }
 
 type SendCodeData {
-    Success bool `json:"success"`
+	Success bool `json:"success"`
 }
 
-@server(
-    group: code
+@server (
+	group: code
 )
 service gateway {
-   @handler sendCode
-    post /api/code/send (SendCodeRequest) returns (SendCodeResponse)
+	@handler sendCode
+	post /api/code/send (SendCodeRequest) returns (SendCodeResponse)
 }
+

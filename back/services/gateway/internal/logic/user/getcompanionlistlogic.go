@@ -38,7 +38,7 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 	// 注意：如果 status 为 0，RPC 层会将其视为"未指定"并使用默认值（在线）
 	// 如果用户明确想查询 status=0（离线），需要确保 gateway 层正确传递
 	rpcResp, err := l.svcCtx.UserRPC.GetCompanionList(l.ctx, &userclient.GetCompanionListRequest{
-		GameSkills: req.GameSkills,
+		GameSkill:  req.GameSkill,
 		MinPrice:   int32(req.MinPrice),
 		MaxPrice:   int32(req.MaxPrice),
 		Status:     int32(req.Status),
@@ -61,7 +61,7 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 	for _, cp := range rpcResp.Companions {
 		companions = append(companions, types.CompanionInfo{
 			UserId:       cp.UserId,
-			GameSkills:   cp.GameSkills,
+			GameSkill:    cp.GameSkill,
 			PricePerHour: cp.PricePerHour,
 			Status:       int(cp.Status),
 			Rating:       cp.Rating,
