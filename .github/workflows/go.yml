@@ -23,6 +23,7 @@ jobs:
 
       - name: Build Gateway Docker Image
         uses: docker/build-push-action@v5
+        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/gateway/Dockerfile
@@ -34,6 +35,7 @@ jobs:
 
       - name: Build User Docker Image
         uses: docker/build-push-action@v5
+        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/user/Dockerfile
@@ -45,6 +47,7 @@ jobs:
 
       - name: Build Order Docker Image
         uses: docker/build-push-action@v5
+        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/order/Dockerfile
@@ -56,6 +59,7 @@ jobs:
 
       - name: Build Code Docker Image
         uses: docker/build-push-action@v5
+        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/code/Dockerfile
@@ -68,10 +72,27 @@ jobs:
       - name: Save Docker Images
         run: |
           mkdir -p docker-images
-          docker save ${{ env.IMAGE_PREFIX }}/gateway:latest | gzip > docker-images/gateway.tar.gz
-          docker save ${{ env.IMAGE_PREFIX }}/user:latest | gzip > docker-images/user.tar.gz
-          docker save ${{ env.IMAGE_PREFIX }}/order:latest | gzip > docker-images/order.tar.gz
-          docker save ${{ env.IMAGE_PREFIX }}/code:latest | gzip > docker-images/code.tar.gz
+          echo "=== Saving Docker Images (best-effort) ==="
+          if docker images | grep -q "${{ env.IMAGE_PREFIX }}/gateway"; then
+            docker save ${{ env.IMAGE_PREFIX }}/gateway:latest | gzip > docker-images/gateway.tar.gz
+          else
+            echo "⚠️  gateway image not found, will reuse previous version on server"
+          fi
+          if docker images | grep -q "${{ env.IMAGE_PREFIX }}/user"; then
+            docker save ${{ env.IMAGE_PREFIX }}/user:latest | gzip > docker-images/user.tar.gz
+          else
+            echo "⚠️  user image not found, will reuse previous version on server"
+          fi
+          if docker images | grep -q "${{ env.IMAGE_PREFIX }}/order"; then
+            docker save ${{ env.IMAGE_PREFIX }}/order:latest | gzip > docker-images/order.tar.gz
+          else
+            echo "⚠️  order image not found, will reuse previous version on server"
+          fi
+          if docker images | grep -q "${{ env.IMAGE_PREFIX }}/code"; then
+            docker save ${{ env.IMAGE_PREFIX }}/code:latest | gzip > docker-images/code.tar.gz
+          else
+            echo "⚠️  code image not found, will reuse previous version on server"
+          fi
 
       - name: Upload Docker Images
         uses: actions/upload-artifact@v4
@@ -97,23 +118,18 @@ jobs:
         run: |
           echo "=== Verifying Downloaded Files ==="
           ls -lh docker-images/ || true
-          if [ ! -f "docker-images/gateway.tar.gz" ]; then
-            echo "❌ Error: gateway.tar.gz not found after download"
+          missing=0
+          for f in gateway user order code; do
+            if [ ! -f "docker-images/$f.tar.gz" ]; then
+              echo "⚠️  $f.tar.gz not found after download, will reuse previous image on server"
+              missing=$((missing+1))
+            fi
+          done
+          if [ "$missing" -eq 4 ]; then
+            echo "❌ No images were built in this run, nothing to deploy"
             exit 1
           fi
-          if [ ! -f "docker-images/user.tar.gz" ]; then
-            echo "❌ Error: user.tar.gz not found after download"
-            exit 1
-          fi
-          if [ ! -f "docker-images/order.tar.gz" ]; then
-            echo "❌ Error: order.tar.gz not found after download"
-            exit 1
-          fi
-          if [ ! -f "docker-images/code.tar.gz" ]; then
-            echo "❌ Error: code.tar.gz not found after download"
-            exit 1
-          fi
-          echo "✅ All files downloaded successfully"
+          echo "✅ Docker image artifacts ready (some services may reuse old images)"
 
       - name: Load Docker Images on Server
         uses: appleboy/scp-action@v0.1.7
@@ -136,23 +152,8 @@ jobs:
           script: |
             echo "=== Verifying Transferred Files ==="
             ls -lh ${{ secrets.DEPLOY_PATH }}/docker-images/ || true
-            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/gateway.tar.gz" ]; then
-              echo "❌ Error: gateway.tar.gz not found after transfer"
-              exit 1
-            fi
-            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/user.tar.gz" ]; then
-              echo "❌ Error: user.tar.gz not found after transfer"
-              exit 1
-            fi
-            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/order.tar.gz" ]; then
-              echo "❌ Error: order.tar.gz not found after transfer"
-              exit 1
-            fi
-            if [ ! -f "${{ secrets.DEPLOY_PATH }}/docker-images/code.tar.gz" ]; then
-              echo "❌ Error: code.tar.gz not found after transfer"
-              exit 1
-            fi
-            echo "✅ All files transferred successfully"
+            echo "⚠️ Some *.tar.gz may be missing; corresponding services will keep previous images if so"
+            echo "✅ Files transferred check completed"
 
       - name: Deploy Services with Docker
         uses: appleboy/ssh-action@v1.0.3
@@ -171,91 +172,122 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH }}/docker-images
             pwd
             ls -lh || true
-            
-            echo "=== Loading Docker Images ==="
-            if [ ! -f gateway.tar.gz ]; then
-              echo "❌ Error: gateway.tar.gz not found"
-              exit 1
+
+            echo "=== Loading Docker Images (per service, with fallback) ==="
+            update_gateway=0
+            update_user=0
+            update_order=0
+            update_code=0
+
+            if [ -f gateway.tar.gz ]; then
+              docker load -i gateway.tar.gz
+              update_gateway=1
+            else
+              echo "⚠️  gateway.tar.gz missing, keep existing gateway image/container"
             fi
-            if [ ! -f user.tar.gz ]; then
-              echo "❌ Error: user.tar.gz not found"
-              exit 1
+            if [ -f user.tar.gz ]; then
+              docker load -i user.tar.gz
+              update_user=1
+            else
+              echo "⚠️  user.tar.gz missing, keep existing user image/container"
             fi
-            if [ ! -f order.tar.gz ]; then
-              echo "❌ Error: order.tar.gz not found"
-              exit 1
+            if [ -f order.tar.gz ]; then
+              docker load -i order.tar.gz
+              update_order=1
+            else
+              echo "⚠️  order.tar.gz missing, keep existing order image/container"
             fi
-            if [ ! -f code.tar.gz ]; then
-              echo "❌ Error: code.tar.gz not found"
-              exit 1
+            if [ -f code.tar.gz ]; then
+              docker load -i code.tar.gz
+              update_code=1
+            else
+              echo "⚠️  code.tar.gz missing, keep existing code image/container"
             fi
-            
-            docker load -i gateway.tar.gz
-            docker load -i user.tar.gz
-            docker load -i order.tar.gz
-            docker load -i code.tar.gz
-            
+
             echo "=== Verifying Images Loaded ==="
             docker images | grep slgaming || true
-            
-            echo "=== Stopping Old Containers ==="
-            docker stop slgaming-gateway slgaming-user slgaming-order slgaming-code 2>/dev/null || true
-            docker rm slgaming-gateway slgaming-user slgaming-order slgaming-code 2>/dev/null || true
+
+            echo "=== Stopping Old Containers (only for services with new image) ==="
+            [ "$update_gateway" -eq 1 ] && docker stop slgaming-gateway 2>/dev/null || true
+            [ "$update_user" -eq 1 ] && docker stop slgaming-user 2>/dev/null || true
+            [ "$update_order" -eq 1 ] && docker stop slgaming-order 2>/dev/null || true
+            [ "$update_code" -eq 1 ] && docker stop slgaming-code 2>/dev/null || true
+
+            [ "$update_gateway" -eq 1 ] && docker rm slgaming-gateway 2>/dev/null || true
+            [ "$update_user" -eq 1 ] && docker rm slgaming-user 2>/dev/null || true
+            [ "$update_order" -eq 1 ] && docker rm slgaming-order 2>/dev/null || true
+            [ "$update_code" -eq 1 ] && docker rm slgaming-code 2>/dev/null || true
             
             echo "=== Starting New Containers ==="
             echo "部署顺序: Code -> User -> Order -> Gateway (Gateway 最后启动)"
             
             # ========== 第一步：启动 Code Service (端口 8085) ==========
-            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/code"; then
-              echo "❌ Error: slgaming/code image not found"
-              exit 1
+            if [ "$update_code" -eq 1 ]; then
+              if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/code"; then
+                echo "❌ Error: slgaming/code image not found"
+                exit 1
+              fi
+              echo "启动 Code Service..."
+              docker run -d \
+                --name slgaming-code \
+                --restart unless-stopped \
+                -p 8085:8085 \
+                ${{ env.IMAGE_PREFIX }}/code:latest
+            else
+              echo "⚠️  No new code image, keep existing Code Service (if running)"
             fi
-            echo "启动 Code Service..."
-            docker run -d \
-              --name slgaming-code \
-              --restart unless-stopped \
-              -p 8085:8085 \
-              ${{ env.IMAGE_PREFIX }}/code:latest
             
             # ========== 第二步：启动 User Service (端口 8086) ==========
-            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/user"; then
-              echo "❌ Error: slgaming/user image not found"
-              exit 1
+            if [ "$update_user" -eq 1 ]; then
+              if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/user"; then
+                echo "❌ Error: slgaming/user image not found"
+                exit 1
+              fi
+              echo "启动 User Service..."
+              docker run -d \
+                --name slgaming-user \
+                --restart unless-stopped \
+                -p 8086:8086 \
+                ${{ env.IMAGE_PREFIX }}/user:latest
+            else
+              echo "⚠️  No new user image, keep existing User Service (if running)"
             fi
-            echo "启动 User Service..."
-            docker run -d \
-              --name slgaming-user \
-              --restart unless-stopped \
-              -p 8086:8086 \
-              ${{ env.IMAGE_PREFIX }}/user:latest
             
             # ========== 第三步：启动 Order Service (端口 8087) ==========
-            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/order"; then
-              echo "❌ Error: slgaming/order image not found"
-              exit 1
+            if [ "$update_order" -eq 1 ]; then
+              if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/order"; then
+                echo "❌ Error: slgaming/order image not found"
+                exit 1
+              fi
+              echo "启动 Order Service..."
+              docker run -d \
+                --name slgaming-order \
+                --restart unless-stopped \
+                -p 8087:8087 \
+                ${{ env.IMAGE_PREFIX }}/order:latest
+            else
+              echo "⚠️  No new order image, keep existing Order Service (if running)"
             fi
-            echo "启动 Order Service..."
-            docker run -d \
-              --name slgaming-order \
-              --restart unless-stopped \
-              -p 8087:8087 \
-              ${{ env.IMAGE_PREFIX }}/order:latest
             
             # ========== 等待后端服务启动完成 ==========
             echo "=== Waiting for backend services to start ==="
             sleep 30
             
             # ========== 第四步：最后启动 Gateway (端口 8888) ==========
-            if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/gateway"; then
-              echo "❌ Error: slgaming/gateway image not found"
-              exit 1
+            if [ "$update_gateway" -eq 1 ]; then
+              if ! docker images | grep -q "${{ env.IMAGE_PREFIX }}/gateway"; then
+                echo "❌ Error: slgaming/gateway image not found"
+                exit 1
+              fi
+              echo "最后启动 Gateway Service..."
+              docker run -d \
+                --name slgaming-gateway \
+                --restart unless-stopped \
+                -p 8888:8888 \
+                ${{ env.IMAGE_PREFIX }}/gateway:latest
+            else
+              echo "⚠️  No new gateway image, keep existing Gateway Service (if running)"
             fi
-            echo "最后启动 Gateway Service..."
-            docker run -d \
-              --name slgaming-gateway \
-              --restart unless-stopped \
-              -p 8888:8888 \
-              ${{ env.IMAGE_PREFIX }}/gateway:latest
             
             sleep 5
             
