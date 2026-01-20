@@ -76,7 +76,7 @@ const doReset = () => {
         ElMessage({ type: "success", message: "密码重置成功，请重新登录" });
         router.push("/login");
       } catch (err) {
-        ElMessage({ type: "error", message: "重置失败，请检查验证码或手机号" });
+        // ElMessage({ type: "error", message: "重置失败，请检查验证码或手机号" });
       }
     }
   });

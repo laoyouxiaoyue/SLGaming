@@ -12,8 +12,19 @@ const form = ref({
   phone: "",
   code: "",
   password: "",
+  rePassword: "",
   nickname: "",
 });
+
+const validatePass2 = (rule, value, callback) => {
+  if (value === "") {
+    callback(new Error("请再次输入密码"));
+  } else if (value !== form.value.password) {
+    callback(new Error("两次输入密码不一致!"));
+  } else {
+    callback();
+  }
+};
 
 const rules = {
   phone: [
@@ -28,6 +39,7 @@ const rules = {
     { required: true, message: "密码不能为空", trigger: "blur" },
     { min: 6, max: 14, message: "密码长度为6-14个字符", trigger: "blur" },
   ],
+  rePassword: [{ validator: validatePass2, trigger: "blur" }],
   nickname: [
     { required: true, message: "昵称不能为空", trigger: "blur" },
     { min: 2, max: 10, message: "昵称长度为2-10个字符", trigger: "blur" },
@@ -113,6 +125,14 @@ const doRegister = () => {
                 type="password"
                 show-password
                 placeholder="密码 (6-14个字符)"
+              />
+            </el-form-item>
+            <el-form-item prop="rePassword" label="确认密码">
+              <el-input
+                v-model="form.rePassword"
+                type="password"
+                show-password
+                placeholder="请再次填写密码"
               />
             </el-form-item>
             <el-button size="large" class="subBtn" @click="doRegister">立即注册</el-button>
