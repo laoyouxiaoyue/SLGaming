@@ -3,7 +3,7 @@ name: vue
 on:
   push:
     branches:
-      - front_daisy
+      - front
 
 jobs:
   check-version:

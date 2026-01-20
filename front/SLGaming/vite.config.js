@@ -41,7 +41,8 @@ export default defineConfig({
     proxy: {
       // 匹配以 /api 开头的请求
       "/api": {
-        target: "http://120.26.29.194:8888", // 后端接口地址，包含 /api 前缀
+        // target: "http://120.26.29.194:8888", // 后端接口地址，包含 /api 前缀
+        target: "http://192.168.0.108:8888", // 后端接口地址，包含 /api 前缀
         changeOrigin: true, // 开启跨域
         // rewrite: (path) => path.replace(/^\/api/, '') // 如果后端接口没有 /api 前缀，需要重写路径
       },

@@ -123,7 +123,7 @@ const doLogin = () => {
               </el-form-item>
               <template v-if="loginType === 'account'">
                 <el-form-item prop="password" label="密码">
-                  <el-input v-model="form.password" />
+                  <el-input v-model="form.password" type="password" show-password />
                 </el-form-item>
               </template>
               <template v-else>
@@ -193,7 +193,8 @@ const doLogin = () => {
 }
 
 .login-section {
-  background: linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),
     url("@/assets/images/login-bg.png") no-repeat center / cover;
   height: 783px;
   position: relative;
