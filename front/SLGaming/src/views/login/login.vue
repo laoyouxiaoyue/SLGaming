@@ -54,7 +54,7 @@ const sendCode = async () => {
       }
     }, 1000);
   } catch {
-    ElMessage({ type: "error", message: "验证码发送失败" });
+    // 拦截器已经处理了错误提示
   }
 };
 const doLogin = () => {

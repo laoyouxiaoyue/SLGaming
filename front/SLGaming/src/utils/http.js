@@ -30,7 +30,7 @@ http.interceptors.request.use(
   (e) => {
     console.log("请求还没发出去就出错了", e);
     return Promise.reject(e); // 把错误抛出去，让外面能捕获
-  }
+  },
 );
 
 // axios响应拦截器：服务器"返回结果后"会经过这里
@@ -47,8 +47,8 @@ http.interceptors.response.use(
     // 可以在这里统一处理错误，比如401跳登录、500提示服务器错误
     const errorMsg = e.response?.data.msg || "请求失败，请稍后重试";
     ElMessage.error(errorMsg);
-    // return Promise.reject(e); // 把错误抛出去，让外面能捕获
-  }
+    return Promise.reject(e); // 把错误抛出去，让外面能捕获
+  },
 );
 
 export default http;

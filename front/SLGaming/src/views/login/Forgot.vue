@@ -5,15 +5,25 @@ import "element-plus/theme-chalk/el-message.css";
 import { useRouter } from "vue-router";
 
 import { codeAPI } from "@/api/user/code";
-import { registerapi } from "@/api/user/register";
+import { forgetpasswordapi } from "@/api/user/forget";
 import LoginPanel from "./component/loginpanel.vue";
 
 const form = ref({
   phone: "",
   code: "",
   password: "",
-  nickname: "",
+  rePassword: "",
 });
+
+const validatePass = (rule, value, callback) => {
+  if (value === "") {
+    callback(new Error("请再次输入密码"));
+  } else if (value !== form.value.password) {
+    callback(new Error("两次输入密码不一致!"));
+  } else {
+    callback();
+  }
+};
 
 const rules = {
   phone: [
@@ -25,13 +35,10 @@ const rules = {
     { pattern: /^\d{6}$/, message: "验证码必须是6位数字", trigger: "blur" },
   ],
   password: [
-    { required: true, message: "密码不能为空", trigger: "blur" },
+    { required: true, message: "新密码不能为空", trigger: "blur" },
     { min: 6, max: 14, message: "密码长度为6-14个字符", trigger: "blur" },
   ],
-  nickname: [
-    { required: true, message: "昵称不能为空", trigger: "blur" },
-    { min: 2, max: 10, message: "昵称长度为2-10个字符", trigger: "blur" },
-  ],
+  rePassword: [{ required: true, validator: validatePass, trigger: "blur" }],
 };
 
 const formRef = ref(null);
@@ -46,7 +53,7 @@ const sendCode = async () => {
     return;
   }
   try {
-    await codeAPI({ phone, purpose: "register" });
+    await codeAPI({ phone, purpose: "resetpassword" });
     ElMessage({ type: "success", message: "验证码发送成功" });
     countdown.value = 60;
     const timer = setInterval(() => {
@@ -60,15 +67,16 @@ const sendCode = async () => {
   }
 };
 
-const doRegister = () => {
+const doReset = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        await registerapi(form.value);
-        ElMessage({ type: "success", message: "注册成功，请登录" });
+        const { phone, code, password } = form.value;
+        await forgetpasswordapi({ phone, code, password });
+        ElMessage({ type: "success", message: "密码重置成功，请重新登录" });
         router.push("/login");
       } catch (err) {
-        ElMessage({ type: "error", message: "注册失败，请稍后重试" });
+        ElMessage({ type: "error", message: "重置失败，请检查验证码或手机号" });
       }
     }
   });
@@ -79,46 +87,52 @@ const doRegister = () => {
   <LoginPanel>
     <div class="wrapper">
       <nav>
-        <a class="active">新用户注册</a>
+        <a class="active">重置登录密码</a>
       </nav>
       <div class="account-box">
         <div class="form">
           <el-form
             label-position="right"
-            label-width="80px"
+            label-width="90px"
             ref="formRef"
             :model="form"
             :rules="rules"
             status-icon
           >
-            <el-form-item prop="nickname" label="昵    称">
-              <el-input v-model="form.nickname" placeholder="昵称 (2-10个字符)" />
-            </el-form-item>
             <el-form-item prop="phone" label="手机号">
-              <el-input v-model="form.phone" placeholder="请输入手机号" />
+              <el-input v-model="form.phone" placeholder="请输入绑定的手机号" />
             </el-form-item>
             <el-form-item prop="code" label="验证码">
-              <el-input v-model="form.code" style="width: 60%" placeholder="6位验证码" />
+              <el-input v-model="form.code" style="width: 55%" placeholder="6位验证码" />
               <el-button
                 :disabled="countdown > 0"
                 @click="sendCode"
-                style="width: 35%; margin-left: 5%"
+                style="width: 40%; margin-left: 5%"
               >
                 {{ countdown > 0 ? `${countdown}s` : "获取验证码" }}
               </el-button>
             </el-form-item>
-            <el-form-item prop="password" label="设置密码">
+            <el-form-item prop="password" label="新密码">
               <el-input
                 v-model="form.password"
                 type="password"
                 show-password
-                placeholder="密码 (6-14个字符)"
+                placeholder="6-14位字符"
               />
             </el-form-item>
-            <el-button size="large" class="subBtn" @click="doRegister">立即注册</el-button>
+            <el-form-item prop="rePassword" label="确认密码">
+              <el-input
+                v-model="form.rePassword"
+                type="password"
+                show-password
+                placeholder="请再次输入新密码"
+              />
+            </el-form-item>
+            <el-button size="large" class="subBtn" @click="doReset">提交修改</el-button>
             <div class="login-links">
-              <span style="color: #999">已有账号？</span>
               <RouterLink to="/login">返回登录</RouterLink>
+              <span class="divider">|</span>
+              <RouterLink to="/register">立即注册</RouterLink>
             </div>
           </el-form>
         </div>
@@ -129,11 +143,11 @@ const doRegister = () => {
 
 <style scoped lang="scss">
 .wrapper {
-  width: 380px;
+  width: 400px;
   background: #fff;
   position: absolute;
   left: 44%;
-  top: 150px; /* 注册表单较长，稍微上移 */
+  top: 150px;
   transform: translate3d(100px, 0, 0);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 
@@ -173,14 +187,18 @@ const doRegister = () => {
       font-size: 14px;
       margin-top: 15px;
       margin-bottom: 6px;
+      color: #999;
 
       a {
         color: #409eff;
         text-decoration: none;
-        margin-left: 4px;
+        margin: 0 8px;
         &:hover {
           text-decoration: underline;
         }
+      }
+      .divider {
+        color: #ccc;
       }
     }
   }
