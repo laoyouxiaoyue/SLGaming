@@ -6,28 +6,7 @@ on:
       - front
 
 jobs:
-  check-version:
-    runs-on: ubuntu-latest
-    outputs:
-      should_run: ${{ steps.check.outputs.should_run }}
-    steps:
-      - id: check
-        name: Check commit message for version
-        shell: bash
-        run: |
-          msg='${{ github.event.head_commit.message }}'
-          echo "Commit message: $msg"
-
-          # Match patterns like: v1.1, v.1.0, v1.1.2
-          if echo "$msg" | grep -Eiq '\bv\.?[0-9]+(\.[0-9]+)*\b'; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-          fi
-
   build-and-deploy:
-    needs: check-version
-    if: ${{ needs.check-version.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
