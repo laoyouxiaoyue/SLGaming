@@ -6,8 +6,7 @@ import "element-plus/theme-chalk/el-message.css";
 
 // 创建axios实例（相当于造了一个专属的"请求工具"）
 const http = axios.create({
-  baseURL: "/api",
-  // baseURL: "http://120.26.29.194:8888/api",
+  baseURL: "http://192.168.0.108:8888/api",
   timeout: 5000, // 请求超过5秒没响应就报错
 });
 
