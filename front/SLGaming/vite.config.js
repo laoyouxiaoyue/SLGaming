@@ -21,6 +21,12 @@ export default defineConfig({
       resolvers: [ElementPlusResolver({ importStyle: "sass" })],
     }),
   ],
+  server: {
+    middlewareMode: true,
+    fallback: {
+      index: "/index.html",
+    },
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

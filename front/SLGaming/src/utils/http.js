@@ -8,7 +8,7 @@ import router from "@/router";
 // 创建axios实例（相当于造了一个专属的"请求工具"）
 const http = axios.create({
   baseURL: "http://120.26.29.194:8888/api",
-  timeout: 10000, // 请求超过5秒没响应就报错
+  timeout: 10000, // 请求超过10秒没响应就报错
 });
 
 // axios请求拦截器：请求"发出去之前"会经过这里
