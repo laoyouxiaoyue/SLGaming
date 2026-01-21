@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 
 import { codeAPI } from "@/api/user/code";
 import { registerapi } from "@/api/user/register";
-import LoginPanel from "./component/loginpanel.vue";
+import LoginPanel from "./component/LoginPanel.vue";
 
 const form = ref({
   phone: "",
@@ -79,7 +79,7 @@ const doRegister = () => {
         await registerapi(form.value);
         ElMessage({ type: "success", message: "注册成功，请登录" });
         router.push("/login");
-      } catch (err) {
+      } catch {
         ElMessage({ type: "error", message: "注册失败，请稍后重试" });
       }
     }

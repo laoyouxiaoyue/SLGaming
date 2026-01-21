@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 
 import { codeAPI } from "@/api/user/code";
 import { forgetpasswordapi } from "@/api/user/forget";
-import LoginPanel from "./component/loginpanel.vue";
+import LoginPanel from "./component/LoginPanel.vue";
 
 const form = ref({
   phone: "",
@@ -75,7 +75,7 @@ const doReset = () => {
         await forgetpasswordapi({ phone, code, password });
         ElMessage({ type: "success", message: "密码重置成功，请重新登录" });
         router.push("/login");
-      } catch (err) {
+      } catch {
         // ElMessage({ type: "error", message: "重置失败，请检查验证码或手机号" });
       }
     }

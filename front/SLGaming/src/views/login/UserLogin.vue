@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 
 import { useUserStore } from "@/stores/userStore";
 import { codeAPI } from "@/api/user/code";
-import LoginPanel from "./component/loginpanel.vue";
+import LoginPanel from "./component/LoginPanel.vue";
 const userStore = useUserStore();
 
 const loginType = ref("account"); // 'account' or 'code'
