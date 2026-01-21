@@ -46,3 +46,34 @@ JWT:
   SecretKey: "your-secret-key-change-in-production"  # JWT 密钥（生产环境请修改）
   AccessTokenDuration: 900s   # Access Token 过期时间，默认 15 分钟（900 秒）
   RefreshTokenDuration: 604800s  # Refresh Token 过期时间，默认 7 天（604800 秒）
+
+# 限流配置
+RateLimit:
+  Enabled: true              # 是否启用限流
+  GlobalQPS: 2000            # 全局 QPS 限制
+  Routes:
+    # 验证码发送接口：严格限流，防止短信轰炸
+    - Path: "/api/code/send"
+      Method: "POST"
+      GlobalQPS: 100          # 该接口全局 QPS 限制
+      PerIPQPS: 5             # 每个 IP 每秒最多 5 次
+      PerIPPerMinute: 10       # 每个 IP 每分钟最多 10 次（暂未实现，可扩展）
+    
+    # 用户登录接口：防止暴力破解
+    - Path: "/api/user/login"
+      Method: "POST"
+      GlobalQPS: 200
+      PerIPQPS: 10             # 每个 IP 每秒最多 10 次
+      PerUserQPS: 5            # 每个用户每秒最多 5 次
+    
+    # 用户注册接口：防止批量注册
+    - Path: "/api/user/register"
+      Method: "POST"
+      GlobalQPS: 100
+      PerIPQPS: 3              # 每个 IP 每秒最多 3 次
+    
+    # 订单创建接口：防止刷单
+    - Path: "/api/order"
+      Method: "POST"
+      GlobalQPS: 500
+      PerUserQPS: 10           # 每个用户每秒最多 10 次

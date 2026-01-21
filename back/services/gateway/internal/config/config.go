@@ -12,11 +12,12 @@ import (
 
 type Config struct {
 	rest.RestConf
-	Nacos    NacosConf    `json:",optional"` // Nacos 配置
-	Consul   ConsulConf   `json:",optional"` // Consul 配置
-	Upstream UpstreamConf `json:",optional"` // 上游服务配置
-	JWT      JWTConf      `json:",optional"` // JWT 配置
-	Redis    RedisConf    `json:",optional"` // Redis 配置
+	Nacos     NacosConf     `json:",optional"` // Nacos 配置
+	Consul    ConsulConf    `json:",optional"` // Consul 配置
+	Upstream  UpstreamConf  `json:",optional"` // 上游服务配置
+	JWT       JWTConf       `json:",optional"` // JWT 配置
+	Redis     RedisConf     `json:",optional"` // Redis 配置
+	RateLimit RateLimitConf `json:",optional"` // 限流配置
 }
 
 // JWTConf JWT 配置
@@ -63,4 +64,22 @@ type UpstreamConf struct {
 // RedisConf Redis 配置
 type RedisConf struct {
 	redis.RedisConf
+}
+
+// RateLimitConf 限流配置
+type RateLimitConf struct {
+	Enabled   bool                 `json:",default=true"` // 是否启用限流
+	GlobalQPS int                  `json:",default=2000"` // 全局 QPS 限制
+	Routes    []RouteRateLimitConf `json:",optional"`     // 路由级别的限流配置
+}
+
+// RouteRateLimitConf 路由限流配置
+type RouteRateLimitConf struct {
+	Path             string `json:",optional"` // 路由路径，如 "/api/user/login"
+	Method           string `json:",optional"` // HTTP 方法，如 "POST"，为空则匹配所有方法
+	GlobalQPS        int    `json:",optional"` // 该路由的全局 QPS 限制
+	PerIPQPS         int    `json:",optional"` // 每个 IP 的 QPS 限制
+	PerUserQPS       int    `json:",optional"` // 每个用户（已登录）的 QPS 限制
+	PerIPPerMinute   int    `json:",optional"` // 每个 IP 每分钟请求数限制
+	PerUserPerMinute int    `json:",optional"` // 每个用户每分钟请求数限制
 }
