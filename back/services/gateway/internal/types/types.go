@@ -35,6 +35,7 @@ type CompanionInfo struct {
 	Rating       float64 `json:"rating"`       // 评分（0-5分）
 	TotalOrders  int64   `json:"totalOrders"`  // 总接单数
 	IsVerified   bool    `json:"isVerified"`   // 是否认证
+	Nickname     string  `json:"nickname"`     // 昵称
 	AvatarUrl    string  `json:"avatarUrl"`    // 头像URL
 	Bio          string  `json:"bio"`          // 个人简介
 }
@@ -71,6 +72,12 @@ type ForgetPasswordResponse struct {
 	Data LoginData `json:"data"`
 }
 
+type GameSkill struct {
+	Id          uint64 `json:"id"`          // 技能ID
+	Name        string `json:"name"`        // 技能名称
+	Description string `json:"description"` // 技能描述
+}
+
 type GetCompanionListData struct {
 	Companions []CompanionInfo `json:"companions"` // 陪玩列表
 	Total      int             `json:"total"`      // 总数
@@ -91,6 +98,10 @@ type GetCompanionListRequest struct {
 type GetCompanionListResponse struct {
 	BaseResp
 	Data GetCompanionListData `json:"data"`
+}
+
+type GetCompanionProfileByIdRequest struct {
+	UserId uint64 `form:"userId"` // 目标用户ID
 }
 
 type GetCompanionProfileResponse struct {
@@ -141,6 +152,11 @@ type GetUserResponse struct {
 type GetWalletResponse struct {
 	BaseResp
 	Data WalletInfo `json:"data"`
+}
+
+type ListGameSkillsResponse struct {
+	BaseResp
+	Data []GameSkill `json:"data"`
 }
 
 type LoginByCodeRequest struct {

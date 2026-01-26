@@ -22,9 +22,9 @@ type Config struct {
 
 // JWTConf JWT 配置
 type JWTConf struct {
-	SecretKey            string        `json:",optional"`        // JWT 密钥
-	AccessTokenDuration  time.Duration `json:",default=900s"`    // Access Token 过期时间，默认 15 分钟
-	RefreshTokenDuration time.Duration `json:",default=604800s"` // Refresh Token 过期时间，默认 7 天
+	SecretKey            string        `json:",optional"`         // JWT 密钥
+	AccessTokenDuration  time.Duration `json:",default=600s"`     // Access Token 过期时间，默认 10 分钟
+	RefreshTokenDuration time.Duration `json:",default=1209600s"` // Refresh Token 过期时间，默认 14 天
 }
 
 // NacosConf Nacos 配置结构

@@ -97,7 +97,7 @@ func (l *GetCompanionListLogic) GetCompanionList(in *user.GetCompanionListReques
 		}
 
 		var users []model.User
-		if err := db.Select("id, avatar_url, bio").Where("id IN ?", userIDs).Find(&users).Error; err != nil {
+		if err := db.Select("id, nickname, avatar_url, bio").Where("id IN ?", userIDs).Find(&users).Error; err != nil {
 			l.Errorf("[GetCompanionList] query users failed: %v", err)
 			return nil, status.Error(codes.Internal, err.Error())
 		}

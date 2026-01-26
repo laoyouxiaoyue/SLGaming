@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/order/internal/config"
@@ -33,8 +37,6 @@ func main() {
 		registrar, err = orderioc.RegisterConsul(c.Consul, c.ListenOn)
 		if err != nil {
 			fmt.Printf("failed to register service to consul: %v\n", err)
-		} else {
-			defer registrar.Deregister()
 		}
 	}
 
@@ -47,7 +49,28 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
-	defer s.Stop()
+
+	// 捕获退出信号，优雅停机
+	var stopOnce sync.Once
+	stopServer := func() {
+		stopOnce.Do(func() {
+			fmt.Println("shutting down order rpc server")
+			s.Stop()
+			if registrar != nil {
+				registrar.Deregister()
+			}
+		})
+	}
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh
+		stopServer()
+	}()
+
+	defer stopServer()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
 	s.Start()

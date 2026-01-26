@@ -19,6 +19,7 @@ func main() {
 		&model.UserWallet{},
 		&model.WalletTransaction{},
 		&model.CompanionProfile{},
+		&model.GameSkill{},
 	)
 	if err != nil {
 		log.Panicf("database migration failed: %v", err)

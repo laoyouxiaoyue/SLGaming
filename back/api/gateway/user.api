@@ -136,13 +136,31 @@ type CompanionInfo {
 	Rating       float64 `json:"rating"` // 评分（0-5分）
 	TotalOrders  int64   `json:"totalOrders"` // 总接单数
 	IsVerified   bool    `json:"isVerified"` // 是否认证
+	Nickname     string  `json:"nickname"` // 昵称
 	AvatarUrl    string  `json:"avatarUrl"` // 头像URL
 	Bio          string  `json:"bio"` // 个人简介
+}
+
+// 游戏技能（词典）
+type GameSkill {
+	Id          uint64 `json:"id"` // 技能ID
+	Name        string `json:"name"` // 技能名称
+	Description string `json:"description"` // 技能描述
+}
+
+type ListGameSkillsResponse {
+	BaseResp
+	Data []GameSkill `json:"data"`
 }
 
 type GetCompanionProfileResponse {
 	BaseResp
 	Data CompanionInfo `json:"data"`
+}
+
+// 公开按用户ID获取陪玩信息（无需登录）
+type GetCompanionProfileByIdRequest {
+	UserId uint64 `form:"userId"` // 目标用户ID
 }
 
 type UpdateCompanionProfileRequest {
@@ -215,6 +233,10 @@ service gateway {
 	@handler getCompanionProfile
 	get /api/user/companion/profile returns (GetCompanionProfileResponse)
 
+	// 公开获取陪玩信息（按 userId，无需登录）
+	@handler getCompanionProfileById
+	get /api/user/companion/profile/public (GetCompanionProfileByIdRequest) returns (GetCompanionProfileResponse)
+
 	// 更新陪玩信息（需要登录，仅陪玩角色）
 	@handler updateCompanionProfile
 	put /api/user/companion/profile (UpdateCompanionProfileRequest) returns (UpdateCompanionProfileResponse)
@@ -222,5 +244,9 @@ service gateway {
 	// 获取陪玩列表（公开接口，用于订单匹配）
 	@handler getCompanionList
 	get /api/user/companions (GetCompanionListRequest) returns (GetCompanionListResponse)
+
+	// 获取游戏技能列表（公开，无需登录）
+	@handler listGameSkills
+	get /api/user/gameskills returns (ListGameSkillsResponse)
 }
 

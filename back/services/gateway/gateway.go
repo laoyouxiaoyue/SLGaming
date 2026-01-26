@@ -7,7 +7,12 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
+	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/gateway/internal/handler"
 	"SLGaming/back/services/gateway/internal/ioc"
 	"SLGaming/back/services/gateway/internal/middleware"
@@ -27,14 +32,27 @@ func main() {
 
 	// 创建 REST 服务器
 	server := rest.MustNewServer(c.RestConf)
-	defer server.Stop()
+
+	// Consul 注册器（用于退出时注销）
+	var registrar *pkgIoc.ConsulRegistrar
+
+	// 优雅停机：确保信号时只 Stop/Deregister 一次
+	var stopOnce sync.Once
+	stopServer := func() {
+		stopOnce.Do(func() {
+			logx.Info("shutting down gateway server")
+			server.Stop()
+			if registrar != nil {
+				registrar.Deregister()
+			}
+		})
+	}
 
 	// 注册 Consul 服务
-	registrar, err := ioc.RegisterConsul(c.Consul, fmt.Sprintf("%s:%d", c.Host, c.Port))
+	var err error
+	registrar, err = ioc.RegisterConsul(c.Consul, fmt.Sprintf("%s:%d", c.Host, c.Port))
 	if err != nil {
 		logx.Errorf("consul register failed: %v", err)
-	} else if registrar != nil {
-		defer registrar.Deregister()
 	}
 
 	// 创建服务上下文
@@ -84,6 +102,17 @@ func main() {
 			}),
 		})
 	}
+
+	// 捕获退出信号，触发优雅停机
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh
+		stopServer()
+	}()
+
+	defer stopServer()
 
 	logx.Infof("Starting gateway server at %s:%d...\n", c.Host, c.Port)
 	server.Start()

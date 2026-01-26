@@ -100,6 +100,9 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(req *types.UpdateCo
 			Rating:       profile.Rating,
 			TotalOrders:  profile.TotalOrders,
 			IsVerified:   profile.IsVerified,
+			Nickname:     profile.Nickname,
+			AvatarUrl:    profile.AvatarUrl,
+			Bio:          profile.Bio,
 		},
 	}, nil
 }

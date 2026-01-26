@@ -1,0 +1,75 @@
+{
+  "collection_name": "companion",
+  "schema": {
+    "auto_id": false,
+    "description": "Companion information collection for recommendation service",
+    "fields": [
+      {
+        "name": "companion_id",
+        "description": "Primary ID for companion",
+        "data_type": "Int64",
+        "is_primary": true,
+        "auto_id": false
+      },
+      {
+        "name": "user_id",
+        "description": "User ID, foreign key to users table",
+        "data_type": "Int64"
+      },
+      {
+        "name": "gender",
+        "description": "Gender: male/female/other",
+        "data_type": "VarChar",
+        "max_length": 32
+      },
+      {
+        "name": "age",
+        "description": "Age in years",
+        "data_type": "Int32"
+      },
+      {
+        "name": "game_skill",
+        "description": "Single game skill name",
+        "data_type": "VarChar",
+        "max_length": 128
+      },
+      {
+        "name": "description",
+        "description": "Companion description text for vectorization",
+        "data_type": "VarChar",
+        "max_length": 2000
+      },
+      {
+        "name": "description_vector",
+        "description": "Vector representation of description text",
+        "data_type": "FloatVector",
+        "dim": 1024
+      },
+      {
+        "name": "price_per_hour",
+        "description": "Price per hour in coins",
+        "data_type": "Int64"
+      },
+      {
+        "name": "rating",
+        "description": "Rating score 0-5",
+        "data_type": "Float"
+      }
+    ],
+    "enable_dynamic_field": false
+  },
+  "index_params": [
+    {
+      "field_name": "description_vector",
+      "index_type": "HNSW",
+      "metric_type": "COSINE",
+      "params": {
+        "M": 16,
+        "efConstruction": 200
+      }
+    }
+  ],
+  "properties": {
+    "shards_num": 2
+  }
+}

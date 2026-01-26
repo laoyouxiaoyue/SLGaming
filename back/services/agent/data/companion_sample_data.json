@@ -1,0 +1,74 @@
+[
+  {
+    "user_id": 2001,
+    "gender": "male",
+    "age": 22,
+    "games": ["王者荣耀", "和平精英", "英雄联盟"],
+    "description": "专业王者荣耀陪玩，擅长打野和ADC，段位王者50星，技术过硬，带你上分！性格开朗，沟通能力强，能快速理解你的需求。",
+    "price_per_hour": 50,
+    "rating": 4.8
+  },
+  {
+    "user_id": 2002,
+    "gender": "female",
+    "age": 20,
+    "games": ["和平精英", "原神", "崩坏：星穹铁道"],
+    "description": "温柔耐心的游戏陪玩，主要玩和平精英和原神。擅长团队配合，声音好听，能提供愉快的游戏体验。适合想要轻松游戏氛围的玩家。",
+    "price_per_hour": 45,
+    "rating": 4.6
+  },
+  {
+    "user_id": 2003,
+    "gender": "male",
+    "age": 25,
+    "games": ["英雄联盟", "CS:GO", "DOTA2"],
+    "description": "资深MOBA游戏陪玩，英雄联盟钻石段位，CS:GO黄金段位。擅长教学和指导，能帮你提升游戏技巧。耐心细致，适合想要学习技术的玩家。",
+    "price_per_hour": 60,
+    "rating": 4.9
+  },
+  {
+    "user_id": 2004,
+    "gender": "female",
+    "age": 21,
+    "games": ["王者荣耀", "和平精英"],
+    "description": "活泼可爱的陪玩小姐姐，王者荣耀星耀段位。喜欢和玩家一起聊天打游戏，氛围轻松愉快。适合想要娱乐放松的玩家。",
+    "price_per_hour": 40,
+    "rating": 4.5
+  },
+  {
+    "user_id": 2005,
+    "gender": "male",
+    "age": 23,
+    "games": ["原神", "崩坏：星穹铁道", "明日方舟"],
+    "description": "二次元游戏专业陪玩，原神全角色精通，崩铁深度玩家。能帮你刷副本、做任务、规划资源。对游戏理解深入，能提供专业建议。",
+    "price_per_hour": 55,
+    "rating": 4.7
+  },
+  {
+    "user_id": 2006,
+    "gender": "female",
+    "age": 19,
+    "games": ["王者荣耀", "和平精英", "QQ飞车"],
+    "description": "年轻活力的陪玩，王者荣耀钻石段位。技术不错，性格开朗，能快速融入游戏氛围。适合想要快速上分的玩家。",
+    "price_per_hour": 35,
+    "rating": 4.3
+  },
+  {
+    "user_id": 2007,
+    "gender": "male",
+    "age": 27,
+    "games": ["英雄联盟", "王者荣耀", "DOTA2"],
+    "description": "经验丰富的游戏陪玩，多款MOBA游戏精通。擅长分析局势，制定策略。能帮你提升游戏意识和操作技巧。适合想要系统提升的玩家。",
+    "price_per_hour": 70,
+    "rating": 4.9
+  },
+  {
+    "user_id": 2008,
+    "gender": "female",
+    "age": 24,
+    "games": ["和平精英", "原神", "光遇"],
+    "description": "温柔细心的陪玩，和平精英王牌段位。擅长团队配合，声音甜美。能提供舒适的游戏体验，适合想要轻松游戏的玩家。",
+    "price_per_hour": 50,
+    "rating": 4.6
+  }
+]

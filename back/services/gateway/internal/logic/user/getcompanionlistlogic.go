@@ -67,6 +67,7 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 			Rating:       cp.Rating,
 			TotalOrders:  cp.TotalOrders,
 			IsVerified:   cp.IsVerified,
+			Nickname:     cp.Nickname,
 			AvatarUrl:    cp.AvatarUrl,
 			Bio:          cp.Bio,
 		})

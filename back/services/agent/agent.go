@@ -3,7 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"os/signal"
 	"strings"
+	"sync"
+	"syscall"
 
 	"SLGaming/back/services/agent/agent"
 	"SLGaming/back/services/agent/internal/config"
@@ -43,8 +47,9 @@ func main() {
 
 	ctx := svc.NewServiceContext(cfg)
 
-	if registrar, err := agentioc.RegisterConsul(cfg.Consul, cfg.ListenOn); err == nil && registrar != nil {
-		defer registrar.Deregister()
+	registrar, err := agentioc.RegisterConsul(cfg.Consul, cfg.ListenOn)
+	if err != nil {
+		logx.Errorf("consul register failed: %v", err)
 	}
 
 	if nacosClient != nil {
@@ -66,7 +71,28 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
-	defer s.Stop()
+
+	// 捕获退出信号，优雅停机
+	var stopOnce sync.Once
+	stopServer := func() {
+		stopOnce.Do(func() {
+			logx.Info("shutting down agent rpc server")
+			s.Stop()
+			if registrar != nil {
+				registrar.Deregister()
+			}
+		})
+	}
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh
+		stopServer()
+	}()
+
+	defer stopServer()
 
 	fmt.Printf("Starting rpc server at %s...\n", cfg.ListenOn)
 	s.Start()

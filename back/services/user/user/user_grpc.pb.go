@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: user.proto
+// source: rpc/user/user.proto
 
 package user
 
@@ -34,6 +34,10 @@ const (
 	User_GetCompanionList_FullMethodName          = "/user.User/GetCompanionList"
 	User_GetCompanionRatingRanking_FullMethodName = "/user.User/GetCompanionRatingRanking"
 	User_GetCompanionOrdersRanking_FullMethodName = "/user.User/GetCompanionOrdersRanking"
+	User_ListGameSkills_FullMethodName            = "/user.User/ListGameSkills"
+	User_CreateGameSkill_FullMethodName           = "/user.User/CreateGameSkill"
+	User_UpdateGameSkill_FullMethodName           = "/user.User/UpdateGameSkill"
+	User_DeleteGameSkill_FullMethodName           = "/user.User/DeleteGameSkill"
 )
 
 // UserClient is the client API for User service.
@@ -58,6 +62,11 @@ type UserClient interface {
 	// 陪玩排名相关接口
 	GetCompanionRatingRanking(ctx context.Context, in *GetCompanionRatingRankingRequest, opts ...grpc.CallOption) (*GetCompanionRatingRankingResponse, error)
 	GetCompanionOrdersRanking(ctx context.Context, in *GetCompanionOrdersRankingRequest, opts ...grpc.CallOption) (*GetCompanionOrdersRankingResponse, error)
+	// 游戏技能管理接口
+	ListGameSkills(ctx context.Context, in *ListGameSkillsRequest, opts ...grpc.CallOption) (*ListGameSkillsResponse, error)
+	CreateGameSkill(ctx context.Context, in *CreateGameSkillRequest, opts ...grpc.CallOption) (*CreateGameSkillResponse, error)
+	UpdateGameSkill(ctx context.Context, in *UpdateGameSkillRequest, opts ...grpc.CallOption) (*UpdateGameSkillResponse, error)
+	DeleteGameSkill(ctx context.Context, in *DeleteGameSkillRequest, opts ...grpc.CallOption) (*DeleteGameSkillResponse, error)
 }
 
 type userClient struct {
@@ -218,6 +227,46 @@ func (c *userClient) GetCompanionOrdersRanking(ctx context.Context, in *GetCompa
 	return out, nil
 }
 
+func (c *userClient) ListGameSkills(ctx context.Context, in *ListGameSkillsRequest, opts ...grpc.CallOption) (*ListGameSkillsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListGameSkillsResponse)
+	err := c.cc.Invoke(ctx, User_ListGameSkills_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) CreateGameSkill(ctx context.Context, in *CreateGameSkillRequest, opts ...grpc.CallOption) (*CreateGameSkillResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateGameSkillResponse)
+	err := c.cc.Invoke(ctx, User_CreateGameSkill_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateGameSkill(ctx context.Context, in *UpdateGameSkillRequest, opts ...grpc.CallOption) (*UpdateGameSkillResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateGameSkillResponse)
+	err := c.cc.Invoke(ctx, User_UpdateGameSkill_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DeleteGameSkill(ctx context.Context, in *DeleteGameSkillRequest, opts ...grpc.CallOption) (*DeleteGameSkillResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteGameSkillResponse)
+	err := c.cc.Invoke(ctx, User_DeleteGameSkill_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -240,6 +289,11 @@ type UserServer interface {
 	// 陪玩排名相关接口
 	GetCompanionRatingRanking(context.Context, *GetCompanionRatingRankingRequest) (*GetCompanionRatingRankingResponse, error)
 	GetCompanionOrdersRanking(context.Context, *GetCompanionOrdersRankingRequest) (*GetCompanionOrdersRankingResponse, error)
+	// 游戏技能管理接口
+	ListGameSkills(context.Context, *ListGameSkillsRequest) (*ListGameSkillsResponse, error)
+	CreateGameSkill(context.Context, *CreateGameSkillRequest) (*CreateGameSkillResponse, error)
+	UpdateGameSkill(context.Context, *UpdateGameSkillRequest) (*UpdateGameSkillResponse, error)
+	DeleteGameSkill(context.Context, *DeleteGameSkillRequest) (*DeleteGameSkillResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -294,6 +348,18 @@ func (UnimplementedUserServer) GetCompanionRatingRanking(context.Context, *GetCo
 }
 func (UnimplementedUserServer) GetCompanionOrdersRanking(context.Context, *GetCompanionOrdersRankingRequest) (*GetCompanionOrdersRankingResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCompanionOrdersRanking not implemented")
+}
+func (UnimplementedUserServer) ListGameSkills(context.Context, *ListGameSkillsRequest) (*ListGameSkillsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListGameSkills not implemented")
+}
+func (UnimplementedUserServer) CreateGameSkill(context.Context, *CreateGameSkillRequest) (*CreateGameSkillResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateGameSkill not implemented")
+}
+func (UnimplementedUserServer) UpdateGameSkill(context.Context, *UpdateGameSkillRequest) (*UpdateGameSkillResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateGameSkill not implemented")
+}
+func (UnimplementedUserServer) DeleteGameSkill(context.Context, *DeleteGameSkillRequest) (*DeleteGameSkillResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteGameSkill not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -586,6 +652,78 @@ func _User_GetCompanionOrdersRanking_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_ListGameSkills_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListGameSkillsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ListGameSkills(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_ListGameSkills_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ListGameSkills(ctx, req.(*ListGameSkillsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_CreateGameSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGameSkillRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).CreateGameSkill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_CreateGameSkill_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).CreateGameSkill(ctx, req.(*CreateGameSkillRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateGameSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateGameSkillRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateGameSkill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateGameSkill_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateGameSkill(ctx, req.(*UpdateGameSkillRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DeleteGameSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteGameSkillRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DeleteGameSkill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DeleteGameSkill_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DeleteGameSkill(ctx, req.(*DeleteGameSkillRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -653,7 +791,23 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetCompanionOrdersRanking",
 			Handler:    _User_GetCompanionOrdersRanking_Handler,
 		},
+		{
+			MethodName: "ListGameSkills",
+			Handler:    _User_ListGameSkills_Handler,
+		},
+		{
+			MethodName: "CreateGameSkill",
+			Handler:    _User_CreateGameSkill_Handler,
+		},
+		{
+			MethodName: "UpdateGameSkill",
+			Handler:    _User_UpdateGameSkill_Handler,
+		},
+		{
+			MethodName: "DeleteGameSkill",
+			Handler:    _User_DeleteGameSkill_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "user.proto",
+	Metadata: "rpc/user/user.proto",
 }

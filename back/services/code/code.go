@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"SLGaming/back/services/code/code"
 	"SLGaming/back/services/code/internal/ioc"
@@ -30,8 +34,6 @@ func main() {
 	registrar, err := ioc.RegisterConsul(c.Consul, c.ListenOn)
 	if err != nil {
 		logx.Errorf("consul register failed: %v", err)
-	} else if registrar != nil {
-		defer registrar.Deregister()
 	}
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
@@ -40,7 +42,28 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
-	defer s.Stop()
+
+	// 捕获退出信号，优雅停机
+	var stopOnce sync.Once
+	stopServer := func() {
+		stopOnce.Do(func() {
+			logx.Info("shutting down code rpc server")
+			s.Stop()
+			if registrar != nil {
+				registrar.Deregister()
+			}
+		})
+	}
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh
+		stopServer()
+	}()
+
+	defer stopServer()
 
 	logx.Info(c.Template)
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

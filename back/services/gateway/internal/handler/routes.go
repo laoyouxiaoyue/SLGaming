@@ -94,6 +94,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
+				Path:    "/api/user/companion/profile/public",
+				Handler: user.GetCompanionProfileByIdHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
 				Path:    "/api/user/companions",
 				Handler: user.GetCompanionListHandler(serverCtx),
 			},
@@ -101,6 +106,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPut,
 				Path:    "/api/user/forgetPassword",
 				Handler: user.ForgetPasswordHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/gameskills",
+				Handler: user.ListGameSkillsHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,

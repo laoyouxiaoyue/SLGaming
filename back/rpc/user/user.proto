@@ -132,6 +132,47 @@ message CompanionInfo {
   bool   is_verified = 7;    // 是否认证
   string avatar_url = 8;     // 头像URL
   string bio = 9;            // 个人简介
+  string nickname = 10;      // 昵称
+}
+
+// ------------- 游戏技能（词典）相关 -------------
+message GameSkill {
+  uint64 id = 1;              // 技能ID
+  string name = 2;            // 技能名称（唯一）
+  string description = 3;     // 描述（可选）
+}
+
+message ListGameSkillsRequest {}
+
+message ListGameSkillsResponse {
+  repeated GameSkill skills = 1;
+}
+
+message CreateGameSkillRequest {
+  string name = 1;           // 技能名称（必填，唯一）
+  string description = 2;    // 描述（可选）
+}
+
+message CreateGameSkillResponse {
+  GameSkill skill = 1;
+}
+
+message UpdateGameSkillRequest {
+  uint64 id = 1;             // 技能ID（必填）
+  string name = 2;           // 技能名称（必填，唯一）
+  string description = 3;    // 描述（可选）
+}
+
+message UpdateGameSkillResponse {
+  GameSkill skill = 1;
+}
+
+message DeleteGameSkillRequest {
+  uint64 id = 1;             // 技能ID（必填）
+}
+
+message DeleteGameSkillResponse {
+  bool success = 1;
 }
 
 // 获取陪玩信息
@@ -245,4 +286,10 @@ service User {
   // 陪玩排名相关接口
   rpc GetCompanionRatingRanking(GetCompanionRatingRankingRequest) returns (GetCompanionRatingRankingResponse);
   rpc GetCompanionOrdersRanking(GetCompanionOrdersRankingRequest) returns (GetCompanionOrdersRankingResponse);
+
+  // 游戏技能管理接口
+  rpc ListGameSkills(ListGameSkillsRequest) returns (ListGameSkillsResponse);
+  rpc CreateGameSkill(CreateGameSkillRequest) returns (CreateGameSkillResponse);
+  rpc UpdateGameSkill(UpdateGameSkillRequest) returns (UpdateGameSkillResponse);
+  rpc DeleteGameSkill(DeleteGameSkillRequest) returns (DeleteGameSkillResponse);
 }

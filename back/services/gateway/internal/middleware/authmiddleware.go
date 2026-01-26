@@ -18,13 +18,16 @@ import (
 
 // 不需要鉴权的路径白名单
 var publicPaths = map[string]bool{
-	"/api/code/send":           true,
-	"/api/user/register":       true,
-	"/api/user/login":          true,
-	"/api/user/login-by-code":  true,
-	"/api/user/forgetPassword": true,
-	"/api/user/refresh-token":  true, // 刷新Token接口（使用RefreshToken，不需要AccessToken）
-	"/health":                  true, // 健康检查接口
+	"/api/code/send":                     true,
+	"/api/user/register":                 true,
+	"/api/user/login":                    true,
+	"/api/user/login-by-code":            true,
+	"/api/user/forgetPassword":           true,
+	"/api/user/refresh-token":            true, // 刷新Token接口（使用RefreshToken，不需要AccessToken）
+	"/api/user/companions":               true, // 获取陪玩列表
+	"/api/user/companion/profile/public": true, // 公开获取陪玩信息
+	"/api/user/gameskills":               true, // 获取游戏技能列表
+	"/health":                            true, // 健康检查接口
 }
 
 // isPublicPath 检查路径是否需要鉴权

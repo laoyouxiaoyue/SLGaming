@@ -100,3 +100,24 @@ func (s *UserServer) GetCompanionOrdersRanking(ctx context.Context, in *user.Get
 	l := logic.NewGetCompanionOrdersRankingLogic(ctx, s.svcCtx)
 	return l.GetCompanionOrdersRanking(in)
 }
+
+// 游戏技能管理接口
+func (s *UserServer) ListGameSkills(ctx context.Context, in *user.ListGameSkillsRequest) (*user.ListGameSkillsResponse, error) {
+	l := logic.NewListGameSkillsLogic(ctx, s.svcCtx)
+	return l.ListGameSkills(in)
+}
+
+func (s *UserServer) CreateGameSkill(ctx context.Context, in *user.CreateGameSkillRequest) (*user.CreateGameSkillResponse, error) {
+	l := logic.NewCreateGameSkillLogic(ctx, s.svcCtx)
+	return l.CreateGameSkill(in)
+}
+
+func (s *UserServer) UpdateGameSkill(ctx context.Context, in *user.UpdateGameSkillRequest) (*user.UpdateGameSkillResponse, error) {
+	l := logic.NewUpdateGameSkillLogic(ctx, s.svcCtx)
+	return l.UpdateGameSkill(in)
+}
+
+func (s *UserServer) DeleteGameSkill(ctx context.Context, in *user.DeleteGameSkillRequest) (*user.DeleteGameSkillResponse, error) {
+	l := logic.NewDeleteGameSkillLogic(ctx, s.svcCtx)
+	return l.DeleteGameSkill(in)
+}

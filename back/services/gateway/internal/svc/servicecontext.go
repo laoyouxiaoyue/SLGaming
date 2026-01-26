@@ -74,11 +74,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 	accessTokenDuration := c.JWT.AccessTokenDuration
 	if accessTokenDuration <= 0 {
-		accessTokenDuration = 15 * time.Minute // 默认 15 分钟
+		accessTokenDuration = 10 * time.Minute // 默认 10 分钟
 	}
 	refreshTokenDuration := c.JWT.RefreshTokenDuration
 	if refreshTokenDuration <= 0 {
-		refreshTokenDuration = 7 * 24 * time.Hour // 默认 7 天
+		refreshTokenDuration = 14 * 24 * time.Hour // 默认 14 天
 	}
 	ctx.JWT = jwt.NewJWTManager(secretKey, accessTokenDuration, refreshTokenDuration)
 

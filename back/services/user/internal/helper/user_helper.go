@@ -71,6 +71,7 @@ func ToCompanionInfoWithUser(p *model.CompanionProfile, u *model.User) *user.Com
 	}
 	// 如果提供了用户信息，填充 bio 和 avatar_url
 	if u != nil {
+		info.Nickname = u.Nickname
 		info.AvatarUrl = u.AvatarURL
 		info.Bio = u.Bio
 	}

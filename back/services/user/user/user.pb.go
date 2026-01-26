@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v3.19.4
-// source: user.proto
+// source: rpc/user/user.proto
 
 package user
 
@@ -33,7 +33,7 @@ type RegisterRequest struct {
 
 func (x *RegisterRequest) Reset() {
 	*x = RegisterRequest{}
-	mi := &file_user_proto_msgTypes[0]
+	mi := &file_rpc_user_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *RegisterRequest) String() string {
 func (*RegisterRequest) ProtoMessage() {}
 
 func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[0]
+	mi := &file_rpc_user_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
 func (*RegisterRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{0}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RegisterRequest) GetPhone() string {
@@ -99,7 +99,7 @@ type RegisterResponse struct {
 
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
-	mi := &file_user_proto_msgTypes[1]
+	mi := &file_rpc_user_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -111,7 +111,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[1]
+	mi := &file_rpc_user_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -124,7 +124,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{1}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RegisterResponse) GetId() uint64 {
@@ -151,7 +151,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_user_proto_msgTypes[2]
+	mi := &file_rpc_user_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -163,7 +163,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[2]
+	mi := &file_rpc_user_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -176,7 +176,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{2}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *LoginRequest) GetPhone() string {
@@ -203,7 +203,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_user_proto_msgTypes[3]
+	mi := &file_rpc_user_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -215,7 +215,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[3]
+	mi := &file_rpc_user_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -228,7 +228,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{3}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *LoginResponse) GetId() uint64 {
@@ -256,7 +256,7 @@ type GetUserRequest struct {
 
 func (x *GetUserRequest) Reset() {
 	*x = GetUserRequest{}
-	mi := &file_user_proto_msgTypes[4]
+	mi := &file_rpc_user_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -268,7 +268,7 @@ func (x *GetUserRequest) String() string {
 func (*GetUserRequest) ProtoMessage() {}
 
 func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[4]
+	mi := &file_rpc_user_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -281,7 +281,7 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{4}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetUserRequest) GetId() uint64 {
@@ -320,7 +320,7 @@ type UserInfo struct {
 
 func (x *UserInfo) Reset() {
 	*x = UserInfo{}
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_rpc_user_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -332,7 +332,7 @@ func (x *UserInfo) String() string {
 func (*UserInfo) ProtoMessage() {}
 
 func (x *UserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_rpc_user_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -345,7 +345,7 @@ func (x *UserInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
 func (*UserInfo) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{5}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UserInfo) GetId() uint64 {
@@ -406,7 +406,7 @@ type GetUserResponse struct {
 
 func (x *GetUserResponse) Reset() {
 	*x = GetUserResponse{}
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_rpc_user_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -418,7 +418,7 @@ func (x *GetUserResponse) String() string {
 func (*GetUserResponse) ProtoMessage() {}
 
 func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_rpc_user_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -431,7 +431,7 @@ func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
 func (*GetUserResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{6}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetUserResponse) GetUser() *UserInfo {
@@ -456,7 +456,7 @@ type UpdateUserRequest struct {
 
 func (x *UpdateUserRequest) Reset() {
 	*x = UpdateUserRequest{}
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_rpc_user_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -468,7 +468,7 @@ func (x *UpdateUserRequest) String() string {
 func (*UpdateUserRequest) ProtoMessage() {}
 
 func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_rpc_user_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -481,7 +481,7 @@ func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{7}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateUserRequest) GetId() uint64 {
@@ -542,7 +542,7 @@ type UpdateUserResponse struct {
 
 func (x *UpdateUserResponse) Reset() {
 	*x = UpdateUserResponse{}
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_rpc_user_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -554,7 +554,7 @@ func (x *UpdateUserResponse) String() string {
 func (*UpdateUserResponse) ProtoMessage() {}
 
 func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_rpc_user_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -567,7 +567,7 @@ func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserResponse.ProtoReflect.Descriptor instead.
 func (*UpdateUserResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{8}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdateUserResponse) GetUser() *UserInfo {
@@ -586,7 +586,7 @@ type LoginByCodeRequest struct {
 
 func (x *LoginByCodeRequest) Reset() {
 	*x = LoginByCodeRequest{}
-	mi := &file_user_proto_msgTypes[9]
+	mi := &file_rpc_user_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -598,7 +598,7 @@ func (x *LoginByCodeRequest) String() string {
 func (*LoginByCodeRequest) ProtoMessage() {}
 
 func (x *LoginByCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[9]
+	mi := &file_rpc_user_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -611,7 +611,7 @@ func (x *LoginByCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginByCodeRequest.ProtoReflect.Descriptor instead.
 func (*LoginByCodeRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{9}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *LoginByCodeRequest) GetPhone() string {
@@ -631,7 +631,7 @@ type LoginByCodeResponse struct {
 
 func (x *LoginByCodeResponse) Reset() {
 	*x = LoginByCodeResponse{}
-	mi := &file_user_proto_msgTypes[10]
+	mi := &file_rpc_user_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -643,7 +643,7 @@ func (x *LoginByCodeResponse) String() string {
 func (*LoginByCodeResponse) ProtoMessage() {}
 
 func (x *LoginByCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[10]
+	mi := &file_rpc_user_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -656,7 +656,7 @@ func (x *LoginByCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginByCodeResponse.ProtoReflect.Descriptor instead.
 func (*LoginByCodeResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{10}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *LoginByCodeResponse) GetId() uint64 {
@@ -683,7 +683,7 @@ type ForgetPasswordRequest struct {
 
 func (x *ForgetPasswordRequest) Reset() {
 	*x = ForgetPasswordRequest{}
-	mi := &file_user_proto_msgTypes[11]
+	mi := &file_rpc_user_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -695,7 +695,7 @@ func (x *ForgetPasswordRequest) String() string {
 func (*ForgetPasswordRequest) ProtoMessage() {}
 
 func (x *ForgetPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[11]
+	mi := &file_rpc_user_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -708,7 +708,7 @@ func (x *ForgetPasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ForgetPasswordRequest.ProtoReflect.Descriptor instead.
 func (*ForgetPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{11}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ForgetPasswordRequest) GetPhone() string {
@@ -735,7 +735,7 @@ type ForgetPasswordResponse struct {
 
 func (x *ForgetPasswordResponse) Reset() {
 	*x = ForgetPasswordResponse{}
-	mi := &file_user_proto_msgTypes[12]
+	mi := &file_rpc_user_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -747,7 +747,7 @@ func (x *ForgetPasswordResponse) String() string {
 func (*ForgetPasswordResponse) ProtoMessage() {}
 
 func (x *ForgetPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[12]
+	mi := &file_rpc_user_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -760,7 +760,7 @@ func (x *ForgetPasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ForgetPasswordResponse.ProtoReflect.Descriptor instead.
 func (*ForgetPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{12}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ForgetPasswordResponse) GetId() uint64 {
@@ -789,7 +789,7 @@ type WalletInfo struct {
 
 func (x *WalletInfo) Reset() {
 	*x = WalletInfo{}
-	mi := &file_user_proto_msgTypes[13]
+	mi := &file_rpc_user_user_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -801,7 +801,7 @@ func (x *WalletInfo) String() string {
 func (*WalletInfo) ProtoMessage() {}
 
 func (x *WalletInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[13]
+	mi := &file_rpc_user_user_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -814,7 +814,7 @@ func (x *WalletInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WalletInfo.ProtoReflect.Descriptor instead.
 func (*WalletInfo) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{13}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *WalletInfo) GetUserId() uint64 {
@@ -848,7 +848,7 @@ type GetWalletRequest struct {
 
 func (x *GetWalletRequest) Reset() {
 	*x = GetWalletRequest{}
-	mi := &file_user_proto_msgTypes[14]
+	mi := &file_rpc_user_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -860,7 +860,7 @@ func (x *GetWalletRequest) String() string {
 func (*GetWalletRequest) ProtoMessage() {}
 
 func (x *GetWalletRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[14]
+	mi := &file_rpc_user_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -873,7 +873,7 @@ func (x *GetWalletRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWalletRequest.ProtoReflect.Descriptor instead.
 func (*GetWalletRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{14}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetWalletRequest) GetUserId() uint64 {
@@ -892,7 +892,7 @@ type GetWalletResponse struct {
 
 func (x *GetWalletResponse) Reset() {
 	*x = GetWalletResponse{}
-	mi := &file_user_proto_msgTypes[15]
+	mi := &file_rpc_user_user_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -904,7 +904,7 @@ func (x *GetWalletResponse) String() string {
 func (*GetWalletResponse) ProtoMessage() {}
 
 func (x *GetWalletResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[15]
+	mi := &file_rpc_user_user_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -917,7 +917,7 @@ func (x *GetWalletResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWalletResponse.ProtoReflect.Descriptor instead.
 func (*GetWalletResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{15}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetWalletResponse) GetWallet() *WalletInfo {
@@ -940,7 +940,7 @@ type RechargeRequest struct {
 
 func (x *RechargeRequest) Reset() {
 	*x = RechargeRequest{}
-	mi := &file_user_proto_msgTypes[16]
+	mi := &file_rpc_user_user_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -952,7 +952,7 @@ func (x *RechargeRequest) String() string {
 func (*RechargeRequest) ProtoMessage() {}
 
 func (x *RechargeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[16]
+	mi := &file_rpc_user_user_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -965,7 +965,7 @@ func (x *RechargeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RechargeRequest.ProtoReflect.Descriptor instead.
 func (*RechargeRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{16}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *RechargeRequest) GetUserId() uint64 {
@@ -1005,7 +1005,7 @@ type RechargeResponse struct {
 
 func (x *RechargeResponse) Reset() {
 	*x = RechargeResponse{}
-	mi := &file_user_proto_msgTypes[17]
+	mi := &file_rpc_user_user_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1017,7 +1017,7 @@ func (x *RechargeResponse) String() string {
 func (*RechargeResponse) ProtoMessage() {}
 
 func (x *RechargeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[17]
+	mi := &file_rpc_user_user_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1030,7 +1030,7 @@ func (x *RechargeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RechargeResponse.ProtoReflect.Descriptor instead.
 func (*RechargeResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{17}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *RechargeResponse) GetWallet() *WalletInfo {
@@ -1053,7 +1053,7 @@ type ConsumeRequest struct {
 
 func (x *ConsumeRequest) Reset() {
 	*x = ConsumeRequest{}
-	mi := &file_user_proto_msgTypes[18]
+	mi := &file_rpc_user_user_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1065,7 +1065,7 @@ func (x *ConsumeRequest) String() string {
 func (*ConsumeRequest) ProtoMessage() {}
 
 func (x *ConsumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[18]
+	mi := &file_rpc_user_user_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1078,7 +1078,7 @@ func (x *ConsumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsumeRequest.ProtoReflect.Descriptor instead.
 func (*ConsumeRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{18}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ConsumeRequest) GetUserId() uint64 {
@@ -1118,7 +1118,7 @@ type ConsumeResponse struct {
 
 func (x *ConsumeResponse) Reset() {
 	*x = ConsumeResponse{}
-	mi := &file_user_proto_msgTypes[19]
+	mi := &file_rpc_user_user_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1130,7 +1130,7 @@ func (x *ConsumeResponse) String() string {
 func (*ConsumeResponse) ProtoMessage() {}
 
 func (x *ConsumeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[19]
+	mi := &file_rpc_user_user_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1143,7 +1143,7 @@ func (x *ConsumeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsumeResponse.ProtoReflect.Descriptor instead.
 func (*ConsumeResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{19}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ConsumeResponse) GetWallet() *WalletInfo {
@@ -1165,13 +1165,14 @@ type CompanionInfo struct {
 	IsVerified    bool                   `protobuf:"varint,7,opt,name=is_verified,json=isVerified,proto3" json:"is_verified,omitempty"`         // 是否认证
 	AvatarUrl     string                 `protobuf:"bytes,8,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`             // 头像URL
 	Bio           string                 `protobuf:"bytes,9,opt,name=bio,proto3" json:"bio,omitempty"`                                          // 个人简介
+	Nickname      string                 `protobuf:"bytes,10,opt,name=nickname,proto3" json:"nickname,omitempty"`                               // 昵称
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CompanionInfo) Reset() {
 	*x = CompanionInfo{}
-	mi := &file_user_proto_msgTypes[20]
+	mi := &file_rpc_user_user_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1183,7 +1184,7 @@ func (x *CompanionInfo) String() string {
 func (*CompanionInfo) ProtoMessage() {}
 
 func (x *CompanionInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[20]
+	mi := &file_rpc_user_user_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1196,7 +1197,7 @@ func (x *CompanionInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompanionInfo.ProtoReflect.Descriptor instead.
 func (*CompanionInfo) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{20}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CompanionInfo) GetUserId() uint64 {
@@ -1262,6 +1263,442 @@ func (x *CompanionInfo) GetBio() string {
 	return ""
 }
 
+func (x *CompanionInfo) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+// ------------- 游戏技能（词典）相关 -------------
+type GameSkill struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                  // 技能ID
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`               // 技能名称（唯一）
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"` // 描述（可选）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GameSkill) Reset() {
+	*x = GameSkill{}
+	mi := &file_rpc_user_user_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GameSkill) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GameSkill) ProtoMessage() {}
+
+func (x *GameSkill) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GameSkill.ProtoReflect.Descriptor instead.
+func (*GameSkill) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GameSkill) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *GameSkill) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GameSkill) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type ListGameSkillsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListGameSkillsRequest) Reset() {
+	*x = ListGameSkillsRequest{}
+	mi := &file_rpc_user_user_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListGameSkillsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListGameSkillsRequest) ProtoMessage() {}
+
+func (x *ListGameSkillsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListGameSkillsRequest.ProtoReflect.Descriptor instead.
+func (*ListGameSkillsRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{22}
+}
+
+type ListGameSkillsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Skills        []*GameSkill           `protobuf:"bytes,1,rep,name=skills,proto3" json:"skills,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListGameSkillsResponse) Reset() {
+	*x = ListGameSkillsResponse{}
+	mi := &file_rpc_user_user_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListGameSkillsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListGameSkillsResponse) ProtoMessage() {}
+
+func (x *ListGameSkillsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListGameSkillsResponse.ProtoReflect.Descriptor instead.
+func (*ListGameSkillsResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ListGameSkillsResponse) GetSkills() []*GameSkill {
+	if x != nil {
+		return x.Skills
+	}
+	return nil
+}
+
+type CreateGameSkillRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`               // 技能名称（必填，唯一）
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"` // 描述（可选）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateGameSkillRequest) Reset() {
+	*x = CreateGameSkillRequest{}
+	mi := &file_rpc_user_user_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateGameSkillRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateGameSkillRequest) ProtoMessage() {}
+
+func (x *CreateGameSkillRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateGameSkillRequest.ProtoReflect.Descriptor instead.
+func (*CreateGameSkillRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *CreateGameSkillRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateGameSkillRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type CreateGameSkillResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Skill         *GameSkill             `protobuf:"bytes,1,opt,name=skill,proto3" json:"skill,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateGameSkillResponse) Reset() {
+	*x = CreateGameSkillResponse{}
+	mi := &file_rpc_user_user_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateGameSkillResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateGameSkillResponse) ProtoMessage() {}
+
+func (x *CreateGameSkillResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateGameSkillResponse.ProtoReflect.Descriptor instead.
+func (*CreateGameSkillResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *CreateGameSkillResponse) GetSkill() *GameSkill {
+	if x != nil {
+		return x.Skill
+	}
+	return nil
+}
+
+type UpdateGameSkillRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                  // 技能ID（必填）
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`               // 技能名称（必填，唯一）
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"` // 描述（可选）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateGameSkillRequest) Reset() {
+	*x = UpdateGameSkillRequest{}
+	mi := &file_rpc_user_user_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateGameSkillRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateGameSkillRequest) ProtoMessage() {}
+
+func (x *UpdateGameSkillRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateGameSkillRequest.ProtoReflect.Descriptor instead.
+func (*UpdateGameSkillRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UpdateGameSkillRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateGameSkillRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateGameSkillRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type UpdateGameSkillResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Skill         *GameSkill             `protobuf:"bytes,1,opt,name=skill,proto3" json:"skill,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateGameSkillResponse) Reset() {
+	*x = UpdateGameSkillResponse{}
+	mi := &file_rpc_user_user_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateGameSkillResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateGameSkillResponse) ProtoMessage() {}
+
+func (x *UpdateGameSkillResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateGameSkillResponse.ProtoReflect.Descriptor instead.
+func (*UpdateGameSkillResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UpdateGameSkillResponse) GetSkill() *GameSkill {
+	if x != nil {
+		return x.Skill
+	}
+	return nil
+}
+
+type DeleteGameSkillRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 技能ID（必填）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteGameSkillRequest) Reset() {
+	*x = DeleteGameSkillRequest{}
+	mi := &file_rpc_user_user_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteGameSkillRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteGameSkillRequest) ProtoMessage() {}
+
+func (x *DeleteGameSkillRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteGameSkillRequest.ProtoReflect.Descriptor instead.
+func (*DeleteGameSkillRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *DeleteGameSkillRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type DeleteGameSkillResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteGameSkillResponse) Reset() {
+	*x = DeleteGameSkillResponse{}
+	mi := &file_rpc_user_user_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteGameSkillResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteGameSkillResponse) ProtoMessage() {}
+
+func (x *DeleteGameSkillResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_user_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteGameSkillResponse.ProtoReflect.Descriptor instead.
+func (*DeleteGameSkillResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *DeleteGameSkillResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 // 获取陪玩信息
 type GetCompanionProfileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1272,7 +1709,7 @@ type GetCompanionProfileRequest struct {
 
 func (x *GetCompanionProfileRequest) Reset() {
 	*x = GetCompanionProfileRequest{}
-	mi := &file_user_proto_msgTypes[21]
+	mi := &file_rpc_user_user_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1284,7 +1721,7 @@ func (x *GetCompanionProfileRequest) String() string {
 func (*GetCompanionProfileRequest) ProtoMessage() {}
 
 func (x *GetCompanionProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[21]
+	mi := &file_rpc_user_user_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1297,7 +1734,7 @@ func (x *GetCompanionProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionProfileRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionProfileRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{21}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetCompanionProfileRequest) GetUserId() uint64 {
@@ -1316,7 +1753,7 @@ type GetCompanionProfileResponse struct {
 
 func (x *GetCompanionProfileResponse) Reset() {
 	*x = GetCompanionProfileResponse{}
-	mi := &file_user_proto_msgTypes[22]
+	mi := &file_rpc_user_user_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1328,7 +1765,7 @@ func (x *GetCompanionProfileResponse) String() string {
 func (*GetCompanionProfileResponse) ProtoMessage() {}
 
 func (x *GetCompanionProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[22]
+	mi := &file_rpc_user_user_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1341,7 +1778,7 @@ func (x *GetCompanionProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionProfileResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionProfileResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{22}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GetCompanionProfileResponse) GetProfile() *CompanionInfo {
@@ -1364,7 +1801,7 @@ type UpdateCompanionProfileRequest struct {
 
 func (x *UpdateCompanionProfileRequest) Reset() {
 	*x = UpdateCompanionProfileRequest{}
-	mi := &file_user_proto_msgTypes[23]
+	mi := &file_rpc_user_user_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1376,7 +1813,7 @@ func (x *UpdateCompanionProfileRequest) String() string {
 func (*UpdateCompanionProfileRequest) ProtoMessage() {}
 
 func (x *UpdateCompanionProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[23]
+	mi := &file_rpc_user_user_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1389,7 +1826,7 @@ func (x *UpdateCompanionProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionProfileRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{23}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *UpdateCompanionProfileRequest) GetUserId() uint64 {
@@ -1429,7 +1866,7 @@ type UpdateCompanionProfileResponse struct {
 
 func (x *UpdateCompanionProfileResponse) Reset() {
 	*x = UpdateCompanionProfileResponse{}
-	mi := &file_user_proto_msgTypes[24]
+	mi := &file_rpc_user_user_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1441,7 +1878,7 @@ func (x *UpdateCompanionProfileResponse) String() string {
 func (*UpdateCompanionProfileResponse) ProtoMessage() {}
 
 func (x *UpdateCompanionProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[24]
+	mi := &file_rpc_user_user_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1454,7 +1891,7 @@ func (x *UpdateCompanionProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionProfileResponse.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionProfileResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{24}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *UpdateCompanionProfileResponse) GetProfile() *CompanionInfo {
@@ -1476,7 +1913,7 @@ type UpdateCompanionStatsRequest struct {
 
 func (x *UpdateCompanionStatsRequest) Reset() {
 	*x = UpdateCompanionStatsRequest{}
-	mi := &file_user_proto_msgTypes[25]
+	mi := &file_rpc_user_user_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1488,7 +1925,7 @@ func (x *UpdateCompanionStatsRequest) String() string {
 func (*UpdateCompanionStatsRequest) ProtoMessage() {}
 
 func (x *UpdateCompanionStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[25]
+	mi := &file_rpc_user_user_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1501,7 +1938,7 @@ func (x *UpdateCompanionStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionStatsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionStatsRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{25}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *UpdateCompanionStatsRequest) GetUserId() uint64 {
@@ -1534,7 +1971,7 @@ type UpdateCompanionStatsResponse struct {
 
 func (x *UpdateCompanionStatsResponse) Reset() {
 	*x = UpdateCompanionStatsResponse{}
-	mi := &file_user_proto_msgTypes[26]
+	mi := &file_rpc_user_user_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1546,7 +1983,7 @@ func (x *UpdateCompanionStatsResponse) String() string {
 func (*UpdateCompanionStatsResponse) ProtoMessage() {}
 
 func (x *UpdateCompanionStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[26]
+	mi := &file_rpc_user_user_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1559,7 +1996,7 @@ func (x *UpdateCompanionStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionStatsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionStatsResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{26}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *UpdateCompanionStatsResponse) GetProfile() *CompanionInfo {
@@ -1585,7 +2022,7 @@ type GetCompanionListRequest struct {
 
 func (x *GetCompanionListRequest) Reset() {
 	*x = GetCompanionListRequest{}
-	mi := &file_user_proto_msgTypes[27]
+	mi := &file_rpc_user_user_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1597,7 +2034,7 @@ func (x *GetCompanionListRequest) String() string {
 func (*GetCompanionListRequest) ProtoMessage() {}
 
 func (x *GetCompanionListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[27]
+	mi := &file_rpc_user_user_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1610,7 +2047,7 @@ func (x *GetCompanionListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionListRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionListRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{27}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetCompanionListRequest) GetGameSkill() string {
@@ -1674,7 +2111,7 @@ type GetCompanionListResponse struct {
 
 func (x *GetCompanionListResponse) Reset() {
 	*x = GetCompanionListResponse{}
-	mi := &file_user_proto_msgTypes[28]
+	mi := &file_rpc_user_user_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1686,7 +2123,7 @@ func (x *GetCompanionListResponse) String() string {
 func (*GetCompanionListResponse) ProtoMessage() {}
 
 func (x *GetCompanionListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[28]
+	mi := &file_rpc_user_user_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1699,7 +2136,7 @@ func (x *GetCompanionListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionListResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionListResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{28}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GetCompanionListResponse) GetCompanions() []*CompanionInfo {
@@ -1746,7 +2183,7 @@ type CompanionRankingItem struct {
 
 func (x *CompanionRankingItem) Reset() {
 	*x = CompanionRankingItem{}
-	mi := &file_user_proto_msgTypes[29]
+	mi := &file_rpc_user_user_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1758,7 +2195,7 @@ func (x *CompanionRankingItem) String() string {
 func (*CompanionRankingItem) ProtoMessage() {}
 
 func (x *CompanionRankingItem) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[29]
+	mi := &file_rpc_user_user_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1771,7 +2208,7 @@ func (x *CompanionRankingItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompanionRankingItem.ProtoReflect.Descriptor instead.
 func (*CompanionRankingItem) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{29}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *CompanionRankingItem) GetUserId() uint64 {
@@ -1834,7 +2271,7 @@ type GetCompanionRatingRankingRequest struct {
 
 func (x *GetCompanionRatingRankingRequest) Reset() {
 	*x = GetCompanionRatingRankingRequest{}
-	mi := &file_user_proto_msgTypes[30]
+	mi := &file_rpc_user_user_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1846,7 +2283,7 @@ func (x *GetCompanionRatingRankingRequest) String() string {
 func (*GetCompanionRatingRankingRequest) ProtoMessage() {}
 
 func (x *GetCompanionRatingRankingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[30]
+	mi := &file_rpc_user_user_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1859,7 +2296,7 @@ func (x *GetCompanionRatingRankingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionRatingRankingRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionRatingRankingRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{30}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetCompanionRatingRankingRequest) GetPage() int32 {
@@ -1888,7 +2325,7 @@ type GetCompanionRatingRankingResponse struct {
 
 func (x *GetCompanionRatingRankingResponse) Reset() {
 	*x = GetCompanionRatingRankingResponse{}
-	mi := &file_user_proto_msgTypes[31]
+	mi := &file_rpc_user_user_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1900,7 +2337,7 @@ func (x *GetCompanionRatingRankingResponse) String() string {
 func (*GetCompanionRatingRankingResponse) ProtoMessage() {}
 
 func (x *GetCompanionRatingRankingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[31]
+	mi := &file_rpc_user_user_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1913,7 +2350,7 @@ func (x *GetCompanionRatingRankingResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetCompanionRatingRankingResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionRatingRankingResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{31}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *GetCompanionRatingRankingResponse) GetRankings() []*CompanionRankingItem {
@@ -1955,7 +2392,7 @@ type GetCompanionOrdersRankingRequest struct {
 
 func (x *GetCompanionOrdersRankingRequest) Reset() {
 	*x = GetCompanionOrdersRankingRequest{}
-	mi := &file_user_proto_msgTypes[32]
+	mi := &file_rpc_user_user_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1967,7 +2404,7 @@ func (x *GetCompanionOrdersRankingRequest) String() string {
 func (*GetCompanionOrdersRankingRequest) ProtoMessage() {}
 
 func (x *GetCompanionOrdersRankingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[32]
+	mi := &file_rpc_user_user_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1980,7 +2417,7 @@ func (x *GetCompanionOrdersRankingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionOrdersRankingRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionOrdersRankingRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{32}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *GetCompanionOrdersRankingRequest) GetPage() int32 {
@@ -2009,7 +2446,7 @@ type GetCompanionOrdersRankingResponse struct {
 
 func (x *GetCompanionOrdersRankingResponse) Reset() {
 	*x = GetCompanionOrdersRankingResponse{}
-	mi := &file_user_proto_msgTypes[33]
+	mi := &file_rpc_user_user_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2021,7 +2458,7 @@ func (x *GetCompanionOrdersRankingResponse) String() string {
 func (*GetCompanionOrdersRankingResponse) ProtoMessage() {}
 
 func (x *GetCompanionOrdersRankingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[33]
+	mi := &file_rpc_user_user_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2034,7 +2471,7 @@ func (x *GetCompanionOrdersRankingResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetCompanionOrdersRankingResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionOrdersRankingResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{33}
+	return file_rpc_user_user_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *GetCompanionOrdersRankingResponse) GetRankings() []*CompanionRankingItem {
@@ -2065,12 +2502,11 @@ func (x *GetCompanionOrdersRankingResponse) GetPageSize() int32 {
 	return 0
 }
 
-var File_user_proto protoreflect.FileDescriptor
+var File_rpc_user_user_proto protoreflect.FileDescriptor
 
-const file_user_proto_rawDesc = "" +
+const file_rpc_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\n" +
-	"user.proto\x12\x04user\"s\n" +
+	"\x13rpc/user/user.proto\x12\x04user\"s\n" +
 	"\x0fRegisterRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x1a\n" +
@@ -2146,7 +2582,7 @@ const file_user_proto_rawDesc = "" +
 	"bizOrderId\x12\x16\n" +
 	"\x06remark\x18\x04 \x01(\tR\x06remark\";\n" +
 	"\x0fConsumeResponse\x12(\n" +
-	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet\"\x92\x02\n" +
+	"\x06wallet\x18\x01 \x01(\v2\x10.user.WalletInfoR\x06wallet\"\xae\x02\n" +
 	"\rCompanionInfo\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
 	"\n" +
@@ -2159,7 +2595,31 @@ const file_user_proto_rawDesc = "" +
 	"isVerified\x12\x1d\n" +
 	"\n" +
 	"avatar_url\x18\b \x01(\tR\tavatarUrl\x12\x10\n" +
-	"\x03bio\x18\t \x01(\tR\x03bio\"5\n" +
+	"\x03bio\x18\t \x01(\tR\x03bio\x12\x1a\n" +
+	"\bnickname\x18\n" +
+	" \x01(\tR\bnickname\"Q\n" +
+	"\tGameSkill\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\"\x17\n" +
+	"\x15ListGameSkillsRequest\"A\n" +
+	"\x16ListGameSkillsResponse\x12'\n" +
+	"\x06skills\x18\x01 \x03(\v2\x0f.user.GameSkillR\x06skills\"N\n" +
+	"\x16CreateGameSkillRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"@\n" +
+	"\x17CreateGameSkillResponse\x12%\n" +
+	"\x05skill\x18\x01 \x01(\v2\x0f.user.GameSkillR\x05skill\"^\n" +
+	"\x16UpdateGameSkillRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\"@\n" +
+	"\x17UpdateGameSkillResponse\x12%\n" +
+	"\x05skill\x18\x01 \x01(\v2\x0f.user.GameSkillR\x05skill\"(\n" +
+	"\x16DeleteGameSkillRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\"3\n" +
+	"\x17DeleteGameSkillResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"5\n" +
 	"\x1aGetCompanionProfileRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\"L\n" +
 	"\x1bGetCompanionProfileResponse\x12-\n" +
@@ -2221,7 +2681,7 @@ const file_user_proto_rawDesc = "" +
 	"\brankings\x18\x01 \x03(\v2\x1a.user.CompanionRankingItemR\brankings\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\xfd\b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\xba\v\n" +
 	"\x04User\x129\n" +
 	"\bRegister\x12\x15.user.RegisterRequest\x1a\x16.user.RegisterResponse\x120\n" +
 	"\x05Login\x12\x12.user.LoginRequest\x1a\x13.user.LoginResponse\x126\n" +
@@ -2238,22 +2698,26 @@ const file_user_proto_rawDesc = "" +
 	"\x14UpdateCompanionStats\x12!.user.UpdateCompanionStatsRequest\x1a\".user.UpdateCompanionStatsResponse\x12Q\n" +
 	"\x10GetCompanionList\x12\x1d.user.GetCompanionListRequest\x1a\x1e.user.GetCompanionListResponse\x12l\n" +
 	"\x19GetCompanionRatingRanking\x12&.user.GetCompanionRatingRankingRequest\x1a'.user.GetCompanionRatingRankingResponse\x12l\n" +
-	"\x19GetCompanionOrdersRanking\x12&.user.GetCompanionOrdersRankingRequest\x1a'.user.GetCompanionOrdersRankingResponseB\bZ\x06./userb\x06proto3"
+	"\x19GetCompanionOrdersRanking\x12&.user.GetCompanionOrdersRankingRequest\x1a'.user.GetCompanionOrdersRankingResponse\x12K\n" +
+	"\x0eListGameSkills\x12\x1b.user.ListGameSkillsRequest\x1a\x1c.user.ListGameSkillsResponse\x12N\n" +
+	"\x0fCreateGameSkill\x12\x1c.user.CreateGameSkillRequest\x1a\x1d.user.CreateGameSkillResponse\x12N\n" +
+	"\x0fUpdateGameSkill\x12\x1c.user.UpdateGameSkillRequest\x1a\x1d.user.UpdateGameSkillResponse\x12N\n" +
+	"\x0fDeleteGameSkill\x12\x1c.user.DeleteGameSkillRequest\x1a\x1d.user.DeleteGameSkillResponseB\bZ\x06./userb\x06proto3"
 
 var (
-	file_user_proto_rawDescOnce sync.Once
-	file_user_proto_rawDescData []byte
+	file_rpc_user_user_proto_rawDescOnce sync.Once
+	file_rpc_user_user_proto_rawDescData []byte
 )
 
-func file_user_proto_rawDescGZIP() []byte {
-	file_user_proto_rawDescOnce.Do(func() {
-		file_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)))
+func file_rpc_user_user_proto_rawDescGZIP() []byte {
+	file_rpc_user_user_proto_rawDescOnce.Do(func() {
+		file_rpc_user_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_rpc_user_user_proto_rawDesc), len(file_rpc_user_user_proto_rawDesc)))
 	})
-	return file_user_proto_rawDescData
+	return file_rpc_user_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
-var file_user_proto_goTypes = []any{
+var file_rpc_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
+var file_rpc_user_user_proto_goTypes = []any{
 	(*RegisterRequest)(nil),                   // 0: user.RegisterRequest
 	(*RegisterResponse)(nil),                  // 1: user.RegisterResponse
 	(*LoginRequest)(nil),                      // 2: user.LoginRequest
@@ -2275,89 +2739,109 @@ var file_user_proto_goTypes = []any{
 	(*ConsumeRequest)(nil),                    // 18: user.ConsumeRequest
 	(*ConsumeResponse)(nil),                   // 19: user.ConsumeResponse
 	(*CompanionInfo)(nil),                     // 20: user.CompanionInfo
-	(*GetCompanionProfileRequest)(nil),        // 21: user.GetCompanionProfileRequest
-	(*GetCompanionProfileResponse)(nil),       // 22: user.GetCompanionProfileResponse
-	(*UpdateCompanionProfileRequest)(nil),     // 23: user.UpdateCompanionProfileRequest
-	(*UpdateCompanionProfileResponse)(nil),    // 24: user.UpdateCompanionProfileResponse
-	(*UpdateCompanionStatsRequest)(nil),       // 25: user.UpdateCompanionStatsRequest
-	(*UpdateCompanionStatsResponse)(nil),      // 26: user.UpdateCompanionStatsResponse
-	(*GetCompanionListRequest)(nil),           // 27: user.GetCompanionListRequest
-	(*GetCompanionListResponse)(nil),          // 28: user.GetCompanionListResponse
-	(*CompanionRankingItem)(nil),              // 29: user.CompanionRankingItem
-	(*GetCompanionRatingRankingRequest)(nil),  // 30: user.GetCompanionRatingRankingRequest
-	(*GetCompanionRatingRankingResponse)(nil), // 31: user.GetCompanionRatingRankingResponse
-	(*GetCompanionOrdersRankingRequest)(nil),  // 32: user.GetCompanionOrdersRankingRequest
-	(*GetCompanionOrdersRankingResponse)(nil), // 33: user.GetCompanionOrdersRankingResponse
+	(*GameSkill)(nil),                         // 21: user.GameSkill
+	(*ListGameSkillsRequest)(nil),             // 22: user.ListGameSkillsRequest
+	(*ListGameSkillsResponse)(nil),            // 23: user.ListGameSkillsResponse
+	(*CreateGameSkillRequest)(nil),            // 24: user.CreateGameSkillRequest
+	(*CreateGameSkillResponse)(nil),           // 25: user.CreateGameSkillResponse
+	(*UpdateGameSkillRequest)(nil),            // 26: user.UpdateGameSkillRequest
+	(*UpdateGameSkillResponse)(nil),           // 27: user.UpdateGameSkillResponse
+	(*DeleteGameSkillRequest)(nil),            // 28: user.DeleteGameSkillRequest
+	(*DeleteGameSkillResponse)(nil),           // 29: user.DeleteGameSkillResponse
+	(*GetCompanionProfileRequest)(nil),        // 30: user.GetCompanionProfileRequest
+	(*GetCompanionProfileResponse)(nil),       // 31: user.GetCompanionProfileResponse
+	(*UpdateCompanionProfileRequest)(nil),     // 32: user.UpdateCompanionProfileRequest
+	(*UpdateCompanionProfileResponse)(nil),    // 33: user.UpdateCompanionProfileResponse
+	(*UpdateCompanionStatsRequest)(nil),       // 34: user.UpdateCompanionStatsRequest
+	(*UpdateCompanionStatsResponse)(nil),      // 35: user.UpdateCompanionStatsResponse
+	(*GetCompanionListRequest)(nil),           // 36: user.GetCompanionListRequest
+	(*GetCompanionListResponse)(nil),          // 37: user.GetCompanionListResponse
+	(*CompanionRankingItem)(nil),              // 38: user.CompanionRankingItem
+	(*GetCompanionRatingRankingRequest)(nil),  // 39: user.GetCompanionRatingRankingRequest
+	(*GetCompanionRatingRankingResponse)(nil), // 40: user.GetCompanionRatingRankingResponse
+	(*GetCompanionOrdersRankingRequest)(nil),  // 41: user.GetCompanionOrdersRankingRequest
+	(*GetCompanionOrdersRankingResponse)(nil), // 42: user.GetCompanionOrdersRankingResponse
 }
-var file_user_proto_depIdxs = []int32{
+var file_rpc_user_user_proto_depIdxs = []int32{
 	5,  // 0: user.GetUserResponse.user:type_name -> user.UserInfo
 	5,  // 1: user.UpdateUserResponse.user:type_name -> user.UserInfo
 	13, // 2: user.GetWalletResponse.wallet:type_name -> user.WalletInfo
 	13, // 3: user.RechargeResponse.wallet:type_name -> user.WalletInfo
 	13, // 4: user.ConsumeResponse.wallet:type_name -> user.WalletInfo
-	20, // 5: user.GetCompanionProfileResponse.profile:type_name -> user.CompanionInfo
-	20, // 6: user.UpdateCompanionProfileResponse.profile:type_name -> user.CompanionInfo
-	20, // 7: user.UpdateCompanionStatsResponse.profile:type_name -> user.CompanionInfo
-	20, // 8: user.GetCompanionListResponse.companions:type_name -> user.CompanionInfo
-	29, // 9: user.GetCompanionRatingRankingResponse.rankings:type_name -> user.CompanionRankingItem
-	29, // 10: user.GetCompanionOrdersRankingResponse.rankings:type_name -> user.CompanionRankingItem
-	0,  // 11: user.User.Register:input_type -> user.RegisterRequest
-	2,  // 12: user.User.Login:input_type -> user.LoginRequest
-	4,  // 13: user.User.GetUser:input_type -> user.GetUserRequest
-	7,  // 14: user.User.UpdateUser:input_type -> user.UpdateUserRequest
-	9,  // 15: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
-	11, // 16: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
-	14, // 17: user.User.GetWallet:input_type -> user.GetWalletRequest
-	16, // 18: user.User.Recharge:input_type -> user.RechargeRequest
-	18, // 19: user.User.Consume:input_type -> user.ConsumeRequest
-	21, // 20: user.User.GetCompanionProfile:input_type -> user.GetCompanionProfileRequest
-	23, // 21: user.User.UpdateCompanionProfile:input_type -> user.UpdateCompanionProfileRequest
-	25, // 22: user.User.UpdateCompanionStats:input_type -> user.UpdateCompanionStatsRequest
-	27, // 23: user.User.GetCompanionList:input_type -> user.GetCompanionListRequest
-	30, // 24: user.User.GetCompanionRatingRanking:input_type -> user.GetCompanionRatingRankingRequest
-	32, // 25: user.User.GetCompanionOrdersRanking:input_type -> user.GetCompanionOrdersRankingRequest
-	1,  // 26: user.User.Register:output_type -> user.RegisterResponse
-	3,  // 27: user.User.Login:output_type -> user.LoginResponse
-	6,  // 28: user.User.GetUser:output_type -> user.GetUserResponse
-	8,  // 29: user.User.UpdateUser:output_type -> user.UpdateUserResponse
-	10, // 30: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
-	12, // 31: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
-	15, // 32: user.User.GetWallet:output_type -> user.GetWalletResponse
-	17, // 33: user.User.Recharge:output_type -> user.RechargeResponse
-	19, // 34: user.User.Consume:output_type -> user.ConsumeResponse
-	22, // 35: user.User.GetCompanionProfile:output_type -> user.GetCompanionProfileResponse
-	24, // 36: user.User.UpdateCompanionProfile:output_type -> user.UpdateCompanionProfileResponse
-	26, // 37: user.User.UpdateCompanionStats:output_type -> user.UpdateCompanionStatsResponse
-	28, // 38: user.User.GetCompanionList:output_type -> user.GetCompanionListResponse
-	31, // 39: user.User.GetCompanionRatingRanking:output_type -> user.GetCompanionRatingRankingResponse
-	33, // 40: user.User.GetCompanionOrdersRanking:output_type -> user.GetCompanionOrdersRankingResponse
-	26, // [26:41] is the sub-list for method output_type
-	11, // [11:26] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	21, // 5: user.ListGameSkillsResponse.skills:type_name -> user.GameSkill
+	21, // 6: user.CreateGameSkillResponse.skill:type_name -> user.GameSkill
+	21, // 7: user.UpdateGameSkillResponse.skill:type_name -> user.GameSkill
+	20, // 8: user.GetCompanionProfileResponse.profile:type_name -> user.CompanionInfo
+	20, // 9: user.UpdateCompanionProfileResponse.profile:type_name -> user.CompanionInfo
+	20, // 10: user.UpdateCompanionStatsResponse.profile:type_name -> user.CompanionInfo
+	20, // 11: user.GetCompanionListResponse.companions:type_name -> user.CompanionInfo
+	38, // 12: user.GetCompanionRatingRankingResponse.rankings:type_name -> user.CompanionRankingItem
+	38, // 13: user.GetCompanionOrdersRankingResponse.rankings:type_name -> user.CompanionRankingItem
+	0,  // 14: user.User.Register:input_type -> user.RegisterRequest
+	2,  // 15: user.User.Login:input_type -> user.LoginRequest
+	4,  // 16: user.User.GetUser:input_type -> user.GetUserRequest
+	7,  // 17: user.User.UpdateUser:input_type -> user.UpdateUserRequest
+	9,  // 18: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
+	11, // 19: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
+	14, // 20: user.User.GetWallet:input_type -> user.GetWalletRequest
+	16, // 21: user.User.Recharge:input_type -> user.RechargeRequest
+	18, // 22: user.User.Consume:input_type -> user.ConsumeRequest
+	30, // 23: user.User.GetCompanionProfile:input_type -> user.GetCompanionProfileRequest
+	32, // 24: user.User.UpdateCompanionProfile:input_type -> user.UpdateCompanionProfileRequest
+	34, // 25: user.User.UpdateCompanionStats:input_type -> user.UpdateCompanionStatsRequest
+	36, // 26: user.User.GetCompanionList:input_type -> user.GetCompanionListRequest
+	39, // 27: user.User.GetCompanionRatingRanking:input_type -> user.GetCompanionRatingRankingRequest
+	41, // 28: user.User.GetCompanionOrdersRanking:input_type -> user.GetCompanionOrdersRankingRequest
+	22, // 29: user.User.ListGameSkills:input_type -> user.ListGameSkillsRequest
+	24, // 30: user.User.CreateGameSkill:input_type -> user.CreateGameSkillRequest
+	26, // 31: user.User.UpdateGameSkill:input_type -> user.UpdateGameSkillRequest
+	28, // 32: user.User.DeleteGameSkill:input_type -> user.DeleteGameSkillRequest
+	1,  // 33: user.User.Register:output_type -> user.RegisterResponse
+	3,  // 34: user.User.Login:output_type -> user.LoginResponse
+	6,  // 35: user.User.GetUser:output_type -> user.GetUserResponse
+	8,  // 36: user.User.UpdateUser:output_type -> user.UpdateUserResponse
+	10, // 37: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
+	12, // 38: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
+	15, // 39: user.User.GetWallet:output_type -> user.GetWalletResponse
+	17, // 40: user.User.Recharge:output_type -> user.RechargeResponse
+	19, // 41: user.User.Consume:output_type -> user.ConsumeResponse
+	31, // 42: user.User.GetCompanionProfile:output_type -> user.GetCompanionProfileResponse
+	33, // 43: user.User.UpdateCompanionProfile:output_type -> user.UpdateCompanionProfileResponse
+	35, // 44: user.User.UpdateCompanionStats:output_type -> user.UpdateCompanionStatsResponse
+	37, // 45: user.User.GetCompanionList:output_type -> user.GetCompanionListResponse
+	40, // 46: user.User.GetCompanionRatingRanking:output_type -> user.GetCompanionRatingRankingResponse
+	42, // 47: user.User.GetCompanionOrdersRanking:output_type -> user.GetCompanionOrdersRankingResponse
+	23, // 48: user.User.ListGameSkills:output_type -> user.ListGameSkillsResponse
+	25, // 49: user.User.CreateGameSkill:output_type -> user.CreateGameSkillResponse
+	27, // 50: user.User.UpdateGameSkill:output_type -> user.UpdateGameSkillResponse
+	29, // 51: user.User.DeleteGameSkill:output_type -> user.DeleteGameSkillResponse
+	33, // [33:52] is the sub-list for method output_type
+	14, // [14:33] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
-func init() { file_user_proto_init() }
-func file_user_proto_init() {
-	if File_user_proto != nil {
+func init() { file_rpc_user_user_proto_init() }
+func file_rpc_user_user_proto_init() {
+	if File_rpc_user_user_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_user_user_proto_rawDesc), len(file_rpc_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   34,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_user_proto_goTypes,
-		DependencyIndexes: file_user_proto_depIdxs,
-		MessageInfos:      file_user_proto_msgTypes,
+		GoTypes:           file_rpc_user_user_proto_goTypes,
+		DependencyIndexes: file_rpc_user_user_proto_depIdxs,
+		MessageInfos:      file_rpc_user_user_proto_msgTypes,
 	}.Build()
-	File_user_proto = out.File
-	file_user_proto_goTypes = nil
-	file_user_proto_depIdxs = nil
+	File_rpc_user_user_proto = out.File
+	file_rpc_user_user_proto_goTypes = nil
+	file_rpc_user_user_proto_depIdxs = nil
 }

@@ -4,7 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"os/signal"
 	"strings"
+	"sync"
+	"syscall"
 
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
@@ -63,8 +67,6 @@ func main() {
 	registrar, err := ioc.RegisterConsul(cfg.Consul, cfg.ListenOn)
 	if err != nil {
 		logx.Errorf("consul register failed: %v", err)
-	} else if registrar != nil {
-		defer registrar.Deregister()
 	}
 
 	if nacosClient != nil {
@@ -100,7 +102,29 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
-	defer s.Stop()
+
+	// 捕获退出信号，优雅停机
+	var stopOnce sync.Once
+	stopServer := func() {
+		stopOnce.Do(func() {
+			logx.Info("shutting down user rpc server")
+			cancel()
+			s.Stop()
+			if registrar != nil {
+				registrar.Deregister()
+			}
+		})
+	}
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh
+		stopServer()
+	}()
+
+	defer stopServer()
 
 	fmt.Printf("Starting rpc server at %s...\n", cfg.ListenOn)
 	s.Start()

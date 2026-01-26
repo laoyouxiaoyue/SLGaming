@@ -18,8 +18,13 @@ type (
 	CompanionRankingItem              = user.CompanionRankingItem
 	ConsumeRequest                    = user.ConsumeRequest
 	ConsumeResponse                   = user.ConsumeResponse
+	CreateGameSkillRequest            = user.CreateGameSkillRequest
+	CreateGameSkillResponse           = user.CreateGameSkillResponse
+	DeleteGameSkillRequest            = user.DeleteGameSkillRequest
+	DeleteGameSkillResponse           = user.DeleteGameSkillResponse
 	ForgetPasswordRequest             = user.ForgetPasswordRequest
 	ForgetPasswordResponse            = user.ForgetPasswordResponse
+	GameSkill                         = user.GameSkill
 	GetCompanionListRequest           = user.GetCompanionListRequest
 	GetCompanionListResponse          = user.GetCompanionListResponse
 	GetCompanionOrdersRankingRequest  = user.GetCompanionOrdersRankingRequest
@@ -32,6 +37,8 @@ type (
 	GetUserResponse                   = user.GetUserResponse
 	GetWalletRequest                  = user.GetWalletRequest
 	GetWalletResponse                 = user.GetWalletResponse
+	ListGameSkillsRequest             = user.ListGameSkillsRequest
+	ListGameSkillsResponse            = user.ListGameSkillsResponse
 	LoginByCodeRequest                = user.LoginByCodeRequest
 	LoginByCodeResponse               = user.LoginByCodeResponse
 	LoginRequest                      = user.LoginRequest
@@ -44,6 +51,8 @@ type (
 	UpdateCompanionProfileResponse    = user.UpdateCompanionProfileResponse
 	UpdateCompanionStatsRequest       = user.UpdateCompanionStatsRequest
 	UpdateCompanionStatsResponse      = user.UpdateCompanionStatsResponse
+	UpdateGameSkillRequest            = user.UpdateGameSkillRequest
+	UpdateGameSkillResponse           = user.UpdateGameSkillResponse
 	UpdateUserRequest                 = user.UpdateUserRequest
 	UpdateUserResponse                = user.UpdateUserResponse
 	UserInfo                          = user.UserInfo
@@ -68,6 +77,11 @@ type (
 		// 陪玩排名相关接口
 		GetCompanionRatingRanking(ctx context.Context, in *GetCompanionRatingRankingRequest, opts ...grpc.CallOption) (*GetCompanionRatingRankingResponse, error)
 		GetCompanionOrdersRanking(ctx context.Context, in *GetCompanionOrdersRankingRequest, opts ...grpc.CallOption) (*GetCompanionOrdersRankingResponse, error)
+		// 游戏技能管理接口
+		ListGameSkills(ctx context.Context, in *ListGameSkillsRequest, opts ...grpc.CallOption) (*ListGameSkillsResponse, error)
+		CreateGameSkill(ctx context.Context, in *CreateGameSkillRequest, opts ...grpc.CallOption) (*CreateGameSkillResponse, error)
+		UpdateGameSkill(ctx context.Context, in *UpdateGameSkillRequest, opts ...grpc.CallOption) (*UpdateGameSkillResponse, error)
+		DeleteGameSkill(ctx context.Context, in *DeleteGameSkillRequest, opts ...grpc.CallOption) (*DeleteGameSkillResponse, error)
 	}
 
 	defaultUser struct {
@@ -157,4 +171,25 @@ func (m *defaultUser) GetCompanionRatingRanking(ctx context.Context, in *GetComp
 func (m *defaultUser) GetCompanionOrdersRanking(ctx context.Context, in *GetCompanionOrdersRankingRequest, opts ...grpc.CallOption) (*GetCompanionOrdersRankingResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetCompanionOrdersRanking(ctx, in, opts...)
+}
+
+// 游戏技能管理接口
+func (m *defaultUser) ListGameSkills(ctx context.Context, in *ListGameSkillsRequest, opts ...grpc.CallOption) (*ListGameSkillsResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.ListGameSkills(ctx, in, opts...)
+}
+
+func (m *defaultUser) CreateGameSkill(ctx context.Context, in *CreateGameSkillRequest, opts ...grpc.CallOption) (*CreateGameSkillResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.CreateGameSkill(ctx, in, opts...)
+}
+
+func (m *defaultUser) UpdateGameSkill(ctx context.Context, in *UpdateGameSkillRequest, opts ...grpc.CallOption) (*UpdateGameSkillResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateGameSkill(ctx, in, opts...)
+}
+
+func (m *defaultUser) DeleteGameSkill(ctx context.Context, in *DeleteGameSkillRequest, opts ...grpc.CallOption) (*DeleteGameSkillResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.DeleteGameSkill(ctx, in, opts...)
 }

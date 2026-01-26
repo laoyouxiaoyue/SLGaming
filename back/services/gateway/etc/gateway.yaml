@@ -44,8 +44,8 @@ Redis:
 # JWT 配置
 JWT:
   SecretKey: "your-secret-key-change-in-production"  # JWT 密钥（生产环境请修改）
-  AccessTokenDuration: 900s   # Access Token 过期时间，默认 15 分钟（900 秒）
-  RefreshTokenDuration: 604800s  # Refresh Token 过期时间，默认 7 天（604800 秒）
+  AccessTokenDuration: 600s   # Access Token 过期时间，默认 10 分钟（600 秒）
+  RefreshTokenDuration: 1209600s  # Refresh Token 过期时间，默认 14 天（1,209,600 秒）
 
 # 限流配置
 RateLimit:

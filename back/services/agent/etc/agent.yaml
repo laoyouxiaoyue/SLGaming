@@ -24,7 +24,7 @@ Consul:
   Service:
     Name: agent-rpc
     ID: agent-rpc-1
-    Address: 127.0.0.1
+    Address: 0.0.0.0
     Tags:
       - rpc
       - agent

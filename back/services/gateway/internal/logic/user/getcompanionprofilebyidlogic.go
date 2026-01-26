@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
@@ -16,39 +15,24 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type GetCompanionProfileLogic struct {
+type GetCompanionProfileByIdLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewGetCompanionProfileLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetCompanionProfileLogic {
-	return &GetCompanionProfileLogic{
+func NewGetCompanionProfileByIdLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetCompanionProfileByIdLogic {
+	return &GetCompanionProfileByIdLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *GetCompanionProfileLogic) GetCompanionProfile() (resp *types.GetCompanionProfileResponse, err error) {
-	// 从 context 中获取当前登录用户 ID（由网关鉴权中间件注入）
-	userID, err := middleware.GetUserID(l.ctx)
-	if err != nil {
-		code, msg := utils.HandleError(err, l.Logger, "GetUserID")
+func (l *GetCompanionProfileByIdLogic) GetCompanionProfileById(req *types.GetCompanionProfileByIdRequest) (*types.GetCompanionProfileResponse, error) {
+	if req.UserId == 0 {
 		return &types.GetCompanionProfileResponse{
-			BaseResp: types.BaseResp{
-				Code: code,
-				Msg:  msg,
-			},
-		}, nil
-	}
-	if userID == 0 {
-		l.Errorf("userID is 0, authentication may have failed")
-		return &types.GetCompanionProfileResponse{
-			BaseResp: types.BaseResp{
-				Code: 401,
-				Msg:  "未登录或认证失败",
-			},
+			BaseResp: types.BaseResp{Code: 400, Msg: "userId is required"},
 		}, nil
 	}
 
@@ -56,35 +40,25 @@ func (l *GetCompanionProfileLogic) GetCompanionProfile() (resp *types.GetCompani
 		return nil, fmt.Errorf("user rpc client not initialized")
 	}
 
-	// 调用 User RPC 的 GetCompanionProfile 接口
 	rpcResp, err := l.svcCtx.UserRPC.GetCompanionProfile(l.ctx, &userclient.GetCompanionProfileRequest{
-		UserId: userID,
+		UserId: req.UserId,
 	})
 	if err != nil {
-		code, msg := utils.HandleRPCError(err, l.Logger, "GetCompanionProfile")
+		code, msg := utils.HandleRPCError(err, l.Logger, "GetCompanionProfileById")
 		return &types.GetCompanionProfileResponse{
-			BaseResp: types.BaseResp{
-				Code: code,
-				Msg:  msg,
-			},
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
 		}, nil
 	}
 
 	profile := rpcResp.GetProfile()
 	if profile == nil {
 		return &types.GetCompanionProfileResponse{
-			BaseResp: types.BaseResp{
-				Code: 404,
-				Msg:  "陪玩信息不存在",
-			},
+			BaseResp: types.BaseResp{Code: 404, Msg: "陪玩信息不存在"},
 		}, nil
 	}
 
 	return &types.GetCompanionProfileResponse{
-		BaseResp: types.BaseResp{
-			Code: 0,
-			Msg:  "success",
-		},
+		BaseResp: types.BaseResp{Code: 0, Msg: "success"},
 		Data: types.CompanionInfo{
 			UserId:       profile.UserId,
 			GameSkill:    profile.GameSkill,

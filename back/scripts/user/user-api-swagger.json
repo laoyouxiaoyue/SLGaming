@@ -629,12 +629,13 @@
                 "msg": "获取成功",
                 "data": {
                   "userId": 2,
-                  "gameSkills": "[\"王者荣耀\", \"和平精英\", \"原神\"]",
+                  "gameSkill": "王者荣耀",
                   "pricePerHour": 50,
                   "status": 1,
                   "rating": 4.8,
                   "totalOrders": 128,
                   "isVerified": true,
+                  "nickname": "小明陪玩",
                   "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
                   "bio": "专业陪玩，技术过硬，带你上分！"
                 }
@@ -711,12 +712,13 @@
                 "msg": "更新成功",
                 "data": {
                   "userId": 2,
-                  "gameSkills": "[\"王者荣耀\", \"和平精英\"]",
+                  "gameSkill": "王者荣耀",
                   "pricePerHour": 60,
                   "status": 1,
                   "rating": 4.8,
                   "totalOrders": 128,
                   "isVerified": true,
+                  "nickname": "小明陪玩",
                   "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
                   "bio": "专业陪玩，技术过硬，带你上分！"
                 }
@@ -762,6 +764,86 @@
         }
       }
     },
+    "/user/companion/profile/public": {
+      "get": {
+        "tags": ["陪玩信息"],
+        "summary": "公开获取陪玩信息（按用户ID）",
+        "description": "无需登录，按 userId 获取陪玩信息。",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "type": "integer",
+            "format": "int64",
+            "required": true,
+            "description": "目标用户ID",
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetCompanionProfileResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "userId": 2,
+                  "gameSkill": "王者荣耀",
+                  "pricePerHour": 50,
+                  "status": 1,
+                  "rating": 4.8,
+                  "totalOrders": 128,
+                  "isVerified": true,
+                  "nickname": "小明陪玩",
+                  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                  "bio": "专业陪玩，技术过硬，带你上分！"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "缺少 userId",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "userId is required"
+              }
+            }
+          },
+          "404": {
+            "description": "陪玩信息不存在",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 404,
+                "msg": "陪玩信息不存在"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "获取陪玩信息失败"
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/companions": {
       "get": {
         "tags": ["陪玩信息"],
@@ -770,15 +852,11 @@
         "operationId": "getCompanionList",
         "parameters": [
           {
-            "name": "gameSkills",
+            "name": "gameSkill",
             "in": "query",
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "游戏技能筛选（可传多个，如：gameSkills=王者荣耀&gameSkills=和平精英）",
-            "example": ["王者荣耀", "和平精英"]
+            "type": "string",
+            "description": "游戏技能筛选（单个游戏名称）",
+            "example": "王者荣耀"
           },
           {
             "name": "minPrice",
@@ -846,23 +924,25 @@
                   "companions": [
                     {
                       "userId": 2,
-                      "gameSkills": "[\"王者荣耀\", \"和平精英\"]",
+                      "gameSkill": "王者荣耀",
                       "pricePerHour": 50,
                       "status": 1,
                       "rating": 4.8,
                       "totalOrders": 128,
                       "isVerified": true,
+                      "nickname": "小明陪玩",
                       "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
                       "bio": "专业陪玩，技术过硬，带你上分！"
                     },
                     {
                       "userId": 3,
-                      "gameSkills": "[\"原神\", \"崩坏：星穹铁道\"]",
+                      "gameSkill": "原神",
                       "pricePerHour": 45,
                       "status": 1,
                       "rating": 4.6,
                       "totalOrders": 95,
                       "isVerified": true,
+                      "nickname": "可莉陪玩",
                       "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000002",
                       "bio": "游戏经验丰富，性格开朗，陪你一起游戏！"
                     }
@@ -888,6 +968,40 @@
           }
         }
       }
+    },
+    "/user/gameskills": {
+      "get": {
+        "tags": ["陪玩信息"],
+        "summary": "获取游戏技能列表（公开）",
+        "description": "获取游戏技能词典列表，公开接口无需登录。返回技能ID、名称和描述，可用于前端筛选。",
+        "operationId": "listGameSkills",
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/ListGameSkillsResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": [
+                  {
+                    "id": 1,
+                    "name": "王者荣耀",
+                    "description": "王者荣耀上分陪玩"
+                  },
+                  {
+                    "id": 2,
+                    "name": "原神",
+                    "description": "原神联机陪玩"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -905,6 +1019,46 @@
         }
       },
       "required": ["code", "msg"]
+    },
+    "GameSkill": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "技能ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "技能名称",
+          "example": "王者荣耀"
+        },
+        "description": {
+          "type": "string",
+          "description": "技能描述",
+          "example": "王者荣耀上分陪玩"
+        }
+      },
+      "required": ["id", "name"]
+    },
+    "ListGameSkillsResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/GameSkill"
+              }
+            }
+          }
+        }
+      ]
     },
     "RegisterRequest": {
       "type": "object",
@@ -1343,10 +1497,10 @@
           "format": "int64",
           "description": "用户ID"
         },
-        "gameSkills": {
+        "gameSkill": {
           "type": "string",
-          "description": "游戏技能列表（JSON格式）",
-          "example": "[\"王者荣耀\", \"和平精英\", \"原神\"]"
+          "description": "游戏技能（单个游戏名称）",
+          "example": "王者荣耀"
         },
         "pricePerHour": {
           "type": "integer",
@@ -1379,6 +1533,11 @@
           "description": "是否认证",
           "example": true
         },
+        "nickname": {
+          "type": "string",
+          "description": "昵称",
+          "example": "小明陪玩"
+        },
         "avatarUrl": {
           "type": "string",
           "description": "头像URL",
@@ -1390,7 +1549,7 @@
           "example": "专业陪玩，技术过硬，带你上分！"
         }
       },
-      "required": ["userId", "gameSkills", "pricePerHour", "status", "rating", "totalOrders", "isVerified"]
+      "required": ["userId", "gameSkill", "pricePerHour", "status", "rating", "totalOrders", "isVerified"]
     },
     "GetCompanionProfileResponse": {
       "type": "object",
@@ -1411,10 +1570,10 @@
     "UpdateCompanionProfileRequest": {
       "type": "object",
       "properties": {
-        "gameSkills": {
+        "gameSkill": {
           "type": "string",
-          "description": "游戏技能列表（JSON格式，可选）",
-          "example": "[\"王者荣耀\", \"和平精英\"]"
+          "description": "游戏技能（单个游戏名称，可选）",
+          "example": "王者荣耀"
         },
         "pricePerHour": {
           "type": "integer",
@@ -1429,7 +1588,7 @@
         }
       },
       "example": {
-        "gameSkills": "[\"王者荣耀\", \"和平精英\"]",
+        "gameSkill": "王者荣耀",
         "pricePerHour": 60,
         "status": 1
       }
