@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import UserCard from "./component/user.vue";
+import UserCard from "./component/UserCard.vue";
 import { getgameskillapi } from "@/api/home/gameskill";
 import { getcompanionlist } from "@/api/home/companions";
 
@@ -31,7 +31,7 @@ const loadSkills = async () => {
     const payload = res?.data?.data ?? res?.data ?? {};
     const list = payload.list || payload.skills || payload || [];
     skills.value = Array.isArray(list) ? list : [];
-  } catch (error) {
+  } catch {
     skills.value = ["王者荣耀"];
   }
 };
