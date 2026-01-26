@@ -11,6 +11,17 @@ const pageSize = ref(10);
 const total = ref(0);
 const loading = ref(false);
 const finished = ref(false);
+const skill = ref("");
+const minPrice = ref(undefined);
+const maxPrice = ref(undefined);
+const status = ref(undefined);
+
+const statusOptions = [
+  { label: "全部", value: undefined },
+  { label: "在线", value: 1 },
+  { label: "离线", value: 0 },
+  { label: "忙碌", value: 2 },
+];
 
 const normalizeCompanions = (list) =>
   list.map((item) => {
@@ -28,11 +39,11 @@ const normalizeCompanions = (list) =>
 const loadSkills = async () => {
   try {
     const res = await getgameskillapi();
-    const payload = res?.data?.data ?? res?.data ?? {};
+    const payload = res?.data ?? {};
     const list = payload.list || payload.skills || payload || [];
     skills.value = Array.isArray(list) ? list : [];
   } catch {
-    skills.value = ["王者荣耀"];
+    skills.value = [];
   }
 };
 
@@ -41,15 +52,19 @@ const loadCompanions = async () => {
   loading.value = true;
   try {
     const res = await getcompanionlist({
+      gameSkill: skill.value,
       page: page.value,
       pageSize: pageSize.value,
+      minPrice: minPrice.value,
+      maxPrice: maxPrice.value,
+      status: status.value,
     });
-    const payload = res?.data?.data ?? res?.data ?? {};
+    const payload = res?.data ?? {};
     const list = Array.isArray(payload.companions) ? payload.companions : [];
     const normalized = normalizeCompanions(list);
     companions.value = companions.value.concat(normalized);
     total.value = payload.total ?? total.value;
-    if (companions.value.length >= total.value && total.value > 0) {
+    if (companions.value.length >= total.value) {
       finished.value = true;
     } else {
       page.value += 1;
@@ -69,6 +84,19 @@ onMounted(() => {
   loadSkills();
   loadCompanions();
 });
+
+const changecom = (name) => {
+  skill.value = name;
+  handleFilter();
+};
+
+const handleFilter = () => {
+  page.value = 1;
+  total.value = 0;
+  companions.value = [];
+  finished.value = false;
+  loadCompanions();
+};
 </script>
 
 <template>
@@ -76,12 +104,69 @@ onMounted(() => {
     <section class="home__section">
       <div class="skills-box">
         <template v-if="skills.length">
-          <span class="skill-chip">全部</span>
-          <span v-for="(item, index) in skills" :key="index" class="skill-chip">
-            {{ item.name || item.label || item }}
-          </span>
+          <el-button type="primary" round class="skills-button" @click="() => changecom('')"
+            >全部</el-button
+          >
+          <el-button
+            v-for="(item, index) in skills"
+            :key="index"
+            type="primary"
+            round
+            class="skills-button"
+            @click="() => changecom(item.name)"
+          >
+            {{ item.name }}
+          </el-button>
         </template>
         <span v-else class="skill-empty">暂无分类</span>
+      </div>
+    </section>
+
+    <section class="home__section">
+      <div class="filter-box">
+        <span class="filter-label">价格区间:</span>
+        <el-input-number
+          v-model="minPrice"
+          :min="0"
+          placeholder="最低价格"
+          class="filter-input"
+          :controls="false"
+        />
+        <span class="filter-separator">-</span>
+        <el-input-number
+          v-model="maxPrice"
+          :min="0"
+          placeholder="最高价格"
+          class="filter-input"
+          :controls="false"
+        />
+        <span class="filter-label" style="margin-left: 10px">状态:</span>
+        <el-select
+          v-model="status"
+          placeholder="默认全部"
+          style="width: 120px"
+          @change="handleFilter"
+        >
+          <el-option
+            v-for="item in statusOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <el-button type="primary" plain class="filter-button" @click="handleFilter">筛选</el-button>
+        <el-button
+          plain
+          @click="
+            () => {
+              minPrice = undefined;
+              maxPrice = undefined;
+              status = undefined;
+              handleFilter();
+            }
+          "
+          >重置</el-button
+        >
       </div>
     </section>
 
@@ -121,19 +206,34 @@ onMounted(() => {
   gap: 15px;
   min-height: 36px;
 }
-
-.skill-chip {
+.skills-button {
   font-size: 18px;
   font-weight: 400;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgb(248, 200, 208);
-  color: #ffffff;
 }
-
 .skill-empty {
   color: #999;
   font-size: 13px;
+}
+
+.filter-box {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+}
+.filter-label {
+  font-size: 16px;
+  color: #606266;
+}
+.filter-input {
+  width: 120px;
+}
+.filter-separator {
+  color: #dcdfe6;
+}
+.filter-button {
+  margin-left: 10px;
 }
 
 .companions {
