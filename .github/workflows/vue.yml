@@ -3,31 +3,10 @@ name: vue
 on:
   push:
     branches:
-      - front_daisy
+      - front
 
 jobs:
-  check-version:
-    runs-on: ubuntu-latest
-    outputs:
-      should_run: ${{ steps.check.outputs.should_run }}
-    steps:
-      - id: check
-        name: Check commit message for version
-        shell: bash
-        run: |
-          msg='${{ github.event.head_commit.message }}'
-          echo "Commit message: $msg"
-
-          # Match patterns like: v1.1, v.1.0, v1.1.2
-          if echo "$msg" | grep -Eiq '\bv\.?[0-9]+(\.[0-9]+)*\b'; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-          fi
-
   build-and-deploy:
-    needs: check-version
-    if: ${{ needs.check-version.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -64,7 +43,7 @@ jobs:
           mkdir -p docker-images
           docker save slgaming-vue:latest | gzip > docker-images/slgaming-vue.tar.gz
 
-      - name: Load Docker Images on Server
+      - name: Upload Docker image to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -74,12 +53,21 @@ jobs:
           source: "docker-images/*.tar.gz"
           target: "${{ secrets.DEPLOY_PATH }}/vue"
 
-      - name: Upload deploy script
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy Docker container
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          source: "front/SLGaming/deploy.sh"
-          target: "${{ secrets.DEPLOY_PATH }}/vue"
+          script: |
+            cd ${{ secrets.DEPLOY_PATH }}/vue
+            # 加载Docker镜像
+            docker load < docker-images/slgaming-vue.tar.gz
+            # 停止并移除旧容器
+            docker stop slgaming-vue || true
+            docker rm slgaming-vue || true
+            # 运行新容器
+            docker run -d --name slgaming-vue -p 9090:80 slgaming-vue:latest
+            # 检查容器状态
+            docker ps | grep slgaming-vue

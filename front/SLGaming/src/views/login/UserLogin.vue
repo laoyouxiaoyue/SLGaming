@@ -6,6 +6,7 @@ import { useRouter } from "vue-router";
 
 import { useUserStore } from "@/stores/userStore";
 import { codeAPI } from "@/api/user/code";
+import LoginPanel from "./component/LoginPanel.vue";
 const userStore = useUserStore();
 
 const loginType = ref("account"); // 'account' or 'code'
@@ -53,7 +54,7 @@ const sendCode = async () => {
       }
     }, 1000);
   } catch {
-    ElMessage({ type: "error", message: "验证码发送失败" });
+    // 拦截器已经处理了错误提示
   }
 };
 const doLogin = () => {
@@ -79,158 +80,100 @@ const doLogin = () => {
 </script>
 
 <template>
-  <div>
-    <header class="login-header">
-      <div class="container m-top-20">
-        <h1 class="logo">
-          <RouterLink to="/">SLGaming</RouterLink>
-        </h1>
-        <RouterLink class="entry" to="/">
-          进入网站首页
-          <i class="iconfont icon-angle-right"></i>
-          <i class="iconfont icon-angle-right"></i>
-        </RouterLink>
+  <LoginPanel>
+    <div class="wrapper">
+      <div class="wrapper-header">
+        <h1>slgaming/SLGaming</h1>
       </div>
-    </header>
-    <section class="login-section">
-      <div class="wrapper">
-        <nav>
-          <a
-            href="javascript:;"
-            :class="{ active: loginType === 'account' }"
-            @click="loginType = 'account'"
-            >账户登录</a
+      <nav>
+        <a
+          href="javascript:;"
+          :class="{ active: loginType === 'account' }"
+          @click="loginType = 'account'"
+          >账户登录</a
+        >
+        <a href="javascript:;" :class="{ active: loginType === 'code' }" @click="loginType = 'code'"
+          >验证码登录</a
+        >
+      </nav>
+      <div class="account-box">
+        <div class="form">
+          <el-form
+            label-position="right"
+            label-width="80px"
+            ref="formRef"
+            :model="form"
+            :rules="rules"
+            status-icon
           >
-          <a
-            href="javascript:;"
-            :class="{ active: loginType === 'code' }"
-            @click="loginType = 'code'"
-            >验证码登录</a
-          >
-        </nav>
-        <div class="account-box">
-          <div class="form">
-            <el-form
-              label-position="right"
-              label-width="80px"
-              ref="formRef"
-              :model="form"
-              :rules="rules"
-              status-icon
-            >
-              <el-form-item prop="phone" label="账户">
-                <el-input v-model="form.phone" />
+            <el-form-item prop="phone" label="账    户">
+              <el-input v-model="form.phone" />
+            </el-form-item>
+            <template v-if="loginType === 'account'">
+              <el-form-item prop="password" label="密    码">
+                <el-input v-model="form.password" type="password" show-password />
               </el-form-item>
-              <template v-if="loginType === 'account'">
-                <el-form-item prop="password" label="密码">
-                  <el-input v-model="form.password" />
-                </el-form-item>
-              </template>
-              <template v-else>
-                <el-form-item prop="code" label="验证码">
-                  <el-input v-model="form.code" style="width: 60%" />
-                  <el-button
-                    :disabled="countdown > 0"
-                    @click="sendCode"
-                    style="width: 35%; margin-left: 5%"
-                  >
-                    {{ countdown > 0 ? `${countdown}s` : "发送验证码" }}
-                  </el-button>
-                </el-form-item>
-              </template>
-              <el-button size="large" class="subBtn" @click="doLogin">点击登录</el-button>
-            </el-form>
-          </div>
+            </template>
+            <template v-else>
+              <el-form-item prop="code" label="验证码">
+                <el-input v-model="form.code" style="width: 60%" />
+                <el-button
+                  :disabled="countdown > 0"
+                  @click="sendCode"
+                  style="width: 35%; margin-left: 5%"
+                >
+                  {{ countdown > 0 ? `${countdown}s` : "发送验证码" }}
+                </el-button>
+              </el-form-item>
+            </template>
+            <el-button size="large" class="subBtn" @click="doLogin">点击登录</el-button>
+            <div class="login-links">
+              <RouterLink to="/register">注册账号</RouterLink>
+              <span class="divider">|</span>
+              <RouterLink to="/forgot">忘记密码？</RouterLink>
+              <span class="divider">|</span>
+              <RouterLink to="/">返回首页</RouterLink>
+            </div>
+          </el-form>
         </div>
       </div>
-    </section>
-  </div>
+    </div>
+  </LoginPanel>
 </template>
 
 <style scoped lang="scss">
-.login-header {
+.wrapper {
+  // height: 300px;
+  width: 380px;
   background: #fff;
-  border-bottom: 1px solid #e4e4e4;
+  position: absolute;
+  left: 50%;
+  top: 300px;
+  transform: translate3d(100px, 0, 0);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 
-  .container {
+  nav {
+    font-size: 14px;
+    height: 55px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f5f5f5;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .logo {
-    width: 200px;
+    padding: 0 40px;
+    text-align: right;
+    align-items: center;
 
     a {
-      display: block;
-      height: 132px;
-      width: 100%;
-      text-indent: -9999px;
-      background: url("@/assets/images/logo.png") no-repeat center 18px / contain;
-    }
-  }
+      flex: 1;
+      line-height: 1;
+      display: inline-block;
+      font-size: 18px;
+      position: relative;
+      text-align: center;
+      cursor: pointer;
 
-  .sub {
-    flex: 1;
-    font-size: 24px;
-    font-weight: normal;
-    margin-bottom: 38px;
-    margin-left: 20px;
-    color: #666;
-  }
-
-  .entry {
-    width: 120px;
-    margin-bottom: 38px;
-    font-size: 16px;
-
-    i {
-      font-size: 14px;
-      color: $xtxColor;
-      letter-spacing: -5px;
-    }
-  }
-}
-
-.login-section {
-  background: linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),
-    url("@/assets/images/login-bg.png") no-repeat center / cover;
-  height: 783px;
-  position: relative;
-
-  .wrapper {
-    // height: 300px;
-    width: 380px;
-    background: #fff;
-    position: absolute;
-    left: 44%;
-    top: 200px;
-    transform: translate3d(100px, 0, 0);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-
-    nav {
-      font-size: 14px;
-      height: 55px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #f5f5f5;
-      display: flex;
-      padding: 0 40px;
-      text-align: right;
-      align-items: center;
-
-      a {
-        flex: 1;
-        line-height: 1;
-        display: inline-block;
-        font-size: 18px;
-        position: relative;
-        text-align: center;
-        cursor: pointer;
-
-        &.active {
-          color: $xtxColor;
-          border-bottom: 2px solid $xtxColor;
-        }
+      &.active {
+        color: $xtxColor;
+        border-bottom: 2px solid $xtxColor;
       }
     }
   }
@@ -359,6 +302,27 @@ const doLogin = () => {
         background: #cfcdcd;
       }
     }
+    .login-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      color: #999;
+      a {
+        color: #409eff;
+        text-decoration: none;
+        margin: 0 4px;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      .divider {
+        color: #ccc;
+        margin: 0 2px;
+      }
+    }
   }
 
   .action {
@@ -376,9 +340,28 @@ const doLogin = () => {
   }
 }
 
+.wrapper-header {
+  height: 100px;
+  background: url("@/assets/images/logo.png") no-repeat center / contain;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h1 {
+    font-size: 24px;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+    text-indent: -9999px;
+  }
+}
+
 .subBtn {
   background: $xtxColor;
-  width: 100%;
+  width: 70%;
+  display: block;
+  margin: 20px auto;
   color: #fff;
 }
 </style>

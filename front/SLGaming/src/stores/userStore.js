@@ -28,6 +28,9 @@ export const useUserStore = defineStore(
     };
   },
   {
+    // Pinia 解决了组件通信和响应式问题。
+    // LocalStorage 解决了持久化（防刷新、跨会话保存）问题
+    // 通过 persist: true，你享受了 Pinia 的便利，同时自动获得了 LocalStorage 的持久化能力
     persist: true,
-  }
+  },
 );
