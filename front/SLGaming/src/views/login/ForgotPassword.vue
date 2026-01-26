@@ -86,6 +86,9 @@ const doReset = () => {
 <template>
   <LoginPanel>
     <div class="wrapper">
+      <div class="wrapper-header">
+        <h1>slgaming/SLGaming</h1>
+      </div>
       <nav>
         <a class="active">重置登录密码</a>
       </nav>
@@ -133,6 +136,8 @@ const doReset = () => {
               <RouterLink to="/login">返回登录</RouterLink>
               <span class="divider">|</span>
               <RouterLink to="/register">立即注册</RouterLink>
+              <span class="divider">|</span>
+              <RouterLink to="/">返回首页</RouterLink>
             </div>
           </el-form>
         </div>
@@ -146,7 +151,7 @@ const doReset = () => {
   width: 400px;
   background: #fff;
   position: absolute;
-  left: 44%;
+  left: 50%;
   top: 150px;
   transform: translate3d(100px, 0, 0);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
@@ -201,6 +206,23 @@ const doReset = () => {
         color: #ccc;
       }
     }
+  }
+}
+
+.wrapper-header {
+  height: 100px;
+  background: url("@/assets/images/logo.png") no-repeat center / contain;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h1 {
+    font-size: 24px;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+    text-indent: -9999px;
   }
 }
 

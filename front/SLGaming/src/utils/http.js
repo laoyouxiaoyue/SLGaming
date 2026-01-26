@@ -8,7 +8,7 @@ import router from "@/router";
 // 创建axios实例（相当于造了一个专属的"请求工具"）
 const http = axios.create({
   baseURL: "http://120.26.29.194:8888/api",
-  timeout: 10000, // 请求超过10秒没响应就报错
+  timeout: 100000, // 请求超过10秒没响应就报错
 });
 
 // axios请求拦截器：请求"发出去之前"会经过这里
@@ -53,7 +53,7 @@ http.interceptors.response.use(
     // 2、跳转到登录页
     if (e.response && e.response.status === 401) {
       userStore.clearUserInfo();
-      router.push("/login");
+      // router.push("/login");
     }
     return Promise.reject(e); // 把错误抛出去，让外面能捕获
   },

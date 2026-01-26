@@ -90,6 +90,9 @@ const doRegister = () => {
 <template>
   <LoginPanel>
     <div class="wrapper">
+      <div class="wrapper-header">
+        <h1>slgaming/SLGaming</h1>
+      </div>
       <nav>
         <a class="active">新用户注册</a>
       </nav>
@@ -139,6 +142,8 @@ const doRegister = () => {
             <div class="login-links">
               <span style="color: #999">已有账号？</span>
               <RouterLink to="/login">返回登录</RouterLink>
+              <span class="divider">|</span>
+              <RouterLink to="/">返回首页</RouterLink>
             </div>
           </el-form>
         </div>
@@ -152,7 +157,7 @@ const doRegister = () => {
   width: 380px;
   background: #fff;
   position: absolute;
-  left: 44%;
+  left: 50%;
   top: 150px; /* 注册表单较长，稍微上移 */
   transform: translate3d(100px, 0, 0);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
@@ -203,6 +208,23 @@ const doRegister = () => {
         }
       }
     }
+  }
+}
+
+.wrapper-header {
+  height: 100px;
+  background: url("@/assets/images/logo.png") no-repeat center / contain;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h1 {
+    font-size: 24px;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+    text-indent: -9999px;
   }
 }
 

@@ -65,20 +65,29 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .app-topnav {
-  background: #333;
+  background-image:
+    linear-gradient(rgba(130, 129, 129, 0.3), rgba(111, 110, 110, 0)),
+    url("@/assets/images/home.png");
+  background-repeat: no-repeat;
+  background-position: 50% 25%;
+  background-size: cover;
+  // background-color: #333;
 
   ul {
+    height: 156px;
     display: flex;
-    height: 53px;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-start;
 
     li {
       a {
+        margin-top: 30px;
         padding: 0 15px;
-        color: #cdcdcd;
+        color: #ffffff;
         line-height: 1;
         display: inline-block;
+        font-weight: 400;
+        font-size: 18px;
 
         i {
           font-size: 14px;
@@ -97,5 +106,12 @@ onMounted(() => {
       }
     }
   }
+}
+
+.app-topnav .container {
+  width: 100%;
+  max-width: 2560px;
+  padding: 0 66px;
+  position: relative;
 }
 </style>
