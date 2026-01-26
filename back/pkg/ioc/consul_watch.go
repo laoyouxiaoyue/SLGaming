@@ -44,11 +44,11 @@ func NewConsulWatcher(cfg ConsulConfig, serviceName string, onChange func([]stri
 		onChange:    onChange,
 	}
 
-	// 初始解析一次
+	// 初始解析一次（允许失败，服务可能还没启动）
 	endpoints, err := watcher.resolveEndpoints()
 	if err != nil {
-		cancel()
-		return nil, fmt.Errorf("initial resolve endpoints failed: %w", err)
+		logx.Infof("[consul_watch] 初始解析服务端点失败（服务可能未启动）: service=%s, error=%v，将等待服务注册后自动发现", serviceName, err)
+		endpoints = []string{} // 使用空数组，稍后通过 watch 更新
 	}
 	watcher.setEndpoints(endpoints)
 
@@ -142,7 +142,14 @@ func (w *ConsulWatcher) watch() {
 		case <-ticker.C:
 			endpoints, err := w.resolveEndpoints()
 			if err != nil {
-				logx.Errorf("[consul_watch] 失败: 解析服务端点失败, service=%s, error=%v", w.serviceName, err)
+				// 如果解析失败，检查当前是否有 endpoints
+				// 如果当前也没有，说明服务还没注册，继续等待
+				currentEndpoints := w.GetEndpoints()
+				if len(currentEndpoints) == 0 {
+					logx.Debugf("[consul_watch] 服务暂未注册，继续等待: service=%s", w.serviceName)
+				} else {
+					logx.Errorf("[consul_watch] 失败: 解析服务端点失败, service=%s, error=%v", w.serviceName, err)
+				}
 				continue
 			}
 

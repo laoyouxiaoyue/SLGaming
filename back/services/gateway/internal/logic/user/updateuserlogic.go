@@ -5,7 +5,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -68,7 +67,10 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.
 	}
 
 	if l.svcCtx.UserRPC == nil {
-		return nil, fmt.Errorf("user rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		return &types.UpdateUserResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 调用用户服务的 RPC

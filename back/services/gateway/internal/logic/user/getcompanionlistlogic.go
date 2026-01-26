@@ -5,7 +5,9 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -31,7 +33,20 @@ func NewGetCompanionListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 
 func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequest) (resp *types.GetCompanionListResponse, err error) {
 	if l.svcCtx.UserRPC == nil {
-		return nil, fmt.Errorf("user rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		return &types.GetCompanionListResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
+	}
+
+	cacheKey := buildCompanionListCacheKey(req)
+	if l.svcCtx.CacheRedis != nil {
+		if cached, cacheErr := l.svcCtx.CacheRedis.Get(cacheKey); cacheErr == nil && cached != "" {
+			var cachedResp types.GetCompanionListResponse
+			if unmarshalErr := json.Unmarshal([]byte(cached), &cachedResp); unmarshalErr == nil {
+				return &cachedResp, nil
+			}
+		}
 	}
 
 	// 调用 User RPC 的 GetCompanionList 接口
@@ -73,7 +88,7 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 		})
 	}
 
-	return &types.GetCompanionListResponse{
+	resp = &types.GetCompanionListResponse{
 		BaseResp: types.BaseResp{
 			Code: 0,
 			Msg:  "success",
@@ -84,5 +99,26 @@ func (l *GetCompanionListLogic) GetCompanionList(req *types.GetCompanionListRequ
 			Page:       int(rpcResp.Page),
 			PageSize:   int(rpcResp.PageSize),
 		},
-	}, nil
+	}
+
+	if l.svcCtx.CacheRedis != nil {
+		if payload, marshalErr := json.Marshal(resp); marshalErr == nil {
+			_ = l.svcCtx.CacheRedis.Setex(cacheKey, string(payload), int((60 * time.Second).Seconds()))
+		}
+	}
+
+	return resp, nil
+}
+
+func buildCompanionListCacheKey(req *types.GetCompanionListRequest) string {
+	return fmt.Sprintf(
+		"cache:companions:%s:%d:%d:%d:%t:%d:%d",
+		req.GameSkill,
+		req.MinPrice,
+		req.MaxPrice,
+		req.Status,
+		req.IsVerified,
+		req.Page,
+		req.PageSize,
+	)
 }

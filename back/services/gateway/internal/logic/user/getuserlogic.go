@@ -6,7 +6,6 @@ package user
 import (
 	"SLGaming/back/services/gateway/internal/middleware"
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -32,7 +31,10 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 
 func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (resp *types.GetUserResponse, err error) {
 	if l.svcCtx.UserRPC == nil {
-		return nil, fmt.Errorf("user rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		return &types.GetUserResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 如果所有查询条件都为空，使用当前登录用户的 ID 作为默认值

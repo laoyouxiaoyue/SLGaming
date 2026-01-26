@@ -5,7 +5,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -31,7 +30,10 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 
 func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
 	if l.svcCtx.UserRPC == nil {
-		return nil, fmt.Errorf("user rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		return &types.LoginResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 调用用户服务的 RPC

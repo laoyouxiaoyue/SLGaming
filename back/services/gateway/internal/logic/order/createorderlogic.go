@@ -2,7 +2,6 @@ package order
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -29,7 +28,10 @@ func NewCreateOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Creat
 
 func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderRequest) (resp *types.CreateOrderResponse, err error) {
 	if l.svcCtx.OrderRPC == nil {
-		return nil, fmt.Errorf("order rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "OrderRPC")
+		return &types.CreateOrderResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 从 context 中获取当前登录用户 ID（老板，由网关鉴权中间件注入）

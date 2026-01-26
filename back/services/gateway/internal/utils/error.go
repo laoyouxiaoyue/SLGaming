@@ -188,6 +188,15 @@ func HandleError(err error, logger logx.Logger, operation string) (int32, string
 	return 500, "操作失败，请稍后重试"
 }
 
+// HandleRPCClientUnavailable 处理 RPC 客户端未初始化错误
+// 返回 (code, message) 用于构建 BaseResp
+func HandleRPCClientUnavailable(logger logx.Logger, service string) (int32, string) {
+	if logger != nil {
+		logger.Errorf("[%s] RPC client not initialized", service)
+	}
+	return 503, "服务暂时不可用，请稍后重试"
+}
+
 // BuildErrorResponse 构建错误响应（用于返回给前端）
 // 返回格式：BaseResp{Code: code, Msg: message}
 func BuildErrorResponse(code int32, message string) map[string]interface{} {

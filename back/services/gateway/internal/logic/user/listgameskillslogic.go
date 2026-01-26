@@ -5,7 +5,8 @@ package user
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"time"
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -31,7 +32,20 @@ func NewListGameSkillsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Li
 
 func (l *ListGameSkillsLogic) ListGameSkills() (resp *types.ListGameSkillsResponse, err error) {
 	if l.svcCtx.UserRPC == nil {
-		return nil, fmt.Errorf("user rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		return &types.ListGameSkillsResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
+	}
+
+	const cacheKey = "cache:gameskills:all"
+	if l.svcCtx.CacheRedis != nil {
+		if cached, cacheErr := l.svcCtx.CacheRedis.Get(cacheKey); cacheErr == nil && cached != "" {
+			var cachedResp types.ListGameSkillsResponse
+			if unmarshalErr := json.Unmarshal([]byte(cached), &cachedResp); unmarshalErr == nil {
+				return &cachedResp, nil
+			}
+		}
 	}
 
 	rpcResp, err := l.svcCtx.UserRPC.ListGameSkills(l.ctx, &userclient.ListGameSkillsRequest{})
@@ -51,8 +65,16 @@ func (l *ListGameSkillsLogic) ListGameSkills() (resp *types.ListGameSkillsRespon
 		})
 	}
 
-	return &types.ListGameSkillsResponse{
+	resp = &types.ListGameSkillsResponse{
 		BaseResp: types.BaseResp{Code: 0, Msg: "success"},
 		Data:     data,
-	}, nil
+	}
+
+	if l.svcCtx.CacheRedis != nil {
+		if payload, marshalErr := json.Marshal(resp); marshalErr == nil {
+			_ = l.svcCtx.CacheRedis.Setex(cacheKey, string(payload), int((30 * time.Minute).Seconds()))
+		}
+	}
+
+	return resp, nil
 }

@@ -5,7 +5,6 @@ package order
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -32,7 +31,10 @@ func NewCancelOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Cance
 
 func (l *CancelOrderLogic) CancelOrder(req *types.CancelOrderRequest) (resp *types.CancelOrderResponse, err error) {
 	if l.svcCtx.OrderRPC == nil {
-		return nil, fmt.Errorf("order rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "OrderRPC")
+		return &types.CancelOrderResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 当前登录用户作为 operator_id（由网关鉴权中间件注入）

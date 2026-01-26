@@ -5,7 +5,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -32,7 +31,10 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 
 func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.RegisterResponse, err error) {
 	if l.svcCtx.UserRPC == nil {
-		return nil, fmt.Errorf("user rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		return &types.RegisterResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 验证验证码

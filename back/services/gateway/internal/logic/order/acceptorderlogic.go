@@ -5,7 +5,6 @@ package order
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -32,7 +31,10 @@ func NewAcceptOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Accep
 
 func (l *AcceptOrderLogic) AcceptOrder(req *types.AcceptOrderRequest) (resp *types.AcceptOrderResponse, err error) {
 	if l.svcCtx.OrderRPC == nil {
-		return nil, fmt.Errorf("order rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "OrderRPC")
+		return &types.AcceptOrderResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 当前登录用户作为陪玩ID（由网关鉴权中间件注入）

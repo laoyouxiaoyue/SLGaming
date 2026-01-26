@@ -2,7 +2,6 @@ package order
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -28,7 +27,10 @@ func NewGetOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetOrder
 
 func (l *GetOrderLogic) GetOrder(req *types.GetOrderRequest) (resp *types.GetOrderResponse, err error) {
 	if l.svcCtx.OrderRPC == nil {
-		return nil, fmt.Errorf("order rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "OrderRPC")
+		return &types.GetOrderResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	rpcResp, err := l.svcCtx.OrderRPC.GetOrder(l.ctx, &orderclient.GetOrderRequest{

@@ -5,7 +5,6 @@ package code
 
 import (
 	"context"
-	"fmt"
 
 	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -31,7 +30,10 @@ func NewSendCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendCode
 
 func (l *SendCodeLogic) SendCode(req *types.SendCodeRequest) (resp *types.SendCodeResponse, err error) {
 	if l.svcCtx.CodeRPC == nil {
-		return nil, fmt.Errorf("code rpc client not initialized")
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "CodeRPC")
+		return &types.SendCodeResponse{
+			BaseResp: types.BaseResp{Code: code, Msg: msg},
+		}, nil
 	}
 
 	// 调用验证码服务的 RPC

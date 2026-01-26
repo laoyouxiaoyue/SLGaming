@@ -4,7 +4,6 @@
 package svc
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -29,6 +28,7 @@ type ServiceContext struct {
 	OrderRPC   orderclient.Order
 	JWT        *jwt.JWTManager
 	TokenStore jwt.TokenStore
+	CacheRedis *redis.Redis
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -89,6 +89,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 	redisClient := redis.MustNewRedis(c.Redis.RedisConf)
 	ctx.TokenStore = jwt.NewRedisTokenStore(redisClient)
+	ctx.CacheRedis = redisClient
 	logx.Infof("使用 Redis 存储 Refresh Token")
 
 	return ctx
@@ -164,17 +165,31 @@ func newConsulDynamicRPCClient(consulConf config.ConsulConf, serviceName string)
 		Token:   consulConf.Token,
 	}
 
-	// 初始解析一次
+	// 初始解析一次（允许失败，服务可能还没启动）
 	endpoints, err := ioc.ResolveServiceEndpoints(adapter, serviceName)
 	if err != nil {
-		return nil, fmt.Errorf("initial resolve endpoints failed: %w", err)
+		logx.Infof("初始解析服务端点失败（服务可能未启动）: service=%s, error=%v，将等待服务注册后自动发现", serviceName, err)
+		endpoints = []string{} // 使用空数组，稍后通过 watch 更新
 	}
 
-	// 创建初始客户端
-	client := zrpc.MustNewClient(zrpc.RpcClientConf{
-		Endpoints: endpoints,
-		NonBlock:  true,
-	})
+	var client zrpc.Client
+	if len(endpoints) > 0 {
+		// 如果初始解析成功，创建客户端
+		client = zrpc.MustNewClient(zrpc.RpcClientConf{
+			Endpoints: endpoints,
+			NonBlock:  true,
+		})
+		logx.Infof("成功创建动态 Consul RPC 客户端: service=%s, initial_endpoints=%v", serviceName, endpoints)
+	} else {
+		// 如果初始解析失败，创建一个占位符客户端（使用无效地址，但不会报错）
+		// 注意：zrpc 不支持空 endpoints，所以我们使用一个占位符
+		// 这个客户端在第一次实际调用时会失败，但 watch 会很快更新它
+		client = zrpc.MustNewClient(zrpc.RpcClientConf{
+			Endpoints: []string{"127.0.0.1:0"}, // 占位符，不会实际连接
+			NonBlock:  true,
+		})
+		logx.Infof("创建动态 Consul RPC 客户端（等待服务注册）: service=%s, 将自动发现服务端点", serviceName)
+	}
 
 	// 创建动态客户端包装器
 	dynamicClient := &DynamicRPCClient{
@@ -184,15 +199,23 @@ func newConsulDynamicRPCClient(consulConf config.ConsulConf, serviceName string)
 	}
 
 	// 启动监听，当端点变化时更新客户端
+	// 注意：即使初始解析失败，也要创建 watcher，这样可以在服务注册后自动发现
 	watcher, err := ioc.NewConsulWatcher(adapter, serviceName, func(newEndpoints []string) {
-		dynamicClient.updateClient(newEndpoints)
+		if len(newEndpoints) > 0 {
+			// 只有当发现有效 endpoints 时才更新客户端
+			dynamicClient.updateClient(newEndpoints)
+		} else {
+			logx.Infof("[dynamic_rpc] 服务暂未注册: service=%s，继续等待...", serviceName)
+		}
 	})
 	if err != nil {
-		return nil, fmt.Errorf("create consul watcher failed: %w", err)
+		// 如果创建 watcher 失败，仍然返回客户端（使用初始解析的结果）
+		logx.Errorf("创建 Consul watcher 失败: service=%s, error=%v，将使用静态端点", serviceName, err)
+		return &dynamicRPCClientWrapper{client: dynamicClient}, nil
 	}
 
 	dynamicClient.watcher = watcher
-	logx.Infof("成功创建动态 Consul RPC 客户端: service=%s, initial_endpoints=%v (支持动态更新和负载均衡)", serviceName, endpoints)
+	logx.Infof("成功创建动态 Consul RPC 客户端: service=%s (支持动态更新和负载均衡)", serviceName)
 
 	// 返回一个包装器，实现 zrpc.Client 接口
 	return &dynamicRPCClientWrapper{client: dynamicClient}, nil
