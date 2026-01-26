@@ -3,12 +3,12 @@ import { useUserStore } from "@/stores/userStore";
 
 import { ElMessage } from "element-plus";
 import "element-plus/theme-chalk/el-message.css";
+import router from "@/router";
 
 // 创建axios实例（相当于造了一个专属的"请求工具"）
 const http = axios.create({
-  baseURL: "/api",
-  // baseURL: "http://120.26.29.194:8888/api",
-  timeout: 5000, // 请求超过5秒没响应就报错
+  baseURL: "http://120.26.29.194:8888/api",
+  timeout: 100000, // 请求超过10秒没响应就报错
 });
 
 // axios请求拦截器：请求"发出去之前"会经过这里
@@ -30,7 +30,7 @@ http.interceptors.request.use(
   (e) => {
     console.log("请求还没发出去就出错了", e);
     return Promise.reject(e); // 把错误抛出去，让外面能捕获
-  }
+  },
 );
 
 // axios响应拦截器：服务器"返回结果后"会经过这里
@@ -44,11 +44,19 @@ http.interceptors.response.use(
   },
   // 第二个函数：响应失败（比如404、500、超时）时执行
   (e) => {
+    const userStore = useUserStore();
     // 可以在这里统一处理错误，比如401跳登录、500提示服务器错误
     const errorMsg = e.response?.data.msg || "请求失败，请稍后重试";
-    ElMessage.error(errorMsg);
-    // return Promise.reject(e); // 把错误抛出去，让外面能捕获
-  }
+    ElMessage.warning(errorMsg);
+    //401 token 失效处理
+    // 1、清楚本地用户数据
+    // 2、跳转到登录页
+    if (e.response && e.response.status === 401) {
+      userStore.clearUserInfo();
+      // router.push("/login");
+    }
+    return Promise.reject(e); // 把错误抛出去，让外面能捕获
+  },
 );
 
 export default http;
