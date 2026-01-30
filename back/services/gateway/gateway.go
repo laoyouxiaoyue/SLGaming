@@ -70,38 +70,48 @@ func main() {
 	// 注册路由处理器
 	handler.RegisterHandlers(server, ctx)
 
-	// 为所有API路由注册OPTIONS方法支持，确保CORS预检请求能通过
-	// 注意：这必须在RegisterHandlers之后
-	apiPaths := []string{
-		"/api/user/login",
-		"/api/user/register",
-		"/api/user/logout",
-		"/api/user/refresh-token",
-		"/api/user/login-by-code",
-		"/api/user",
-		"/api/user/companion/profile",
-		"/api/user/companions",
-		"/api/user/forgetPassword",
-		"/api/code/send",
-		"/api/order",
-		"/api/orders",
-		"/api/order/accept",
-		"/api/order/cancel",
-		"/api/order/complete",
-		"/api/order/rate",
-		"/api/order/start",
-	}
+	// 为所有 /api/* 路径自动添加 OPTIONS 方法支持，确保 CORS 预检请求能通过
+	// 使用路径参数匹配所有可能的路径层级
+	// 注意：go-zero 的路由匹配是精确匹配，所以需要添加多个通配符路由来覆盖所有情况
+	apiOptionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// CORS 中间件已经处理了 CORS 头，这里只是确保路由存在并返回 204
+		w.WriteHeader(http.StatusNoContent)
+	})
 
-	for _, path := range apiPaths {
-		server.AddRoute(rest.Route{
-			Method: http.MethodOptions,
-			Path:   path,
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// CORS中间件已经处理了，这里只是确保路由存在
-				w.WriteHeader(http.StatusNoContent)
-			}),
-		})
-	}
+	// 支持单级路径：/api/:path
+	server.AddRoute(rest.Route{
+		Method:  http.MethodOptions,
+		Path:    "/api/:path",
+		Handler: apiOptionsHandler,
+	})
+
+	// 支持两级路径：/api/:path1/:path2
+	server.AddRoute(rest.Route{
+		Method:  http.MethodOptions,
+		Path:    "/api/:path1/:path2",
+		Handler: apiOptionsHandler,
+	})
+
+	// 支持三级路径：/api/:path1/:path2/:path3
+	server.AddRoute(rest.Route{
+		Method:  http.MethodOptions,
+		Path:    "/api/:path1/:path2/:path3",
+		Handler: apiOptionsHandler,
+	})
+
+	// 支持四级路径：/api/:path1/:path2/:path3/:path4
+	server.AddRoute(rest.Route{
+		Method:  http.MethodOptions,
+		Path:    "/api/:path1/:path2/:path3/:path4",
+		Handler: apiOptionsHandler,
+	})
+
+	// 也支持 /api 路径本身
+	server.AddRoute(rest.Route{
+		Method:  http.MethodOptions,
+		Path:    "/api",
+		Handler: apiOptionsHandler,
+	})
 
 	// 捕获退出信号，触发优雅停机
 	sigCh := make(chan os.Signal, 1)
