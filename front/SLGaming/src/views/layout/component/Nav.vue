@@ -88,7 +88,11 @@ onMounted(() => {
           </li>
         </template>
         <template v-else>
-          <li><a href="javascript:;" @click="$router.push('/login')">登录</a></li>
+          <li>
+            <a href="javascript:;" @click="$router.push('/login')"
+              ><sl-icon name="icon-touxiang" />去登录</a
+            >
+          </li>
         </template>
         <li>
           <a href="javascript:;"><sl-icon name="icon-bangzhuzhongxin" />帮助中心</a>
