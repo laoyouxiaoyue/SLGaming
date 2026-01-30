@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	dsn := "root:root123456@tcp(120.26.29.194:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
+	dsn := "root:root123456@tcp(120.26.29.242:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Panicf("database connection failed: %v", err)

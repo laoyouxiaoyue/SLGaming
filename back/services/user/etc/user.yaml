@@ -3,7 +3,7 @@ ListenOn: 0.0.0.0:8086
 
 Nacos:
   Hosts:
-    - 120.26.29.194
+    - 120.26.29.242
   Namespace: "df1bdb69-492b-4b4a-81a4-26419cc53c71"
   Group: dev
   DataId: user.yaml
@@ -12,14 +12,14 @@ Nacos:
 
 # MySQL 数据库
 Mysql:
-  DSN: "root:root123456@tcp(120.26.29.194:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
+  DSN: "root:root123456@tcp(120.26.29.242:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
   MaxIdleConns: 10
   MaxOpenConns: 100
   ConnMaxLifetime: "300s"
   ConnMaxIdleTime: "60s"
 
 Consul:
-  Address: 120.26.29.194:8500
+  Address: 120.26.29.242:8500
   Token: ""
   Service:
     Name: user-rpc
@@ -34,7 +34,7 @@ Consul:
 # RocketMQ 配置（预留，用于钱包变动、订单结算等异步处理）
 RocketMQ:
   NameServers:
-    - 120.26.29.194:9876
+    - 120.26.29.242:9876
   Namespace: ""
   AccessKey: ""
   SecretKey: ""

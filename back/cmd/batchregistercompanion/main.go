@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	endpoint = flag.String("endpoint", "120.26.29.194:8086", "user rpc endpoint")
+	endpoint = flag.String("endpoint", "120.26.29.242:8086", "user rpc endpoint")
 	count    = flag.Int("count", 10, "要注册的陪玩数量")
 )
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"path"
 	"strings"
 
 	"SLGaming/back/services/gateway/internal/jwt"
@@ -32,7 +33,23 @@ var publicPaths = map[string]bool{
 
 // isPublicPath 检查路径是否需要鉴权
 func isPublicPath(path string) bool {
-	return publicPaths[path]
+	if publicPaths[path] {
+		return true
+	}
+	cleaned := pathClean(path)
+	return publicPaths[cleaned]
+}
+
+func pathClean(p string) string {
+	if p == "" {
+		return "/"
+	}
+	cleaned := path.Clean(p)
+	// 保留原始结尾斜杠的兼容性：/api/user/gameskills/ -> /api/user/gameskills
+	if strings.HasSuffix(p, "/") && cleaned != "/" {
+		cleaned = strings.TrimSuffix(cleaned, "/")
+	}
+	return cleaned
 }
 
 // AuthMiddleware JWT 鉴权中间件

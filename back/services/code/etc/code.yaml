@@ -3,14 +3,14 @@ ListenOn: 0.0.0.0:8085
 
 Redis:
   Key: ""
-  Host: 120.26.29.194:6379
+  Host: 120.26.29.242:6379
   Type: node
   Pass: ""
   Tls: false
 
 Nacos:
   Hosts:
-    - 120.26.29.194
+    - 120.26.29.242
   Namespace: "adc722cd-9c3b-40a7-80fa-b25535bdbe58"
   Group: dev
   DataId: code.yaml
@@ -22,7 +22,7 @@ TemplateNacos:
   Group: dev
 
 Consul:
-  Address: 120.26.29.194:8500
+  Address: 120.26.29.242:8500
   Token: ""
   Service:
     Name: code-rpc

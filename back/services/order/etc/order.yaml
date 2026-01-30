@@ -4,7 +4,7 @@ ListenOn: 0.0.0.0:8087
 # Nacos 配置（可选）
 Nacos:
   Hosts:
-    - 120.26.29.194:8848
+    - 120.26.29.242:8848
   Namespace: "31b819c6-62bf-4081-b6bb-7d3e52d09b36"
   Group: dev
   DataId: order.yaml
@@ -13,7 +13,7 @@ Nacos:
 
 # MySQL 数据库
 Mysql:
-  DSN: "root:root123456@tcp(120.26.29.194:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
+  DSN: "root:root123456@tcp(120.26.29.242:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
   MaxIdleConns: 10
   MaxOpenConns: 100
   ConnMaxLifetime: "300s"
@@ -21,7 +21,7 @@ Mysql:
 
 # Consul 配置（可选）
 Consul:
-  Address: 120.26.29.194:8500
+  Address: 120.26.29.242:8500
   Token: ""
   Service:
     Name: order-rpc
@@ -36,7 +36,7 @@ Consul:
 # Redis 配置（如果订单服务需要用缓存）
 Redis:
   Key: ""
-  Host: 120.26.29.194:6379
+  Host: 120.26.29.242:6379
   Type: node
   Pass: ""
   Tls: false
@@ -48,7 +48,7 @@ Upstream:
 # RocketMQ 配置（预留，用于订单事件异步处理：下单、支付、取消、退款等）
 RocketMQ:
   NameServers:
-    - 120.26.29.194:9876
+    - 120.26.29.242:9876
   Namespace: ""
   AccessKey: ""
   SecretKey: ""

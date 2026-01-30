@@ -18,7 +18,7 @@ func main() {
 	// 优先从环境变量读取，否则使用默认值
 	dsn := os.Getenv("MYSQL_DSN")
 	if dsn == "" {
-		dsn = "root:root123456@tcp(120.26.29.194:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
+		dsn = "root:root123456@tcp(120.26.29.242:3306)/SLGaming?charset=utf8mb4&parseTime=true&loc=Local"
 		log.Println("使用默认 DSN，如需修改请设置环境变量 MYSQL_DSN")
 	}
 
