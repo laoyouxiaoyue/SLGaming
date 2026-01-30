@@ -4,10 +4,12 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 import App from "./App.vue";
 import router from "./router";
+import Icon from "@/components/Icon.vue";
 // 引入初始化样式文件
 import "@/styles/common.scss";
 
 const app = createApp(App);
+app.component("SlIcon", Icon);
 const pinia = createPinia();
 
 pinia.use(piniaPluginPersistedstate);

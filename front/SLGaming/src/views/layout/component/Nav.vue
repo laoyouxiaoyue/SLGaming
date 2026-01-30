@@ -50,7 +50,9 @@ onMounted(() => {
               </template>
             </el-popconfirm>
           </li>
-          <li><a href="javascript:;">我的订单</a></li>
+          <li>
+            <a href="javascript:;"><sl-icon name="icon-dingdan" />我的订单</a>
+          </li>
           <li><a href="javascript:;">会员中心</a></li>
         </template>
         <template v-else>
@@ -66,15 +68,15 @@ onMounted(() => {
 <style scoped lang="scss">
 .app-topnav {
   background-image:
-    linear-gradient(rgba(130, 129, 129, 0.3), rgba(111, 110, 110, 0)),
+    linear-gradient(rgba(130, 129, 129, 0.45), rgba(111, 110, 110, 0)),
     url("@/assets/images/home.png");
   background-repeat: no-repeat;
-  background-position: 50% 25%;
+  background-position: 50% 24%;
   background-size: cover;
   // background-color: #333;
 
   ul {
-    height: 156px;
+    height: 183px;
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
@@ -86,22 +88,16 @@ onMounted(() => {
         color: #ffffff;
         line-height: 1;
         display: inline-block;
-        font-weight: 400;
+        font-weight: 549;
         font-size: 18px;
 
         i {
           font-size: 14px;
-          margin-right: 2px;
+          margin-right: 1px;
         }
 
         &:hover {
           color: $xtxColor;
-        }
-      }
-
-      ~ li {
-        a {
-          border-left: 2px solid #666;
         }
       }
     }
@@ -111,7 +107,7 @@ onMounted(() => {
 .app-topnav .container {
   width: 100%;
   max-width: 2560px;
-  padding: 0 66px;
+  padding: 0 80px;
   position: relative;
 }
 </style>

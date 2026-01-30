@@ -98,13 +98,17 @@ const handleFilter = () => {
     <section class="home__section">
       <div class="skills-box">
         <template v-if="skills?.length">
-          <el-button type="primary" round class="skills-button" @click="() => changecom('')"
+          <el-button
+            :type="skill === '' ? 'primary' : ''"
+            round
+            class="skills-button"
+            @click="() => changecom('')"
             >全部</el-button
           >
           <el-button
             v-for="(item, index) in skills"
             :key="index"
-            type="primary"
+            :type="skill === item.name ? 'primary' : ''"
             round
             class="skills-button"
             @click="() => changecom(item.name)"

@@ -194,9 +194,10 @@ const ratingText = computed(() => {
   padding: 10px 18px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, #ff7a45, #ff4d4f);
+  background: linear-gradient(135deg, #fc8d61, #f1787a);
   color: #fff;
   font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
   transition:
     transform 0.2s ease,
