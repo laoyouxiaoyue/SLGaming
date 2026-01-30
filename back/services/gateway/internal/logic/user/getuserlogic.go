@@ -67,19 +67,32 @@ func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (resp *types.GetUserRe
 		}, nil
 	}
 
+	// 检查 RPC 返回的用户信息
+	if rpcResp == nil || rpcResp.GetUser() == nil {
+		return &types.GetUserResponse{
+			BaseResp: types.BaseResp{
+				Code: 500,
+				Msg:  "用户信息为空",
+			},
+		}, nil
+	}
+
+	userInfo := rpcResp.GetUser()
 	return &types.GetUserResponse{
 		BaseResp: types.BaseResp{
 			Code: 0,
 			Msg:  "success",
 		},
 		Data: types.UserInfo{
-			Id:        rpcResp.User.Id,
-			Uid:       rpcResp.User.Uid,
-			Nickname:  rpcResp.User.Nickname,
-			Phone:     rpcResp.User.Phone,
-			Role:      int(rpcResp.User.Role),
-			AvatarUrl: rpcResp.User.AvatarUrl,
-			Bio:       rpcResp.User.Bio,
+			Id:            userInfo.GetId(),
+			Uid:           userInfo.GetUid(),
+			Nickname:      userInfo.GetNickname(),
+			Phone:         userInfo.GetPhone(),
+			Role:          int(userInfo.GetRole()),
+			AvatarUrl:     userInfo.GetAvatarUrl(),
+			Bio:           userInfo.GetBio(),
+			Balance:       userInfo.GetBalance(),
+			FrozenBalance: userInfo.GetFrozenBalance(),
 		},
 	}, nil
 }

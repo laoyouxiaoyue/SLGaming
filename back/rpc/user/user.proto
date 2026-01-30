@@ -38,6 +38,8 @@ message UserInfo {
   int32  role = 5;        // 用户角色：1=老板, 2=陪玩, 3=管理员
   string avatar_url = 6; // 头像URL
   string bio = 7;        // 个人简介
+  int64  balance = 8;    // 帅币可用余额
+  int64  frozen_balance = 9; // 冻结帅币余额（预留）
 }
 
 message GetUserResponse {

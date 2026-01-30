@@ -308,13 +308,15 @@ type UpdateUserResponse struct {
 }
 
 type UserInfo struct {
-	Id        uint64 `json:"id"`
-	Uid       uint64 `json:"uid"`
-	Nickname  string `json:"nickname"`
-	Phone     string `json:"phone"`
-	Role      int    `json:"role"`      // 用户角色：1=老板, 2=陪玩, 3=管理员
-	AvatarUrl string `json:"avatarUrl"` // 头像URL
-	Bio       string `json:"bio"`       // 个人简介
+	Id            uint64 `json:"id"`
+	Uid           uint64 `json:"uid"`
+	Nickname      string `json:"nickname"`
+	Phone         string `json:"phone"`
+	Role          int    `json:"role"`          // 用户角色：1=老板, 2=陪玩, 3=管理员
+	AvatarUrl     string `json:"avatarUrl"`     // 头像URL
+	Bio           string `json:"bio"`           // 个人简介
+	Balance       int64  `json:"balance"`       // 帅币可用余额
+	FrozenBalance int64  `json:"frozenBalance"` // 冻结帅币余额（预留）
 }
 
 type WalletInfo struct {
