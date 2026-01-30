@@ -14,10 +14,10 @@ const finished = ref(false);
 const skill = ref("");
 const minPrice = ref(undefined);
 const maxPrice = ref(undefined);
-const status = ref(undefined);
+const status = ref("");
 
 const statusOptions = [
-  { label: "全部", value: undefined },
+  { label: "全部", value: "" },
   { label: "在线", value: 1 },
   { label: "离线", value: 0 },
   { label: "忙碌", value: 2 },
@@ -37,14 +37,8 @@ const normalizeCompanions = (list) =>
   });
 
 const loadSkills = async () => {
-  try {
-    const res = await getgameskillapi();
-    const payload = res?.data ?? {};
-    const list = payload.list || payload.skills || payload || [];
-    skills.value = Array.isArray(list) ? list : [];
-  } catch {
-    skills.value = [];
-  }
+  const res = await getgameskillapi();
+  skills.value = res.data;
 };
 
 const loadCompanions = async () => {
@@ -57,7 +51,7 @@ const loadCompanions = async () => {
       pageSize: pageSize.value,
       minPrice: minPrice.value,
       maxPrice: maxPrice.value,
-      status: status.value,
+      status: status.value === "" ? undefined : status.value,
     });
     const payload = res?.data ?? {};
     const list = Array.isArray(payload.companions) ? payload.companions : [];
@@ -103,7 +97,7 @@ const handleFilter = () => {
   <div class="home">
     <section class="home__section">
       <div class="skills-box">
-        <template v-if="skills.length">
+        <template v-if="skills?.length">
           <el-button type="primary" round class="skills-button" @click="() => changecom('')"
             >全部</el-button
           >
@@ -161,7 +155,7 @@ const handleFilter = () => {
             () => {
               minPrice = undefined;
               maxPrice = undefined;
-              status = undefined;
+              status = '';
               handleFilter();
             }
           "
