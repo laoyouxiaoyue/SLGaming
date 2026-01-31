@@ -38,6 +38,11 @@ onMounted(() => {
   <nav class="app-topnav">
     <div class="container">
       <ul>
+        <li class="rank-item">
+          <a href="javascript:;" class="menu-item" @click="$router.push('/')">
+            <sl-icon name="icon-guanjun" size="16" class="rank-icon" />排行榜
+          </a>
+        </li>
         <!-- 多模版渲染 区分登录状态和非登录状态 -->
         <!-- 适配思路: 登录时显示第一块 非登录时显示第二块  是否有token -->
         <template v-if="userStore.userInfo?.accessToken">
@@ -67,10 +72,10 @@ onMounted(() => {
                 </div>
                 <div class="divider"></div>
                 <a href="javascript:;" class="menu-item" @click="$router.push('/account/setting')">
-                  <sl-icon name="icon-touxiang" size="16" />个人中心
+                  <sl-icon name="icon-qudenglu" size="16" color="#fff" />个人中心
                 </a>
                 <a href="javascript:;" class="menu-item logout" @click="confirm">
-                  <sl-icon name="icon-tuichu" size="16" />退出登录
+                  <sl-icon name="icon-tuichu" size="16" color="#fff" />退出登录
                 </a>
               </div>
             </el-popover>
@@ -80,7 +85,7 @@ onMounted(() => {
           </li>
           <li>
             <a href="javascript:;" @click="$router.push('/account/order')"
-              ><sl-icon name="icon-dingdan" />我的订单</a
+              ><sl-icon name="icon-dingdan1" />我的订单</a
             >
           </li>
           <li>
@@ -92,7 +97,7 @@ onMounted(() => {
         <template v-else>
           <li>
             <a href="javascript:;" @click="$router.push('/login')"
-              ><sl-icon name="icon-touxiang" />去登录</a
+              ><sl-icon name="icon-qudenglu" />去登录</a
             >
           </li>
         </template>
@@ -123,6 +128,21 @@ onMounted(() => {
 
     li {
       margin-top: -100px;
+
+      &.rank-item {
+        margin-right: auto; // 核心：利用 flex 布局特性，自动占据剩余空间，将自己推向最左侧
+        a {
+          flex-direction: row; // 图标和文字并排
+          gap: 10px; // 图标和文字间距
+          font-size: 25px;
+
+          i {
+            // 重置之前强制的 margin-bottom
+            margin-bottom: 0 !important;
+          }
+        }
+      }
+
       &.user-info {
         a {
           .avatar-box {
@@ -172,7 +192,7 @@ onMounted(() => {
 .app-topnav .container {
   width: 100%;
   max-width: 2560px;
-  padding: 0 80px;
+  padding: 0 100px;
   position: relative;
 }
 

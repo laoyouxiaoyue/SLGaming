@@ -10,7 +10,7 @@ defineProps({
   },
   color: {
     type: String,
-    default: "inherit",
+    default: "#fff",
   },
 });
 </script>
@@ -20,7 +20,7 @@ defineProps({
 </template>
 
 <style scoped>
-@import url("//at.alicdn.com/t/c/font_5120505_evqf7astmms.css");
+@import url("//at.alicdn.com/t/c/font_5120505_ritsif9r24.css");
 
 .iconfont {
   display: inline-block;
