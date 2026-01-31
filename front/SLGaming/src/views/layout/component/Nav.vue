@@ -1,40 +1,35 @@
 <script setup>
 import { useUserStore } from "@/stores/userStore";
 import { useWalletStore } from "@/stores/walletStore";
+import { useInfoStore } from "@/stores/infoStore";
 import { useRouter } from "vue-router";
-import { getInfoAPI } from "@/api/user/info";
-import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { getlogoutAPI } from "@/api/user/logout";
 
 const userStore = useUserStore();
 const walletStore = useWalletStore();
+const infoStore = useInfoStore();
 const router = useRouter();
+
+// 使用 storeToRefs 获取响应式 state
+const { info } = storeToRefs(infoStore);
+const { walletInfo } = storeToRefs(walletStore);
+
 const confirm = async () => {
   // 退出登录业务逻辑实现
   // 1.清除用户信息 触发action
   await getlogoutAPI();
   userStore.clearUserInfo();
+  infoStore.clearInfo();
   // 2.跳转到登录页
   router.push("/login");
 };
 
-const info = ref({});
-const walletInfo = ref({});
-
-const getInfo = async () => {
-  const res = await getInfoAPI();
-  info.value = res.data;
-};
-
-const getWalletInfo = async () => {
-  await walletStore.getWallet();
-  walletInfo.value = walletStore.walletInfo;
-};
-
 onMounted(() => {
   if (userStore.userInfo?.accessToken) {
-    getInfo();
-    getWalletInfo();
+    infoStore.getUserDetail();
+    walletStore.getWallet();
   }
 });
 </script>

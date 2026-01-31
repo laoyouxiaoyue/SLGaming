@@ -1,11 +1,16 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { getInfoAPI, updateInfoAPI } from "@/api/user/info";
+import { useInfoStore } from "@/stores/infoStore";
+import { storeToRefs } from "pinia";
 import { ElMessage } from "element-plus";
+import { Camera } from "@element-plus/icons-vue";
+
+const infoStore = useInfoStore();
+const { info } = storeToRefs(infoStore);
 
 const formRef = ref(null);
+const fileInputRef = ref(null);
 const form = ref({
-  id: "",
   nickname: "",
   phone: "",
   role: 1, // 默认老板
@@ -18,32 +23,74 @@ const rules = {
   role: [{ required: true, message: "请选择角色", trigger: "change" }],
 };
 
-const getUserInfo = async () => {
-  const res = await getInfoAPI();
-  // 回显数据，注意处理空值情况
-  if (res.data) {
+const initForm = () => {
+  if (info.value && Object.keys(info.value).length > 0) {
     form.value = {
-      id: res.data.id,
-      nickname: res.data.nickname || "",
-      phone: res.data.phone || "",
-      role: res.data.role || 1,
-      avatarUrl: res.data.avatarUrl || "",
-      bio: res.data.bio || "",
+      nickname: info.value.nickname || "",
+      phone: info.value.phone || "",
+      role: info.value.role || 1,
+      avatarUrl: info.value.avatarUrl || "",
+      bio: info.value.bio || "",
     };
   }
+};
+
+const getUserInfo = async () => {
+  await infoStore.getUserDetail();
+  initForm();
+};
+
+const triggerFileUpload = () => {
+  fileInputRef.value.click();
+};
+
+const handleFileChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const isJPGOrPNG = file.type === "image/jpeg" || file.type === "image/png";
+  const isLt2M = file.size / 1024 / 1024 < 2;
+
+  if (!isJPGOrPNG) {
+    ElMessage.error("头像只能是 JPG 或 PNG 格式!");
+    return;
+  }
+  if (!isLt2M) {
+    ElMessage.error("头像大小不能超过 2MB!");
+    return;
+  }
+
+  // 模拟预览 (此处应调用后端上传接口)
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => {
+    form.value.avatarUrl = reader.result;
+    ElMessage.success("图片已选择 (仅为本地预览，需后端接口支持)");
+  };
+  e.target.value = "";
 };
 
 const onSave = async () => {
   if (!formRef.value) return;
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      updateInfoAPI(form.value);
+      try {
+        await infoStore.updateUserInfo(form.value);
+        ElMessage.success("保存成功");
+        initForm();
+      } catch (error) {
+        ElMessage.error("保存失败，请稍后重试");
+      }
     }
   });
 };
 
 onMounted(() => {
-  getUserInfo();
+  if (Object.keys(info.value).length > 0) {
+    initForm();
+  } else {
+    getUserInfo();
+  }
 });
 </script>
 
@@ -57,12 +104,24 @@ onMounted(() => {
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" class="user-form">
         <el-form-item label="头像" prop="avatarUrl">
           <div class="avatar-wrapper">
-            <el-avatar :size="60" :src="form.avatarUrl" v-if="form.avatarUrl">
-              <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
-            </el-avatar>
-            <el-avatar :size="60" v-else>
-              <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
-            </el-avatar>
+            <input
+              type="file"
+              ref="fileInputRef"
+              style="display: none"
+              accept="image/jpeg,image/png"
+              @change="handleFileChange"
+            />
+            <div class="avatar-click-area" @click="triggerFileUpload">
+              <el-avatar :size="60" :src="form.avatarUrl" v-if="form.avatarUrl">
+                <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+              </el-avatar>
+              <el-avatar :size="60" v-else>
+                <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+              </el-avatar>
+              <div class="avatar-mask">
+                <el-icon><Camera /></el-icon>
+              </div>
+            </div>
             <el-input v-model="form.avatarUrl" placeholder="请输入头像URL链接" style="flex: 1" />
           </div>
         </el-form-item>
@@ -121,6 +180,38 @@ onMounted(() => {
         align-items: center;
         gap: 16px;
         width: 100%;
+
+        .avatar-click-area {
+          position: relative;
+          cursor: pointer;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          overflow: hidden;
+
+          &:hover .avatar-mask {
+            opacity: 1;
+          }
+
+          .avatar-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            color: #fff;
+
+            i {
+              font-size: 20px;
+            }
+          }
+        }
       }
 
       .save-btn {
