@@ -21,6 +21,14 @@ export default defineConfig({
       resolvers: [ElementPlusResolver({ importStyle: "sass" })],
     }),
   ],
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://120.26.29.242:8888",
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
