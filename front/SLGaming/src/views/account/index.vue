@@ -1,5 +1,10 @@
 <script setup>
 import { RouterView, RouterLink } from "vue-router";
+import { useInfoStore } from "@/stores/infoStore";
+import { ref } from "vue";
+const infoStore = useInfoStore();
+const info = ref({});
+info.value = infoStore.info;
 </script>
 
 <template>
@@ -11,7 +16,7 @@ import { RouterView, RouterLink } from "vue-router";
           <sl-icon name="icon-touxiang" size="16" />
           <span>我的信息</span>
         </RouterLink>
-        <RouterLink to="/account/companion" class="menu-item">
+        <RouterLink to="/account/companion" class="menu-item" v-if="info.role === 2">
           <sl-icon name="icon-peiwandailian" size="16" />
           <span>陪玩设置</span>
         </RouterLink>

@@ -57,31 +57,23 @@ const sendCode = async () => {
     ElMessage({ type: "error", message: "请输入正确的手机号" });
     return;
   }
-  try {
-    await codeAPI({ phone, purpose: "register" });
-    ElMessage({ type: "success", message: "验证码发送成功" });
-    countdown.value = 60;
-    const timer = setInterval(() => {
-      countdown.value--;
-      if (countdown.value <= 0) {
-        clearInterval(timer);
-      }
-    }, 1000);
-  } catch {
-    // 拦截器已经处理了错误提示
-  }
+  await codeAPI({ phone, purpose: "register" });
+  ElMessage({ type: "success", message: "验证码发送成功" });
+  countdown.value = 60;
+  const timer = setInterval(() => {
+    countdown.value--;
+    if (countdown.value <= 0) {
+      clearInterval(timer);
+    }
+  }, 1000);
 };
 
 const doRegister = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      try {
-        await registerapi(form.value);
-        ElMessage({ type: "success", message: "注册成功，请登录" });
-        router.push("/login");
-      } catch {
-        ElMessage({ type: "error", message: "注册失败，请稍后重试" });
-      }
+      await registerapi(form.value);
+      ElMessage({ type: "success", message: "注册成功，请登录" });
+      router.push("/login");
     }
   });
 };

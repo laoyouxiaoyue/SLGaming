@@ -37,25 +37,15 @@ const onSave = async () => {
   if (!formRef.value) return;
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      try {
-        await updatecompanionapi({
-          gameSkill: form.value.gameSkill,
-          pricePerHour: Number(form.value.pricePerHour),
-          status: form.value.status,
-        });
-        ElMessage.success("保存成功");
-        getCompanionInfo(); // 刷新数据
-      } catch (error) {
-        ElMessage.error("保存失败，请稍后重试");
-      }
+      await updatecompanionapi({
+        gameSkill: form.value.gameSkill,
+        pricePerHour: Number(form.value.pricePerHour),
+        status: form.value.status,
+      });
+      ElMessage.success("保存成功");
+      getCompanionInfo(); // 刷新数据
     }
   });
-};
-
-const statusMap = {
-  0: { label: "离线", type: "info" },
-  1: { label: "在线", type: "success" },
-  2: { label: "忙碌", type: "warning" },
 };
 
 onMounted(() => {

@@ -74,13 +74,10 @@ const onSave = async () => {
   if (!formRef.value) return;
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      try {
-        await infoStore.updateUserInfo(form.value);
-        ElMessage.success("保存成功");
-        initForm();
-      } catch (error) {
-        ElMessage.error("保存失败，请稍后重试");
-      }
+      await infoStore.updateUserInfo(form.value);
+      ElMessage.success("保存成功");
+      // 更新成功后，Store中的数据已是最新的，这里可以再次同步一下表单（可选）
+      initForm();
     }
   });
 };
