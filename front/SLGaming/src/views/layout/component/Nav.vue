@@ -50,10 +50,10 @@ onMounted(() => {
             <el-popover placement="bottom" trigger="hover" width="200" popper-class="user-popover">
               <template #reference>
                 <a href="javascript:;" class="avatar-link">
-                  <div class="avatar-box">
-                    <img :src="info.avatarUrl" v-if="info.avatarUrl" />
-                    <sl-icon name="icon-user" v-else size="40" color="#fff" />
+                  <div class="avatar-box" v-if="info.avatarUrl">
+                    <img :src="info.avatarUrl" />
                   </div>
+                  <sl-icon name="icon-touxiang1" v-else size="64" color="#fff" />
                 </a>
               </template>
               <div class="user-popover-content">
@@ -71,8 +71,8 @@ onMounted(() => {
                   </div>
                 </div>
                 <div class="divider"></div>
-                <a href="javascript:;" class="menu-item" @click="$router.push('/member')">
-                  <sl-icon name="icon-user" size="16" />个人中心
+                <a href="javascript:;" class="menu-item" @click="$router.push('/account/setting')">
+                  <sl-icon name="icon-touxiang" size="16" />个人中心
                 </a>
                 <a href="javascript:;" class="menu-item logout" @click="confirm">
                   <sl-icon name="icon-tuichu" size="16" />退出登录
@@ -81,10 +81,17 @@ onMounted(() => {
             </el-popover>
           </li>
           <li>
-            <a href="javascript:;"><sl-icon name="icon-dingdan" />我的订单</a>
+            <a href="javascript:;" @click="$router.push('/')"><sl-icon name="icon-shouye" />首页</a>
           </li>
           <li>
-            <a href="javascript:;"><sl-icon name="icon-chongzhi" />帅币充值</a>
+            <a href="javascript:;" @click="$router.push('/account/order')"
+              ><sl-icon name="icon-dingdan" />我的订单</a
+            >
+          </li>
+          <li>
+            <a href="javascript:;" @click="$router.push('/account/wallet')"
+              ><sl-icon name="icon-chongzhi" />帅币充值</a
+            >
           </li>
         </template>
         <template v-else>
@@ -94,6 +101,7 @@ onMounted(() => {
             >
           </li>
         </template>
+
         <li>
           <a href="javascript:;"><sl-icon name="icon-bangzhuzhongxin" />帮助中心</a>
         </li>
@@ -147,10 +155,15 @@ onMounted(() => {
         font-weight: 549;
         font-size: 16px;
 
-        i {
+        // 仅针对非头像链接的图标设置强制大小
+        &:not(.avatar-link) i {
           font-size: 26px !important;
           margin-right: 0;
           margin-bottom: 1px;
+        }
+
+        &.avatar-link :deep(i) {
+          font-weight: normal !important;
         }
 
         &:hover {
