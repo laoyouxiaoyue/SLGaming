@@ -63,20 +63,10 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.
 		}, nil
 	}
 
-	// 获取当前用户角色，用于权限控制
-	roleResp, err := l.svcCtx.UserRPC.GetUser(l.ctx, &userclient.GetUserRequest{Id: currentUserID})
-	if err != nil {
-		code, msg := utils.HandleRPCError(err, l.Logger, "GetUser")
-		return &types.UpdateUserResponse{
-			BaseResp: types.BaseResp{
-				Code: code,
-				Msg:  msg,
-			},
-		}, nil
-	}
-	currentRole := int32(0)
-	if roleResp != nil && roleResp.User != nil {
-		currentRole = roleResp.User.Role
+	// 获取当前用户角色（优先 JWT 里的 role）
+	currentRole, roleErr := middleware.GetUserRole(l.ctx)
+	if roleErr != nil {
+		currentRole = 0
 	}
 	// 非管理员仅允许修改昵称/密码/手机号/bio，忽略 role 与 avatarUrl
 	if currentRole != 3 {

@@ -15,6 +15,7 @@ var (
 // Claims JWT 载荷结构
 type Claims struct {
 	UserID uint64 `json:"user_id"`
+	Role   int32  `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -35,10 +36,11 @@ func NewJWTManager(secretKey string, accessTokenDuration, refreshTokenDuration t
 }
 
 // GenerateAccessToken 生成 Access Token（短期）
-func (m *JWTManager) GenerateAccessToken(userID uint64) (string, error) {
+func (m *JWTManager) GenerateAccessToken(userID uint64, role int32) (string, error) {
 	now := time.Now()
 	claims := &Claims{
 		UserID: userID,
+		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(m.accessTokenDuration)),
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -52,10 +54,11 @@ func (m *JWTManager) GenerateAccessToken(userID uint64) (string, error) {
 }
 
 // GenerateRefreshToken 生成 Refresh Token（长期）
-func (m *JWTManager) GenerateRefreshToken(userID uint64) (string, error) {
+func (m *JWTManager) GenerateRefreshToken(userID uint64, role int32) (string, error) {
 	now := time.Now()
 	claims := &Claims{
 		UserID: userID,
+		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(m.refreshTokenDuration)),
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -69,8 +72,8 @@ func (m *JWTManager) GenerateRefreshToken(userID uint64) (string, error) {
 }
 
 // GenerateToken 生成 JWT token（兼容旧接口，生成 Access Token）
-func (m *JWTManager) GenerateToken(userID uint64) (string, error) {
-	return m.GenerateAccessToken(userID)
+func (m *JWTManager) GenerateToken(userID uint64, role int32) (string, error) {
+	return m.GenerateAccessToken(userID, role)
 }
 
 // GetAccessTokenDuration 获取 Access Token 过期时间

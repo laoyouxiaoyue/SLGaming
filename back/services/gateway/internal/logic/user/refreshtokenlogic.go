@@ -27,7 +27,6 @@ func NewRefreshTokenLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Refr
 		svcCtx: svcCtx,
 	}
 }
-
 func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenRequest) (resp *types.RefreshTokenResponse, err error) {
 	if req.RefreshToken == "" {
 		return &types.RefreshTokenResponse{
@@ -82,8 +81,10 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenRequest) (resp *
 		}
 	}
 
+	role := claims.Role
+
 	// 只生成新的 Access Token，Refresh Token 保持不变
-	accessToken, err := l.svcCtx.JWT.GenerateAccessToken(claims.UserID)
+	accessToken, err := l.svcCtx.JWT.GenerateAccessToken(claims.UserID, role)
 	if err != nil {
 		code, msg := utils.HandleError(err, l.Logger, "GenerateAccessToken")
 		return &types.RefreshTokenResponse{
