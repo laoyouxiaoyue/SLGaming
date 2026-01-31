@@ -374,6 +374,70 @@
         }
       }
     },
+    "/user/avatar": {
+      "post": {
+        "tags": ["用户信息"],
+        "summary": "上传用户头像",
+        "description": "上传头像文件并更新用户头像URL",
+        "operationId": "uploadAvatar",
+        "consumes": ["multipart/form-data"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "avatar",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "头像文件"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "上传成功",
+            "schema": {
+              "$ref": "#/definitions/UploadAvatarResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "avatarUrl": "/uploads/avatars/1700000000000000000.png"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "缺少头像文件字段 avatar"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/forgetPassword": {
       "put": {
         "tags": ["用户认证"],
@@ -1351,6 +1415,32 @@
           "properties": {
             "data": {
               "$ref": "#/definitions/UserInfo"
+            }
+          }
+        }
+      ]
+    },
+    "UploadAvatarData": {
+      "type": "object",
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "头像URL",
+          "example": "/uploads/avatars/1700000000000000000.png"
+        }
+      }
+    },
+    "UploadAvatarResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/UploadAvatarData"
             }
           }
         }

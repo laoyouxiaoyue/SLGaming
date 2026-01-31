@@ -307,6 +307,19 @@ type UpdateUserResponse struct {
 	Data UserInfo `json:"data"`
 }
 
+type UploadAvatarData struct {
+	AvatarUrl string `json:"avatarUrl"` // 头像URL
+}
+
+type UploadAvatarRequest struct {
+	Avatar string `form:"avatar"` // 头像文件（Base64）
+}
+
+type UploadAvatarResponse struct {
+	BaseResp
+	Data UploadAvatarData `json:"data"`
+}
+
 type UserInfo struct {
 	Id            uint64 `json:"id"`
 	Uid           uint64 `json:"uid"`

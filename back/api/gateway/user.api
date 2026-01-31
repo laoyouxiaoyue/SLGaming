@@ -76,6 +76,19 @@ type UpdateUserResponse {
 	Data UserInfo `json:"data"`
 }
 
+type UploadAvatarRequest {
+	Avatar string `form:"avatar"` // 头像文件（multipart/form-data 文件字段）
+}
+
+type UploadAvatarData {
+	AvatarUrl string `json:"avatarUrl"` // 头像URL
+}
+
+type UploadAvatarResponse {
+	BaseResp
+	Data UploadAvatarData `json:"data"`
+}
+
 type LoginByCodeRequest {
 	Phone string `json:"phone"`
 	Code  string `json:"code"`
@@ -217,6 +230,10 @@ service gateway {
 
 	@handler updateUser
 	put /api/user (UpdateUserRequest) returns (UpdateUserResponse)
+
+	// 上传用户头像（需要登录）
+	@handler uploadAvatar
+	post /api/user/avatar (UploadAvatarRequest) returns (UploadAvatarResponse)
 
 	@handler forgetPassword
 	put /api/user/forgetPassword (ForgetPasswordRequest) returns (ForgetPasswordResponse)

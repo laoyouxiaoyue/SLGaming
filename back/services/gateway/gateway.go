@@ -7,8 +7,12 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
+	"path"
+	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -69,6 +73,50 @@ func main() {
 
 	// 注册路由处理器
 	handler.RegisterHandlers(server, ctx)
+
+	// 提供本地上传文件访问
+	baseURLRaw := strings.TrimSpace(c.Upload.BaseURL)
+	uploadBase := strings.TrimRight(baseURLRaw, "/")
+	if uploadBase == "" {
+		uploadBase = "/uploads"
+	}
+	if strings.HasPrefix(uploadBase, "http://") || strings.HasPrefix(uploadBase, "https://") {
+		if u, err := url.Parse(uploadBase); err == nil {
+			uploadBase = strings.TrimRight(u.Path, "/")
+		}
+	}
+	if uploadBase == "" {
+		uploadBase = "/uploads"
+	}
+	if !strings.HasPrefix(uploadBase, "/") {
+		uploadBase = "/" + uploadBase
+	}
+	uploadDir := strings.TrimSpace(c.Upload.LocalDir)
+	if uploadDir == "" {
+		uploadDir = "uploads"
+	}
+	fileHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rel := strings.TrimPrefix(r.URL.Path, uploadBase)
+		rel = strings.TrimPrefix(rel, "/")
+		clean := path.Clean("/" + rel)
+		if strings.Contains(clean, "..") {
+			http.Error(w, "invalid path", http.StatusBadRequest)
+			return
+		}
+		filePath := filepath.Join(uploadDir, filepath.FromSlash(strings.TrimPrefix(clean, "/")))
+		http.ServeFile(w, r, filePath)
+	})
+
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    uploadBase + "/:path1",
+		Handler: fileHandler,
+	})
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    uploadBase + "/:path1/:path2",
+		Handler: fileHandler,
+	})
 
 	// 为所有 /api/* 路径自动添加 OPTIONS 方法支持，确保 CORS 预检请求能通过
 	// 使用路径参数匹配所有可能的路径层级

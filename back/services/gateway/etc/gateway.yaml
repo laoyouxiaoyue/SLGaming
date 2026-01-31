@@ -77,3 +77,10 @@ RateLimit:
       Method: "POST"
       GlobalQPS: 500
       PerUserQPS: 10           # 每个用户每秒最多 10 次
+
+# 上传配置
+Upload:
+  LocalDir: "uploads"          # 本地保存目录（相对运行目录）
+  BaseURL: "http://120.26.29.242/uploads"  # 对外访问前缀
+  MaxSizeMB: 5                  # 单文件最大大小（MB）
+  AllowedExt: [".jpg", ".jpeg", ".png", ".gif", ".webp"]

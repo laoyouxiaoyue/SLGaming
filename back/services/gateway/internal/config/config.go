@@ -18,6 +18,7 @@ type Config struct {
 	JWT       JWTConf       `json:",optional"` // JWT 配置
 	Redis     RedisConf     `json:",optional"` // Redis 配置
 	RateLimit RateLimitConf `json:",optional"` // 限流配置
+	Upload    UploadConf    `json:",optional"` // 上传配置
 }
 
 // JWTConf JWT 配置
@@ -71,6 +72,14 @@ type RateLimitConf struct {
 	Enabled   bool                 `json:",default=true"` // 是否启用限流
 	GlobalQPS int                  `json:",default=2000"` // 全局 QPS 限制
 	Routes    []RouteRateLimitConf `json:",optional"`     // 路由级别的限流配置
+}
+
+// UploadConf 上传配置
+type UploadConf struct {
+	LocalDir   string   `json:",default=uploads"`  // 本地保存目录（相对运行目录）
+	BaseURL    string   `json:",default=/uploads"` // 对外访问前缀
+	MaxSizeMB  int64    `json:",default=5"`        // 单文件最大大小（MB）
+	AllowedExt []string `json:",optional"`         // 允许的扩展名，如 [".jpg",".png"]
 }
 
 // RouteRateLimitConf 路由限流配置

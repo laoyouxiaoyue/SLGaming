@@ -83,6 +83,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.UpdateUserHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/avatar",
+				Handler: user.UploadAvatarHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/api/user/companion/profile",
 				Handler: user.GetCompanionProfileHandler(serverCtx),
