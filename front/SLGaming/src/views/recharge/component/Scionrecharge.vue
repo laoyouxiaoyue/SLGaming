@@ -3,10 +3,6 @@ import { ref, computed, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { createrechargeorderapi } from "@/api/money/wallet";
 
-defineOptions({
-  name: "ScionRecharge",
-});
-
 // 预设充值档位
 const presetAmounts = [6, 18, 68, 233, 648, 998];
 const amount = ref(6); // 默认选中第一个
