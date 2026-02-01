@@ -28,6 +28,7 @@ var publicPaths = map[string]bool{
 	"/api/user/companions":               true, // 获取陪玩列表
 	"/api/user/companion/profile/public": true, // 公开获取陪玩信息
 	"/api/user/gameskills":               true, // 获取游戏技能列表
+	"/uploads":                           true, // 静态资源访问前缀
 	"/health":                            true, // 健康检查接口
 }
 
@@ -37,6 +38,9 @@ func isPublicPath(path string) bool {
 		return true
 	}
 	cleaned := pathClean(path)
+	if cleaned == "/uploads" || strings.HasPrefix(cleaned, "/uploads/") {
+		return true
+	}
 	return publicPaths[cleaned]
 }
 
