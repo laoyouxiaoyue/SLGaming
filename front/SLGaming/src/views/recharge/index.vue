@@ -1,5 +1,5 @@
 <script setup>
-import { RouterView, RouterLink, useRoute } from "vue-router";
+import { RouterView, RouterLink } from "vue-router";
 import { useInfoStore } from "@/stores/infoStore";
 import { useWalletStore } from "@/stores/walletStore";
 import { storeToRefs } from "pinia";
