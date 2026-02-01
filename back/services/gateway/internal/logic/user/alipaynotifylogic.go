@@ -54,6 +54,7 @@ func (l *AlipayNotifyLogic) AlipayNotify(req *types.AlipayNotifyRequest) (resp *
 	outTradeNo := strings.TrimSpace(req.Payload["out_trade_no"])
 	tradeStatus := strings.TrimSpace(req.Payload["trade_status"])
 	totalAmount := strings.TrimSpace(req.Payload["total_amount"])
+	tradeNo := strings.TrimSpace(req.Payload["trade_no"])
 	if outTradeNo == "" || tradeStatus == "" {
 		return &types.AlipayNotifyResponse{
 			BaseResp: types.BaseResp{Code: 400, Msg: "通知参数缺失"},
@@ -87,8 +88,8 @@ func (l *AlipayNotifyLogic) AlipayNotify(req *types.AlipayNotifyRequest) (resp *
 
 	if totalAmount != "" {
 		if f, err := strconv.ParseFloat(totalAmount, 64); err == nil {
-			cents := int64(math.Round(f * 100))
-			if order.Amount != cents && order.Amount != int64(f) {
+			amount := int64(math.Round(f))
+			if order.Amount != amount {
 				return &types.AlipayNotifyResponse{
 					BaseResp: types.BaseResp{Code: 400, Msg: "金额校验失败"},
 				}, nil
@@ -114,6 +115,19 @@ func (l *AlipayNotifyLogic) AlipayNotify(req *types.AlipayNotifyRequest) (resp *
 		order.Status = rechargeStatusClosed
 	} else {
 		order.Status = rechargeStatusFailed
+	}
+
+	if l.svcCtx.UserRPC != nil {
+		_, err = l.svcCtx.UserRPC.UpdateRechargeOrderStatus(l.ctx, &userclient.UpdateRechargeOrderStatusRequest{
+			OrderNo: order.OrderNo,
+			Status:  int32(order.Status),
+			TradeNo: tradeNo,
+			Remark:  "alipay notify",
+			PaidAt:  time.Now().Unix(),
+		})
+		if err != nil {
+			l.Logger.Errorf("update recharge order status failed: %v", err)
+		}
 	}
 
 	// 更新订单状态

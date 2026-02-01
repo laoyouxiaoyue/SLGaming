@@ -20,6 +20,8 @@ type (
 	ConsumeResponse                   = user.ConsumeResponse
 	CreateGameSkillRequest            = user.CreateGameSkillRequest
 	CreateGameSkillResponse           = user.CreateGameSkillResponse
+	CreateRechargeOrderRequest        = user.CreateRechargeOrderRequest
+	CreateRechargeOrderResponse       = user.CreateRechargeOrderResponse
 	DeleteGameSkillRequest            = user.DeleteGameSkillRequest
 	DeleteGameSkillResponse           = user.DeleteGameSkillResponse
 	ForgetPasswordRequest             = user.ForgetPasswordRequest
@@ -53,6 +55,8 @@ type (
 	UpdateCompanionStatsResponse      = user.UpdateCompanionStatsResponse
 	UpdateGameSkillRequest            = user.UpdateGameSkillRequest
 	UpdateGameSkillResponse           = user.UpdateGameSkillResponse
+	UpdateRechargeOrderStatusRequest  = user.UpdateRechargeOrderStatusRequest
+	UpdateRechargeOrderStatusResponse = user.UpdateRechargeOrderStatusResponse
 	UpdateUserRequest                 = user.UpdateUserRequest
 	UpdateUserResponse                = user.UpdateUserResponse
 	UserInfo                          = user.UserInfo
@@ -69,6 +73,8 @@ type (
 		GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 		Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
 		Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
+		CreateRechargeOrder(ctx context.Context, in *CreateRechargeOrderRequest, opts ...grpc.CallOption) (*CreateRechargeOrderResponse, error)
+		UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRechargeOrderStatusRequest, opts ...grpc.CallOption) (*UpdateRechargeOrderStatusResponse, error)
 		// 陪玩信息相关接口
 		GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
 		UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
@@ -139,6 +145,16 @@ func (m *defaultUser) Recharge(ctx context.Context, in *RechargeRequest, opts ..
 func (m *defaultUser) Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.Consume(ctx, in, opts...)
+}
+
+func (m *defaultUser) CreateRechargeOrder(ctx context.Context, in *CreateRechargeOrderRequest, opts ...grpc.CallOption) (*CreateRechargeOrderResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.CreateRechargeOrder(ctx, in, opts...)
+}
+
+func (m *defaultUser) UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRechargeOrderStatusRequest, opts ...grpc.CallOption) (*UpdateRechargeOrderStatusResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateRechargeOrderStatus(ctx, in, opts...)
 }
 
 // 陪玩信息相关接口

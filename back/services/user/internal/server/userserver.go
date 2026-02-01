@@ -69,6 +69,16 @@ func (s *UserServer) Consume(ctx context.Context, in *user.ConsumeRequest) (*use
 	return l.Consume(in)
 }
 
+func (s *UserServer) CreateRechargeOrder(ctx context.Context, in *user.CreateRechargeOrderRequest) (*user.CreateRechargeOrderResponse, error) {
+	l := logic.NewCreateRechargeOrderLogic(ctx, s.svcCtx)
+	return l.CreateRechargeOrder(in)
+}
+
+func (s *UserServer) UpdateRechargeOrderStatus(ctx context.Context, in *user.UpdateRechargeOrderStatusRequest) (*user.UpdateRechargeOrderStatusResponse, error) {
+	l := logic.NewUpdateRechargeOrderStatusLogic(ctx, s.svcCtx)
+	return l.UpdateRechargeOrderStatus(in)
+}
+
 // 陪玩信息相关接口
 func (s *UserServer) GetCompanionProfile(ctx context.Context, in *user.GetCompanionProfileRequest) (*user.GetCompanionProfileResponse, error) {
 	l := logic.NewGetCompanionProfileLogic(ctx, s.svcCtx)

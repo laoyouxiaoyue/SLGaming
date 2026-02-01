@@ -28,6 +28,8 @@ const (
 	User_GetWallet_FullMethodName                 = "/user.User/GetWallet"
 	User_Recharge_FullMethodName                  = "/user.User/Recharge"
 	User_Consume_FullMethodName                   = "/user.User/Consume"
+	User_CreateRechargeOrder_FullMethodName       = "/user.User/CreateRechargeOrder"
+	User_UpdateRechargeOrderStatus_FullMethodName = "/user.User/UpdateRechargeOrderStatus"
 	User_GetCompanionProfile_FullMethodName       = "/user.User/GetCompanionProfile"
 	User_UpdateCompanionProfile_FullMethodName    = "/user.User/UpdateCompanionProfile"
 	User_UpdateCompanionStats_FullMethodName      = "/user.User/UpdateCompanionStats"
@@ -54,6 +56,8 @@ type UserClient interface {
 	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 	Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
 	Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
+	CreateRechargeOrder(ctx context.Context, in *CreateRechargeOrderRequest, opts ...grpc.CallOption) (*CreateRechargeOrderResponse, error)
+	UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRechargeOrderStatusRequest, opts ...grpc.CallOption) (*UpdateRechargeOrderStatusResponse, error)
 	// 陪玩信息相关接口
 	GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
 	UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
@@ -161,6 +165,26 @@ func (c *userClient) Consume(ctx context.Context, in *ConsumeRequest, opts ...gr
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ConsumeResponse)
 	err := c.cc.Invoke(ctx, User_Consume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) CreateRechargeOrder(ctx context.Context, in *CreateRechargeOrderRequest, opts ...grpc.CallOption) (*CreateRechargeOrderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateRechargeOrderResponse)
+	err := c.cc.Invoke(ctx, User_CreateRechargeOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRechargeOrderStatusRequest, opts ...grpc.CallOption) (*UpdateRechargeOrderStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateRechargeOrderStatusResponse)
+	err := c.cc.Invoke(ctx, User_UpdateRechargeOrderStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -281,6 +305,8 @@ type UserServer interface {
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
 	Recharge(context.Context, *RechargeRequest) (*RechargeResponse, error)
 	Consume(context.Context, *ConsumeRequest) (*ConsumeResponse, error)
+	CreateRechargeOrder(context.Context, *CreateRechargeOrderRequest) (*CreateRechargeOrderResponse, error)
+	UpdateRechargeOrderStatus(context.Context, *UpdateRechargeOrderStatusRequest) (*UpdateRechargeOrderStatusResponse, error)
 	// 陪玩信息相关接口
 	GetCompanionProfile(context.Context, *GetCompanionProfileRequest) (*GetCompanionProfileResponse, error)
 	UpdateCompanionProfile(context.Context, *UpdateCompanionProfileRequest) (*UpdateCompanionProfileResponse, error)
@@ -330,6 +356,12 @@ func (UnimplementedUserServer) Recharge(context.Context, *RechargeRequest) (*Rec
 }
 func (UnimplementedUserServer) Consume(context.Context, *ConsumeRequest) (*ConsumeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Consume not implemented")
+}
+func (UnimplementedUserServer) CreateRechargeOrder(context.Context, *CreateRechargeOrderRequest) (*CreateRechargeOrderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateRechargeOrder not implemented")
+}
+func (UnimplementedUserServer) UpdateRechargeOrderStatus(context.Context, *UpdateRechargeOrderStatusRequest) (*UpdateRechargeOrderStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateRechargeOrderStatus not implemented")
 }
 func (UnimplementedUserServer) GetCompanionProfile(context.Context, *GetCompanionProfileRequest) (*GetCompanionProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCompanionProfile not implemented")
@@ -540,6 +572,42 @@ func _User_Consume_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).Consume(ctx, req.(*ConsumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_CreateRechargeOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRechargeOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).CreateRechargeOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_CreateRechargeOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).CreateRechargeOrder(ctx, req.(*CreateRechargeOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateRechargeOrderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRechargeOrderStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateRechargeOrderStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateRechargeOrderStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateRechargeOrderStatus(ctx, req.(*UpdateRechargeOrderStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -766,6 +834,14 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Consume",
 			Handler:    _User_Consume_Handler,
+		},
+		{
+			MethodName: "CreateRechargeOrder",
+			Handler:    _User_CreateRechargeOrder_Handler,
+		},
+		{
+			MethodName: "UpdateRechargeOrderStatus",
+			Handler:    _User_UpdateRechargeOrderStatus_Handler,
 		},
 		{
 			MethodName: "GetCompanionProfile",

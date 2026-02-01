@@ -2,14 +2,18 @@ package logic
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 type RechargeLogic struct {
@@ -49,6 +53,45 @@ func (l *RechargeLogic) Recharge(in *user.RechargeRequest) (*user.RechargeRespon
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	// 落库充值订单（成功态）。若重复回调，做幂等更新。
+	if in.GetBizOrderId() != "" {
+		now := time.Now()
+		db := l.svcCtx.DB()
+		if db != nil {
+			var existing model.RechargeOrder
+			err := db.Where("order_no = ?", in.GetBizOrderId()).First(&existing).Error
+			switch {
+			case err == nil:
+				updates := map[string]interface{}{
+					"user_id":  userID,
+					"amount":   amount,
+					"status":   model.RechargeStatusSuccess,
+					"remark":   in.GetRemark(),
+					"paid_at":  &now,
+					"pay_type": "alipay",
+				}
+				if err := db.Model(&existing).Updates(updates).Error; err != nil {
+					l.Logger.Errorf("update recharge order failed: %v", err)
+				}
+			case errors.Is(err, gorm.ErrRecordNotFound):
+				order := &model.RechargeOrder{
+					UserID:  userID,
+					OrderNo: in.GetBizOrderId(),
+					Amount:  amount,
+					Status:  model.RechargeStatusSuccess,
+					PayType: "alipay",
+					Remark:  in.GetRemark(),
+					PaidAt:  &now,
+				}
+				if err := db.Create(order).Error; err != nil {
+					l.Logger.Errorf("create recharge order failed: %v", err)
+				}
+			default:
+				l.Logger.Errorf("query recharge order failed: %v", err)
+			}
+		}
 	}
 
 	return &user.RechargeResponse{

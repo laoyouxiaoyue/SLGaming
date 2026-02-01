@@ -109,6 +109,33 @@ message RechargeResponse {
   WalletInfo wallet = 1;    // 充值后的最新钱包信息
 }
 
+// 充值订单落库（pending）
+message CreateRechargeOrderRequest {
+  uint64 user_id = 1;      // 用户ID
+  string order_no = 2;     // 充值单号
+  int64  amount = 3;       // 充值金额（帅币）
+  string pay_type = 4;     // 支付方式（alipay 等）
+  string remark = 5;       // 备注
+  int32  status = 6;       // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+}
+
+message CreateRechargeOrderResponse {
+  bool success = 1;
+}
+
+// 更新充值订单状态
+message UpdateRechargeOrderStatusRequest {
+  string order_no = 1;     // 充值单号
+  int32  status = 2;       // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+  string trade_no = 3;     // 支付平台交易号（可选）
+  string remark = 4;       // 备注（可选）
+  int64  paid_at = 5;      // 支付完成时间（Unix 秒，可选）
+}
+
+message UpdateRechargeOrderStatusResponse {
+  bool success = 1;
+}
+
 // 消费帅币（支付订单时扣减帅币）
 message ConsumeRequest {
   uint64 user_id = 1;       // 用户ID
@@ -278,6 +305,8 @@ service User {
   rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
   rpc Recharge(RechargeRequest) returns (RechargeResponse);
   rpc Consume(ConsumeRequest) returns (ConsumeResponse);
+  rpc CreateRechargeOrder(CreateRechargeOrderRequest) returns (CreateRechargeOrderResponse);
+  rpc UpdateRechargeOrderStatus(UpdateRechargeOrderStatusRequest) returns (UpdateRechargeOrderStatusResponse);
 
   // 陪玩信息相关接口
   rpc GetCompanionProfile(GetCompanionProfileRequest) returns (GetCompanionProfileResponse);

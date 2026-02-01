@@ -18,6 +18,7 @@ func main() {
 		&model.User{},
 		&model.UserWallet{},
 		&model.WalletTransaction{},
+		&model.RechargeOrder{},
 		&model.CompanionProfile{},
 		&model.GameSkill{},
 	)

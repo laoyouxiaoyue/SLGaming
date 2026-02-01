@@ -4,6 +4,7 @@
 package user
 
 import (
+	"SLGaming/back/services/user/userclient"
 	"context"
 	"fmt"
 	"strings"
@@ -82,13 +83,30 @@ func (l *RechargeCreateLogic) RechargeCreate(req *types.RechargeCreateRequest) (
 		}, nil
 	}
 
+	if l.svcCtx.UserRPC != nil {
+		_, err = l.svcCtx.UserRPC.CreateRechargeOrder(l.ctx, &userclient.CreateRechargeOrderRequest{
+			UserId:  userID,
+			OrderNo: orderNo,
+			Amount:  req.Amount,
+			PayType: payType,
+			Remark:  "pending",
+			Status:  rechargeStatusPending,
+		})
+		if err != nil {
+			code, msg := utils.HandleRPCError(err, l.Logger, "CreateRechargeOrder")
+			return &types.RechargeCreateResponse{
+				BaseResp: types.BaseResp{Code: code, Msg: msg},
+			}, nil
+		}
+	}
+
 	if l.svcCtx.Alipay == nil {
 		return &types.RechargeCreateResponse{
 			BaseResp: types.BaseResp{Code: 500, Msg: "支付宝未配置"},
 		}, nil
 	}
 
-	amountStr := fmt.Sprintf("%.2f", float64(req.Amount)/100)
+	amountStr := fmt.Sprintf("%.2f", float64(req.Amount))
 	notifyURL := strings.TrimSpace(l.svcCtx.Config.Alipay.NotifyURL)
 	returnURL := strings.TrimSpace(l.svcCtx.Config.Alipay.ReturnURL)
 	if req.ReturnUrl != "" {
