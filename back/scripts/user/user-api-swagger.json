@@ -670,6 +670,150 @@
         }
       }
     },
+    "/user/recharge": {
+      "post": {
+        "tags": ["钱包"],
+        "summary": "创建充值订单",
+        "description": "创建支付宝充值订单并返回支付地址（PC/WAP）或支付表单（APP）",
+        "operationId": "rechargeCreate",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RechargeCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/RechargeCreateResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "orderNo": "RCFBWT5BX7514W",
+                  "payUrl": "https://openapi-sandbox.dl.alipaydev.com/gateway.do?...",
+                  "payForm": "",
+                  "expiresIn": 1800
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["钱包"],
+        "summary": "查询充值订单",
+        "description": "根据订单号查询充值订单状态",
+        "operationId": "rechargeQuery",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "orderNo",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "充值单号"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "schema": {
+              "$ref": "#/definitions/RechargeQueryResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "orderNo": "RCFBWT5BX7514W",
+                  "status": 0,
+                  "amount": 100
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "403": {
+            "description": "无权查询",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          }
+        }
+      }
+    },
+    "/user/recharge/alipay/notify": {
+      "post": {
+        "tags": ["钱包"],
+        "summary": "支付宝异步通知",
+        "description": "支付宝服务器异步回调通知。该接口不需要登录认证。",
+        "operationId": "alipayNotify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AlipayNotifyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "通知处理结果",
+            "schema": {
+              "$ref": "#/definitions/AlipayNotifyResponse"
+            }
+          }
+        }
+      }
+    },
     "/user/companion/profile": {
       "get": {
         "tags": ["陪玩信息"],
@@ -1755,6 +1899,143 @@
               "$ref": "#/definitions/WalletInfo"
             }
           }
+        }
+      ]
+    },
+    "RechargeCreateRequest": {
+      "type": "object",
+      "required": ["amount"],
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "充值金额（分/帅币）",
+          "example": 100
+        },
+        "payType": {
+          "type": "string",
+          "description": "支付方式：alipay_page(PC，默认) / alipay_wap(H5) / alipay_app(APP)",
+          "enum": ["alipay_page", "alipay_wap", "alipay_app"],
+          "example": "alipay_page"
+        },
+        "returnUrl": {
+          "type": "string",
+          "description": "同步回跳地址（可选）",
+          "example": "https://example.com/pay/return"
+        }
+      },
+      "example": {
+        "amount": 100,
+        "payType": "alipay_page"
+      }
+    },
+    "RechargeCreateData": {
+      "type": "object",
+      "properties": {
+        "orderNo": {
+          "type": "string",
+          "description": "充值单号",
+          "example": "RCFBWT5BX7514W"
+        },
+        "payUrl": {
+          "type": "string",
+          "description": "支付跳转URL（PC/WAP）",
+          "example": "https://openapi-sandbox.dl.alipaydev.com/gateway.do?..."
+        },
+        "payForm": {
+          "type": "string",
+          "description": "支付表单（APP/PC场景可选）"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单有效期（秒）",
+          "example": 1800
+        }
+      }
+    },
+    "RechargeCreateResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/RechargeCreateData"
+            }
+          }
+        }
+      ]
+    },
+    "RechargeQueryRequest": {
+      "type": "object",
+      "required": ["orderNo"],
+      "properties": {
+        "orderNo": {
+          "type": "string",
+          "description": "充值单号",
+          "example": "RCFBWT5BX7514W"
+        }
+      }
+    },
+    "RechargeQueryData": {
+      "type": "object",
+      "properties": {
+        "orderNo": {
+          "type": "string",
+          "description": "充值单号",
+          "example": "RCFBWT5BX7514W"
+        },
+        "status": {
+          "type": "integer",
+          "description": "订单状态：0=待支付,1=成功,2=失败,3=关闭",
+          "enum": [0, 1, 2, 3],
+          "example": 0
+        },
+        "amount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "金额（分/帅币）",
+          "example": 100
+        }
+      }
+    },
+    "RechargeQueryResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/RechargeQueryData"
+            }
+          }
+        }
+      ]
+    },
+    "AlipayNotifyRequest": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "object",
+          "description": "支付宝异步通知参数",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "AlipayNotifyResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
         }
       ]
     },

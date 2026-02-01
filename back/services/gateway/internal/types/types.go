@@ -12,6 +12,14 @@ type AcceptOrderResponse struct {
 	Data OrderInfo `json:"data"`
 }
 
+type AlipayNotifyRequest struct {
+	Payload map[string]string `json:"payload"` // 支付宝异步通知参数
+}
+
+type AlipayNotifyResponse struct {
+	BaseResp
+}
+
 type ApplyCompanionRequest struct {
 	GameSkill    string `json:"gameSkill"`    // 游戏技能（单个游戏名称）
 	PricePerHour int64  `json:"pricePerHour"` // 每小时价格（帅币）
@@ -239,6 +247,39 @@ type RateOrderRequest struct {
 type RateOrderResponse struct {
 	BaseResp
 	Data OrderInfo `json:"data"`
+}
+
+type RechargeCreateData struct {
+	OrderNo   string `json:"orderNo"`   // 充值单号
+	PayUrl    string `json:"payUrl"`    // 支付跳转URL（WAP/PC）
+	PayForm   string `json:"payForm"`   // 支付表单（APP/PC场景可选）
+	ExpiresIn int64  `json:"expiresIn"` // 订单有效期（秒）
+}
+
+type RechargeCreateRequest struct {
+	Amount    int64  `json:"amount"`             // 充值金额（分/帅币）
+	PayType   string `json:"payType"`            // 支付方式：alipay_wap / alipay_page / alipay_app
+	ReturnUrl string `json:"returnUrl,optional"` // 同步回跳地址（可选）
+}
+
+type RechargeCreateResponse struct {
+	BaseResp
+	Data RechargeCreateData `json:"data"`
+}
+
+type RechargeQueryData struct {
+	OrderNo string `json:"orderNo"`
+	Status  int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+	Amount  int64  `json:"amount"`
+}
+
+type RechargeQueryRequest struct {
+	OrderNo string `form:"orderNo"` // 充值单号
+}
+
+type RechargeQueryResponse struct {
+	BaseResp
+	Data RechargeQueryData `json:"data"`
 }
 
 type RefreshTokenRequest struct {

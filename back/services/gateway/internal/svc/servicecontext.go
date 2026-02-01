@@ -14,6 +14,7 @@ import (
 	"SLGaming/back/services/order/orderclient"
 	"SLGaming/back/services/user/userclient"
 
+	"github.com/smartwalle/alipay/v3"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -26,6 +27,7 @@ type ServiceContext struct {
 	CodeRPC    codeclient.Code
 	UserRPC    userclient.User
 	OrderRPC   orderclient.Order
+	Alipay     *alipay.Client
 	JWT        *jwt.JWTManager
 	TokenStore jwt.TokenStore
 	CacheRedis *redis.Redis
@@ -91,6 +93,20 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	ctx.TokenStore = jwt.NewRedisTokenStore(redisClient)
 	ctx.CacheRedis = redisClient
 	logx.Infof("使用 Redis 存储 Refresh Token")
+
+	// 初始化支付宝客户端
+	if c.Alipay.AppID != "" && c.Alipay.PrivateKey != "" {
+		client, err := alipay.New(c.Alipay.AppID, c.Alipay.PrivateKey, c.Alipay.IsProduction)
+		if err != nil {
+			logx.Errorf("初始化支付宝客户端失败: %v", err)
+		} else {
+			if c.Alipay.AlipayPublicKey != "" {
+				client.LoadAliPayPublicKey(c.Alipay.AlipayPublicKey)
+			}
+			ctx.Alipay = client
+			logx.Infof("成功初始化支付宝客户端")
+		}
+	}
 
 	return ctx
 }

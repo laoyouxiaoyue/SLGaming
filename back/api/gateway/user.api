@@ -153,6 +153,48 @@ type GetWalletResponse {
 	Data WalletInfo `json:"data"`
 }
 
+// ---------------- 余额充值 ----------------
+type RechargeCreateRequest {
+	Amount   int64  `json:"amount"` // 充值金额（分/帅币）
+	PayType  string `json:"payType"` // 支付方式：alipay_wap / alipay_page / alipay_app
+	ReturnUrl string `json:"returnUrl,optional"` // 同步回跳地址（可选）
+}
+
+type RechargeCreateData {
+	OrderNo  string `json:"orderNo"` // 充值单号
+	PayUrl   string `json:"payUrl"` // 支付跳转URL（WAP/PC）
+	PayForm  string `json:"payForm"` // 支付表单（APP/PC场景可选）
+	ExpiresIn int64 `json:"expiresIn"` // 订单有效期（秒）
+}
+
+type RechargeCreateResponse {
+	BaseResp
+	Data RechargeCreateData `json:"data"`
+}
+
+type RechargeQueryRequest {
+	OrderNo string `form:"orderNo"` // 充值单号
+}
+
+type RechargeQueryData {
+	OrderNo string `json:"orderNo"`
+	Status  int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+	Amount  int64  `json:"amount"`
+}
+
+type RechargeQueryResponse {
+	BaseResp
+	Data RechargeQueryData `json:"data"`
+}
+
+type AlipayNotifyRequest {
+	Payload map[string]string `json:"payload"` // 支付宝异步通知参数
+}
+
+type AlipayNotifyResponse {
+	BaseResp
+}
+
 // ---------------- 陪玩信息 ----------------
 type CompanionInfo {
 	UserId       uint64  `json:"userId"` // 用户ID
@@ -267,6 +309,18 @@ service gateway {
 	// 查询帅币钱包余额（需要登录）
 	@handler getWallet
 	get /api/user/wallet returns (GetWalletResponse)
+
+	// 余额充值下单（需要登录）
+	@handler rechargeCreate
+	post /api/user/recharge (RechargeCreateRequest) returns (RechargeCreateResponse)
+
+	// 查询充值单（需要登录）
+	@handler rechargeQuery
+	get /api/user/recharge (RechargeQueryRequest) returns (RechargeQueryResponse)
+
+	// 支付宝充值异步通知（公开）
+	@handler alipayNotify
+	post /api/user/recharge/alipay/notify (AlipayNotifyRequest) returns (AlipayNotifyResponse)
 
 	// 老板申请成为陪玩（需要登录）
 	@handler applyCompanion

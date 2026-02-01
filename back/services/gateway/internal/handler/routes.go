@@ -144,6 +144,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/api/user/recharge",
+				Handler: user.RechargeCreateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/recharge",
+				Handler: user.RechargeQueryHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/recharge/alipay/notify",
+				Handler: user.AlipayNotifyHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/api/user/refresh-token",
 				Handler: user.RefreshTokenHandler(serverCtx),
 			},
