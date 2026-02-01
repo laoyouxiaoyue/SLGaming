@@ -3,6 +3,7 @@ import { onMounted } from "vue";
 import { useWalletStore } from "@/stores/walletStore";
 import { storeToRefs } from "pinia";
 import { Money, Lock } from "@element-plus/icons-vue";
+import router from "@/router";
 
 const walletStore = useWalletStore();
 const { walletInfo } = storeToRefs(walletStore);
@@ -32,7 +33,13 @@ onMounted(() => {
             <div class="card-body">
               <span class="currency">¥</span>
               <span class="amount">{{ walletInfo.balance || 0 }}</span>
-              <el-button type="primary" round class="action-btn">充值</el-button>
+              <el-button
+                type="primary"
+                round
+                class="action-btn"
+                @click="$router.push('/scion/recharge')"
+                >充值</el-button
+              >
             </div>
           </el-card>
         </el-col>

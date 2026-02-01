@@ -91,7 +91,7 @@ onMounted(() => {
             >
           </li>
           <li>
-            <a href="javascript:;" @click="$router.push('/account/wallet')"
+            <a href="javascript:;" @click="$router.push('/scion/recharge')"
               ><sl-icon name="icon-chongzhi" />帅币充值</a
             >
           </li>
