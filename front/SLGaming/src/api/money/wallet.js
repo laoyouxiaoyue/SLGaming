@@ -45,3 +45,25 @@ export const alipaynotifyapi = (data) => {
     data,
   });
 };
+
+/**
+ * 查询充值订单
+ * @param {string} orderNo - 充值单号
+ * @returns {Promise}
+ * HTTP 状态码：200
+ * code: integer <int32>, 响应码，0表示成功
+ * msg: string, 响应消息
+ * data: object (RechargeQueryData)
+ *   orderNo: string, 充值单号
+ *   status: integer, 订单状态：0=待支付,1=成功,2=失败,3=关闭
+ *   amount: integer <int64>, 金额（分/帅币）
+ */
+export const queryrechargeorderapi = (orderNo) => {
+  return http({
+    url: "/user/recharge",
+    method: "GET",
+    params: {
+      orderNo,
+    },
+  });
+};

@@ -9,7 +9,6 @@ const infoStore = useInfoStore();
 const walletStore = useWalletStore();
 const { info } = storeToRefs(infoStore);
 const { walletInfo } = storeToRefs(walletStore);
-const route = useRoute();
 
 onMounted(() => {
   walletStore.getWallet();

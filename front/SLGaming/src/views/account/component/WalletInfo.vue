@@ -3,7 +3,6 @@ import { onMounted } from "vue";
 import { useWalletStore } from "@/stores/walletStore";
 import { storeToRefs } from "pinia";
 import { Money, Lock } from "@element-plus/icons-vue";
-import router from "@/router";
 
 const walletStore = useWalletStore();
 const { walletInfo } = storeToRefs(walletStore);
