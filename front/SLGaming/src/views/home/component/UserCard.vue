@@ -8,11 +8,27 @@ const props = defineProps({
   },
 });
 
+const map = {
+  王者荣耀: "https://game.gtimg.cn/images/yxzj/img201606/skin/hero-info/545/545-bigskin-2.jpg",
+  三角洲行动:
+    "https://image.baidu.com/search/down?url=https://tvax1.sinaimg.cn/large/e2737f34gy1i56ca9fh0hj22yo1o0x6p.jpg",
+  无畏契约:
+    "https://image.baidu.com/search/down?url=https://tvax1.sinaimg.cn/large/ea98bce0gy1ha20l29adnj21hc0u0wpc.jpg",
+  英雄联盟: "https://www.bizhigq.com/pc-img/2023-05/g1931.jpg",
+};
+
 const mediaStyle = computed(() => {
-  const url = props.user.avatarUrl || "";
-  return url
-    ? { backgroundImage: `url(${url})` }
-    : { backgroundImage: "linear-gradient(135deg, #ffe6f0, #ffd1e6)" };
+  let url = props.user.avatarUrl;
+
+  // 适配头像地址: 如果是远程的具体IP地址，转为相对路径走代理
+  if (url && url.includes("http://120.26.29.242")) {
+    url = url.replace("http://120.26.29.242", "");
+  }
+
+  if (!url) {
+    url = map[props.user.gameSkill] || "";
+  }
+  return { backgroundImage: `url(${url})` };
 });
 
 const statusText = computed(() => {
@@ -78,7 +94,10 @@ const ratingText = computed(() => {
     </div>
 
     <div class="user-card__info">
-      <div class="user-card__name">{{ user.nickname || "未命名" }}</div>
+      <div class="user-card__name">
+        {{ user.nickname || "未命名" }}
+        <sl-icon name="icon-guanfangrenzheng" v-if="user?.isVerified === true"></sl-icon>
+      </div>
       <div class="user-card__meta">
         <span class="user-card__skills">{{ gameSkillsText }}</span>
         <span class="user-card__price">{{ priceText }}</span>

@@ -21,7 +21,7 @@ http.interceptors.request.use(
     const userStore = useUserStore();
     // 2. 按照后端的要求拼接token数据
     if (userStore.userInfo.accessToken) {
-      config.headers.Authorization = `Bearer ${userStore.userInfo.accessToken}`;
+      config.headers.Authorization = `Bearer ${userStore.userInfo.refreshToken}`;
     }
     return config; // 必须返回config，请求才能继续发出去
   },

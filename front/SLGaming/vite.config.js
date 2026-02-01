@@ -27,6 +27,10 @@ export default defineConfig({
         target: "http://120.26.29.242:8888",
         changeOrigin: true,
       },
+      "/uploads": {
+        target: "http://120.26.29.242:8888",
+        changeOrigin: true,
+      },
     },
   },
   resolve: {
