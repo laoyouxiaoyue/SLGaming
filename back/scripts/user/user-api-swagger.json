@@ -374,6 +374,70 @@
         }
       }
     },
+    "/user/avatar": {
+      "post": {
+        "tags": ["用户信息"],
+        "summary": "上传用户头像",
+        "description": "上传头像文件并更新用户头像URL",
+        "operationId": "uploadAvatar",
+        "consumes": ["multipart/form-data"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "avatar",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "头像文件"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "上传成功",
+            "schema": {
+              "$ref": "#/definitions/UploadAvatarResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "avatarUrl": "/uploads/avatars/1700000000000000000.png"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "缺少头像文件字段 avatar"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/forgetPassword": {
       "put": {
         "tags": ["用户认证"],
@@ -606,6 +670,150 @@
         }
       }
     },
+    "/user/recharge": {
+      "post": {
+        "tags": ["钱包"],
+        "summary": "创建充值订单",
+        "description": "创建支付宝充值订单并返回支付地址（PC/WAP）或支付表单（APP）",
+        "operationId": "rechargeCreate",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RechargeCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/RechargeCreateResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "orderNo": "RCFBWT5BX7514W",
+                  "payUrl": "https://openapi-sandbox.dl.alipaydev.com/gateway.do?...",
+                  "payForm": "",
+                  "expiresIn": 1800
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["钱包"],
+        "summary": "查询充值订单",
+        "description": "根据订单号查询充值订单状态",
+        "operationId": "rechargeQuery",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "orderNo",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "充值单号"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "schema": {
+              "$ref": "#/definitions/RechargeQueryResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "orderNo": "RCFBWT5BX7514W",
+                  "status": 0,
+                  "amount": 100
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "403": {
+            "description": "无权查询",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          }
+        }
+      }
+    },
+    "/user/recharge/alipay/notify": {
+      "post": {
+        "tags": ["钱包"],
+        "summary": "支付宝异步通知",
+        "description": "支付宝服务器异步回调通知。该接口不需要登录认证。",
+        "operationId": "alipayNotify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AlipayNotifyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "通知处理结果",
+            "schema": {
+              "$ref": "#/definitions/AlipayNotifyResponse"
+            }
+          }
+        }
+      }
+    },
     "/user/companion/profile": {
       "get": {
         "tags": ["陪玩信息"],
@@ -758,6 +966,185 @@
               "application/json": {
                 "code": 404,
                 "msg": "陪玩信息不存在"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/companion/apply": {
+      "post": {
+        "tags": ["陪玩信息"],
+        "summary": "申请成为陪玩",
+        "description": "老板申请成为陪玩（需要登录）。提交游戏技能、价格与个人简介。",
+        "operationId": "applyCompanion",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ApplyCompanionRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "申请成功",
+            "schema": {
+              "$ref": "#/definitions/ApplyCompanionResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "id": 2,
+                  "uid": 10002,
+                  "nickname": "小明",
+                  "phone": "13800138000",
+                  "role": 2,
+                  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                  "bio": "专业陪玩，技术过硬，带你上分！"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "游戏技能不能为空"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "仅老板可申请成为陪玩"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/companion/status": {
+      "put": {
+        "tags": ["陪玩信息"],
+        "summary": "陪玩上下线",
+        "description": "陪玩控制自己的上下线状态（需要登录，仅陪玩角色）。忙碌状态下禁止切换为在线/离线。",
+        "operationId": "updateCompanionStatus",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateCompanionStatusRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "schema": {
+              "$ref": "#/definitions/UpdateCompanionStatusResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "userId": 2,
+                  "gameSkill": "王者荣耀",
+                  "pricePerHour": 60,
+                  "status": 1,
+                  "rating": 4.8,
+                  "totalOrders": 128,
+                  "isVerified": true,
+                  "nickname": "小明陪玩",
+                  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                  "bio": "专业陪玩，技术过硬，带你上分！"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，当前用户不是陪玩角色",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "当前用户不是陪玩角色"
+              }
+            }
+          },
+          "400": {
+            "description": "状态参数无效",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "状态参数无效"
+              }
+            }
+          },
+          "409": {
+            "description": "忙碌状态禁止上下线",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 409,
+                "msg": "忙碌状态下禁止上下线"
               }
             }
           }
@@ -1356,6 +1743,32 @@
         }
       ]
     },
+    "UploadAvatarData": {
+      "type": "object",
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "description": "头像URL",
+          "example": "/uploads/avatars/1700000000000000000.png"
+        }
+      }
+    },
+    "UploadAvatarResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/UploadAvatarData"
+            }
+          }
+        }
+      ]
+    },
     "ForgetPasswordRequest": {
       "type": "object",
       "required": ["phone", "code", "password"],
@@ -1489,6 +1902,143 @@
         }
       ]
     },
+    "RechargeCreateRequest": {
+      "type": "object",
+      "required": ["amount"],
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "充值金额（分/帅币）",
+          "example": 100
+        },
+        "payType": {
+          "type": "string",
+          "description": "支付方式：alipay_page(PC，默认) / alipay_wap(H5) / alipay_app(APP)",
+          "enum": ["alipay_page", "alipay_wap", "alipay_app"],
+          "example": "alipay_page"
+        },
+        "returnUrl": {
+          "type": "string",
+          "description": "同步回跳地址（可选）",
+          "example": "https://example.com/pay/return"
+        }
+      },
+      "example": {
+        "amount": 100,
+        "payType": "alipay_page"
+      }
+    },
+    "RechargeCreateData": {
+      "type": "object",
+      "properties": {
+        "orderNo": {
+          "type": "string",
+          "description": "充值单号",
+          "example": "RCFBWT5BX7514W"
+        },
+        "payUrl": {
+          "type": "string",
+          "description": "支付跳转URL（PC/WAP）",
+          "example": "https://openapi-sandbox.dl.alipaydev.com/gateway.do?..."
+        },
+        "payForm": {
+          "type": "string",
+          "description": "支付表单（APP/PC场景可选）"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int64",
+          "description": "订单有效期（秒）",
+          "example": 1800
+        }
+      }
+    },
+    "RechargeCreateResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/RechargeCreateData"
+            }
+          }
+        }
+      ]
+    },
+    "RechargeQueryRequest": {
+      "type": "object",
+      "required": ["orderNo"],
+      "properties": {
+        "orderNo": {
+          "type": "string",
+          "description": "充值单号",
+          "example": "RCFBWT5BX7514W"
+        }
+      }
+    },
+    "RechargeQueryData": {
+      "type": "object",
+      "properties": {
+        "orderNo": {
+          "type": "string",
+          "description": "充值单号",
+          "example": "RCFBWT5BX7514W"
+        },
+        "status": {
+          "type": "integer",
+          "description": "订单状态：0=待支付,1=成功,2=失败,3=关闭",
+          "enum": [0, 1, 2, 3],
+          "example": 0
+        },
+        "amount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "金额（分/帅币）",
+          "example": 100
+        }
+      }
+    },
+    "RechargeQueryResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/RechargeQueryData"
+            }
+          }
+        }
+      ]
+    },
+    "AlipayNotifyRequest": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "object",
+          "description": "支付宝异步通知参数",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "AlipayNotifyResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        }
+      ]
+    },
     "CompanionInfo": {
       "type": "object",
       "properties": {
@@ -1594,6 +2144,80 @@
       }
     },
     "UpdateCompanionProfileResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/CompanionInfo"
+            }
+          }
+        }
+      ]
+    },
+    "ApplyCompanionRequest": {
+      "type": "object",
+      "required": ["gameSkill", "pricePerHour"],
+      "properties": {
+        "gameSkill": {
+          "type": "string",
+          "description": "游戏技能（单个游戏名称）",
+          "example": "王者荣耀"
+        },
+        "pricePerHour": {
+          "type": "integer",
+          "format": "int64",
+          "description": "每小时价格（帅币）",
+          "example": 60
+        },
+        "bio": {
+          "type": "string",
+          "description": "个人简介（可选）",
+          "example": "专业陪玩，技术过硬，带你上分！"
+        }
+      },
+      "example": {
+        "gameSkill": "王者荣耀",
+        "pricePerHour": 60,
+        "bio": "专业陪玩，技术过硬，带你上分！"
+      }
+    },
+    "ApplyCompanionResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/UserInfo"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateCompanionStatusRequest": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "integer",
+          "description": "状态：0=离线, 1=在线, 2=忙碌",
+          "enum": [0, 1, 2],
+          "example": 1
+        }
+      },
+      "example": {
+        "status": 1
+      }
+    },
+    "UpdateCompanionStatusResponse": {
       "type": "object",
       "allOf": [
         {

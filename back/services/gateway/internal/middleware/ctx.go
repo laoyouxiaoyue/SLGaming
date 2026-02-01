@@ -10,6 +10,7 @@ type ctxKey string
 
 const (
 	userIDKey       ctxKey = "user_id"
+	userRoleKey     ctxKey = "user_role"
 	accessTokenKey  ctxKey = "access_token"
 	refreshTokenKey ctxKey = "refresh_token"
 )
@@ -41,6 +42,26 @@ func MustGetUserID(ctx context.Context) uint64 {
 		panic(fmt.Sprintf("must get user id from context: %v", err))
 	}
 	return userID
+}
+
+// SetUserRole 将用户角色设置到 context 中
+func SetUserRole(ctx context.Context, role int32) context.Context {
+	return context.WithValue(ctx, userRoleKey, role)
+}
+
+// GetUserRole 从 context 中获取用户角色
+func GetUserRole(ctx context.Context) (int32, error) {
+	val := ctx.Value(userRoleKey)
+	if val == nil {
+		return 0, fmt.Errorf("user role not found in context")
+	}
+
+	role, ok := val.(int32)
+	if !ok {
+		return 0, fmt.Errorf("invalid user role type in context")
+	}
+
+	return role, nil
 }
 
 // SetAccessToken 将 Access Token 设置到 context 中

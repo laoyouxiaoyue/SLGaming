@@ -77,3 +77,19 @@ RateLimit:
       Method: "POST"
       GlobalQPS: 500
       PerUserQPS: 10           # 每个用户每秒最多 10 次
+
+# 上传配置
+Upload:
+  LocalDir: "uploads"          # 本地保存目录（相对运行目录）
+  BaseURL: "http://120.26.29.242/uploads"  # 对外访问前缀
+  MaxSizeMB: 5                  # 单文件最大大小（MB）
+  AllowedExt: [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+
+# 支付宝配置
+Alipay:
+  AppID: "9021000157645392"
+  PrivateKey: "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCMsMunnJIOkTFqMBdKZWBCatZuALtZczVo7z+ThAAh4E6jJagPycJNisBK8wYfALQ6mvPSvYJ1X8Nn5j5kEbpEa2EP5ddUlnK5iYfQgedruRnZlmDDX1xsdqy+xjFpYVSZsCTGE5A/hpIPvgHssY57hJDb+enzp44UqDZyvX0U6gbtRNElq9lTw8Lxig205ZO1pPQTS3JgDCPrX8+x4qWjA24Yfjr3g/WiiqiOcdjqDPHiOqFAJ73/PBGWPtONW8KyHy7a+kA5o9XOmSgNHlETj+aeNdOCUU/+wus2Wo752MI3B2O720MAms8Os/Zhx7dQg02EonqJifJIcGCB7NOrAgMBAAECggEAXhOOasrwg5slDtuPh2jYgDEOp8oHfR3jtgJdYdffeseR7dgtVDlWmyFPyg5NpoeC/LlGl0GvrarWcHBugd20zzF6WvYXEfH0Twqe7Zcf11GT7oJ2u83VcJW+l2bR/aRevNIjFOxaBZCHtM0aXlqwavnPH7kyboI5KKj+l6ULseJ5qmLcXG11faPEhsqEBIyV1jDeu4O6ejK4ASVwb9qQJmS0v5FBHQpnFbxlH0tgG4Pf+hdHAJ/3ygUkGDlA2OncPxyy0IO+aH25qCY6zrVrQEODg84Cx/ZJixTPa7yWtR13vN2A4EEhgkbgD2NjLPG+aPtIwK4alxTxhBzFjGR8WQKBgQDGH7cYUeWyo9pEcnPtixyzegkvZcq1kJHaNGnrTG7jolIg0Q12BlaXz/jftsM3BhiblKM2/PeHMBIpXST5z7GlKaZYyOaUn5zIYRlUNZrTq+schskf8OjQ1TZSVf+Ab837ec+MJ2RTuXCprLcQLql78QIv8x79Flxp0kkLL14UHQKBgQC1yg0l5sQx06Bp6bVjdYHBzIrT7ZnYWrsEuClLqfCnJ5NeRtm5CnZ8cB9mP5jPtRezJSdjfJbALqn2QivLuEk5a+OU6Uf3KxTg/CXjpNpujSMSAa9FEqAzNmMcykAutgplwOucE/cPyNkDySS99dJhp7uRpJBvAhjqDWYgpCjsZwKBgF3smSNpZ+h5bzc1vymk4nVfbE1RB3lt0QdOA8ytzoAR6rduA+Co/pI34PdFsGQ8epv/KiUeZcZsDqAXbTkUslXnWdoLW+yngm8oQRa/1ud0QCCk8WI4FlcyTO9Zn6fm2RLX24HJBvH+HqABpkOAq457YhsTOeSnniX4r/IigYotAoGBAJtHl6uETpnxFtjhVJs8SDXuLbeRARSZi54gYMXMx09AstSY2GkC0urAK1H/iNwC59eSKO8GAQ7vzSYYp6hAJevyiFcuXNZ36kGzn/mvWxWLYSWEYt4xZr3X+xkgeWps/Lyl6ZtMQoEtIpHlQokwbSAVUla5ptXriLSD9XR0RLCJAoGAaxThKWAHaImv6rOfEEqaALFfoksTo2Tgafxt2R0uxZ7aYtRNn9BPJTGOtUE8Bp+QY8RgtLJjevFNXLW+I6Qm6ZBKHqCIrLMEprCGdZWS+IwkxSmuFyyr0nG00VAmQauNVBfmZWqX9hWA1s1lmLrToi5XoBQPdEZswSc/k6JmsRY="          # PKCS8 私钥内容
+  AlipayPublicKey: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq84SgJeAQDfbu2B5sRkN0R/R1tP76AW+Wy13vulRODKhgK6kcEDQiCdkvzfJGoz7A+ILgKURntaM2r44rGhlb/9Mx/zp4moQvX5sgqGsqo/6qe9Kko7IbRfW2kZ0tJli1c1Mf2baLjnBAIL27gjMAyp6fh9T2jVlosSl40nVNPAIolgt1kyihIb04bw1VG33u1csuXjDbUu/YWpDadTONhmJTRMKm52ziX7Rpj8pyWvjwg5OJe0hsWBMgVzBSx1fc0nwr7ryHmBwd4+dJHiLj2EzQ+L2vidGDJ3FvCVXcJ2L53Lr8c1JAdl3ec9fpsKd728SE/M8SfbBakdfrdSB0wIDAQAB"     # 支付宝公钥
+  NotifyURL: "http://120.26.29.242:9090/api/user/recharge/alipay/notify"           # 异步通知地址
+  ReturnURL: "http://120.26.29.242:9090/"           # 同步回跳地址
+  IsProduction: false      # 沙箱=false，生产=true

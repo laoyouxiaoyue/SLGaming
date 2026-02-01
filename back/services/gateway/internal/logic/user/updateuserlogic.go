@@ -56,21 +56,22 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserRequest) (resp *types.
 		}
 	}
 
-	// 普通用户不允许修改角色，只有管理员可以（这里先禁止所有角色修改）
-	if req.Role != 0 {
-		return &types.UpdateUserResponse{
-			BaseResp: types.BaseResp{
-				Code: 403,
-				Msg:  "无权修改用户角色",
-			},
-		}, nil
-	}
-
 	if l.svcCtx.UserRPC == nil {
 		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
 		return &types.UpdateUserResponse{
 			BaseResp: types.BaseResp{Code: code, Msg: msg},
 		}, nil
+	}
+
+	// 获取当前用户角色（优先 JWT 里的 role）
+	currentRole, roleErr := middleware.GetUserRole(l.ctx)
+	if roleErr != nil {
+		currentRole = 0
+	}
+	// 非管理员仅允许修改昵称/密码/手机号/bio，忽略 role 与 avatarUrl
+	if currentRole != 3 {
+		req.Role = 0
+		req.AvatarUrl = ""
 	}
 
 	// 调用用户服务的 RPC

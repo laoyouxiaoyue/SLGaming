@@ -12,6 +12,25 @@ type AcceptOrderResponse struct {
 	Data OrderInfo `json:"data"`
 }
 
+type AlipayNotifyRequest struct {
+	Payload map[string]string `json:"payload"` // 支付宝异步通知参数
+}
+
+type AlipayNotifyResponse struct {
+	BaseResp
+}
+
+type ApplyCompanionRequest struct {
+	GameSkill    string `json:"gameSkill"`    // 游戏技能（单个游戏名称）
+	PricePerHour int64  `json:"pricePerHour"` // 每小时价格（帅币）
+	Bio          string `json:"bio,optional"` // 个人简介
+}
+
+type ApplyCompanionResponse struct {
+	BaseResp
+	Data UserInfo `json:"data"`
+}
+
 type BaseResp struct {
 	Code int32  `json:"code"`
 	Msg  string `json:"msg"`
@@ -230,6 +249,39 @@ type RateOrderResponse struct {
 	Data OrderInfo `json:"data"`
 }
 
+type RechargeCreateData struct {
+	OrderNo   string `json:"orderNo"`   // 充值单号
+	PayUrl    string `json:"payUrl"`    // 支付跳转URL（WAP/PC）
+	PayForm   string `json:"payForm"`   // 支付表单（APP/PC场景可选）
+	ExpiresIn int64  `json:"expiresIn"` // 订单有效期（秒）
+}
+
+type RechargeCreateRequest struct {
+	Amount    int64  `json:"amount"`             // 充值金额（分/帅币）
+	PayType   string `json:"payType"`            // 支付方式：alipay_wap / alipay_page / alipay_app
+	ReturnUrl string `json:"returnUrl,optional"` // 同步回跳地址（可选）
+}
+
+type RechargeCreateResponse struct {
+	BaseResp
+	Data RechargeCreateData `json:"data"`
+}
+
+type RechargeQueryData struct {
+	OrderNo string `json:"orderNo"`
+	Status  int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+	Amount  int64  `json:"amount"`
+}
+
+type RechargeQueryRequest struct {
+	OrderNo string `form:"orderNo"` // 充值单号
+}
+
+type RechargeQueryResponse struct {
+	BaseResp
+	Data RechargeQueryData `json:"data"`
+}
+
 type RefreshTokenRequest struct {
 	RefreshToken string `json:"refreshToken"`
 }
@@ -292,6 +344,15 @@ type UpdateCompanionProfileResponse struct {
 	Data CompanionInfo `json:"data"`
 }
 
+type UpdateCompanionStatusRequest struct {
+	Status int `json:"status"` // 状态：0=离线, 1=在线, 2=忙碌
+}
+
+type UpdateCompanionStatusResponse struct {
+	BaseResp
+	Data CompanionInfo `json:"data"`
+}
+
 type UpdateUserRequest struct {
 	Id        uint64 `json:"id"`
 	Nickname  string `json:"nickname,optional"`
@@ -305,6 +366,19 @@ type UpdateUserRequest struct {
 type UpdateUserResponse struct {
 	BaseResp
 	Data UserInfo `json:"data"`
+}
+
+type UploadAvatarData struct {
+	AvatarUrl string `json:"avatarUrl"` // 头像URL
+}
+
+type UploadAvatarRequest struct {
+	Avatar string `form:"avatar"` // 头像文件（multipart/form-data 文件字段）
+}
+
+type UploadAvatarResponse struct {
+	BaseResp
+	Data UploadAvatarData `json:"data"`
 }
 
 type UserInfo struct {

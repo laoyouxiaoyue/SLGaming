@@ -83,6 +83,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.UpdateUserHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/avatar",
+				Handler: user.UploadAvatarHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/companion/apply",
+				Handler: user.ApplyCompanionHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/api/user/companion/profile",
 				Handler: user.GetCompanionProfileHandler(serverCtx),
@@ -96,6 +106,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/user/companion/profile/public",
 				Handler: user.GetCompanionProfileByIdHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/user/companion/status",
+				Handler: user.UpdateCompanionStatusHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
@@ -126,6 +141,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/api/user/logout",
 				Handler: user.LogoutHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/recharge",
+				Handler: user.RechargeCreateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/recharge",
+				Handler: user.RechargeQueryHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/recharge/alipay/notify",
+				Handler: user.AlipayNotifyHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,

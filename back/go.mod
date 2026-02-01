@@ -47,6 +47,10 @@ require (
 	github.com/milvus-io/milvus-proto/go-api/v2 v2.4.10-0.20240819025435-512e3b98866a // indirect
 	github.com/pingcap/errors v0.11.5-0.20211224045212-9687c2b0f87c // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
+	github.com/smartwalle/alipay/v3 v3.2.28 // indirect
+	github.com/smartwalle/ncrypto v1.0.4 // indirect
+	github.com/smartwalle/ngx v1.0.12 // indirect
+	github.com/smartwalle/nsign v1.0.9 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/volcengine/volc-sdk-golang v1.0.199 // indirect
 	github.com/volcengine/volcengine-go-sdk v1.1.44 // indirect
