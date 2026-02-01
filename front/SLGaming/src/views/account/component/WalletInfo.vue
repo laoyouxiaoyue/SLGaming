@@ -17,7 +17,7 @@ onMounted(() => {
 
 <template>
   <div class="setting-info">
-    <div class="setting-title">我的钱包</div>
+    <div class="panel-title">我的钱包</div>
     <div class="setting-content">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -25,7 +25,7 @@ onMounted(() => {
             <template #header>
               <div class="card-header">
                 <div class="header-left">
-                  <el-icon><Money /></el-icon>
+                  <el-icon class="icon-orange"><Money /></el-icon>
                   <span>账户余额</span>
                 </div>
               </div>
@@ -65,43 +65,45 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .setting-info {
-  background: #fff;
-  border-radius: 8px;
-  min-height: 500px;
+  padding: 0 10px;
 }
 
-.setting-title {
-  padding: 18px 30px;
-  margin-top: -22px;
-  font-size: 18px;
+.panel-title {
+  font-size: 20px;
   font-weight: 600;
+  margin-bottom: 25px;
   color: #333;
-  border-bottom: 1px solid #f0f0f0;
+  border-left: 4px solid #ff6b35;
+  padding-left: 12px;
 }
 
 .setting-content {
-  padding: 30px;
+  padding-top: 10px;
 }
 
 .wallet-card {
   height: 100%;
   border-radius: 12px;
   transition: all 0.3s;
-}
+  border: 1px solid #eee;
 
-.wallet-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.08);
+    border-color: #ffccb8;
+  }
 }
 
 .balance-card :deep(.el-card__header) {
-  background: linear-gradient(to right, #e6f7ff, #ffffff);
+  background: linear-gradient(to right, #fff6f2, #ffffff);
+  border-bottom: 1px solid #f9f9f9;
 }
 
 .frozen-card :deep(.el-card__header) {
-  background: linear-gradient(to right, #fff1f0, #ffffff);
+  background: linear-gradient(to right, #f8f8f8, #ffffff);
+  border-bottom: 1px solid #f9f9f9;
 }
 
 .card-header {
@@ -115,7 +117,12 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   font-size: 16px;
-  color: #606266;
+  color: #333;
+  font-weight: 500;
+
+  .icon-orange {
+    color: #ff6b35;
+  }
 }
 
 .card-body {
@@ -153,5 +160,12 @@ onMounted(() => {
   right: 0;
   bottom: 10px;
   padding: 8px 24px;
+  background: linear-gradient(135deg, #ff8e61, #ff6b35);
+  border: none;
+
+  &:hover {
+    background: linear-gradient(135deg, #ff9ca4, #ff7a45);
+    opacity: 0.9;
+  }
 }
 </style>

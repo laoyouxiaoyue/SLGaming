@@ -56,7 +56,7 @@ onMounted(() => {
 <template>
   <div class="setting-info">
     <!-- 标题栏 -->
-    <div class="setting-title">陪玩设置</div>
+    <div class="panel-title">陪玩设置</div>
 
     <!-- 表单内容 -->
     <div class="setting-content">
@@ -127,31 +127,41 @@ onMounted(() => {
 <style scoped lang="scss">
 .setting-info {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  padding: 0 10px;
 
-  .setting-title {
-    font-size: 18px;
-    padding: 0 0 15px 0;
-    border-bottom: 1px solid #f0f0f0;
-    margin-bottom: 24px;
-    color: #409eff;
-    font-weight: 500;
+  .panel-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #333;
+    border-left: 4px solid #ff6b35;
+    padding-left: 12px;
   }
 
   .setting-content {
-    flex: 1;
-
     .user-form {
       max-width: 800px;
 
       .info-section {
         margin-bottom: 30px;
+        :deep(.el-descriptions__title) {
+          font-size: 15px;
+          font-weight: 600;
+          color: #333;
+        }
       }
 
       .save-btn {
-        width: 120px;
+        width: 140px;
         margin-top: 20px;
+        background: linear-gradient(135deg, #ff8e61, #ff6b35);
+        border: none;
+        font-weight: 500;
+
+        &:hover {
+          background: linear-gradient(135deg, #ff9ca4, #ff7a45);
+          opacity: 0.9;
+        }
       }
     }
   }

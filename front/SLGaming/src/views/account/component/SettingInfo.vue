@@ -94,7 +94,7 @@ onMounted(() => {
 <template>
   <div class="setting-info">
     <!-- 标题栏 -->
-    <div class="setting-title">我的信息</div>
+    <div class="panel-title">我的信息</div>
 
     <!-- 表单内容 -->
     <div class="setting-content">
@@ -155,16 +155,15 @@ onMounted(() => {
 <style scoped lang="scss">
 .setting-info {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  padding: 0 10px;
 
-  .setting-title {
-    font-size: 18px;
-    padding: 0 0 15px 0; // 上下边距调整以对齐
-    border-bottom: 1px solid #f0f0f0;
-    margin-bottom: 24px;
-    color: #409eff; // 蓝色
-    font-weight: 500;
+  .panel-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #333;
+    border-left: 4px solid #ff6b35;
+    padding-left: 12px;
   }
 
   .setting-content {
@@ -172,6 +171,7 @@ onMounted(() => {
 
     .user-form {
       max-width: 600px;
+      margin-top: 10px;
 
       .avatar-wrapper {
         display: flex;
@@ -185,13 +185,27 @@ onMounted(() => {
           height: 60px;
           border-radius: 50%;
           overflow: hidden;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
       }
 
       .save-btn {
         width: 120px;
         margin-top: 10px;
-        margin-left: 183px;
+        margin-left: 0;
+        background: linear-gradient(135deg, #ff8e61, #ff6b35);
+        border: none;
+        font-weight: 500;
+
+        &:hover {
+          background: linear-gradient(135deg, #ff9ca4, #ff7a45);
+          opacity: 0.9;
+        }
+      }
+
+      :deep(.el-form-item__label) {
+        font-weight: 500;
       }
     }
   }
