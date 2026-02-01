@@ -11,6 +11,7 @@ const { info } = storeToRefs(infoStore);
 const formRef = ref(null);
 const fileInputRef = ref(null);
 const form = ref({
+  id: "",
   nickname: "",
   phone: "",
   role: 1, // 默认老板
@@ -26,6 +27,7 @@ const rules = {
 const initForm = () => {
   if (info.value && Object.keys(info.value).length > 0) {
     form.value = {
+      id: info.value.id || "",
       nickname: info.value.nickname || "",
       phone: info.value.phone || "",
       role: info.value.role || 1,
@@ -63,7 +65,7 @@ const handleFileChange = async (e) => {
   const res = await upavatarUrlapi(file);
   if (res.data && res.data.avatarUrl) {
     form.value.avatarUrl = res.data.avatarUrl;
-    ElMessage.success("头像上传成功");
+    ElMessage.success("头像更换成功");
   }
   e.target.value = "";
 };

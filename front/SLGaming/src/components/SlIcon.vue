@@ -20,8 +20,6 @@ defineProps({
 </template>
 
 <style scoped>
-@import url("//at.alicdn.com/t/c/font_5120505_ritsif9r24.css");
-
 .iconfont {
   display: inline-block;
   font-style: normal;

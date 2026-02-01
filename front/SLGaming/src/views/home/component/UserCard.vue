@@ -78,7 +78,10 @@ const ratingText = computed(() => {
     </div>
 
     <div class="user-card__info">
-      <div class="user-card__name">{{ user.nickname || "未命名" }}</div>
+      <div class="user-card__name">
+        {{ user.nickname || "未命名" }}
+        <sl-icon name="icon-guanfangrenzheng" v-if="user?.isVerified === true"></sl-icon>
+      </div>
       <div class="user-card__meta">
         <span class="user-card__skills">{{ gameSkillsText }}</span>
         <span class="user-card__price">{{ priceText }}</span>
