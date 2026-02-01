@@ -1,4 +1,6 @@
 <script setup>
+defineOptions({ name: "ScionRecharge" });
+
 import { ref, computed, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { createrechargeorderapi } from "@/api/money/wallet";
