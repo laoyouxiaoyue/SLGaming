@@ -9,6 +9,10 @@ import Companion from "@/views/account/component/CompanionInfo.vue";
 import Order from "@/views/account/component/OrderInfo.vue";
 import Setting from "@/views/account/component/SettingInfo.vue";
 import Wallet from "@/views/account/component/WalletInfo.vue";
+import Scion from "@/views/recharge/index.vue";
+import ScionRecharge from "@/views/recharge/component/ScionRecharge.vue";
+import ScionRecord from "@/views/recharge/component/ScionRecord.vue";
+import Pay from "@/views/pay/index.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -19,6 +23,24 @@ const router = createRouter({
         {
           path: "",
           component: Home,
+        },
+        {
+          path: "scion",
+          component: Scion,
+          children: [
+            {
+              path: "recharge",
+              component: ScionRecharge,
+            },
+            {
+              path: "recond",
+              component: ScionRecord,
+            },
+          ],
+        },
+        {
+          path: "pay",
+          component: Pay,
         },
         {
           path: "account",

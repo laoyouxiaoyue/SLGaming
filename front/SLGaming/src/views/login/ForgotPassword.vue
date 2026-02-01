@@ -52,32 +52,24 @@ const sendCode = async () => {
     ElMessage({ type: "error", message: "请输入正确的手机号" });
     return;
   }
-  try {
-    await codeAPI({ phone, purpose: "resetpassword" });
-    ElMessage({ type: "success", message: "验证码发送成功" });
-    countdown.value = 60;
-    const timer = setInterval(() => {
-      countdown.value--;
-      if (countdown.value <= 0) {
-        clearInterval(timer);
-      }
-    }, 1000);
-  } catch {
-    // 拦截器已经处理了错误提示
-  }
+  await codeAPI({ phone, purpose: "resetpassword" });
+  ElMessage({ type: "success", message: "验证码发送成功" });
+  countdown.value = 60;
+  const timer = setInterval(() => {
+    countdown.value--;
+    if (countdown.value <= 0) {
+      clearInterval(timer);
+    }
+  }, 1000);
 };
 
 const doReset = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      try {
-        const { phone, code, password } = form.value;
-        await forgetpasswordapi({ phone, code, password });
-        ElMessage({ type: "success", message: "密码重置成功，请重新登录" });
-        router.push("/login");
-      } catch {
-        // ElMessage({ type: "error", message: "重置失败，请检查验证码或手机号" });
-      }
+      const { phone, code, password } = form.value;
+      await forgetpasswordapi({ phone, code, password });
+      ElMessage({ type: "success", message: "密码重置成功，请重新登录" });
+      router.push("/login");
     }
   });
 };

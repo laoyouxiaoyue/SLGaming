@@ -1,41 +1,44 @@
 <script setup>
 import { RouterView, RouterLink } from "vue-router";
 import { useInfoStore } from "@/stores/infoStore";
+import { useWalletStore } from "@/stores/walletStore";
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 
 const infoStore = useInfoStore();
+const walletStore = useWalletStore();
 const { info } = storeToRefs(infoStore);
+const { walletInfo } = storeToRefs(walletStore);
+
+onMounted(() => {
+  walletStore.getWallet();
+});
 </script>
 
 <template>
-  <div class="account-container">
+  <div class="recharge-container">
     <div class="sidebar">
-      <!-- 只有登录后才显示用户信息摘要 -->
-      <div class="user-summary" v-if="info">
+      <div class="user-summary">
         <div class="user-info-row">
           <el-avatar :size="60" :src="info.avatarUrl" class="user-avatar">
             <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
           </el-avatar>
           <div class="user-name">{{ info.nickname || "用户" }}</div>
         </div>
+        <div class="wallet-balance">
+          <span class="label">帅币</span>
+          <span class="amount">{{ walletInfo.balance || "0" }}</span>
+        </div>
       </div>
 
       <div class="menu-list">
-        <RouterLink to="/account/setting" class="menu-item">
-          <sl-icon name="icon-touxiang" size="18" />
-          <span>我的信息</span>
+        <RouterLink to="/scion/recharge" class="menu-item">
+          <sl-icon name="icon-chongzhi1" size="18" />
+          <span>充值页面</span>
         </RouterLink>
-        <RouterLink to="/account/companion" class="menu-item" v-if="info.role === 2">
-          <sl-icon name="icon-peiwandailian" size="18" />
-          <span>陪玩设置</span>
-        </RouterLink>
-        <RouterLink to="/account/order" class="menu-item">
+        <RouterLink to="/scion/recond" class="menu-item">
           <sl-icon name="icon-dingdan" size="18" />
-          <span>我的订单</span>
-        </RouterLink>
-        <RouterLink to="/account/wallet" class="menu-item">
-          <sl-icon name="icon-qianbao" size="18" />
-          <span>我的钱包</span>
+          <span>消费记录</span>
         </RouterLink>
       </div>
     </div>
@@ -46,7 +49,7 @@ const { info } = storeToRefs(infoStore);
 </template>
 
 <style scoped lang="scss">
-.account-container {
+.recharge-container {
   display: flex;
   width: 1200px;
   margin: 20px auto;
@@ -90,6 +93,30 @@ const { info } = storeToRefs(infoStore);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+      }
+
+      .wallet-balance {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #fff6f2, #fff0ea);
+        padding: 12px 10px;
+        border-radius: 12px;
+        width: 80%;
+
+        .label {
+          font-size: 16px;
+          color: #666;
+          margin-bottom: 0;
+        }
+
+        .amount {
+          font-size: 18px;
+          font-weight: bold;
+          color: #0c0909;
         }
       }
     }

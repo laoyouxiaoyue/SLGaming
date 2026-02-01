@@ -1,40 +1,35 @@
 <script setup>
 import { useUserStore } from "@/stores/userStore";
 import { useWalletStore } from "@/stores/walletStore";
+import { useInfoStore } from "@/stores/infoStore";
 import { useRouter } from "vue-router";
-import { getInfoAPI } from "@/api/user/info";
-import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { getlogoutAPI } from "@/api/user/logout";
 
 const userStore = useUserStore();
 const walletStore = useWalletStore();
+const infoStore = useInfoStore();
 const router = useRouter();
+
+// 使用 storeToRefs 获取响应式 state
+const { info } = storeToRefs(infoStore);
+const { walletInfo } = storeToRefs(walletStore);
+
 const confirm = async () => {
   // 退出登录业务逻辑实现
   // 1.清除用户信息 触发action
   await getlogoutAPI();
   userStore.clearUserInfo();
+  infoStore.clearInfo();
   // 2.跳转到登录页
   router.push("/login");
 };
 
-const info = ref({});
-const walletInfo = ref({});
-
-const getInfo = async () => {
-  const res = await getInfoAPI();
-  info.value = res.data;
-};
-
-const getWalletInfo = async () => {
-  await walletStore.getWallet();
-  walletInfo.value = walletStore.walletInfo;
-};
-
 onMounted(() => {
   if (userStore.userInfo?.accessToken) {
-    getInfo();
-    getWalletInfo();
+    infoStore.getUserDetail();
+    walletStore.getWallet();
   }
 });
 </script>
@@ -43,6 +38,11 @@ onMounted(() => {
   <nav class="app-topnav">
     <div class="container">
       <ul>
+        <li class="rank-item">
+          <a href="javascript:;" class="menu-item" @click="$router.push('/')">
+            <sl-icon name="icon-guanjun" size="16" class="rank-icon" />排行榜
+          </a>
+        </li>
         <!-- 多模版渲染 区分登录状态和非登录状态 -->
         <!-- 适配思路: 登录时显示第一块 非登录时显示第二块  是否有token -->
         <template v-if="userStore.userInfo?.accessToken">
@@ -50,10 +50,12 @@ onMounted(() => {
             <el-popover placement="bottom" trigger="hover" width="200" popper-class="user-popover">
               <template #reference>
                 <a href="javascript:;" class="avatar-link">
-                  <div class="avatar-box">
-                    <img :src="info.avatarUrl" v-if="info.avatarUrl" />
-                    <sl-icon name="icon-user" v-else size="40" color="#fff" />
-                  </div>
+                  <div
+                    class="avatar-box"
+                    v-if="info.avatarUrl"
+                    :style="{ backgroundImage: `url(${info.avatarUrl})` }"
+                  ></div>
+                  <sl-icon name="icon-touxiang1" v-else size="64" color="#fff" />
                 </a>
               </template>
               <div class="user-popover-content">
@@ -71,29 +73,37 @@ onMounted(() => {
                   </div>
                 </div>
                 <div class="divider"></div>
-                <a href="javascript:;" class="menu-item" @click="$router.push('/member')">
-                  <sl-icon name="icon-user" size="16" />个人中心
+                <a href="javascript:;" class="menu-item" @click="$router.push('/account/setting')">
+                  <sl-icon name="iconfont icon-touxiang" size="16" color="#fff" />个人中心
                 </a>
                 <a href="javascript:;" class="menu-item logout" @click="confirm">
-                  <sl-icon name="icon-tuichu" size="16" />退出登录
+                  <sl-icon name="icon-tuichu" size="16" color="#fff" />退出登录
                 </a>
               </div>
             </el-popover>
           </li>
           <li>
-            <a href="javascript:;"><sl-icon name="icon-dingdan" />我的订单</a>
+            <a href="javascript:;" @click="$router.push('/')"><sl-icon name="icon-shouye" />首页</a>
           </li>
           <li>
-            <a href="javascript:;"><sl-icon name="icon-chongzhi" />帅币充值</a>
+            <a href="javascript:;" @click="$router.push('/account/order')"
+              ><sl-icon name="icon-dingdan1" />我的订单</a
+            >
+          </li>
+          <li>
+            <a href="javascript:;" @click="$router.push('/scion/recharge')"
+              ><sl-icon name="icon-chongzhi" />帅币充值</a
+            >
           </li>
         </template>
         <template v-else>
           <li>
             <a href="javascript:;" @click="$router.push('/login')"
-              ><sl-icon name="icon-touxiang" />去登录</a
+              ><sl-icon name="icon-qudenglu" />去登录</a
             >
           </li>
         </template>
+
         <li>
           <a href="javascript:;"><sl-icon name="icon-bangzhuzhongxin" />帮助中心</a>
         </li>
@@ -120,6 +130,21 @@ onMounted(() => {
 
     li {
       margin-top: -100px;
+
+      &.rank-item {
+        margin-right: auto; // 核心：利用 flex 布局特性，自动占据剩余空间，将自己推向最左侧
+        a {
+          flex-direction: row; // 图标和文字并排
+          gap: 10px; // 图标和文字间距
+          font-size: 25px;
+
+          i {
+            // 重置之前强制的 margin-bottom
+            margin-bottom: 0 !important;
+          }
+        }
+      }
+
       &.user-info {
         a {
           .avatar-box {
@@ -128,12 +153,8 @@ onMounted(() => {
             border-radius: 50%;
             border: 2px solid #fff;
             background-color: rgba(255, 255, 255, 0.2);
-
-            img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-            }
+            background-size: cover;
+            background-position: center;
           }
         }
       }
@@ -147,10 +168,15 @@ onMounted(() => {
         font-weight: 549;
         font-size: 16px;
 
-        i {
+        // 仅针对非头像链接的图标设置强制大小
+        &:not(.avatar-link) i {
           font-size: 26px !important;
           margin-right: 0;
           margin-bottom: 1px;
+        }
+
+        &.avatar-link :deep(i) {
+          font-weight: normal !important;
         }
 
         &:hover {
@@ -164,7 +190,7 @@ onMounted(() => {
 .app-topnav .container {
   width: 100%;
   max-width: 2560px;
-  padding: 0 80px;
+  padding: 0 100px;
   position: relative;
 }
 

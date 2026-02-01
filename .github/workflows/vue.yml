@@ -3,7 +3,7 @@ name: vue
 on:
   push:
     branches:
-      - font_daisy1.26
+      - front_daisy
 
 jobs:
   build-and-deploy:
