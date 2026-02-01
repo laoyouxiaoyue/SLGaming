@@ -1,4 +1,5 @@
 <script setup>
+// 自定义组件
 defineOptions({ name: "ScionRecharge" });
 
 import { ref, computed, watch } from "vue";
