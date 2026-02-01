@@ -50,9 +50,11 @@ onMounted(() => {
             <el-popover placement="bottom" trigger="hover" width="200" popper-class="user-popover">
               <template #reference>
                 <a href="javascript:;" class="avatar-link">
-                  <div class="avatar-box" v-if="info.avatarUrl">
-                    <img :src="info.avatarUrl" />
-                  </div>
+                  <div
+                    class="avatar-box"
+                    v-if="info.avatarUrl"
+                    :style="{ backgroundImage: `url(${info.avatarUrl})` }"
+                  ></div>
                   <sl-icon name="icon-touxiang1" v-else size="64" color="#fff" />
                 </a>
               </template>
@@ -72,7 +74,7 @@ onMounted(() => {
                 </div>
                 <div class="divider"></div>
                 <a href="javascript:;" class="menu-item" @click="$router.push('/account/setting')">
-                  <sl-icon name="icon-qudenglu" size="16" color="#fff" />个人中心
+                  <sl-icon name="iconfont icon-touxiang" size="16" color="#fff" />个人中心
                 </a>
                 <a href="javascript:;" class="menu-item logout" @click="confirm">
                   <sl-icon name="icon-tuichu" size="16" color="#fff" />退出登录
@@ -151,12 +153,8 @@ onMounted(() => {
             border-radius: 50%;
             border: 2px solid #fff;
             background-color: rgba(255, 255, 255, 0.2);
-
-            img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-            }
+            background-size: cover;
+            background-position: center;
           }
         }
       }

@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { useInfoStore } from "@/stores/infoStore";
 import { storeToRefs } from "pinia";
 import { ElMessage } from "element-plus";
-import { Camera } from "@element-plus/icons-vue";
+import { upavatarUrlapi } from "@/api/user/info";
 
 const infoStore = useInfoStore();
 const { info } = storeToRefs(infoStore);
@@ -60,13 +60,11 @@ const handleFileChange = async (e) => {
     return;
   }
 
-  // 模拟预览 (此处应调用后端上传接口)
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = () => {
-    form.value.avatarUrl = reader.result;
-    ElMessage.success("图片已选择 (仅为本地预览，需后端接口支持)");
-  };
+  const res = await upavatarUrlapi(file);
+  if (res.data && res.data.avatarUrl) {
+    form.value.avatarUrl = res.data.avatarUrl;
+    ElMessage.success("头像上传成功");
+  }
   e.target.value = "";
 };
 
@@ -108,18 +106,27 @@ onMounted(() => {
               accept="image/jpeg,image/png"
               @change="handleFileChange"
             />
-            <div class="avatar-click-area" @click="triggerFileUpload">
-              <el-avatar :size="60" :src="form.avatarUrl" v-if="form.avatarUrl">
-                <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
-              </el-avatar>
+            <div class="avatar-click-area">
+              <el-avatar :size="60" :src="form.avatarUrl" v-if="form.avatarUrl" />
               <el-avatar :size="60" v-else>
                 <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
               </el-avatar>
-              <div class="avatar-mask">
-                <el-icon><Camera /></el-icon>
+            </div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin-left: 10px;
+              "
+            >
+              <el-button type="primary" size="small" @click="triggerFileUpload"
+                >点击更换头像</el-button
+              >
+              <div style="font-size: 12px; color: #999; margin-top: 5px">
+                支持 JPG/PNG，小于 2MB
               </div>
             </div>
-            <el-input v-model="form.avatarUrl" placeholder="请输入头像URL链接" style="flex: 1" />
           </div>
         </el-form-item>
 
@@ -129,14 +136,6 @@ onMounted(() => {
 
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="form.phone" placeholder="请输入手机号" />
-        </el-form-item>
-
-        <el-form-item label="用户角色" prop="role">
-          <el-radio-group v-model="form.role">
-            <el-radio :value="1">老板</el-radio>
-            <el-radio :value="2">陪玩</el-radio>
-            <el-radio :value="3">管理员</el-radio>
-          </el-radio-group>
         </el-form-item>
 
         <el-form-item label="个人简介" prop="bio">
@@ -180,34 +179,10 @@ onMounted(() => {
 
         .avatar-click-area {
           position: relative;
-          cursor: pointer;
           width: 60px;
           height: 60px;
           border-radius: 50%;
           overflow: hidden;
-
-          &:hover .avatar-mask {
-            opacity: 1;
-          }
-
-          .avatar-mask {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-            color: #fff;
-
-            i {
-              font-size: 20px;
-            }
-          }
         }
       }
 
