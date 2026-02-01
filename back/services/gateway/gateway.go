@@ -70,6 +70,14 @@ func main() {
 	// 注册路由处理器
 	handler.RegisterHandlers(server, ctx)
 
+	// 静态资源服务
+	// 映射 /uploads/ 路径到当前运行目录下的 uploads 文件夹
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/uploads/:file",
+		Handler: http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))).ServeHTTP,
+	})
+
 	// 为所有 /api/* 路径自动添加 OPTIONS 方法支持，确保 CORS 预检请求能通过
 	// 使用路径参数匹配所有可能的路径层级
 	// 注意：go-zero 的路由匹配是精确匹配，所以需要添加多个通配符路由来覆盖所有情况

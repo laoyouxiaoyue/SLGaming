@@ -14,13 +14,9 @@ export const useInfoStore = defineStore(
         const res = await getInfoAPI();
         if (res.data) {
           info.value = res.data;
-          // 适配头像地址: 如果是远程的具体IP地址（带或不带端口），转为相对路径走代理
-          if (info.value.avatarUrl) {
-            // 匹配 http://120.26.29.242 或 http://120.26.29.242:xxxx
-            const remotePrefixRegex = /^http:\/\/120\.26\.29\.242(:\d+)?/;
-            if (remotePrefixRegex.test(info.value.avatarUrl)) {
-              info.value.avatarUrl = info.value.avatarUrl.replace(remotePrefixRegex, "");
-            }
+          // 适配头像地址: 如果是远程的具体IP地址且端口不对（默认80），转为相对路径走代理
+          if (info.value.avatarUrl && info.value.avatarUrl.includes("http://120.26.29.242")) {
+            info.value.avatarUrl = info.value.avatarUrl.replace("http://120.26.29.242", "");
           }
         }
       } catch (error) {
