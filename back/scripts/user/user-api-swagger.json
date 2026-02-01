@@ -828,6 +828,185 @@
         }
       }
     },
+    "/user/companion/apply": {
+      "post": {
+        "tags": ["陪玩信息"],
+        "summary": "申请成为陪玩",
+        "description": "老板申请成为陪玩（需要登录）。提交游戏技能、价格与个人简介。",
+        "operationId": "applyCompanion",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ApplyCompanionRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "申请成功",
+            "schema": {
+              "$ref": "#/definitions/ApplyCompanionResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "id": 2,
+                  "uid": 10002,
+                  "nickname": "小明",
+                  "phone": "13800138000",
+                  "role": 2,
+                  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                  "bio": "专业陪玩，技术过硬，带你上分！"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "游戏技能不能为空"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "仅老板可申请成为陪玩"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/companion/status": {
+      "put": {
+        "tags": ["陪玩信息"],
+        "summary": "陪玩上下线",
+        "description": "陪玩控制自己的上下线状态（需要登录，仅陪玩角色）。忙碌状态下禁止切换为在线/离线。",
+        "operationId": "updateCompanionStatus",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateCompanionStatusRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "schema": {
+              "$ref": "#/definitions/UpdateCompanionStatusResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "userId": 2,
+                  "gameSkill": "王者荣耀",
+                  "pricePerHour": 60,
+                  "status": 1,
+                  "rating": 4.8,
+                  "totalOrders": 128,
+                  "isVerified": true,
+                  "nickname": "小明陪玩",
+                  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
+                  "bio": "专业陪玩，技术过硬，带你上分！"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足，当前用户不是陪玩角色",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 403,
+                "msg": "当前用户不是陪玩角色"
+              }
+            }
+          },
+          "400": {
+            "description": "状态参数无效",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "状态参数无效"
+              }
+            }
+          },
+          "409": {
+            "description": "忙碌状态禁止上下线",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 409,
+                "msg": "忙碌状态下禁止上下线"
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/companion/profile/public": {
       "get": {
         "tags": ["陪玩信息"],
@@ -1684,6 +1863,80 @@
       }
     },
     "UpdateCompanionProfileResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/CompanionInfo"
+            }
+          }
+        }
+      ]
+    },
+    "ApplyCompanionRequest": {
+      "type": "object",
+      "required": ["gameSkill", "pricePerHour"],
+      "properties": {
+        "gameSkill": {
+          "type": "string",
+          "description": "游戏技能（单个游戏名称）",
+          "example": "王者荣耀"
+        },
+        "pricePerHour": {
+          "type": "integer",
+          "format": "int64",
+          "description": "每小时价格（帅币）",
+          "example": 60
+        },
+        "bio": {
+          "type": "string",
+          "description": "个人简介（可选）",
+          "example": "专业陪玩，技术过硬，带你上分！"
+        }
+      },
+      "example": {
+        "gameSkill": "王者荣耀",
+        "pricePerHour": 60,
+        "bio": "专业陪玩，技术过硬，带你上分！"
+      }
+    },
+    "ApplyCompanionResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/UserInfo"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateCompanionStatusRequest": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "integer",
+          "description": "状态：0=离线, 1=在线, 2=忙碌",
+          "enum": [0, 1, 2],
+          "example": 1
+        }
+      },
+      "example": {
+        "status": 1
+      }
+    },
+    "UpdateCompanionStatusResponse": {
       "type": "object",
       "allOf": [
         {

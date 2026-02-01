@@ -89,6 +89,17 @@ type UploadAvatarResponse {
 	Data UploadAvatarData `json:"data"`
 }
 
+type ApplyCompanionRequest {
+	GameSkill    string `json:"gameSkill"` // 游戏技能（单个游戏名称）
+	PricePerHour int64  `json:"pricePerHour"` // 每小时价格（帅币）
+	Bio          string `json:"bio,optional"` // 个人简介
+}
+
+type ApplyCompanionResponse {
+	BaseResp
+	Data UserInfo `json:"data"`
+}
+
 type LoginByCodeRequest {
 	Phone string `json:"phone"`
 	Code  string `json:"code"`
@@ -189,6 +200,15 @@ type UpdateCompanionProfileResponse {
 	Data CompanionInfo `json:"data"`
 }
 
+type UpdateCompanionStatusRequest {
+	Status int `json:"status"` // 状态：0=离线, 1=在线, 2=忙碌
+}
+
+type UpdateCompanionStatusResponse {
+	BaseResp
+	Data CompanionInfo `json:"data"`
+}
+
 type GetCompanionListRequest {
 	GameSkill  string `form:"gameSkill,optional"` // 游戏技能筛选（单个游戏名称）
 	MinPrice   int    `form:"minPrice,optional"` // 最低价格
@@ -248,6 +268,10 @@ service gateway {
 	@handler getWallet
 	get /api/user/wallet returns (GetWalletResponse)
 
+	// 老板申请成为陪玩（需要登录）
+	@handler applyCompanion
+	post /api/user/companion/apply (ApplyCompanionRequest) returns (ApplyCompanionResponse)
+
 	// 获取陪玩信息（需要登录）
 	@handler getCompanionProfile
 	get /api/user/companion/profile returns (GetCompanionProfileResponse)
@@ -259,6 +283,10 @@ service gateway {
 	// 更新陪玩信息（需要登录，仅陪玩角色）
 	@handler updateCompanionProfile
 	put /api/user/companion/profile (UpdateCompanionProfileRequest) returns (UpdateCompanionProfileResponse)
+
+	// 陪玩上下线（需要登录，仅陪玩角色）
+	@handler updateCompanionStatus
+	put /api/user/companion/status (UpdateCompanionStatusRequest) returns (UpdateCompanionStatusResponse)
 
 	// 获取陪玩列表（公开接口，用于订单匹配）
 	@handler getCompanionList

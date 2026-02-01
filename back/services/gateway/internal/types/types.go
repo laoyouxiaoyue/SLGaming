@@ -12,6 +12,17 @@ type AcceptOrderResponse struct {
 	Data OrderInfo `json:"data"`
 }
 
+type ApplyCompanionRequest struct {
+	GameSkill    string `json:"gameSkill"`    // 游戏技能（单个游戏名称）
+	PricePerHour int64  `json:"pricePerHour"` // 每小时价格（帅币）
+	Bio          string `json:"bio,optional"` // 个人简介
+}
+
+type ApplyCompanionResponse struct {
+	BaseResp
+	Data UserInfo `json:"data"`
+}
+
 type BaseResp struct {
 	Code int32  `json:"code"`
 	Msg  string `json:"msg"`
@@ -292,6 +303,15 @@ type UpdateCompanionProfileResponse struct {
 	Data CompanionInfo `json:"data"`
 }
 
+type UpdateCompanionStatusRequest struct {
+	Status int `json:"status"` // 状态：0=离线, 1=在线, 2=忙碌
+}
+
+type UpdateCompanionStatusResponse struct {
+	BaseResp
+	Data CompanionInfo `json:"data"`
+}
+
 type UpdateUserRequest struct {
 	Id        uint64 `json:"id"`
 	Nickname  string `json:"nickname,optional"`
@@ -312,7 +332,7 @@ type UploadAvatarData struct {
 }
 
 type UploadAvatarRequest struct {
-	Avatar string `form:"avatar"` // 头像文件（Base64）
+	Avatar string `form:"avatar"` // 头像文件（multipart/form-data 文件字段）
 }
 
 type UploadAvatarResponse struct {
