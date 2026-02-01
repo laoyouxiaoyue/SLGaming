@@ -12,6 +12,7 @@ import Wallet from "@/views/account/component/WalletInfo.vue";
 import Scion from "@/views/recharge/index.vue";
 import Scionrecharge from "@/views/recharge/component/Scionrecharge.vue";
 import Scionrecond from "@/views/recharge/component/Scionrecond.vue";
+import Pay from "@/views/pay/index.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -36,6 +37,10 @@ const router = createRouter({
               component: Scionrecond,
             },
           ],
+        },
+        {
+          path: "pay",
+          component: Pay,
         },
         {
           path: "account",

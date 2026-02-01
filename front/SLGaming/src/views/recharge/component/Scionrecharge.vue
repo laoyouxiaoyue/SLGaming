@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { ElMessage } from "element-plus";
+import { createrechargeorderapi } from "@/api/money/wallet";
 
 // 预设充值档位
 const presetAmounts = [6, 18, 68, 233, 648, 998];
@@ -8,7 +9,7 @@ const amount = ref(6); // 默认选中第一个
 const customAmount = ref(""); // 自定义金额
 const isCustom = ref(false); // 是否是自定义模式
 
-const paymentMethod = ref("wechat"); // 支付方式：wechat | alipay
+const paymentMethod = ref("alipay"); // 支付方式：alipay
 
 // 监听预设金额选择，选中时清空自定义状态
 const selectPreset = (val) => {
@@ -47,7 +48,7 @@ const payAmount = computed(() => {
   return amount.value || 0;
 });
 
-const handlePay = () => {
+const handlePay = async () => {
   if (payAmount.value <= 0) {
     ElMessage.warning("请选择或输入充值金额");
     return;
@@ -57,10 +58,42 @@ const handlePay = () => {
     return;
   }
 
-  ElMessage.success(
-    `发起支付：充值 ${amount.value} 帅币，需支付 ¥${payAmount.value}，方式：${paymentMethod.value === "wechat" ? "微信" : "支付宝"}`,
-  );
-  // TODO: 调用后端下单接口，跳转收银台或弹出二维码
+  const loading = ElMessage({
+    message: "正在创建订单...",
+    duration: 0,
+    type: "info",
+  });
+
+  try {
+    const res = await createrechargeorderapi({
+      amount: payAmount.value * 100, // 转换为分
+      payType: "alipay_page",
+      returnUrl: window.location.origin + "/pay", // 支付成功后的回调页面
+    });
+
+    loading.close();
+
+    if (res.code === 0 && res.data) {
+      if (res.data.payUrl) {
+        // 跳转到支付宝收银台
+        window.location.href = res.data.payUrl;
+      } else if (res.data.payForm) {
+        // 如果是表单形式（极少见的情况）
+        const div = document.createElement("div");
+        div.innerHTML = res.data.payForm;
+        document.body.appendChild(div);
+        div.querySelector("form").submit();
+      } else {
+        ElMessage.error("未获取到支付链接");
+      }
+    } else {
+      ElMessage.error(res.msg || "创建订单失败");
+    }
+  } catch (error) {
+    loading.close();
+    console.error(error);
+    ElMessage.error("系统繁忙，请稍后再试");
+  }
 };
 </script>
 
@@ -105,27 +138,14 @@ const handlePay = () => {
       <div class="section-title">选择支付方式</div>
       <div class="payment-methods">
         <div
-          class="pay-item wechat"
-          :class="{ active: paymentMethod === 'wechat' }"
-          @click="paymentMethod = 'wechat'"
-        >
-          <div class="icon-wrapper">
-            <!-- 这里使用 sl-icon 或者 svg，暂时用文字代替或者模拟图标 -->
-            <span class="pay-icon-text wechat-icon">微</span>
-          </div>
-          <span class="pay-name">微信支付</span>
-          <div class="radio-check" v-if="paymentMethod === 'wechat'">✔</div>
-        </div>
-
-        <div
           class="pay-item alipay"
           :class="{ active: paymentMethod === 'alipay' }"
           @click="paymentMethod = 'alipay'"
         >
           <div class="icon-wrapper">
-            <span class="pay-icon-text alipay-icon">支</span>
+            <sl-icon name="icon-zhifu-_zhifubaozhifu" size="26" color="#1677ff" />
           </div>
-          <span class="pay-name">支付宝</span>
+          <span class="pay-name">支付宝支付</span>
           <div class="radio-check" v-if="paymentMethod === 'alipay'">✔</div>
         </div>
       </div>
@@ -293,25 +313,6 @@ const handlePay = () => {
           margin-right: 12px;
           display: flex;
           align-items: center;
-
-          .pay-icon-text {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            color: #fff;
-            font-size: 14px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-
-            &.wechat-icon {
-              background-color: #09bb07;
-            }
-            &.alipay-icon {
-              background-color: #1677ff;
-            }
-          }
         }
 
         .pay-name {

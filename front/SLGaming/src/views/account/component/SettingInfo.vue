@@ -4,6 +4,7 @@ import { useInfoStore } from "@/stores/infoStore";
 import { storeToRefs } from "pinia";
 import { ElMessage } from "element-plus";
 import { upavatarUrlapi } from "@/api/user/info";
+import { CameraFilled } from "@element-plus/icons-vue";
 
 const infoStore = useInfoStore();
 const { info } = storeToRefs(infoStore);
@@ -110,8 +111,8 @@ onMounted(() => {
             />
             <div class="avatar-click-area">
               <el-avatar :size="60" :src="form.avatarUrl" v-if="form.avatarUrl" />
-              <el-avatar :size="60" v-else>
-                <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+              <el-avatar :size="60" v-else class="no-avatar-trigger" @click="triggerFileUpload">
+                <el-icon :size="24"><CameraFilled /></el-icon>
               </el-avatar>
             </div>
             <div
@@ -187,6 +188,18 @@ onMounted(() => {
           overflow: hidden;
           border: 2px solid #fff;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+          .no-avatar-trigger {
+            background-color: #f2f3f5;
+            cursor: pointer;
+            color: #909399;
+            transition: all 0.3s;
+
+            &:hover {
+              color: #ff6b35;
+              background-color: #fff6f2;
+            }
+          }
         }
       }
 
