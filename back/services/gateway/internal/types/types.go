@@ -46,6 +46,27 @@ type CancelOrderResponse struct {
 	Data OrderInfo `json:"data"`
 }
 
+type ChangePasswordRequest struct {
+	OldPhone    string `json:"oldPhone"`
+	OldCode     string `json:"oldCode"`
+	NewPassword string `json:"newPassword"`
+}
+
+type ChangePasswordResponse struct {
+	BaseResp
+}
+
+type ChangePhoneRequest struct {
+	OldPhone string `json:"oldPhone"`
+	OldCode  string `json:"oldCode"`
+	NewPhone string `json:"newPhone"`
+	NewCode  string `json:"newCode"`
+}
+
+type ChangePhoneResponse struct {
+	BaseResp
+}
+
 type CompanionInfo struct {
 	UserId       uint64  `json:"userId"`       // 用户ID
 	GameSkill    string  `json:"gameSkill"`    // 游戏技能（单个游戏名称）

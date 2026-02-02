@@ -14,6 +14,10 @@ import (
 )
 
 type (
+	ChangePasswordRequest             = user.ChangePasswordRequest
+	ChangePasswordResponse            = user.ChangePasswordResponse
+	ChangePhoneRequest                = user.ChangePhoneRequest
+	ChangePhoneResponse               = user.ChangePhoneResponse
 	CompanionInfo                     = user.CompanionInfo
 	CompanionRankingItem              = user.CompanionRankingItem
 	ConsumeRequest                    = user.ConsumeRequest
@@ -69,6 +73,8 @@ type (
 		UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 		LoginByCode(ctx context.Context, in *LoginByCodeRequest, opts ...grpc.CallOption) (*LoginByCodeResponse, error)
 		ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error)
+		ChangePhone(ctx context.Context, in *ChangePhoneRequest, opts ...grpc.CallOption) (*ChangePhoneResponse, error)
+		ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 		// 帅币钱包相关接口
 		GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 		Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
@@ -129,6 +135,16 @@ func (m *defaultUser) LoginByCode(ctx context.Context, in *LoginByCodeRequest, o
 func (m *defaultUser) ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.ForgetPassword(ctx, in, opts...)
+}
+
+func (m *defaultUser) ChangePhone(ctx context.Context, in *ChangePhoneRequest, opts ...grpc.CallOption) (*ChangePhoneResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.ChangePhone(ctx, in, opts...)
+}
+
+func (m *defaultUser) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.ChangePassword(ctx, in, opts...)
 }
 
 // 帅币钱包相关接口

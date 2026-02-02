@@ -793,6 +793,216 @@ func (x *ForgetPasswordResponse) GetUid() uint64 {
 	return 0
 }
 
+// 修改手机号（需验证原手机号）
+type ChangePhoneRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	OldPhone      string                 `protobuf:"bytes,2,opt,name=old_phone,json=oldPhone,proto3" json:"old_phone,omitempty"`
+	NewPhone      string                 `protobuf:"bytes,3,opt,name=new_phone,json=newPhone,proto3" json:"new_phone,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePhoneRequest) Reset() {
+	*x = ChangePhoneRequest{}
+	mi := &file_user_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePhoneRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePhoneRequest) ProtoMessage() {}
+
+func (x *ChangePhoneRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePhoneRequest.ProtoReflect.Descriptor instead.
+func (*ChangePhoneRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ChangePhoneRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *ChangePhoneRequest) GetOldPhone() string {
+	if x != nil {
+		return x.OldPhone
+	}
+	return ""
+}
+
+func (x *ChangePhoneRequest) GetNewPhone() string {
+	if x != nil {
+		return x.NewPhone
+	}
+	return ""
+}
+
+type ChangePhoneResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePhoneResponse) Reset() {
+	*x = ChangePhoneResponse{}
+	mi := &file_user_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePhoneResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePhoneResponse) ProtoMessage() {}
+
+func (x *ChangePhoneResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePhoneResponse.ProtoReflect.Descriptor instead.
+func (*ChangePhoneResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ChangePhoneResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+// 修改密码（需验证原手机号）
+type ChangePasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	OldPhone      string                 `protobuf:"bytes,2,opt,name=old_phone,json=oldPhone,proto3" json:"old_phone,omitempty"`
+	NewPassword   string                 `protobuf:"bytes,3,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePasswordRequest) Reset() {
+	*x = ChangePasswordRequest{}
+	mi := &file_user_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePasswordRequest) ProtoMessage() {}
+
+func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePasswordRequest.ProtoReflect.Descriptor instead.
+func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ChangePasswordRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *ChangePasswordRequest) GetOldPhone() string {
+	if x != nil {
+		return x.OldPhone
+	}
+	return ""
+}
+
+func (x *ChangePasswordRequest) GetNewPassword() string {
+	if x != nil {
+		return x.NewPassword
+	}
+	return ""
+}
+
+type ChangePasswordResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePasswordResponse) Reset() {
+	*x = ChangePasswordResponse{}
+	mi := &file_user_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePasswordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePasswordResponse) ProtoMessage() {}
+
+func (x *ChangePasswordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePasswordResponse.ProtoReflect.Descriptor instead.
+func (*ChangePasswordResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ChangePasswordResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 // 钱包信息
 type WalletInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -805,7 +1015,7 @@ type WalletInfo struct {
 
 func (x *WalletInfo) Reset() {
 	*x = WalletInfo{}
-	mi := &file_user_proto_msgTypes[13]
+	mi := &file_user_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -817,7 +1027,7 @@ func (x *WalletInfo) String() string {
 func (*WalletInfo) ProtoMessage() {}
 
 func (x *WalletInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[13]
+	mi := &file_user_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -830,7 +1040,7 @@ func (x *WalletInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WalletInfo.ProtoReflect.Descriptor instead.
 func (*WalletInfo) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{13}
+	return file_user_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *WalletInfo) GetUserId() uint64 {
@@ -864,7 +1074,7 @@ type GetWalletRequest struct {
 
 func (x *GetWalletRequest) Reset() {
 	*x = GetWalletRequest{}
-	mi := &file_user_proto_msgTypes[14]
+	mi := &file_user_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -876,7 +1086,7 @@ func (x *GetWalletRequest) String() string {
 func (*GetWalletRequest) ProtoMessage() {}
 
 func (x *GetWalletRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[14]
+	mi := &file_user_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -889,7 +1099,7 @@ func (x *GetWalletRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWalletRequest.ProtoReflect.Descriptor instead.
 func (*GetWalletRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{14}
+	return file_user_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GetWalletRequest) GetUserId() uint64 {
@@ -908,7 +1118,7 @@ type GetWalletResponse struct {
 
 func (x *GetWalletResponse) Reset() {
 	*x = GetWalletResponse{}
-	mi := &file_user_proto_msgTypes[15]
+	mi := &file_user_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -920,7 +1130,7 @@ func (x *GetWalletResponse) String() string {
 func (*GetWalletResponse) ProtoMessage() {}
 
 func (x *GetWalletResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[15]
+	mi := &file_user_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -933,7 +1143,7 @@ func (x *GetWalletResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWalletResponse.ProtoReflect.Descriptor instead.
 func (*GetWalletResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{15}
+	return file_user_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetWalletResponse) GetWallet() *WalletInfo {
@@ -956,7 +1166,7 @@ type RechargeRequest struct {
 
 func (x *RechargeRequest) Reset() {
 	*x = RechargeRequest{}
-	mi := &file_user_proto_msgTypes[16]
+	mi := &file_user_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -968,7 +1178,7 @@ func (x *RechargeRequest) String() string {
 func (*RechargeRequest) ProtoMessage() {}
 
 func (x *RechargeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[16]
+	mi := &file_user_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -981,7 +1191,7 @@ func (x *RechargeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RechargeRequest.ProtoReflect.Descriptor instead.
 func (*RechargeRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{16}
+	return file_user_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RechargeRequest) GetUserId() uint64 {
@@ -1021,7 +1231,7 @@ type RechargeResponse struct {
 
 func (x *RechargeResponse) Reset() {
 	*x = RechargeResponse{}
-	mi := &file_user_proto_msgTypes[17]
+	mi := &file_user_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1033,7 +1243,7 @@ func (x *RechargeResponse) String() string {
 func (*RechargeResponse) ProtoMessage() {}
 
 func (x *RechargeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[17]
+	mi := &file_user_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1046,7 +1256,7 @@ func (x *RechargeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RechargeResponse.ProtoReflect.Descriptor instead.
 func (*RechargeResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{17}
+	return file_user_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *RechargeResponse) GetWallet() *WalletInfo {
@@ -1071,7 +1281,7 @@ type CreateRechargeOrderRequest struct {
 
 func (x *CreateRechargeOrderRequest) Reset() {
 	*x = CreateRechargeOrderRequest{}
-	mi := &file_user_proto_msgTypes[18]
+	mi := &file_user_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1083,7 +1293,7 @@ func (x *CreateRechargeOrderRequest) String() string {
 func (*CreateRechargeOrderRequest) ProtoMessage() {}
 
 func (x *CreateRechargeOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[18]
+	mi := &file_user_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1096,7 +1306,7 @@ func (x *CreateRechargeOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRechargeOrderRequest.ProtoReflect.Descriptor instead.
 func (*CreateRechargeOrderRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{18}
+	return file_user_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CreateRechargeOrderRequest) GetUserId() uint64 {
@@ -1150,7 +1360,7 @@ type CreateRechargeOrderResponse struct {
 
 func (x *CreateRechargeOrderResponse) Reset() {
 	*x = CreateRechargeOrderResponse{}
-	mi := &file_user_proto_msgTypes[19]
+	mi := &file_user_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1162,7 +1372,7 @@ func (x *CreateRechargeOrderResponse) String() string {
 func (*CreateRechargeOrderResponse) ProtoMessage() {}
 
 func (x *CreateRechargeOrderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[19]
+	mi := &file_user_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1175,7 +1385,7 @@ func (x *CreateRechargeOrderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRechargeOrderResponse.ProtoReflect.Descriptor instead.
 func (*CreateRechargeOrderResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{19}
+	return file_user_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CreateRechargeOrderResponse) GetSuccess() bool {
@@ -1199,7 +1409,7 @@ type UpdateRechargeOrderStatusRequest struct {
 
 func (x *UpdateRechargeOrderStatusRequest) Reset() {
 	*x = UpdateRechargeOrderStatusRequest{}
-	mi := &file_user_proto_msgTypes[20]
+	mi := &file_user_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1211,7 +1421,7 @@ func (x *UpdateRechargeOrderStatusRequest) String() string {
 func (*UpdateRechargeOrderStatusRequest) ProtoMessage() {}
 
 func (x *UpdateRechargeOrderStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[20]
+	mi := &file_user_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1224,7 +1434,7 @@ func (x *UpdateRechargeOrderStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRechargeOrderStatusRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRechargeOrderStatusRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{20}
+	return file_user_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *UpdateRechargeOrderStatusRequest) GetOrderNo() string {
@@ -1271,7 +1481,7 @@ type UpdateRechargeOrderStatusResponse struct {
 
 func (x *UpdateRechargeOrderStatusResponse) Reset() {
 	*x = UpdateRechargeOrderStatusResponse{}
-	mi := &file_user_proto_msgTypes[21]
+	mi := &file_user_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1283,7 +1493,7 @@ func (x *UpdateRechargeOrderStatusResponse) String() string {
 func (*UpdateRechargeOrderStatusResponse) ProtoMessage() {}
 
 func (x *UpdateRechargeOrderStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[21]
+	mi := &file_user_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1296,7 +1506,7 @@ func (x *UpdateRechargeOrderStatusResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use UpdateRechargeOrderStatusResponse.ProtoReflect.Descriptor instead.
 func (*UpdateRechargeOrderStatusResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{21}
+	return file_user_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *UpdateRechargeOrderStatusResponse) GetSuccess() bool {
@@ -1319,7 +1529,7 @@ type ConsumeRequest struct {
 
 func (x *ConsumeRequest) Reset() {
 	*x = ConsumeRequest{}
-	mi := &file_user_proto_msgTypes[22]
+	mi := &file_user_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1331,7 +1541,7 @@ func (x *ConsumeRequest) String() string {
 func (*ConsumeRequest) ProtoMessage() {}
 
 func (x *ConsumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[22]
+	mi := &file_user_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1344,7 +1554,7 @@ func (x *ConsumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsumeRequest.ProtoReflect.Descriptor instead.
 func (*ConsumeRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{22}
+	return file_user_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ConsumeRequest) GetUserId() uint64 {
@@ -1384,7 +1594,7 @@ type ConsumeResponse struct {
 
 func (x *ConsumeResponse) Reset() {
 	*x = ConsumeResponse{}
-	mi := &file_user_proto_msgTypes[23]
+	mi := &file_user_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1396,7 +1606,7 @@ func (x *ConsumeResponse) String() string {
 func (*ConsumeResponse) ProtoMessage() {}
 
 func (x *ConsumeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[23]
+	mi := &file_user_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1409,7 +1619,7 @@ func (x *ConsumeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsumeResponse.ProtoReflect.Descriptor instead.
 func (*ConsumeResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{23}
+	return file_user_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ConsumeResponse) GetWallet() *WalletInfo {
@@ -1438,7 +1648,7 @@ type CompanionInfo struct {
 
 func (x *CompanionInfo) Reset() {
 	*x = CompanionInfo{}
-	mi := &file_user_proto_msgTypes[24]
+	mi := &file_user_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1450,7 +1660,7 @@ func (x *CompanionInfo) String() string {
 func (*CompanionInfo) ProtoMessage() {}
 
 func (x *CompanionInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[24]
+	mi := &file_user_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1463,7 +1673,7 @@ func (x *CompanionInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompanionInfo.ProtoReflect.Descriptor instead.
 func (*CompanionInfo) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{24}
+	return file_user_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *CompanionInfo) GetUserId() uint64 {
@@ -1548,7 +1758,7 @@ type GameSkill struct {
 
 func (x *GameSkill) Reset() {
 	*x = GameSkill{}
-	mi := &file_user_proto_msgTypes[25]
+	mi := &file_user_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1560,7 +1770,7 @@ func (x *GameSkill) String() string {
 func (*GameSkill) ProtoMessage() {}
 
 func (x *GameSkill) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[25]
+	mi := &file_user_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1573,7 +1783,7 @@ func (x *GameSkill) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameSkill.ProtoReflect.Descriptor instead.
 func (*GameSkill) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{25}
+	return file_user_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GameSkill) GetId() uint64 {
@@ -1605,7 +1815,7 @@ type ListGameSkillsRequest struct {
 
 func (x *ListGameSkillsRequest) Reset() {
 	*x = ListGameSkillsRequest{}
-	mi := &file_user_proto_msgTypes[26]
+	mi := &file_user_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1617,7 +1827,7 @@ func (x *ListGameSkillsRequest) String() string {
 func (*ListGameSkillsRequest) ProtoMessage() {}
 
 func (x *ListGameSkillsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[26]
+	mi := &file_user_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1630,7 +1840,7 @@ func (x *ListGameSkillsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGameSkillsRequest.ProtoReflect.Descriptor instead.
 func (*ListGameSkillsRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{26}
+	return file_user_proto_rawDescGZIP(), []int{30}
 }
 
 type ListGameSkillsResponse struct {
@@ -1642,7 +1852,7 @@ type ListGameSkillsResponse struct {
 
 func (x *ListGameSkillsResponse) Reset() {
 	*x = ListGameSkillsResponse{}
-	mi := &file_user_proto_msgTypes[27]
+	mi := &file_user_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1654,7 +1864,7 @@ func (x *ListGameSkillsResponse) String() string {
 func (*ListGameSkillsResponse) ProtoMessage() {}
 
 func (x *ListGameSkillsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[27]
+	mi := &file_user_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1667,7 +1877,7 @@ func (x *ListGameSkillsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGameSkillsResponse.ProtoReflect.Descriptor instead.
 func (*ListGameSkillsResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{27}
+	return file_user_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ListGameSkillsResponse) GetSkills() []*GameSkill {
@@ -1687,7 +1897,7 @@ type CreateGameSkillRequest struct {
 
 func (x *CreateGameSkillRequest) Reset() {
 	*x = CreateGameSkillRequest{}
-	mi := &file_user_proto_msgTypes[28]
+	mi := &file_user_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1699,7 +1909,7 @@ func (x *CreateGameSkillRequest) String() string {
 func (*CreateGameSkillRequest) ProtoMessage() {}
 
 func (x *CreateGameSkillRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[28]
+	mi := &file_user_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1712,7 +1922,7 @@ func (x *CreateGameSkillRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateGameSkillRequest.ProtoReflect.Descriptor instead.
 func (*CreateGameSkillRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{28}
+	return file_user_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *CreateGameSkillRequest) GetName() string {
@@ -1738,7 +1948,7 @@ type CreateGameSkillResponse struct {
 
 func (x *CreateGameSkillResponse) Reset() {
 	*x = CreateGameSkillResponse{}
-	mi := &file_user_proto_msgTypes[29]
+	mi := &file_user_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1750,7 +1960,7 @@ func (x *CreateGameSkillResponse) String() string {
 func (*CreateGameSkillResponse) ProtoMessage() {}
 
 func (x *CreateGameSkillResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[29]
+	mi := &file_user_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1763,7 +1973,7 @@ func (x *CreateGameSkillResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateGameSkillResponse.ProtoReflect.Descriptor instead.
 func (*CreateGameSkillResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{29}
+	return file_user_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *CreateGameSkillResponse) GetSkill() *GameSkill {
@@ -1784,7 +1994,7 @@ type UpdateGameSkillRequest struct {
 
 func (x *UpdateGameSkillRequest) Reset() {
 	*x = UpdateGameSkillRequest{}
-	mi := &file_user_proto_msgTypes[30]
+	mi := &file_user_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1796,7 +2006,7 @@ func (x *UpdateGameSkillRequest) String() string {
 func (*UpdateGameSkillRequest) ProtoMessage() {}
 
 func (x *UpdateGameSkillRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[30]
+	mi := &file_user_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1809,7 +2019,7 @@ func (x *UpdateGameSkillRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateGameSkillRequest.ProtoReflect.Descriptor instead.
 func (*UpdateGameSkillRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{30}
+	return file_user_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *UpdateGameSkillRequest) GetId() uint64 {
@@ -1842,7 +2052,7 @@ type UpdateGameSkillResponse struct {
 
 func (x *UpdateGameSkillResponse) Reset() {
 	*x = UpdateGameSkillResponse{}
-	mi := &file_user_proto_msgTypes[31]
+	mi := &file_user_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1854,7 +2064,7 @@ func (x *UpdateGameSkillResponse) String() string {
 func (*UpdateGameSkillResponse) ProtoMessage() {}
 
 func (x *UpdateGameSkillResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[31]
+	mi := &file_user_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1867,7 +2077,7 @@ func (x *UpdateGameSkillResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateGameSkillResponse.ProtoReflect.Descriptor instead.
 func (*UpdateGameSkillResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{31}
+	return file_user_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *UpdateGameSkillResponse) GetSkill() *GameSkill {
@@ -1886,7 +2096,7 @@ type DeleteGameSkillRequest struct {
 
 func (x *DeleteGameSkillRequest) Reset() {
 	*x = DeleteGameSkillRequest{}
-	mi := &file_user_proto_msgTypes[32]
+	mi := &file_user_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1898,7 +2108,7 @@ func (x *DeleteGameSkillRequest) String() string {
 func (*DeleteGameSkillRequest) ProtoMessage() {}
 
 func (x *DeleteGameSkillRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[32]
+	mi := &file_user_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1911,7 +2121,7 @@ func (x *DeleteGameSkillRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteGameSkillRequest.ProtoReflect.Descriptor instead.
 func (*DeleteGameSkillRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{32}
+	return file_user_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *DeleteGameSkillRequest) GetId() uint64 {
@@ -1930,7 +2140,7 @@ type DeleteGameSkillResponse struct {
 
 func (x *DeleteGameSkillResponse) Reset() {
 	*x = DeleteGameSkillResponse{}
-	mi := &file_user_proto_msgTypes[33]
+	mi := &file_user_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1942,7 +2152,7 @@ func (x *DeleteGameSkillResponse) String() string {
 func (*DeleteGameSkillResponse) ProtoMessage() {}
 
 func (x *DeleteGameSkillResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[33]
+	mi := &file_user_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1955,7 +2165,7 @@ func (x *DeleteGameSkillResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteGameSkillResponse.ProtoReflect.Descriptor instead.
 func (*DeleteGameSkillResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{33}
+	return file_user_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *DeleteGameSkillResponse) GetSuccess() bool {
@@ -1975,7 +2185,7 @@ type GetCompanionProfileRequest struct {
 
 func (x *GetCompanionProfileRequest) Reset() {
 	*x = GetCompanionProfileRequest{}
-	mi := &file_user_proto_msgTypes[34]
+	mi := &file_user_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1987,7 +2197,7 @@ func (x *GetCompanionProfileRequest) String() string {
 func (*GetCompanionProfileRequest) ProtoMessage() {}
 
 func (x *GetCompanionProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[34]
+	mi := &file_user_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2000,7 +2210,7 @@ func (x *GetCompanionProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionProfileRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionProfileRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{34}
+	return file_user_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *GetCompanionProfileRequest) GetUserId() uint64 {
@@ -2019,7 +2229,7 @@ type GetCompanionProfileResponse struct {
 
 func (x *GetCompanionProfileResponse) Reset() {
 	*x = GetCompanionProfileResponse{}
-	mi := &file_user_proto_msgTypes[35]
+	mi := &file_user_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2031,7 +2241,7 @@ func (x *GetCompanionProfileResponse) String() string {
 func (*GetCompanionProfileResponse) ProtoMessage() {}
 
 func (x *GetCompanionProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[35]
+	mi := &file_user_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2044,7 +2254,7 @@ func (x *GetCompanionProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionProfileResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionProfileResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{35}
+	return file_user_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetCompanionProfileResponse) GetProfile() *CompanionInfo {
@@ -2067,7 +2277,7 @@ type UpdateCompanionProfileRequest struct {
 
 func (x *UpdateCompanionProfileRequest) Reset() {
 	*x = UpdateCompanionProfileRequest{}
-	mi := &file_user_proto_msgTypes[36]
+	mi := &file_user_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2079,7 +2289,7 @@ func (x *UpdateCompanionProfileRequest) String() string {
 func (*UpdateCompanionProfileRequest) ProtoMessage() {}
 
 func (x *UpdateCompanionProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[36]
+	mi := &file_user_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2092,7 +2302,7 @@ func (x *UpdateCompanionProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionProfileRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{36}
+	return file_user_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *UpdateCompanionProfileRequest) GetUserId() uint64 {
@@ -2132,7 +2342,7 @@ type UpdateCompanionProfileResponse struct {
 
 func (x *UpdateCompanionProfileResponse) Reset() {
 	*x = UpdateCompanionProfileResponse{}
-	mi := &file_user_proto_msgTypes[37]
+	mi := &file_user_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2144,7 +2354,7 @@ func (x *UpdateCompanionProfileResponse) String() string {
 func (*UpdateCompanionProfileResponse) ProtoMessage() {}
 
 func (x *UpdateCompanionProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[37]
+	mi := &file_user_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2157,7 +2367,7 @@ func (x *UpdateCompanionProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionProfileResponse.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionProfileResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{37}
+	return file_user_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *UpdateCompanionProfileResponse) GetProfile() *CompanionInfo {
@@ -2179,7 +2389,7 @@ type UpdateCompanionStatsRequest struct {
 
 func (x *UpdateCompanionStatsRequest) Reset() {
 	*x = UpdateCompanionStatsRequest{}
-	mi := &file_user_proto_msgTypes[38]
+	mi := &file_user_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2191,7 +2401,7 @@ func (x *UpdateCompanionStatsRequest) String() string {
 func (*UpdateCompanionStatsRequest) ProtoMessage() {}
 
 func (x *UpdateCompanionStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[38]
+	mi := &file_user_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2204,7 +2414,7 @@ func (x *UpdateCompanionStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionStatsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionStatsRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{38}
+	return file_user_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *UpdateCompanionStatsRequest) GetUserId() uint64 {
@@ -2237,7 +2447,7 @@ type UpdateCompanionStatsResponse struct {
 
 func (x *UpdateCompanionStatsResponse) Reset() {
 	*x = UpdateCompanionStatsResponse{}
-	mi := &file_user_proto_msgTypes[39]
+	mi := &file_user_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2249,7 +2459,7 @@ func (x *UpdateCompanionStatsResponse) String() string {
 func (*UpdateCompanionStatsResponse) ProtoMessage() {}
 
 func (x *UpdateCompanionStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[39]
+	mi := &file_user_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2262,7 +2472,7 @@ func (x *UpdateCompanionStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCompanionStatsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateCompanionStatsResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{39}
+	return file_user_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *UpdateCompanionStatsResponse) GetProfile() *CompanionInfo {
@@ -2288,7 +2498,7 @@ type GetCompanionListRequest struct {
 
 func (x *GetCompanionListRequest) Reset() {
 	*x = GetCompanionListRequest{}
-	mi := &file_user_proto_msgTypes[40]
+	mi := &file_user_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2300,7 +2510,7 @@ func (x *GetCompanionListRequest) String() string {
 func (*GetCompanionListRequest) ProtoMessage() {}
 
 func (x *GetCompanionListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[40]
+	mi := &file_user_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2313,7 +2523,7 @@ func (x *GetCompanionListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionListRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionListRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{40}
+	return file_user_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *GetCompanionListRequest) GetGameSkill() string {
@@ -2377,7 +2587,7 @@ type GetCompanionListResponse struct {
 
 func (x *GetCompanionListResponse) Reset() {
 	*x = GetCompanionListResponse{}
-	mi := &file_user_proto_msgTypes[41]
+	mi := &file_user_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2389,7 +2599,7 @@ func (x *GetCompanionListResponse) String() string {
 func (*GetCompanionListResponse) ProtoMessage() {}
 
 func (x *GetCompanionListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[41]
+	mi := &file_user_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2402,7 +2612,7 @@ func (x *GetCompanionListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionListResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionListResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{41}
+	return file_user_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *GetCompanionListResponse) GetCompanions() []*CompanionInfo {
@@ -2449,7 +2659,7 @@ type CompanionRankingItem struct {
 
 func (x *CompanionRankingItem) Reset() {
 	*x = CompanionRankingItem{}
-	mi := &file_user_proto_msgTypes[42]
+	mi := &file_user_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2461,7 +2671,7 @@ func (x *CompanionRankingItem) String() string {
 func (*CompanionRankingItem) ProtoMessage() {}
 
 func (x *CompanionRankingItem) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[42]
+	mi := &file_user_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2474,7 +2684,7 @@ func (x *CompanionRankingItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompanionRankingItem.ProtoReflect.Descriptor instead.
 func (*CompanionRankingItem) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{42}
+	return file_user_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *CompanionRankingItem) GetUserId() uint64 {
@@ -2537,7 +2747,7 @@ type GetCompanionRatingRankingRequest struct {
 
 func (x *GetCompanionRatingRankingRequest) Reset() {
 	*x = GetCompanionRatingRankingRequest{}
-	mi := &file_user_proto_msgTypes[43]
+	mi := &file_user_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2549,7 +2759,7 @@ func (x *GetCompanionRatingRankingRequest) String() string {
 func (*GetCompanionRatingRankingRequest) ProtoMessage() {}
 
 func (x *GetCompanionRatingRankingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[43]
+	mi := &file_user_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2562,7 +2772,7 @@ func (x *GetCompanionRatingRankingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionRatingRankingRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionRatingRankingRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{43}
+	return file_user_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *GetCompanionRatingRankingRequest) GetPage() int32 {
@@ -2591,7 +2801,7 @@ type GetCompanionRatingRankingResponse struct {
 
 func (x *GetCompanionRatingRankingResponse) Reset() {
 	*x = GetCompanionRatingRankingResponse{}
-	mi := &file_user_proto_msgTypes[44]
+	mi := &file_user_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2603,7 +2813,7 @@ func (x *GetCompanionRatingRankingResponse) String() string {
 func (*GetCompanionRatingRankingResponse) ProtoMessage() {}
 
 func (x *GetCompanionRatingRankingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[44]
+	mi := &file_user_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2616,7 +2826,7 @@ func (x *GetCompanionRatingRankingResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetCompanionRatingRankingResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionRatingRankingResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{44}
+	return file_user_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *GetCompanionRatingRankingResponse) GetRankings() []*CompanionRankingItem {
@@ -2658,7 +2868,7 @@ type GetCompanionOrdersRankingRequest struct {
 
 func (x *GetCompanionOrdersRankingRequest) Reset() {
 	*x = GetCompanionOrdersRankingRequest{}
-	mi := &file_user_proto_msgTypes[45]
+	mi := &file_user_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2670,7 +2880,7 @@ func (x *GetCompanionOrdersRankingRequest) String() string {
 func (*GetCompanionOrdersRankingRequest) ProtoMessage() {}
 
 func (x *GetCompanionOrdersRankingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[45]
+	mi := &file_user_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2683,7 +2893,7 @@ func (x *GetCompanionOrdersRankingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCompanionOrdersRankingRequest.ProtoReflect.Descriptor instead.
 func (*GetCompanionOrdersRankingRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{45}
+	return file_user_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *GetCompanionOrdersRankingRequest) GetPage() int32 {
@@ -2712,7 +2922,7 @@ type GetCompanionOrdersRankingResponse struct {
 
 func (x *GetCompanionOrdersRankingResponse) Reset() {
 	*x = GetCompanionOrdersRankingResponse{}
-	mi := &file_user_proto_msgTypes[46]
+	mi := &file_user_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2724,7 +2934,7 @@ func (x *GetCompanionOrdersRankingResponse) String() string {
 func (*GetCompanionOrdersRankingResponse) ProtoMessage() {}
 
 func (x *GetCompanionOrdersRankingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[46]
+	mi := &file_user_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2737,7 +2947,7 @@ func (x *GetCompanionOrdersRankingResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetCompanionOrdersRankingResponse.ProtoReflect.Descriptor instead.
 func (*GetCompanionOrdersRankingResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{46}
+	return file_user_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *GetCompanionOrdersRankingResponse) GetRankings() []*CompanionRankingItem {
@@ -2826,7 +3036,19 @@ const file_user_proto_rawDesc = "" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\":\n" +
 	"\x16ForgetPasswordResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x10\n" +
-	"\x03uid\x18\x02 \x01(\x04R\x03uid\"f\n" +
+	"\x03uid\x18\x02 \x01(\x04R\x03uid\"g\n" +
+	"\x12ChangePhoneRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1b\n" +
+	"\told_phone\x18\x02 \x01(\tR\boldPhone\x12\x1b\n" +
+	"\tnew_phone\x18\x03 \x01(\tR\bnewPhone\"/\n" +
+	"\x13ChangePhoneResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"p\n" +
+	"\x15ChangePasswordRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1b\n" +
+	"\told_phone\x18\x02 \x01(\tR\boldPhone\x12!\n" +
+	"\fnew_password\x18\x03 \x01(\tR\vnewPassword\"2\n" +
+	"\x16ChangePasswordResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"f\n" +
 	"\n" +
 	"WalletInfo\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x18\n" +
@@ -2967,7 +3189,7 @@ const file_user_proto_rawDesc = "" +
 	"\brankings\x18\x01 \x03(\v2\x1a.user.CompanionRankingItemR\brankings\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\x84\r\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\x95\x0e\n" +
 	"\x04User\x129\n" +
 	"\bRegister\x12\x15.user.RegisterRequest\x1a\x16.user.RegisterResponse\x120\n" +
 	"\x05Login\x12\x12.user.LoginRequest\x1a\x13.user.LoginResponse\x126\n" +
@@ -2975,7 +3197,9 @@ const file_user_proto_rawDesc = "" +
 	"\n" +
 	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x18.user.UpdateUserResponse\x12B\n" +
 	"\vLoginByCode\x12\x18.user.LoginByCodeRequest\x1a\x19.user.LoginByCodeResponse\x12K\n" +
-	"\x0eForgetPassword\x12\x1b.user.ForgetPasswordRequest\x1a\x1c.user.ForgetPasswordResponse\x12<\n" +
+	"\x0eForgetPassword\x12\x1b.user.ForgetPasswordRequest\x1a\x1c.user.ForgetPasswordResponse\x12B\n" +
+	"\vChangePhone\x12\x18.user.ChangePhoneRequest\x1a\x19.user.ChangePhoneResponse\x12K\n" +
+	"\x0eChangePassword\x12\x1b.user.ChangePasswordRequest\x1a\x1c.user.ChangePasswordResponse\x12<\n" +
 	"\tGetWallet\x12\x16.user.GetWalletRequest\x1a\x17.user.GetWalletResponse\x129\n" +
 	"\bRecharge\x12\x15.user.RechargeRequest\x1a\x16.user.RechargeResponse\x126\n" +
 	"\aConsume\x12\x14.user.ConsumeRequest\x1a\x15.user.ConsumeResponse\x12Z\n" +
@@ -3004,7 +3228,7 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 51)
 var file_user_proto_goTypes = []any{
 	(*RegisterRequest)(nil),                   // 0: user.RegisterRequest
 	(*RegisterResponse)(nil),                  // 1: user.RegisterResponse
@@ -3019,100 +3243,108 @@ var file_user_proto_goTypes = []any{
 	(*LoginByCodeResponse)(nil),               // 10: user.LoginByCodeResponse
 	(*ForgetPasswordRequest)(nil),             // 11: user.ForgetPasswordRequest
 	(*ForgetPasswordResponse)(nil),            // 12: user.ForgetPasswordResponse
-	(*WalletInfo)(nil),                        // 13: user.WalletInfo
-	(*GetWalletRequest)(nil),                  // 14: user.GetWalletRequest
-	(*GetWalletResponse)(nil),                 // 15: user.GetWalletResponse
-	(*RechargeRequest)(nil),                   // 16: user.RechargeRequest
-	(*RechargeResponse)(nil),                  // 17: user.RechargeResponse
-	(*CreateRechargeOrderRequest)(nil),        // 18: user.CreateRechargeOrderRequest
-	(*CreateRechargeOrderResponse)(nil),       // 19: user.CreateRechargeOrderResponse
-	(*UpdateRechargeOrderStatusRequest)(nil),  // 20: user.UpdateRechargeOrderStatusRequest
-	(*UpdateRechargeOrderStatusResponse)(nil), // 21: user.UpdateRechargeOrderStatusResponse
-	(*ConsumeRequest)(nil),                    // 22: user.ConsumeRequest
-	(*ConsumeResponse)(nil),                   // 23: user.ConsumeResponse
-	(*CompanionInfo)(nil),                     // 24: user.CompanionInfo
-	(*GameSkill)(nil),                         // 25: user.GameSkill
-	(*ListGameSkillsRequest)(nil),             // 26: user.ListGameSkillsRequest
-	(*ListGameSkillsResponse)(nil),            // 27: user.ListGameSkillsResponse
-	(*CreateGameSkillRequest)(nil),            // 28: user.CreateGameSkillRequest
-	(*CreateGameSkillResponse)(nil),           // 29: user.CreateGameSkillResponse
-	(*UpdateGameSkillRequest)(nil),            // 30: user.UpdateGameSkillRequest
-	(*UpdateGameSkillResponse)(nil),           // 31: user.UpdateGameSkillResponse
-	(*DeleteGameSkillRequest)(nil),            // 32: user.DeleteGameSkillRequest
-	(*DeleteGameSkillResponse)(nil),           // 33: user.DeleteGameSkillResponse
-	(*GetCompanionProfileRequest)(nil),        // 34: user.GetCompanionProfileRequest
-	(*GetCompanionProfileResponse)(nil),       // 35: user.GetCompanionProfileResponse
-	(*UpdateCompanionProfileRequest)(nil),     // 36: user.UpdateCompanionProfileRequest
-	(*UpdateCompanionProfileResponse)(nil),    // 37: user.UpdateCompanionProfileResponse
-	(*UpdateCompanionStatsRequest)(nil),       // 38: user.UpdateCompanionStatsRequest
-	(*UpdateCompanionStatsResponse)(nil),      // 39: user.UpdateCompanionStatsResponse
-	(*GetCompanionListRequest)(nil),           // 40: user.GetCompanionListRequest
-	(*GetCompanionListResponse)(nil),          // 41: user.GetCompanionListResponse
-	(*CompanionRankingItem)(nil),              // 42: user.CompanionRankingItem
-	(*GetCompanionRatingRankingRequest)(nil),  // 43: user.GetCompanionRatingRankingRequest
-	(*GetCompanionRatingRankingResponse)(nil), // 44: user.GetCompanionRatingRankingResponse
-	(*GetCompanionOrdersRankingRequest)(nil),  // 45: user.GetCompanionOrdersRankingRequest
-	(*GetCompanionOrdersRankingResponse)(nil), // 46: user.GetCompanionOrdersRankingResponse
+	(*ChangePhoneRequest)(nil),                // 13: user.ChangePhoneRequest
+	(*ChangePhoneResponse)(nil),               // 14: user.ChangePhoneResponse
+	(*ChangePasswordRequest)(nil),             // 15: user.ChangePasswordRequest
+	(*ChangePasswordResponse)(nil),            // 16: user.ChangePasswordResponse
+	(*WalletInfo)(nil),                        // 17: user.WalletInfo
+	(*GetWalletRequest)(nil),                  // 18: user.GetWalletRequest
+	(*GetWalletResponse)(nil),                 // 19: user.GetWalletResponse
+	(*RechargeRequest)(nil),                   // 20: user.RechargeRequest
+	(*RechargeResponse)(nil),                  // 21: user.RechargeResponse
+	(*CreateRechargeOrderRequest)(nil),        // 22: user.CreateRechargeOrderRequest
+	(*CreateRechargeOrderResponse)(nil),       // 23: user.CreateRechargeOrderResponse
+	(*UpdateRechargeOrderStatusRequest)(nil),  // 24: user.UpdateRechargeOrderStatusRequest
+	(*UpdateRechargeOrderStatusResponse)(nil), // 25: user.UpdateRechargeOrderStatusResponse
+	(*ConsumeRequest)(nil),                    // 26: user.ConsumeRequest
+	(*ConsumeResponse)(nil),                   // 27: user.ConsumeResponse
+	(*CompanionInfo)(nil),                     // 28: user.CompanionInfo
+	(*GameSkill)(nil),                         // 29: user.GameSkill
+	(*ListGameSkillsRequest)(nil),             // 30: user.ListGameSkillsRequest
+	(*ListGameSkillsResponse)(nil),            // 31: user.ListGameSkillsResponse
+	(*CreateGameSkillRequest)(nil),            // 32: user.CreateGameSkillRequest
+	(*CreateGameSkillResponse)(nil),           // 33: user.CreateGameSkillResponse
+	(*UpdateGameSkillRequest)(nil),            // 34: user.UpdateGameSkillRequest
+	(*UpdateGameSkillResponse)(nil),           // 35: user.UpdateGameSkillResponse
+	(*DeleteGameSkillRequest)(nil),            // 36: user.DeleteGameSkillRequest
+	(*DeleteGameSkillResponse)(nil),           // 37: user.DeleteGameSkillResponse
+	(*GetCompanionProfileRequest)(nil),        // 38: user.GetCompanionProfileRequest
+	(*GetCompanionProfileResponse)(nil),       // 39: user.GetCompanionProfileResponse
+	(*UpdateCompanionProfileRequest)(nil),     // 40: user.UpdateCompanionProfileRequest
+	(*UpdateCompanionProfileResponse)(nil),    // 41: user.UpdateCompanionProfileResponse
+	(*UpdateCompanionStatsRequest)(nil),       // 42: user.UpdateCompanionStatsRequest
+	(*UpdateCompanionStatsResponse)(nil),      // 43: user.UpdateCompanionStatsResponse
+	(*GetCompanionListRequest)(nil),           // 44: user.GetCompanionListRequest
+	(*GetCompanionListResponse)(nil),          // 45: user.GetCompanionListResponse
+	(*CompanionRankingItem)(nil),              // 46: user.CompanionRankingItem
+	(*GetCompanionRatingRankingRequest)(nil),  // 47: user.GetCompanionRatingRankingRequest
+	(*GetCompanionRatingRankingResponse)(nil), // 48: user.GetCompanionRatingRankingResponse
+	(*GetCompanionOrdersRankingRequest)(nil),  // 49: user.GetCompanionOrdersRankingRequest
+	(*GetCompanionOrdersRankingResponse)(nil), // 50: user.GetCompanionOrdersRankingResponse
 }
 var file_user_proto_depIdxs = []int32{
 	5,  // 0: user.GetUserResponse.user:type_name -> user.UserInfo
 	5,  // 1: user.UpdateUserResponse.user:type_name -> user.UserInfo
-	13, // 2: user.GetWalletResponse.wallet:type_name -> user.WalletInfo
-	13, // 3: user.RechargeResponse.wallet:type_name -> user.WalletInfo
-	13, // 4: user.ConsumeResponse.wallet:type_name -> user.WalletInfo
-	25, // 5: user.ListGameSkillsResponse.skills:type_name -> user.GameSkill
-	25, // 6: user.CreateGameSkillResponse.skill:type_name -> user.GameSkill
-	25, // 7: user.UpdateGameSkillResponse.skill:type_name -> user.GameSkill
-	24, // 8: user.GetCompanionProfileResponse.profile:type_name -> user.CompanionInfo
-	24, // 9: user.UpdateCompanionProfileResponse.profile:type_name -> user.CompanionInfo
-	24, // 10: user.UpdateCompanionStatsResponse.profile:type_name -> user.CompanionInfo
-	24, // 11: user.GetCompanionListResponse.companions:type_name -> user.CompanionInfo
-	42, // 12: user.GetCompanionRatingRankingResponse.rankings:type_name -> user.CompanionRankingItem
-	42, // 13: user.GetCompanionOrdersRankingResponse.rankings:type_name -> user.CompanionRankingItem
+	17, // 2: user.GetWalletResponse.wallet:type_name -> user.WalletInfo
+	17, // 3: user.RechargeResponse.wallet:type_name -> user.WalletInfo
+	17, // 4: user.ConsumeResponse.wallet:type_name -> user.WalletInfo
+	29, // 5: user.ListGameSkillsResponse.skills:type_name -> user.GameSkill
+	29, // 6: user.CreateGameSkillResponse.skill:type_name -> user.GameSkill
+	29, // 7: user.UpdateGameSkillResponse.skill:type_name -> user.GameSkill
+	28, // 8: user.GetCompanionProfileResponse.profile:type_name -> user.CompanionInfo
+	28, // 9: user.UpdateCompanionProfileResponse.profile:type_name -> user.CompanionInfo
+	28, // 10: user.UpdateCompanionStatsResponse.profile:type_name -> user.CompanionInfo
+	28, // 11: user.GetCompanionListResponse.companions:type_name -> user.CompanionInfo
+	46, // 12: user.GetCompanionRatingRankingResponse.rankings:type_name -> user.CompanionRankingItem
+	46, // 13: user.GetCompanionOrdersRankingResponse.rankings:type_name -> user.CompanionRankingItem
 	0,  // 14: user.User.Register:input_type -> user.RegisterRequest
 	2,  // 15: user.User.Login:input_type -> user.LoginRequest
 	4,  // 16: user.User.GetUser:input_type -> user.GetUserRequest
 	7,  // 17: user.User.UpdateUser:input_type -> user.UpdateUserRequest
 	9,  // 18: user.User.LoginByCode:input_type -> user.LoginByCodeRequest
 	11, // 19: user.User.ForgetPassword:input_type -> user.ForgetPasswordRequest
-	14, // 20: user.User.GetWallet:input_type -> user.GetWalletRequest
-	16, // 21: user.User.Recharge:input_type -> user.RechargeRequest
-	22, // 22: user.User.Consume:input_type -> user.ConsumeRequest
-	18, // 23: user.User.CreateRechargeOrder:input_type -> user.CreateRechargeOrderRequest
-	20, // 24: user.User.UpdateRechargeOrderStatus:input_type -> user.UpdateRechargeOrderStatusRequest
-	34, // 25: user.User.GetCompanionProfile:input_type -> user.GetCompanionProfileRequest
-	36, // 26: user.User.UpdateCompanionProfile:input_type -> user.UpdateCompanionProfileRequest
-	38, // 27: user.User.UpdateCompanionStats:input_type -> user.UpdateCompanionStatsRequest
-	40, // 28: user.User.GetCompanionList:input_type -> user.GetCompanionListRequest
-	43, // 29: user.User.GetCompanionRatingRanking:input_type -> user.GetCompanionRatingRankingRequest
-	45, // 30: user.User.GetCompanionOrdersRanking:input_type -> user.GetCompanionOrdersRankingRequest
-	26, // 31: user.User.ListGameSkills:input_type -> user.ListGameSkillsRequest
-	28, // 32: user.User.CreateGameSkill:input_type -> user.CreateGameSkillRequest
-	30, // 33: user.User.UpdateGameSkill:input_type -> user.UpdateGameSkillRequest
-	32, // 34: user.User.DeleteGameSkill:input_type -> user.DeleteGameSkillRequest
-	1,  // 35: user.User.Register:output_type -> user.RegisterResponse
-	3,  // 36: user.User.Login:output_type -> user.LoginResponse
-	6,  // 37: user.User.GetUser:output_type -> user.GetUserResponse
-	8,  // 38: user.User.UpdateUser:output_type -> user.UpdateUserResponse
-	10, // 39: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
-	12, // 40: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
-	15, // 41: user.User.GetWallet:output_type -> user.GetWalletResponse
-	17, // 42: user.User.Recharge:output_type -> user.RechargeResponse
-	23, // 43: user.User.Consume:output_type -> user.ConsumeResponse
-	19, // 44: user.User.CreateRechargeOrder:output_type -> user.CreateRechargeOrderResponse
-	21, // 45: user.User.UpdateRechargeOrderStatus:output_type -> user.UpdateRechargeOrderStatusResponse
-	35, // 46: user.User.GetCompanionProfile:output_type -> user.GetCompanionProfileResponse
-	37, // 47: user.User.UpdateCompanionProfile:output_type -> user.UpdateCompanionProfileResponse
-	39, // 48: user.User.UpdateCompanionStats:output_type -> user.UpdateCompanionStatsResponse
-	41, // 49: user.User.GetCompanionList:output_type -> user.GetCompanionListResponse
-	44, // 50: user.User.GetCompanionRatingRanking:output_type -> user.GetCompanionRatingRankingResponse
-	46, // 51: user.User.GetCompanionOrdersRanking:output_type -> user.GetCompanionOrdersRankingResponse
-	27, // 52: user.User.ListGameSkills:output_type -> user.ListGameSkillsResponse
-	29, // 53: user.User.CreateGameSkill:output_type -> user.CreateGameSkillResponse
-	31, // 54: user.User.UpdateGameSkill:output_type -> user.UpdateGameSkillResponse
-	33, // 55: user.User.DeleteGameSkill:output_type -> user.DeleteGameSkillResponse
-	35, // [35:56] is the sub-list for method output_type
-	14, // [14:35] is the sub-list for method input_type
+	13, // 20: user.User.ChangePhone:input_type -> user.ChangePhoneRequest
+	15, // 21: user.User.ChangePassword:input_type -> user.ChangePasswordRequest
+	18, // 22: user.User.GetWallet:input_type -> user.GetWalletRequest
+	20, // 23: user.User.Recharge:input_type -> user.RechargeRequest
+	26, // 24: user.User.Consume:input_type -> user.ConsumeRequest
+	22, // 25: user.User.CreateRechargeOrder:input_type -> user.CreateRechargeOrderRequest
+	24, // 26: user.User.UpdateRechargeOrderStatus:input_type -> user.UpdateRechargeOrderStatusRequest
+	38, // 27: user.User.GetCompanionProfile:input_type -> user.GetCompanionProfileRequest
+	40, // 28: user.User.UpdateCompanionProfile:input_type -> user.UpdateCompanionProfileRequest
+	42, // 29: user.User.UpdateCompanionStats:input_type -> user.UpdateCompanionStatsRequest
+	44, // 30: user.User.GetCompanionList:input_type -> user.GetCompanionListRequest
+	47, // 31: user.User.GetCompanionRatingRanking:input_type -> user.GetCompanionRatingRankingRequest
+	49, // 32: user.User.GetCompanionOrdersRanking:input_type -> user.GetCompanionOrdersRankingRequest
+	30, // 33: user.User.ListGameSkills:input_type -> user.ListGameSkillsRequest
+	32, // 34: user.User.CreateGameSkill:input_type -> user.CreateGameSkillRequest
+	34, // 35: user.User.UpdateGameSkill:input_type -> user.UpdateGameSkillRequest
+	36, // 36: user.User.DeleteGameSkill:input_type -> user.DeleteGameSkillRequest
+	1,  // 37: user.User.Register:output_type -> user.RegisterResponse
+	3,  // 38: user.User.Login:output_type -> user.LoginResponse
+	6,  // 39: user.User.GetUser:output_type -> user.GetUserResponse
+	8,  // 40: user.User.UpdateUser:output_type -> user.UpdateUserResponse
+	10, // 41: user.User.LoginByCode:output_type -> user.LoginByCodeResponse
+	12, // 42: user.User.ForgetPassword:output_type -> user.ForgetPasswordResponse
+	14, // 43: user.User.ChangePhone:output_type -> user.ChangePhoneResponse
+	16, // 44: user.User.ChangePassword:output_type -> user.ChangePasswordResponse
+	19, // 45: user.User.GetWallet:output_type -> user.GetWalletResponse
+	21, // 46: user.User.Recharge:output_type -> user.RechargeResponse
+	27, // 47: user.User.Consume:output_type -> user.ConsumeResponse
+	23, // 48: user.User.CreateRechargeOrder:output_type -> user.CreateRechargeOrderResponse
+	25, // 49: user.User.UpdateRechargeOrderStatus:output_type -> user.UpdateRechargeOrderStatusResponse
+	39, // 50: user.User.GetCompanionProfile:output_type -> user.GetCompanionProfileResponse
+	41, // 51: user.User.UpdateCompanionProfile:output_type -> user.UpdateCompanionProfileResponse
+	43, // 52: user.User.UpdateCompanionStats:output_type -> user.UpdateCompanionStatsResponse
+	45, // 53: user.User.GetCompanionList:output_type -> user.GetCompanionListResponse
+	48, // 54: user.User.GetCompanionRatingRanking:output_type -> user.GetCompanionRatingRankingResponse
+	50, // 55: user.User.GetCompanionOrdersRanking:output_type -> user.GetCompanionOrdersRankingResponse
+	31, // 56: user.User.ListGameSkills:output_type -> user.ListGameSkillsResponse
+	33, // 57: user.User.CreateGameSkill:output_type -> user.CreateGameSkillResponse
+	35, // 58: user.User.UpdateGameSkill:output_type -> user.UpdateGameSkillResponse
+	37, // 59: user.User.DeleteGameSkill:output_type -> user.DeleteGameSkillResponse
+	37, // [37:60] is the sub-list for method output_type
+	14, // [14:37] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
 	14, // [14:14] is the sub-list for extension extendee
 	0,  // [0:14] is the sub-list for field type_name
@@ -3129,7 +3361,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   47,
+			NumMessages:   51,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

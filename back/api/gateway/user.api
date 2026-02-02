@@ -121,6 +121,29 @@ type ForgetPasswordResponse {
 	Data LoginData `json:"data"`
 }
 
+// 修改手机号（需验证原手机号）
+type ChangePhoneRequest {
+	OldPhone string `json:"oldPhone"`
+	OldCode  string `json:"oldCode"`
+	NewPhone string `json:"newPhone"`
+	NewCode  string `json:"newCode"`
+}
+
+type ChangePhoneResponse {
+	BaseResp
+}
+
+// 修改密码（需验证原手机号）
+type ChangePasswordRequest {
+	OldPhone    string `json:"oldPhone"`
+	OldCode     string `json:"oldCode"`
+	NewPassword string `json:"newPassword"`
+}
+
+type ChangePasswordResponse {
+	BaseResp
+}
+
 type RefreshTokenRequest {
 	RefreshToken string `json:"refreshToken"`
 }
@@ -299,6 +322,14 @@ service gateway {
 
 	@handler forgetPassword
 	put /api/user/forgetPassword (ForgetPasswordRequest) returns (ForgetPasswordResponse)
+
+	// 修改手机号（需要验证原手机号）
+	@handler changePhone
+	put /api/user/change-phone (ChangePhoneRequest) returns (ChangePhoneResponse)
+
+	// 修改密码（需要验证原手机号）
+	@handler changePassword
+	put /api/user/change-password (ChangePasswordRequest) returns (ChangePasswordResponse)
 
 	@handler refreshToken
 	post /api/user/refresh-token (RefreshTokenRequest) returns (RefreshTokenResponse)

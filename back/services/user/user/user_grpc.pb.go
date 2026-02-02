@@ -25,6 +25,8 @@ const (
 	User_UpdateUser_FullMethodName                = "/user.User/UpdateUser"
 	User_LoginByCode_FullMethodName               = "/user.User/LoginByCode"
 	User_ForgetPassword_FullMethodName            = "/user.User/ForgetPassword"
+	User_ChangePhone_FullMethodName               = "/user.User/ChangePhone"
+	User_ChangePassword_FullMethodName            = "/user.User/ChangePassword"
 	User_GetWallet_FullMethodName                 = "/user.User/GetWallet"
 	User_Recharge_FullMethodName                  = "/user.User/Recharge"
 	User_Consume_FullMethodName                   = "/user.User/Consume"
@@ -52,6 +54,8 @@ type UserClient interface {
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	LoginByCode(ctx context.Context, in *LoginByCodeRequest, opts ...grpc.CallOption) (*LoginByCodeResponse, error)
 	ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error)
+	ChangePhone(ctx context.Context, in *ChangePhoneRequest, opts ...grpc.CallOption) (*ChangePhoneResponse, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 	// 帅币钱包相关接口
 	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 	Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeResponse, error)
@@ -135,6 +139,26 @@ func (c *userClient) ForgetPassword(ctx context.Context, in *ForgetPasswordReque
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ForgetPasswordResponse)
 	err := c.cc.Invoke(ctx, User_ForgetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ChangePhone(ctx context.Context, in *ChangePhoneRequest, opts ...grpc.CallOption) (*ChangePhoneResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChangePhoneResponse)
+	err := c.cc.Invoke(ctx, User_ChangePhone_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChangePasswordResponse)
+	err := c.cc.Invoke(ctx, User_ChangePassword_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -301,6 +325,8 @@ type UserServer interface {
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	LoginByCode(context.Context, *LoginByCodeRequest) (*LoginByCodeResponse, error)
 	ForgetPassword(context.Context, *ForgetPasswordRequest) (*ForgetPasswordResponse, error)
+	ChangePhone(context.Context, *ChangePhoneRequest) (*ChangePhoneResponse, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	// 帅币钱包相关接口
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
 	Recharge(context.Context, *RechargeRequest) (*RechargeResponse, error)
@@ -347,6 +373,12 @@ func (UnimplementedUserServer) LoginByCode(context.Context, *LoginByCodeRequest)
 }
 func (UnimplementedUserServer) ForgetPassword(context.Context, *ForgetPasswordRequest) (*ForgetPasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ForgetPassword not implemented")
+}
+func (UnimplementedUserServer) ChangePhone(context.Context, *ChangePhoneRequest) (*ChangePhoneResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangePhone not implemented")
+}
+func (UnimplementedUserServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangePassword not implemented")
 }
 func (UnimplementedUserServer) GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetWallet not implemented")
@@ -518,6 +550,42 @@ func _User_ForgetPassword_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).ForgetPassword(ctx, req.(*ForgetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ChangePhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePhoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ChangePhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_ChangePhone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ChangePhone(ctx, req.(*ChangePhoneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ChangePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_ChangePassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -822,6 +890,14 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ForgetPassword",
 			Handler:    _User_ForgetPassword_Handler,
+		},
+		{
+			MethodName: "ChangePhone",
+			Handler:    _User_ChangePhone_Handler,
+		},
+		{
+			MethodName: "ChangePassword",
+			Handler:    _User_ChangePassword_Handler,
 		},
 		{
 			MethodName: "GetWallet",

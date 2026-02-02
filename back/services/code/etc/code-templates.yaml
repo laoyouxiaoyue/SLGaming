@@ -31,3 +31,27 @@ templates:
     providertemplate: "SMS456789012"
     contenttemplate: "重置密码验证码：{{.Code}}，{{.ExpireMinutes}}分钟内有效。"
 
+  change_phone:
+    id: "change_phone"
+    codelength: 6
+    expireseconds: 300
+    maxdailysends: 5
+    providertemplate: "SMS567890123"
+    contenttemplate: "更换手机号验证码：{{.Code}}，{{.ExpireMinutes}}分钟内有效。"
+
+  change_phone_new:
+    id: "change_phone_new"
+    codelength: 6
+    expireseconds: 300
+    maxdailysends: 5
+    providertemplate: "SMS678901234"
+    contenttemplate: "新手机号验证码：{{.Code}}，{{.ExpireMinutes}}分钟内有效。"
+
+  change_password:
+    id: "change_password"
+    codelength: 6
+    expireseconds: 300
+    maxdailysends: 5
+    providertemplate: "SMS789012345"
+    contenttemplate: "修改密码验证码：{{.Code}}，{{.ExpireMinutes}}分钟内有效。"
+

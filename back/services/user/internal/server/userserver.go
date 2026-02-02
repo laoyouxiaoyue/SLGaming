@@ -53,6 +53,16 @@ func (s *UserServer) ForgetPassword(ctx context.Context, in *user.ForgetPassword
 	return l.ForgetPassword(in)
 }
 
+func (s *UserServer) ChangePhone(ctx context.Context, in *user.ChangePhoneRequest) (*user.ChangePhoneResponse, error) {
+	l := logic.NewChangePhoneLogic(ctx, s.svcCtx)
+	return l.ChangePhone(in)
+}
+
+func (s *UserServer) ChangePassword(ctx context.Context, in *user.ChangePasswordRequest) (*user.ChangePasswordResponse, error) {
+	l := logic.NewChangePasswordLogic(ctx, s.svcCtx)
+	return l.ChangePassword(in)
+}
+
 // 帅币钱包相关接口
 func (s *UserServer) GetWallet(ctx context.Context, in *user.GetWalletRequest) (*user.GetWalletResponse, error) {
 	l := logic.NewGetWalletLogic(ctx, s.svcCtx)

@@ -499,6 +499,152 @@
         }
       }
     },
+    "/user/change-phone": {
+      "put": {
+        "tags": ["用户信息"],
+        "summary": "修改手机号",
+        "description": "验证原手机号验证码后修改手机号（需要登录）",
+        "operationId": "changePhone",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ChangePhoneRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "修改成功",
+            "schema": {
+              "$ref": "#/definitions/ChangePhoneResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success"
+              }
+            }
+          },
+          "400": {
+            "description": "验证码错误或参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "验证码错误或已过期"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "修改手机号失败"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/change-password": {
+      "put": {
+        "tags": ["用户认证"],
+        "summary": "修改密码",
+        "description": "验证原手机号验证码后修改密码（需要登录）",
+        "operationId": "changePassword",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ChangePasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "修改成功",
+            "schema": {
+              "$ref": "#/definitions/ChangePasswordResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success"
+              }
+            }
+          },
+          "400": {
+            "description": "验证码错误或参数错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 400,
+                "msg": "验证码错误或已过期"
+              }
+            }
+          },
+          "401": {
+            "description": "未授权，需要登录",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 401,
+                "msg": "未授权"
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            },
+            "examples": {
+              "application/json": {
+                "code": 500,
+                "msg": "修改密码失败"
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/refresh-token": {
       "post": {
         "tags": ["用户认证"],
@@ -1808,6 +1954,80 @@
               "$ref": "#/definitions/LoginData"
             }
           }
+        }
+      ]
+    },
+    "ChangePhoneRequest": {
+      "type": "object",
+      "required": ["oldPhone", "oldCode", "newPhone"],
+      "properties": {
+        "oldPhone": {
+          "type": "string",
+          "description": "原手机号",
+          "example": "13800138000"
+        },
+        "oldCode": {
+          "type": "string",
+          "description": "原手机号验证码",
+          "example": "123456"
+        },
+        "newPhone": {
+          "type": "string",
+          "description": "新手机号",
+          "example": "13900139000"
+        },
+        "newCode": {
+          "type": "string",
+          "description": "新手机号验证码（可选）",
+          "example": "654321"
+        }
+      },
+      "example": {
+        "oldPhone": "13800138000",
+        "oldCode": "123456",
+        "newPhone": "13900139000",
+        "newCode": "654321"
+      }
+    },
+    "ChangePhoneResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        }
+      ]
+    },
+    "ChangePasswordRequest": {
+      "type": "object",
+      "required": ["oldPhone", "oldCode", "newPassword"],
+      "properties": {
+        "oldPhone": {
+          "type": "string",
+          "description": "原手机号",
+          "example": "13800138000"
+        },
+        "oldCode": {
+          "type": "string",
+          "description": "原手机号验证码",
+          "example": "123456"
+        },
+        "newPassword": {
+          "type": "string",
+          "description": "新密码",
+          "example": "newpassword123"
+        }
+      },
+      "example": {
+        "oldPhone": "13800138000",
+        "oldCode": "123456",
+        "newPassword": "newpassword123"
+      }
+    },
+    "ChangePasswordResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
         }
       ]
     },

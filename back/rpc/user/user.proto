@@ -79,6 +79,28 @@ message ForgetPasswordResponse {
   uint64 uid = 2;
 }
 
+// 修改手机号（需验证原手机号）
+message ChangePhoneRequest {
+  uint64 user_id = 1;
+  string old_phone = 2;
+  string new_phone = 3;
+}
+
+message ChangePhoneResponse {
+  bool success = 1;
+}
+
+// 修改密码（需验证原手机号）
+message ChangePasswordRequest {
+  uint64 user_id = 1;
+  string old_phone = 2;
+  string new_password = 3;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
+}
+
 // ---------------- 帅币钱包相关 ----------------
 
 // 钱包信息
@@ -300,6 +322,8 @@ service User {
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc LoginByCode(LoginByCodeRequest) returns (LoginByCodeResponse);
   rpc ForgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse);
+  rpc ChangePhone(ChangePhoneRequest) returns (ChangePhoneResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
 
   // 帅币钱包相关接口
   rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
