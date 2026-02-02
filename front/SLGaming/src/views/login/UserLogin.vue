@@ -12,8 +12,8 @@ const userStore = useUserStore();
 const loginType = ref("account"); // 'account' or 'code'
 
 const form = ref({
-  phone: "13800138000",
-  password: "password123",
+  phone: "",
+  password: "",
   code: "",
 });
 
