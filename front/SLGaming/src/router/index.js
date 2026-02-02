@@ -13,6 +13,7 @@ import Scion from "@/views/recharge/index.vue";
 import ScionRecharge from "@/views/recharge/component/Scionrecharge.vue";
 import ScionRecord from "@/views/recharge/component/ScionRecord.vue";
 import Pay from "@/views/pay/index.vue";
+import ApplyCompanion from "@/views/account/component/ApplyCompanion.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -61,6 +62,10 @@ const router = createRouter({
             {
               path: "wallet",
               component: Wallet,
+            },
+            {
+              path: "apply_companion",
+              component: ApplyCompanion,
             },
           ],
         },

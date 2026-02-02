@@ -29,6 +29,10 @@ const { info } = storeToRefs(infoStore);
           <sl-icon name="icon-peiwandailian" size="18" />
           <span>陪玩设置</span>
         </RouterLink>
+        <RouterLink to="/account/apply_companion" class="menu-item" v-if="info.role === 1">
+          <sl-icon name="icon-shenqing" size="18" />
+          <span>申请陪玩</span>
+        </RouterLink>
         <RouterLink to="/account/order" class="menu-item">
           <sl-icon name="icon-dingdan" size="18" />
           <span>我的订单</span>
