@@ -1959,7 +1959,7 @@
     },
     "ChangePhoneRequest": {
       "type": "object",
-      "required": ["oldPhone", "oldCode", "newPhone"],
+      "required": ["oldPhone", "oldCode", "newPhone", "newCode"],
       "properties": {
         "oldPhone": {
           "type": "string",
@@ -1978,7 +1978,7 @@
         },
         "newCode": {
           "type": "string",
-          "description": "新手机号验证码（可选）",
+          "description": "新手机号验证码",
           "example": "654321"
         }
       },

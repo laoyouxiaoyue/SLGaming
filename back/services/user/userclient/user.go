@@ -49,6 +49,9 @@ type (
 	LoginByCodeResponse               = user.LoginByCodeResponse
 	LoginRequest                      = user.LoginRequest
 	LoginResponse                     = user.LoginResponse
+	RechargeListRequest               = user.RechargeListRequest
+	RechargeListResponse              = user.RechargeListResponse
+	RechargeOrderInfo                 = user.RechargeOrderInfo
 	RechargeRequest                   = user.RechargeRequest
 	RechargeResponse                  = user.RechargeResponse
 	RegisterRequest                   = user.RegisterRequest
@@ -81,6 +84,7 @@ type (
 		Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
 		CreateRechargeOrder(ctx context.Context, in *CreateRechargeOrderRequest, opts ...grpc.CallOption) (*CreateRechargeOrderResponse, error)
 		UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRechargeOrderStatusRequest, opts ...grpc.CallOption) (*UpdateRechargeOrderStatusResponse, error)
+		RechargeList(ctx context.Context, in *RechargeListRequest, opts ...grpc.CallOption) (*RechargeListResponse, error)
 		// 陪玩信息相关接口
 		GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
 		UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
@@ -171,6 +175,11 @@ func (m *defaultUser) CreateRechargeOrder(ctx context.Context, in *CreateRecharg
 func (m *defaultUser) UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRechargeOrderStatusRequest, opts ...grpc.CallOption) (*UpdateRechargeOrderStatusResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.UpdateRechargeOrderStatus(ctx, in, opts...)
+}
+
+func (m *defaultUser) RechargeList(ctx context.Context, in *RechargeListRequest, opts ...grpc.CallOption) (*RechargeListResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.RechargeList(ctx, in, opts...)
 }
 
 // 陪玩信息相关接口

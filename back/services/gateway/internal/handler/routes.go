@@ -168,6 +168,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.AlipayNotifyHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/recharge/list",
+				Handler: user.RechargeListHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/api/user/refresh-token",
 				Handler: user.RefreshTokenHandler(serverCtx),

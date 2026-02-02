@@ -43,9 +43,9 @@ func (l *ChangePhoneLogic) ChangePhone(req *types.ChangePhoneRequest) (resp *typ
 	newPhone := strings.TrimSpace(req.NewPhone)
 	oldCode := strings.TrimSpace(req.OldCode)
 	newCode := strings.TrimSpace(req.NewCode)
-	if oldPhone == "" || newPhone == "" {
+	if oldPhone == "" || newPhone == "" || newCode == "" {
 		return &types.ChangePhoneResponse{
-			BaseResp: types.BaseResp{Code: 400, Msg: "手机号不能为空"},
+			BaseResp: types.BaseResp{Code: 400, Msg: "手机号或验证码不能为空"},
 		}, nil
 	}
 	if oldPhone == newPhone {
@@ -95,8 +95,8 @@ func (l *ChangePhoneLogic) ChangePhone(req *types.ChangePhoneRequest) (resp *typ
 		}
 	}
 
-	// 可选：验证新手机号验证码（若提供）
-	if newCode != "" && l.svcCtx.CodeRPC != nil {
+	// 验证新手机号验证码
+	if l.svcCtx.CodeRPC != nil {
 		verifyResp, err := l.svcCtx.CodeRPC.VerifyCode(l.ctx, &codeclient.VerifyCodeRequest{
 			Phone:   newPhone,
 			Purpose: "change_phone_new",

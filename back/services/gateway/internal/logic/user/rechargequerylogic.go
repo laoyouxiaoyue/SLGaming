@@ -6,6 +6,7 @@ package user
 import (
 	"context"
 	"strings"
+	"time"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -57,12 +58,18 @@ func (l *RechargeQueryLogic) RechargeQuery(req *types.RechargeQueryRequest) (res
 		}, nil
 	}
 
+	createdAt := ""
+	if order.CreatedAt > 0 {
+		createdAt = time.Unix(order.CreatedAt, 0).Format("2006-01-02 15:04:05")
+	}
+
 	return &types.RechargeQueryResponse{
 		BaseResp: types.BaseResp{Code: 0, Msg: "success"},
 		Data: types.RechargeQueryData{
 			OrderNo: order.OrderNo,
 			Status:  order.Status,
 			Amount:  order.Amount,
+			CreatedAt: createdAt,
 		},
 	}, nil
 }

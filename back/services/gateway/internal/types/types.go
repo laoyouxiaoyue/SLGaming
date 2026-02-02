@@ -288,10 +288,40 @@ type RechargeCreateResponse struct {
 	Data RechargeCreateData `json:"data"`
 }
 
+type RechargeListData struct {
+	Orders   []RechargeOrderInfo `json:"orders"`
+	Total    int                 `json:"total"`
+	Page     int                 `json:"page"`
+	PageSize int                 `json:"pageSize"`
+}
+
+type RechargeListRequest struct {
+	Status   int `form:"status,optional"`   // 订单状态筛选
+	Page     int `form:"page,optional"`     // 页码（从1开始）
+	PageSize int `form:"pageSize,optional"` // 每页数量
+}
+
+type RechargeListResponse struct {
+	BaseResp
+	Data RechargeListData `json:"data"`
+}
+
+type RechargeOrderInfo struct {
+	OrderNo   string `json:"orderNo"`
+	Status    int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+	Amount    int64  `json:"amount"`
+	PayType   string `json:"payType"`
+	TradeNo   string `json:"tradeNo,optional"`
+	PaidAt    string `json:"paidAt,optional"` // 支付完成时间（格式化时间）
+	CreatedAt string `json:"createdAt"`       // 创建时间（格式化时间）
+}
+
 type RechargeQueryData struct {
-	OrderNo string `json:"orderNo"`
-	Status  int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
-	Amount  int64  `json:"amount"`
+	OrderNo   string `json:"orderNo"`
+	Status    int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+	Amount    int64  `json:"amount"`
+	PaidAt    string `json:"paidAt,optional"` // 支付完成时间（格式化时间）
+	CreatedAt string `json:"createdAt"`       // 创建时间（格式化时间）
 }
 
 type RechargeQueryRequest struct {

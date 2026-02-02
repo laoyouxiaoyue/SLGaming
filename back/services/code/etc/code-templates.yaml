@@ -23,8 +23,8 @@ templates:
     providertemplate: "SMS345678901"
     contenttemplate: "欢迎注册！验证码：{{.Code}}，{{.ExpireMinutes}}分钟内有效。"
 
-  resetpassword:
-    id: "resetpassword"
+  forget_password:
+    id: "forget_password"
     codelength: 6
     expireseconds: 600
     maxdailysends: 5

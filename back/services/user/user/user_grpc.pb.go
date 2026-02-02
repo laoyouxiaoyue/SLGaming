@@ -32,6 +32,7 @@ const (
 	User_Consume_FullMethodName                   = "/user.User/Consume"
 	User_CreateRechargeOrder_FullMethodName       = "/user.User/CreateRechargeOrder"
 	User_UpdateRechargeOrderStatus_FullMethodName = "/user.User/UpdateRechargeOrderStatus"
+	User_RechargeList_FullMethodName              = "/user.User/RechargeList"
 	User_GetCompanionProfile_FullMethodName       = "/user.User/GetCompanionProfile"
 	User_UpdateCompanionProfile_FullMethodName    = "/user.User/UpdateCompanionProfile"
 	User_UpdateCompanionStats_FullMethodName      = "/user.User/UpdateCompanionStats"
@@ -62,6 +63,7 @@ type UserClient interface {
 	Consume(ctx context.Context, in *ConsumeRequest, opts ...grpc.CallOption) (*ConsumeResponse, error)
 	CreateRechargeOrder(ctx context.Context, in *CreateRechargeOrderRequest, opts ...grpc.CallOption) (*CreateRechargeOrderResponse, error)
 	UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRechargeOrderStatusRequest, opts ...grpc.CallOption) (*UpdateRechargeOrderStatusResponse, error)
+	RechargeList(ctx context.Context, in *RechargeListRequest, opts ...grpc.CallOption) (*RechargeListResponse, error)
 	// 陪玩信息相关接口
 	GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error)
 	UpdateCompanionProfile(ctx context.Context, in *UpdateCompanionProfileRequest, opts ...grpc.CallOption) (*UpdateCompanionProfileResponse, error)
@@ -215,6 +217,16 @@ func (c *userClient) UpdateRechargeOrderStatus(ctx context.Context, in *UpdateRe
 	return out, nil
 }
 
+func (c *userClient) RechargeList(ctx context.Context, in *RechargeListRequest, opts ...grpc.CallOption) (*RechargeListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RechargeListResponse)
+	err := c.cc.Invoke(ctx, User_RechargeList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) GetCompanionProfile(ctx context.Context, in *GetCompanionProfileRequest, opts ...grpc.CallOption) (*GetCompanionProfileResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetCompanionProfileResponse)
@@ -333,6 +345,7 @@ type UserServer interface {
 	Consume(context.Context, *ConsumeRequest) (*ConsumeResponse, error)
 	CreateRechargeOrder(context.Context, *CreateRechargeOrderRequest) (*CreateRechargeOrderResponse, error)
 	UpdateRechargeOrderStatus(context.Context, *UpdateRechargeOrderStatusRequest) (*UpdateRechargeOrderStatusResponse, error)
+	RechargeList(context.Context, *RechargeListRequest) (*RechargeListResponse, error)
 	// 陪玩信息相关接口
 	GetCompanionProfile(context.Context, *GetCompanionProfileRequest) (*GetCompanionProfileResponse, error)
 	UpdateCompanionProfile(context.Context, *UpdateCompanionProfileRequest) (*UpdateCompanionProfileResponse, error)
@@ -394,6 +407,9 @@ func (UnimplementedUserServer) CreateRechargeOrder(context.Context, *CreateRecha
 }
 func (UnimplementedUserServer) UpdateRechargeOrderStatus(context.Context, *UpdateRechargeOrderStatusRequest) (*UpdateRechargeOrderStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateRechargeOrderStatus not implemented")
+}
+func (UnimplementedUserServer) RechargeList(context.Context, *RechargeListRequest) (*RechargeListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RechargeList not implemented")
 }
 func (UnimplementedUserServer) GetCompanionProfile(context.Context, *GetCompanionProfileRequest) (*GetCompanionProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCompanionProfile not implemented")
@@ -680,6 +696,24 @@ func _User_UpdateRechargeOrderStatus_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_RechargeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RechargeListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).RechargeList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_RechargeList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).RechargeList(ctx, req.(*RechargeListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetCompanionProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetCompanionProfileRequest)
 	if err := dec(in); err != nil {
@@ -918,6 +952,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateRechargeOrderStatus",
 			Handler:    _User_UpdateRechargeOrderStatus_Handler,
+		},
+		{
+			MethodName: "RechargeList",
+			Handler:    _User_RechargeList_Handler,
 		},
 		{
 			MethodName: "GetCompanionProfile",
