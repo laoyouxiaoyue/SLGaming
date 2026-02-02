@@ -14,6 +14,7 @@ import ScionRecharge from "@/views/recharge/component/Scionrecharge.vue";
 import ScionRecord from "@/views/recharge/component/ScionRecord.vue";
 import Pay from "@/views/pay/index.vue";
 import ApplyCompanion from "@/views/account/component/ApplyCompanion.vue";
+import SecuritySetting from "@/views/account/component/SecuritySetting.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -66,6 +67,10 @@ const router = createRouter({
             {
               path: "apply_companion",
               component: ApplyCompanion,
+            },
+            {
+              path: "security",
+              component: SecuritySetting,
             },
           ],
         },

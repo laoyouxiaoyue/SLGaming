@@ -9,7 +9,7 @@ export const getwalletapi = () => {
 /**
  * 创建充值订单
  * @param {Object} data - 请求参数
- * @param {number} data.amount - 充值金额（分/帅币）, 示例: 100
+ * @param {number} data.amount - 充值金额（元/帅币）, 示例: 100
  * @param {string} [data.payType] - 支付方式：alipay_page(PC，默认) / alipay_wap(H5) / alipay_app(APP), 枚举值: alipay_page, alipay_wap, alipay_app, 示例: alipay_page
  * @param {string} [data.returnUrl] - 同步回跳地址（可选）, 示例: https://example.com/pay/return
  * @returns {Promise}

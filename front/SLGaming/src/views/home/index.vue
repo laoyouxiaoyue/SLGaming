@@ -157,7 +157,7 @@ const handleFilter = () => {
             :value="item.value"
           />
         </el-select>
-        <el-button type="primary" plain class="filter-button" @click="handleFilter">筛选</el-button>
+        <el-button plain class="filter-button" @click="handleFilter">筛选</el-button>
         <el-button
           plain
           @click="

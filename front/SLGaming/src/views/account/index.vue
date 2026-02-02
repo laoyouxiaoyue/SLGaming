@@ -41,6 +41,10 @@ const { info } = storeToRefs(infoStore);
           <sl-icon name="icon-qianbao" size="18" />
           <span>我的钱包</span>
         </RouterLink>
+        <RouterLink to="/account/security" class="menu-item">
+          <sl-icon name="icon-zhanghaoanquan" size="22" />
+          <span>账号安全</span>
+        </RouterLink>
       </div>
     </div>
     <div class="content-area">

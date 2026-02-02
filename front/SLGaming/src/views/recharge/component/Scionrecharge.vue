@@ -69,7 +69,7 @@ const handlePay = async () => {
 
   try {
     const res = await createrechargeorderapi({
-      amount: payAmount.value * 100, // 转换为分
+      amount: payAmount.value, // 转换为分
       payType: "alipay_page",
       returnUrl: window.location.origin + "/pay", // 支付成功后的回调页面
     });
