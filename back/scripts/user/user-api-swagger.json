@@ -934,6 +934,84 @@
         }
       }
     },
+    "/user/recharge/list": {
+      "get": {
+        "tags": ["钱包"],
+        "summary": "获取充值记录列表",
+        "description": "分页获取当前用户的充值记录（需要登录）",
+        "operationId": "rechargeList",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "订单状态筛选：0=待支付,1=成功,2=失败,3=关闭（不传则全部）"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "页码（从1开始）"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "每页数量"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "schema": {
+              "$ref": "#/definitions/RechargeListResponse"
+            },
+            "examples": {
+              "application/json": {
+                "code": 0,
+                "msg": "success",
+                "data": {
+                  "orders": [
+                    {
+                      "orderNo": "RCFBWT5BX7514W",
+                      "status": 1,
+                      "amount": 100,
+                      "payType": "alipay",
+                      "tradeNo": "2024020212345678",
+                      "paidAt": "2024-02-02 16:30:00",
+                      "createdAt": "2024-02-02 16:26:35"
+                    }
+                  ],
+                  "total": 1,
+                  "page": 1,
+                  "pageSize": 20
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "schema": {
+              "$ref": "#/definitions/BaseResp"
+            }
+          }
+        }
+      }
+    },
     "/user/recharge/alipay/notify": {
       "post": {
         "tags": ["钱包"],
@@ -2220,6 +2298,16 @@
           "format": "int64",
           "description": "金额（分/帅币）",
           "example": 100
+        },
+        "paidAt": {
+          "type": "string",
+          "description": "支付完成时间（格式化时间）",
+          "example": "2024-02-02 16:30:00"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "创建时间（格式化时间）",
+          "example": "2024-02-02 16:26:35"
         }
       }
     },
@@ -2234,6 +2322,90 @@
           "properties": {
             "data": {
               "$ref": "#/definitions/RechargeQueryData"
+            }
+          }
+        }
+      ]
+    },
+    "RechargeOrderInfo": {
+      "type": "object",
+      "properties": {
+        "orderNo": {
+          "type": "string",
+          "description": "充值单号",
+          "example": "RCFBWT5BX7514W"
+        },
+        "status": {
+          "type": "integer",
+          "description": "订单状态：0=待支付,1=成功,2=失败,3=关闭",
+          "enum": [0, 1, 2, 3],
+          "example": 1
+        },
+        "amount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "金额（分/帅币）",
+          "example": 100
+        },
+        "payType": {
+          "type": "string",
+          "description": "支付方式",
+          "example": "alipay"
+        },
+        "tradeNo": {
+          "type": "string",
+          "description": "支付平台交易号",
+          "example": "2024020212345678"
+        },
+        "paidAt": {
+          "type": "string",
+          "description": "支付完成时间（格式化时间）",
+          "example": "2024-02-02 16:30:00"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "创建时间（格式化时间）",
+          "example": "2024-02-02 16:26:35"
+        }
+      }
+    },
+    "RechargeListData": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RechargeOrderInfo"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "description": "总数",
+          "example": 1
+        },
+        "page": {
+          "type": "integer",
+          "description": "当前页码",
+          "example": 1
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "每页数量",
+          "example": 20
+        }
+      }
+    },
+    "RechargeListResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/RechargeListData"
             }
           }
         }
