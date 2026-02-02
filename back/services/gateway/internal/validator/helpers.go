@@ -76,13 +76,16 @@ func ValidatePurpose(purpose string) error {
 		return fmt.Errorf("验证码用途不能为空")
 	}
 	validPurposes := map[string]bool{
-		"register":        true,
-		"login":           true,
-		"forget_password": true,
-		"resetpassword":   true,
+		"register":         true,
+		"login":            true,
+		"forget_password":  true,
+		"resetpassword":    true,
+		"change_phone":     true,
+		"change_phone_new": true,
+		"change_password":  true,
 	}
 	if !validPurposes[purpose] {
-		return fmt.Errorf("验证码用途不正确，支持: register, login, forget_password")
+		return fmt.Errorf("验证码用途不正确，支持: register, login, forget_password, change_phone, change_phone_new, change_password")
 	}
 	return nil
 }
