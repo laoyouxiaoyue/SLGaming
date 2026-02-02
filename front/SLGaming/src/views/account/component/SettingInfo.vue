@@ -65,7 +65,7 @@ const handleFileChange = async (e) => {
 
   const res = await upavatarUrlapi(file);
   if (res.data && res.data.avatarUrl) {
-    form.value.avatarUrl = res.data.avatarUrl;
+    getUserInfo();
     ElMessage.success("头像更换成功");
   }
   e.target.value = "";
