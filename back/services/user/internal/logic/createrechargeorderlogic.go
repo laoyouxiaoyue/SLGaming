@@ -39,7 +39,7 @@ func (l *CreateRechargeOrderLogic) CreateRechargeOrder(in *user.CreateRechargeOr
 		return nil, status.Error(codes.InvalidArgument, "amount must be positive")
 	}
 
-	db := l.svcCtx.DB()
+	db := l.svcCtx.DB().WithContext(l.ctx)
 	if db == nil {
 		return nil, status.Error(codes.Internal, "db not initialized")
 	}
@@ -51,7 +51,8 @@ func (l *CreateRechargeOrderLogic) CreateRechargeOrder(in *user.CreateRechargeOr
 
 	var existing model.RechargeOrder
 	err := db.Where("order_no = ?", in.GetOrderNo()).First(&existing).Error
-	if err == nil {
+	switch {
+	case err == nil:
 		updates := map[string]interface{}{
 			"user_id":  in.GetUserId(),
 			"amount":   in.GetAmount(),
@@ -63,22 +64,20 @@ func (l *CreateRechargeOrderLogic) CreateRechargeOrder(in *user.CreateRechargeOr
 			return nil, status.Error(codes.Internal, "update recharge order failed")
 		}
 		return &user.CreateRechargeOrderResponse{Success: true}, nil
-	}
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		order := &model.RechargeOrder{
+			UserID:  in.GetUserId(),
+			OrderNo: in.GetOrderNo(),
+			Amount:  in.GetAmount(),
+			Status:  int(in.GetStatus()),
+			PayType: payType,
+			Remark:  in.GetRemark(),
+		}
+		if err := db.Create(order).Error; err != nil {
+			return nil, status.Error(codes.Internal, "create recharge order failed")
+		}
+		return &user.CreateRechargeOrderResponse{Success: true}, nil
+	default:
 		return nil, status.Error(codes.Internal, "query recharge order failed")
 	}
-
-	order := &model.RechargeOrder{
-		UserID:  in.GetUserId(),
-		OrderNo: in.GetOrderNo(),
-		Amount:  in.GetAmount(),
-		Status:  int(in.GetStatus()),
-		PayType: payType,
-		Remark:  in.GetRemark(),
-	}
-	if err := db.Create(order).Error; err != nil {
-		return nil, status.Error(codes.Internal, "create recharge order failed")
-	}
-
-	return &user.CreateRechargeOrderResponse{Success: true}, nil
 }
