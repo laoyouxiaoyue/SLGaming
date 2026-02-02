@@ -218,17 +218,17 @@ onMounted(() => {
     padding: 8px 16px;
     background-color: #f9f9f9;
     margin: 4px 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
 
     .wallet-item {
+      flex: 1;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      margin-bottom: 4px;
+      gap: 4px;
       font-size: 13px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
 
       .label {
         color: #666;
