@@ -18,12 +18,20 @@ const { walletInfo } = storeToRefs(walletStore);
 
 const confirm = async () => {
   // 退出登录业务逻辑实现
-  // 1.清除用户信息 触发action
-  await getlogoutAPI();
-  userStore.clearUserInfo();
-  infoStore.clearInfo();
-  // 2.跳转到登录页
-  router.push("/login");
+  try {
+    // 1. 调用退出登录接口 (可选，即使失败也应清除本地数据)
+    await getlogoutAPI();
+  } catch (error) {
+    console.error("Logout API failed:", error);
+  } finally {
+    // 2. 无论接口是否成功，都必须清除本地持久化的 Pinia 数据
+    userStore.clearUserInfo();
+    infoStore.clearInfo();
+    walletStore.clearWallet();
+
+    // 3. 跳转到登录页
+    router.replace("/login");
+  }
 };
 
 onMounted(() => {
