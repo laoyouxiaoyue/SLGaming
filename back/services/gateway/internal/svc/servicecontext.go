@@ -14,6 +14,7 @@ import (
 	"SLGaming/back/services/order/orderclient"
 	"SLGaming/back/services/user/userclient"
 
+	rocketmq "github.com/apache/rocketmq-client-go/v2"
 	"github.com/smartwalle/alipay/v3"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -31,6 +32,8 @@ type ServiceContext struct {
 	JWT        *jwt.JWTManager
 	TokenStore jwt.TokenStore
 	CacheRedis *redis.Redis
+	// RocketMQ 事件生产者（用于发送充值回调事件）
+	EventProducer rocketmq.Producer
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -105,6 +108,22 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			}
 			ctx.Alipay = client
 			logx.Infof("成功初始化支付宝客户端")
+		}
+	}
+
+	// 初始化 RocketMQ Producer（如果配置了）
+	if len(c.RocketMQ.NameServers) > 0 {
+		mqCfg := &ioc.RocketMQConfigAdapter{
+			NameServers: c.RocketMQ.NameServers,
+			Namespace:   c.RocketMQ.Namespace,
+			AccessKey:   c.RocketMQ.AccessKey,
+			SecretKey:   c.RocketMQ.SecretKey,
+		}
+		if producer, err := ioc.InitRocketMQProducer(mqCfg, "gateway-recharge-producer"); err != nil {
+			logx.Errorf("init rocketmq producer failed: %v", err)
+		} else {
+			ctx.EventProducer = producer
+			logx.Infof("init rocketmq producer success, nameservers=%v", c.RocketMQ.NameServers)
 		}
 	}
 

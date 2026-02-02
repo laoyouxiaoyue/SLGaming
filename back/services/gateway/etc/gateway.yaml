@@ -93,3 +93,11 @@ Alipay:
   NotifyURL: "http://120.26.29.242:9090/api/user/recharge/alipay/notify"           # 异步通知地址
   ReturnURL: "http://120.26.29.242:9090/"           # 同步回跳地址
   IsProduction: false      # 沙箱=false，生产=true
+
+# RocketMQ 配置（用于充值回调事件）
+RocketMQ:
+  NameServers:
+    - 120.26.29.242:9876
+  Namespace: ""
+  AccessKey: ""
+  SecretKey: ""

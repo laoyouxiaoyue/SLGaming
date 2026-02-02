@@ -20,6 +20,7 @@ type Config struct {
 	RateLimit RateLimitConf `json:",optional"` // 限流配置
 	Upload    UploadConf    `json:",optional"` // 上传配置
 	Alipay    AlipayConf    `json:",optional"` // 支付宝配置
+	RocketMQ  RocketMQConf  `json:",optional"` // RocketMQ 配置
 }
 
 // JWTConf JWT 配置
@@ -91,6 +92,17 @@ type AlipayConf struct {
 	NotifyURL       string `json:",optional"`      // 异步通知地址
 	ReturnURL       string `json:",optional"`      // 同步回跳地址
 	IsProduction    bool   `json:",default=false"` // 是否生产环境
+}
+
+// RocketMQConf RocketMQ 配置结构
+type RocketMQConf struct {
+	// NameServer 地址列表，如 ["127.0.0.1:9876"]
+	NameServers []string `json:",optional"`
+	// 可选：命名空间，用于环境/租户隔离
+	Namespace string `json:",optional"`
+	// 可选：访问凭证（如果开启 ACL）
+	AccessKey string `json:",optional"`
+	SecretKey string `json:",optional"`
 }
 
 // RouteRateLimitConf 路由限流配置
