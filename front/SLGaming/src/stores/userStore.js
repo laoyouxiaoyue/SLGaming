@@ -4,6 +4,7 @@ import { loginAPI, codeLoginAPI } from "@/api/user/login";
 import { getlogoutAPI } from "@/api/user/logout";
 import { useInfoStore } from "./infoStore";
 import { useWalletStore } from "./walletStore";
+import { useCompanionStore } from "./companionStore";
 
 export const useUserStore = defineStore(
   "user",
@@ -35,8 +36,10 @@ export const useUserStore = defineStore(
         // 2. 清除其他关联 store
         const infoStore = useInfoStore();
         const walletStore = useWalletStore();
+        const companionStore = useCompanionStore();
         infoStore.clearInfo();
         walletStore.clearWallet();
+        companionStore.clearCompanionInfo();
       }
     };
 

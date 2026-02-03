@@ -90,3 +90,28 @@ export const changePasswordAPI = ({ oldPhone, oldCode, newPassword } = {}) => {
     data: { oldPhone, oldCode, newPassword },
   });
 };
+
+/**
+ * 更新陪玩上下线状态
+ * @param {Object} data - 请求参数
+ * @param {number} data.status - 状态：0=离线, 1=在线, 2=忙碌 (必需)
+ * @returns {Promise}
+ * data: object (CompanionInfo)
+ *   userId: number <int64>, 用户ID
+ *   gameSkill: string, 游戏技能
+ *   pricePerHour: number <int64>, 每小时价格（帅币）
+ *   status: number, 状态：0=离线, 1=在线, 2=忙碌
+ *   rating: number <double>, 评分（0-5分）
+ *   totalOrders: number <int64>, 总接单数
+ *   isVerified: boolean, 是否认证
+ *   nickname: string, 昵称（可选）
+ *   avatarUrl: string, 头像URL（可选）
+ *   bio: string, 个人简介（可选）
+ */
+export const updateCompanionStatusAPI = (data) => {
+  return http({
+    url: "/user/companion/status",
+    method: "PUT",
+    data,
+  });
+};

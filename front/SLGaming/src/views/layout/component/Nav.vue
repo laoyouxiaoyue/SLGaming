@@ -2,18 +2,34 @@
 import { useUserStore } from "@/stores/userStore";
 import { useWalletStore } from "@/stores/walletStore";
 import { useInfoStore } from "@/stores/infoStore";
+import { useCompanionStore } from "@/stores/companionStore";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
-import { onMounted } from "vue";
+import { onMounted, computed, watch } from "vue";
 
 const userStore = useUserStore();
 const walletStore = useWalletStore();
 const infoStore = useInfoStore();
+const companionStore = useCompanionStore();
 const router = useRouter();
 
 // 使用 storeToRefs 获取响应式 state
 const { info } = storeToRefs(infoStore);
 const { walletInfo } = storeToRefs(walletStore);
+const { companionInfo } = storeToRefs(companionStore);
+
+// 用户状态样式映射
+const statusClass = computed(() => {
+  // 仅陪玩角色展示状态 (role: 1=老板, 2=陪玩)
+  if (info.value.role !== 2) return "";
+  const map = {
+    0: "offline",
+    1: "online",
+    2: "busy",
+  };
+  // 优先使用 companionStore 中的状态，因为它是专门管理陪玩业务的
+  return map[companionInfo.value.status] ?? map[info.value.status] ?? "offline";
+});
 
 const handleLogout = async () => {
   // 1. 执行 Store 中的通用退出逻辑
@@ -28,6 +44,17 @@ onMounted(() => {
     walletStore.getWallet();
   }
 });
+
+// 监听角色变化，如果是陪玩则获取陪玩详情信息
+watch(
+  () => info.value.role,
+  (newRole) => {
+    if (newRole === 2) {
+      companionStore.getCompanionDetail();
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -51,23 +78,15 @@ onMounted(() => {
                     v-if="info.avatarUrl"
                     :style="{ backgroundImage: `url(${info.avatarUrl})` }"
                   ></div>
-                  <sl-icon name="icon-touxiang1" v-else size="64" color="#fff" />
+                  <sl-icon name="icon-touxiang1" v-else size="32" color="#fff" />
+                  <!-- 状态展示：小圆点 -->
+                  <div v-if="statusClass" class="status-tag" :class="statusClass"></div>
                 </a>
               </template>
               <div class="user-popover-content">
                 <div class="nickname">{{ info.nickname }}</div>
-                <div class="divider"></div>
-                <!-- 钱包余额 -->
-                <div class="wallet-info">
-                  <div class="wallet-item">
-                    <span class="label">账户余额</span>
-                    <span class="value">¥{{ walletInfo.balance || "0.00" }}</span>
-                  </div>
-                  <div class="wallet-item">
-                    <span class="label">冻结金额</span>
-                    <span class="value">¥{{ walletInfo.frozenBalance || "0.00" }}</span>
-                  </div>
-                </div>
+                <div class="wallet">帅币:{{ walletInfo?.balance || "0.00" }}</div>
+
                 <div class="divider"></div>
                 <a href="javascript:;" class="menu-item" @click="$router.push('/account/setting')">
                   <sl-icon name="iconfont icon-touxiang" size="16" color="#fff" />个人中心
@@ -142,15 +161,46 @@ onMounted(() => {
       }
 
       &.user-info {
-        a {
+        .avatar-link {
+          position: relative;
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          border: 2px solid #fff;
+          background-color: rgba(255, 255, 255, 0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0; // 清除默认 padding
+
           .avatar-box {
-            width: 52px;
-            height: 52px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            border: 2px solid #fff;
-            background-color: rgba(255, 255, 255, 0.2);
             background-size: cover;
             background-position: center;
+          }
+
+          .status-tag {
+            position: absolute;
+            top: 37px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+
+            &.online {
+              background-color: #52c41a; // 绿色
+            }
+            &.busy {
+              background-color: #f5222d; // 红色
+            }
+            &.offline {
+              background-color: #bfbfbf; // 灰色
+            }
           }
         }
       }
@@ -203,38 +253,21 @@ onMounted(() => {
   padding: 12px 0;
 
   .nickname {
-    font-size: 16px;
+    font-size: 23px;
     font-weight: 600;
     color: #333;
     padding: 8px 16px;
+    padding-bottom: 4px;
     text-align: center;
   }
 
-  .wallet-info {
-    padding: 8px 16px;
-    background-color: #f9f9f9;
-    margin: 4px 0;
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-
-    .wallet-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-
-      .label {
-        color: #666;
-      }
-
-      .value {
-        color: #ff6b35;
-        font-weight: 600;
-      }
-    }
+  .wallet {
+    margin-top: 2px;
+    font-size: 12px;
+    color: #292828;
+    font-weight: 400;
+    text-align: center;
+    padding-bottom: 8px;
   }
 
   .divider {
