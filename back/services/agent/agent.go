@@ -32,7 +32,6 @@ func main() {
 
 	var cfg config.Config
 	conf.MustLoad(*configFile, &cfg)
-
 	var nacosClient config_client.IConfigClient
 	if len(cfg.Nacos.Hosts) > 0 && cfg.Nacos.DataId != "" {
 		if client, err := agentioc.InitNacos(cfg.Nacos); err == nil {

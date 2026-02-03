@@ -6,10 +6,13 @@ package server
 
 import (
 	"context"
+	"time"
 
 	"SLGaming/back/services/agent/agent"
 	"SLGaming/back/services/agent/internal/logic"
 	"SLGaming/back/services/agent/internal/svc"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type AgentServer struct {
@@ -25,18 +28,37 @@ func NewAgentServer(svcCtx *svc.ServiceContext) *AgentServer {
 
 // 根据用户输入推荐陪玩
 func (s *AgentServer) RecommendCompanion(ctx context.Context, in *agent.RecommendCompanionRequest) (*agent.RecommendCompanionResponse, error) {
+	logger := logx.WithContext(ctx)
+	start := time.Now()
+	logger.Infof("rpc=RecommendCompanion user_id=%d user_input_len=%d", in.GetUserId(), len(in.GetUserInput()))
 	l := logic.NewRecommendCompanionLogic(ctx, s.svcCtx)
-	return l.RecommendCompanion(in)
+	resp, err := l.RecommendCompanion(in)
+	logger.Infof("rpc=RecommendCompanion done err=%v duration=%s", err, time.Since(start))
+	return resp, err
 }
 
 // 添加陪玩信息到向量数据库
 func (s *AgentServer) AddCompanionToVectorDB(ctx context.Context, in *agent.AddCompanionToVectorDBRequest) (*agent.AddCompanionToVectorDBResponse, error) {
+	logger := logx.WithContext(ctx)
+	start := time.Now()
+	logger.Infof("rpc=AddCompanionToVectorDB user_id=%d game_skill=%s", in.GetUserId(), in.GetGameSkill())
 	l := logic.NewAddCompanionToVectorDBLogic(ctx, s.svcCtx)
-	return l.AddCompanionToVectorDB(in)
+	resp, err := l.AddCompanionToVectorDB(in)
+	logger.Infof("rpc=AddCompanionToVectorDB done err=%v duration=%s", err, time.Since(start))
+	return resp, err
 }
 
 // 头像多模态审核
 func (s *AgentServer) ModerateAvatar(ctx context.Context, in *agent.ModerateAvatarRequest) (*agent.ModerateAvatarResponse, error) {
+	logger := logx.WithContext(ctx)
+	start := time.Now()
+	logger.Infof("rpc=ModerateAvatar user_id=%d scene=%s request_id=%s image_url_len=%d image_base64_len=%d", in.GetUserId(), in.GetScene(), in.GetRequestId(), len(in.GetImageUrl()), len(in.GetImageBase64()))
 	l := logic.NewModerateAvatarLogic(ctx, s.svcCtx)
-	return l.ModerateAvatar(in)
+	resp, err := l.ModerateAvatar(in)
+	decision := ""
+	if resp != nil {
+		decision = resp.GetDecision().String()
+	}
+	logger.Infof("rpc=ModerateAvatar done err=%v decision=%s duration=%s", err, decision, time.Since(start))
+	return resp, err
 }

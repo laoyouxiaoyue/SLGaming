@@ -62,6 +62,7 @@ type UpstreamConf struct {
 	CodeService  string `json:",optional"` // 验证码服务名称（用于 Consul 服务发现）
 	UserService  string `json:",optional"` // 用户服务名称（用于 Consul 服务发现）
 	OrderService string `json:",optional"` // 订单服务名称（用于 Consul 服务发现）
+	AgentService string `json:",optional"` // 智能服务名称（用于 Consul 服务发现）
 }
 
 // RedisConf Redis 配置

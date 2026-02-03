@@ -6,10 +6,10 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cloudwego/eino v0.7.18
-	github.com/cloudwego/eino-examples v0.0.0-20251229084117-f13f4f7555b8
 	github.com/cloudwego/eino-ext/callbacks/cozeloop v0.1.6
 	github.com/cloudwego/eino-ext/components/embedding/ark v0.1.1
 	github.com/cloudwego/eino-ext/components/indexer/milvus v0.0.0-20260116084156-bb0daea635b9
+	github.com/cloudwego/eino-ext/components/model/ark v0.1.45
 	github.com/cloudwego/eino-ext/devops v0.1.8
 	github.com/coze-dev/cozeloop-go v0.1.11
 	github.com/go-redsync/redsync/v4 v4.15.0
@@ -38,13 +38,18 @@ require (
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/evanphx/json-patch v0.5.2 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
+	github.com/getkin/kin-openapi v0.118.0 // indirect
 	github.com/getsentry/sentry-go v0.12.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
+	github.com/invopop/yaml v0.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/meguminnnnnnnnn/go-openai v0.1.1 // indirect
 	github.com/milvus-io/milvus-proto/go-api/v2 v2.4.10-0.20240819025435-512e3b98866a // indirect
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
+	github.com/openai/openai-go v1.10.1 // indirect
+	github.com/perimeterx/marshmallow v1.1.4 // indirect
 	github.com/pingcap/errors v0.11.5-0.20211224045212-9687c2b0f87c // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/smartwalle/alipay/v3 v3.2.28 // indirect
@@ -52,6 +57,7 @@ require (
 	github.com/smartwalle/ngx v1.0.12 // indirect
 	github.com/smartwalle/nsign v1.0.9 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/volcengine/volc-sdk-golang v1.0.199 // indirect
 	github.com/volcengine/volcengine-go-sdk v1.1.44 // indirect
 	github.com/x448/float16 v0.8.4 // indirect

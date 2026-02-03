@@ -4,6 +4,7 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,10 +13,15 @@ import (
 	"strings"
 	"time"
 
+	"SLGaming/back/services/agent/agent"
+	"SLGaming/back/services/agent/agentclient"
 	"SLGaming/back/services/gateway/internal/logic/user"
+	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
+	"SLGaming/back/services/gateway/internal/utils"
 
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
@@ -98,6 +104,52 @@ func UploadAvatarHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			baseURL = "/uploads"
 		}
 		avatarUrl := fmt.Sprintf("%s/avatars/%s", baseURL, filename)
+
+		if svcCtx.AgentRPC == nil {
+			_ = os.Remove(filePath)
+			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
+				BaseResp: types.BaseResp{Code: 503, Msg: "审核服务暂时不可用"},
+			})
+			return
+		}
+
+		userID, err := middleware.GetUserID(r.Context())
+		if err != nil {
+			_ = os.Remove(filePath)
+			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
+				BaseResp: types.BaseResp{Code: 401, Msg: "未登录或登录已过期"},
+			})
+			return
+		}
+
+		requestID := fmt.Sprintf("avatar-%d", time.Now().UnixNano())
+		moderateCtx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+		defer cancel()
+		moderateResp, err := svcCtx.AgentRPC.ModerateAvatar(moderateCtx, &agentclient.ModerateAvatarRequest{
+			UserId:    userID,
+			ImageUrl:  avatarUrl,
+			Scene:     "avatar",
+			RequestId: requestID,
+		})
+		if err != nil {
+			_ = os.Remove(filePath)
+			code, msg := utils.HandleRPCError(err, logx.WithContext(r.Context()), "Agent.ModerateAvatar")
+			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
+				BaseResp: types.BaseResp{Code: code, Msg: msg},
+			})
+			return
+		}
+		if moderateResp != nil && moderateResp.GetDecision() == agent.ModerationDecision_REJECT {
+			_ = os.Remove(filePath)
+			msg := strings.TrimSpace(moderateResp.GetSuggestion())
+			if msg == "" {
+				msg = "头像不合规，请更换"
+			}
+			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
+				BaseResp: types.BaseResp{Code: 400, Msg: msg},
+			})
+			return
+		}
 
 		l := user.NewUploadAvatarLogic(r.Context(), svcCtx)
 		resp, err := l.UploadAvatar(&types.UploadAvatarRequest{Avatar: avatarUrl})

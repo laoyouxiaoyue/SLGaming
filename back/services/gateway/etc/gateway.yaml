@@ -32,6 +32,7 @@ Upstream:
   CodeService: code-rpc   # Consul 中的验证码服务名称
   UserService: user-rpc   # Consul 中的用户服务名称
   OrderService: order-rpc # Consul 中的订单服务名称
+  AgentService: agent-rpc # Consul 中的智能服务名称
 
 # Redis 配置（用于存储 Refresh Token）
 Redis:

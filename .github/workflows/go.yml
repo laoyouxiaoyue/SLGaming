@@ -69,6 +69,18 @@ jobs:
           cache-to: type=gha,mode=max
           load: true
 
+      - name: Build Agent Docker Image
+        uses: docker/build-push-action@v5
+        continue-on-error: true
+        with:
+          context: ${{ env.PROJECT_PATH }}
+          file: ${{ env.PROJECT_PATH }}/services/agent/Dockerfile
+          push: false
+          tags: ${{ env.IMAGE_PREFIX }}/agent:latest,${{ env.IMAGE_PREFIX }}/agent:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
       - name: Save Docker Images
         run: |
           mkdir -p docker-images
@@ -92,6 +104,11 @@ jobs:
             docker save ${{ env.IMAGE_PREFIX }}/code:latest | gzip > docker-images/code.tar.gz
           else
             echo "⚠️  code image not found, will reuse previous version on server"
+          fi
+          if docker images | grep -q "${{ env.IMAGE_PREFIX }}/agent"; then
+            docker save ${{ env.IMAGE_PREFIX }}/agent:latest | gzip > docker-images/agent.tar.gz
+          else
+            echo "⚠️  agent image not found, will reuse previous version on server"
           fi
 
       - name: Upload Docker Images
@@ -119,13 +136,13 @@ jobs:
           echo "=== Verifying Downloaded Files ==="
           ls -lh docker-images/ || true
           missing=0
-          for f in gateway user order code; do
+          for f in gateway user order code agent; do
             if [ ! -f "docker-images/$f.tar.gz" ]; then
               echo "⚠️  $f.tar.gz not found after download, will reuse previous image on server"
               missing=$((missing+1))
             fi
           done
-          if [ "$missing" -eq 4 ]; then
+          if [ "$missing" -eq 5 ]; then
             echo "❌ No images were built in this run, nothing to deploy"
             exit 1
           fi
@@ -178,6 +195,7 @@ jobs:
             update_user=0
             update_order=0
             update_code=0
+            update_agent=0
 
             if [ -f gateway.tar.gz ]; then
               echo "Loading gateway image..."
@@ -231,6 +249,19 @@ jobs:
               echo "⚠️  code.tar.gz missing, keep existing code image/container"
             fi
 
+            if [ -f agent.tar.gz ]; then
+              echo "Loading agent image..."
+              if docker load -i agent.tar.gz; then
+                update_agent=1
+                echo "✅ agent image loaded successfully"
+              else
+                echo "❌ Failed to load agent.tar.gz, exit code: $?"
+                exit 1
+              fi
+            else
+              echo "⚠️  agent.tar.gz missing, keep existing agent image/container"
+            fi
+
             echo "=== Verifying Images Loaded ==="
             docker images | grep slgaming || true
 
@@ -239,14 +270,16 @@ jobs:
             [ "$update_user" -eq 1 ] && docker stop slgaming-user 2>/dev/null || true
             [ "$update_order" -eq 1 ] && docker stop slgaming-order 2>/dev/null || true
             [ "$update_code" -eq 1 ] && docker stop slgaming-code 2>/dev/null || true
+            [ "$update_agent" -eq 1 ] && docker stop slgaming-agent 2>/dev/null || true
 
             [ "$update_gateway" -eq 1 ] && docker rm slgaming-gateway 2>/dev/null || true
             [ "$update_user" -eq 1 ] && docker rm slgaming-user 2>/dev/null || true
             [ "$update_order" -eq 1 ] && docker rm slgaming-order 2>/dev/null || true
             [ "$update_code" -eq 1 ] && docker rm slgaming-code 2>/dev/null || true
+            [ "$update_agent" -eq 1 ] && docker rm slgaming-agent 2>/dev/null || true
             
             echo "=== Starting New Containers ==="
-            echo "部署顺序: Code -> User -> Order -> Gateway (Gateway 最后启动)"
+            echo "部署顺序: Code -> User -> Order -> Agent -> Gateway (Gateway 最后启动)"
             
             # ========== 第一步：启动 Code Service (端口 8085) ==========
             if [ "$update_code" -eq 1 ]; then
@@ -304,12 +337,31 @@ jobs:
             else
               echo "⚠️  No new order image, keep existing Order Service (if running)"
             fi
+
+            # ========== 第四步：启动 Agent Service (端口 8090) ==========
+            if [ "$update_agent" -eq 1 ]; then
+              echo "Verifying agent image..."
+              if ! docker image inspect ${{ env.IMAGE_PREFIX }}/agent:latest >/dev/null 2>&1; then
+                echo "❌ Error: ${{ env.IMAGE_PREFIX }}/agent:latest image not found"
+                echo "Available images:"
+                docker images | grep slgaming || true
+                exit 1
+              fi
+              echo "启动 Agent Service..."
+              docker run -d \
+                --name slgaming-agent \
+                --restart unless-stopped \
+                -p 8090:8090 \
+                ${{ env.IMAGE_PREFIX }}/agent:latest
+            else
+              echo "⚠️  No new agent image, keep existing Agent Service (if running)"
+            fi
             
             # ========== 等待后端服务启动完成 ==========
             echo "=== Waiting for backend services to start ==="
             sleep 30
             
-            # ========== 第四步：最后启动 Gateway (端口 8888) ==========
+            # ========== 第五步：最后启动 Gateway (端口 8888) ==========
             if [ "$update_gateway" -eq 1 ]; then
               echo "Verifying gateway image..."
               if ! docker image inspect ${{ env.IMAGE_PREFIX }}/gateway:latest >/dev/null 2>&1; then
@@ -338,6 +390,7 @@ jobs:
             docker logs --tail 50 slgaming-code || true
             docker logs --tail 50 slgaming-user || true
             docker logs --tail 50 slgaming-order || true
+            docker logs --tail 50 slgaming-agent || true
             
             echo "=== Verifying Services ==="
             ok=1
@@ -345,6 +398,7 @@ jobs:
             docker ps | grep slgaming-code >/dev/null || ok=0
             docker ps | grep slgaming-user >/dev/null || ok=0
             docker ps | grep slgaming-order >/dev/null || ok=0
+            docker ps | grep slgaming-agent >/dev/null || ok=0
             
             if [ "$ok" -ne 1 ]; then
               echo "❌ One or more containers failed to start"
@@ -356,6 +410,8 @@ jobs:
               docker logs --tail 100 slgaming-user || true
               echo "Order logs:"
               docker logs --tail 100 slgaming-order || true
+              echo "Agent logs:"
+              docker logs --tail 100 slgaming-agent || true
               exit 1
             fi
             

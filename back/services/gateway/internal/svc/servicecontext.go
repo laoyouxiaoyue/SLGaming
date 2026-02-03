@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"SLGaming/back/pkg/ioc"
+	"SLGaming/back/services/agent/agentclient"
 	"SLGaming/back/services/code/codeclient"
 	"SLGaming/back/services/gateway/internal/config"
 	"SLGaming/back/services/gateway/internal/jwt"
@@ -28,6 +29,7 @@ type ServiceContext struct {
 	CodeRPC    codeclient.Code
 	UserRPC    userclient.User
 	OrderRPC   orderclient.Order
+	AgentRPC   agentclient.Agent
 	Alipay     *alipay.Client
 	JWT        *jwt.JWTManager
 	TokenStore jwt.TokenStore
@@ -68,6 +70,16 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		} else {
 			ctx.OrderRPC = orderclient.NewOrder(cli)
 			logx.Infof("成功初始化 Order RPC 客户端: service=%s (支持动态服务发现)", c.Upstream.OrderService)
+		}
+	}
+
+	// 初始化 Agent RPC 客户端（支持动态服务发现和负载均衡）
+	if c.Upstream.AgentService != "" {
+		if cli, err := newRPCClient(c.Consul, c.Upstream.AgentService); err != nil {
+			logx.Errorf("初始化 Agent RPC 客户端失败: service=%s, error=%v", c.Upstream.AgentService, err)
+		} else {
+			ctx.AgentRPC = agentclient.NewAgent(cli)
+			logx.Infof("成功初始化 Agent RPC 客户端: service=%s (支持动态服务发现)", c.Upstream.AgentService)
 		}
 	}
 
