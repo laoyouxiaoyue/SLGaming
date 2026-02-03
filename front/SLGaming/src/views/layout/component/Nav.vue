@@ -31,6 +31,15 @@ const statusClass = computed(() => {
   return map[companionInfo.value.status] ?? map[info.value.status] ?? "offline";
 });
 
+const statusText = computed(() => {
+  const map = {
+    0: "离线",
+    1: "在线",
+    2: "忙碌",
+  };
+  return map[companionInfo.value.status] ?? "离线";
+});
+
 const handleLogout = async () => {
   // 1. 执行 Store 中的通用退出逻辑
   await userStore.logout();
@@ -88,6 +97,21 @@ watch(
                 <div class="wallet">帅币:{{ walletInfo?.balance || "0.00" }}</div>
 
                 <div class="divider"></div>
+                <!-- 陪玩专属信息：游戏技能与状态 -->
+                <div
+                  v-if="info.role === 2"
+                  class="companion-info"
+                  @click="$router.push('/account/companion')"
+                >
+                  <div class="info-row">
+                    <span class="value">{{ companionInfo.gameSkill || "" }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="status-text" :class="statusClass">{{ statusText }}</span>
+                  </div>
+                </div>
+
+                <div class="divider" v-if="info.role === 2"></div>
                 <a href="javascript:;" class="menu-item" @click="$router.push('/account/setting')">
                   <sl-icon name="iconfont icon-touxiang" size="16" color="#fff" />个人中心
                 </a>
@@ -268,6 +292,45 @@ watch(
     font-weight: 400;
     text-align: center;
     padding-bottom: 8px;
+  }
+
+  .companion-info {
+    padding: 4px 16px;
+    margin-bottom: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 13px;
+    cursor: pointer;
+
+    .info-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      background-color: #f5f5f5;
+      padding: 4px 12px;
+      border-radius: 12px;
+
+      .value {
+        color: #333;
+        font-weight: 500;
+      }
+
+      .status-text {
+        font-weight: 600;
+        &.online {
+          color: #52c41a;
+        }
+        &.busy {
+          color: #f5222d;
+        }
+        &.offline {
+          color: #bfbfbf;
+        }
+      }
+    }
   }
 
   .divider {
