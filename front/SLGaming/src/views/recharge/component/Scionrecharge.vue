@@ -63,7 +63,7 @@ const handlePay = async () => {
 
   const loading = ElMessage({
     message: "正在创建订单...",
-    duration: 0,
+    duration: 3000,
     type: "info",
   });
 

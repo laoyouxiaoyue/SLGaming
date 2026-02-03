@@ -67,3 +67,24 @@ export const queryrechargeorderapi = (orderNo) => {
     },
   });
 };
+
+/**
+ * 获取充值记录列表
+ * @param {Object} params - 请求参数
+ * @param {number} [params.status] - 订单状态筛选：0=待支付,1=成功,2=失败,3=关闭（不传则全部）
+ * @param {number} [params.page] - 页码（从1开始）
+ * @param {number} [params.pageSize] - 每页数量
+ * @returns {Promise}
+ * data: object (RechargeListData)
+ *   orders: array[object (RechargeOrderInfo)], 订单列表
+ *   total: integer, 总数
+ *   page: integer, 当前页码
+ *   pageSize: integer, 每页数量
+ */
+export const getrechargelistapi = (params) => {
+  return http({
+    url: "/user/recharge/list",
+    method: "GET",
+    params,
+  });
+};

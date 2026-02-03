@@ -14,7 +14,7 @@ const props = defineProps({
 
 const infoStore = useInfoStore();
 
-// 验证码逻辑
+// 获取旧手机验证码逻辑
 const countdown = ref(0);
 const timer = ref(null);
 const startTimer = () => {
@@ -27,7 +27,7 @@ const startTimer = () => {
     }
   }, 1000);
 };
-
+// 获取新手机验证码逻辑
 const countdownNew = ref(0);
 const timerNew = ref(null);
 const startTimerNew = () => {
