@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onUnmounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import { codeAPI } from "@/api/user/code";
 import { changePasswordAPI } from "@/api/user/info";
 import { useUserStore } from "@/stores/userStore";

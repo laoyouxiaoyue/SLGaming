@@ -17,7 +17,7 @@ const http = axios.create({
       try {
         // 使用 json-bigint 解析数据，超长数字会被自动转为字符串
         return JSONBigInt.parse(data);
-      } catch (err) {
+      } catch {
         // 如果解析失败（比如不是 JSON 格式），返回原始数据
         return data;
       }

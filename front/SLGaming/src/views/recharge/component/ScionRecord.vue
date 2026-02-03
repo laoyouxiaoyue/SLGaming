@@ -43,11 +43,6 @@ const fetchRecords = async () => {
 };
 
 // 分页处理
-const handleSizeChange = (val) => {
-  queryParams.value.pageSize = val;
-  fetchRecords();
-};
-
 const handleCurrentChange = (val) => {
   queryParams.value.page = val;
   fetchRecords();
