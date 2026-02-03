@@ -1,0 +1,300 @@
+services:
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+  #   container_name: elasticsearch
+  #   environment:
+  #     - discovery.type=single-node
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - xpack.security.enabled=false
+  #     - xpack.security.enrollment.enabled=false
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   volumes:
+  #     - ./elasticsearch-data:/usr/share/elasticsearch/data
+  #   networks:
+  #     - elastic
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.3.2
+    container_name: rocketmq-namesrv
+    command: ["sh", "mqnamesrv"]
+    ports:
+      - "9876:9876"
+    volumes:
+      - ./rocketmq/logs:/home/rocketmq/logs
+      - ./rocketmq/store:/home/rocketmq/store
+    networks:
+      - rocketmq
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.3.2
+    container_name: rocketmq-broker
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_started
+    command: ["sh", "mqbroker", "-n", "rocketmq-namesrv:9876", "-c", "/home/rocketmq/rocketmq-broker.conf"]
+    environment:
+      - NAMESRV_ADDR=rocketmq-namesrv:9876
+      - JAVA_OPT_EXT=-Xms128m -Xmx256m -Xmn64m -XX:MaxDirectMemorySize=256m
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+    volumes:
+      - ./rocketmq/conf/broker.conf:/home/rocketmq/rocketmq-broker.conf
+      - ./rocketmq/logs:/home/rocketmq/logs
+      - ./rocketmq/store:/home/rocketmq/store
+    networks:
+      - rocketmq
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  rocketmq-dashboard:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: rocketmq-dashboard
+    environment:
+      - JAVA_OPTS=-Drocketmq.namesrv.addr=rocketmq-namesrv:9876
+      - SERVER_PORT=8080
+    ports:
+      - "8082:8080"
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_started
+    networks:
+      - rocketmq
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.11.0
+  #   container_name: kibana
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #     - xpack.security.enabled=false
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #   networks:
+  #     - elastic
+  #   restart: unless-stopped
+
+  # jaeger:
+  #   image: jaegertracing/all-in-one:1.6.0
+  #   container_name: jaeger
+  #   environment:
+  #     - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+  #   ports:
+  #     - "6831:6831/udp"
+  #     - "6832:6832/udp"
+  #     - "5778:5778"
+  #     - "16686:16686"
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #     - "14250:14250"
+  #     - "14268:14268"
+  #     - "14269:14269"
+  #     - "9411:9411"
+  #   restart: unless-stopped
+
+  # jenkins:
+  #   image: jenkins/jenkins:lts-jdk17
+  #   container_name: jenkins
+  #   restart: always
+  #   # 使用 root 用户是为了方便访问宿主机的 Docker socket，
+  #   # 避免 "permission denied" 错误。生产环境如果介意安全性，需配置 jenkins 用户组。
+  #   user: root 
+  #   privileged: true
+  #   ports:
+  #     - "8081:8080"   # Web 访问端口
+  #     - "50000:50000" # JNLP 代理端口 (用于从节点连接)
+  #   volumes:
+  #     # 1. 挂载 Jenkins 数据目录 (核心配置、插件、Job都在这里)
+  #     - ./jenkins_data:/var/jenkins_home
+  #     # 1.1 挂载宿主机安装的 Go 和 GOPATH（只读挂载 Go 1.25.5）
+  #     - /home/ws/go1.25.5:/usr/local/go:ro
+  #     - /home/ws/go-workspace:/var/jenkins_home/go-workspace
+  #     
+  #     # 2. 挂载宿主机的 Docker socket (让 Jenkins 能构建 Docker 镜像)
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     
+  #     # 3. (可选) 如果需要 Java Maven 等工具，可以挂载宿主机的或者让 Jenkins 自动安装
+  #     # - /usr/bin/docker:/usr/bin/docker 
+  #   
+  #   environment:
+  #     # 设置时区，避免日志时间不对应
+  #     - TZ=Asia/Shanghai
+  #     # 设置 Java 内存限制 (根据你机器配置调整，防止 OOM)
+  #     - JAVA_OPTS=-Xmx2048m -Xms1024m
+  #     # Go 相关环境变量（使用挂载进来的 Go）
+  #     - GOROOT=/usr/local/go
+  #     - GOPATH=/var/jenkins_home/go-workspace
+  #     - GOEXPERIMENT=
+  #     - GOTOOLCHAIN=local
+  #     - PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/var/jenkins_home/go-workspace/bin
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "50m"
+  #       max-file: "5"
+
+  mysql:
+    image: mysql:8.0.44
+    container_name: mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123456
+      - MYSQL_DATABASE=nacos
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf:/etc/mysql/conf.d
+      - ./mysql/logs:/var/log/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --lower-case-table-names=2
+    networks:
+      - common
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+    networks:
+      - common
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nacos:
+    image: nacos/nacos-server:v3.1.0
+    container_name: nacos
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    environment:
+      - MODE=standalone
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=mysql
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_DB_NAME=nacos
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD=root123456
+      - MYSQL_SERVICE_DB_PARAM=characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      - NACOS_AUTH_ENABLE=false
+      - NACOS_AUTH_TOKEN=LfQUH7E7M5UPXrRgzqDYL1Vrpz5f630jFjFgKPJAvo4=
+      - NACOS_AUTH_IDENTITY_KEY=serverIdentity
+      - NACOS_AUTH_IDENTITY_VALUE=secServer
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./nacos/logs:/home/nacos/logs
+      - ./nacos/data:/home/nacos/data
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - common
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+  # prometheus:
+  #   container_name: prometheus
+  #   image: prom/prometheus:latest
+  #   volumes:
+  #     - ./prometheus/prometheus-standalone.yaml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "9091:9090"
+  #   depends_on:
+  #     - nacos
+  #   restart: on-failure
+  consul:
+    image: hashicorp/consul
+    container_name: consul
+    restart: unless-stopped
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    volumes:
+      - ./consul/data:/consul/data
+      - ./consul/config:/consul/config
+    command: consul agent -dev -client=0.0.0.0 -ui
+    networks:
+      - common
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8500/v1/status/leader"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  elastic:
+    driver: bridge
+  rocketmq:
+    driver: bridge
+  common:
+    driver: bridge
