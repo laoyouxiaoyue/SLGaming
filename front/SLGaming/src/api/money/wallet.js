@@ -9,7 +9,7 @@ export const getwalletapi = () => {
 /**
  * 创建充值订单
  * @param {Object} data - 请求参数
- * @param {number} data.amount - 充值金额（分/帅币）, 示例: 100
+ * @param {number} data.amount - 充值金额（元/帅币）, 示例: 100
  * @param {string} [data.payType] - 支付方式：alipay_page(PC，默认) / alipay_wap(H5) / alipay_app(APP), 枚举值: alipay_page, alipay_wap, alipay_app, 示例: alipay_page
  * @param {string} [data.returnUrl] - 同步回跳地址（可选）, 示例: https://example.com/pay/return
  * @returns {Promise}
@@ -65,5 +65,26 @@ export const queryrechargeorderapi = (orderNo) => {
     params: {
       orderNo,
     },
+  });
+};
+
+/**
+ * 获取充值记录列表
+ * @param {Object} params - 请求参数
+ * @param {number} [params.status] - 订单状态筛选：0=待支付,1=成功,2=失败,3=关闭（不传则全部）
+ * @param {number} [params.page] - 页码（从1开始）
+ * @param {number} [params.pageSize] - 每页数量
+ * @returns {Promise}
+ * data: object (RechargeListData)
+ *   orders: array[object (RechargeOrderInfo)], 订单列表
+ *   total: integer, 总数
+ *   page: integer, 当前页码
+ *   pageSize: integer, 每页数量
+ */
+export const getrechargelistapi = (params) => {
+  return http({
+    url: "/user/recharge/list",
+    method: "GET",
+    params,
   });
 };

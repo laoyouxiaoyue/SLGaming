@@ -10,9 +10,11 @@ import Order from "@/views/account/component/OrderInfo.vue";
 import Setting from "@/views/account/component/SettingInfo.vue";
 import Wallet from "@/views/account/component/WalletInfo.vue";
 import Scion from "@/views/recharge/index.vue";
-import ScionRecharge from "@/views/recharge/component/ScionRecharge.vue";
+import ScionRecharge from "@/views/recharge/component/Scionrecharge.vue";
 import ScionRecord from "@/views/recharge/component/ScionRecord.vue";
 import Pay from "@/views/pay/index.vue";
+import ApplyCompanion from "@/views/account/component/ApplyCompanion.vue";
+import SecuritySetting from "@/views/account/component/SecuritySetting.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -61,6 +63,14 @@ const router = createRouter({
             {
               path: "wallet",
               component: Wallet,
+            },
+            {
+              path: "apply_companion",
+              component: ApplyCompanion,
+            },
+            {
+              path: "security",
+              component: SecuritySetting,
             },
           ],
         },

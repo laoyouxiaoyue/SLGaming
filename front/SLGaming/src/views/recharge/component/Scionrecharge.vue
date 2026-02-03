@@ -1,4 +1,7 @@
 <script setup>
+// 自定义组件
+defineOptions({ name: "ScionRecharge" });
+
 import { ref, computed, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { createrechargeorderapi } from "@/api/money/wallet";
@@ -58,25 +61,25 @@ const handlePay = async () => {
     return;
   }
 
-  const loading = ElMessage({
-    message: "正在创建订单...",
-    duration: 0,
-    type: "info",
-  });
-
   try {
     const res = await createrechargeorderapi({
-      amount: payAmount.value * 100, // 转换为分
+      amount: payAmount.value, //
       payType: "alipay_page",
       returnUrl: window.location.origin + "/pay", // 支付成功后的回调页面
     });
 
-    loading.close();
-
     if (res.code === 0 && res.data) {
       if (res.data.payUrl) {
         // 跳转到支付宝收银台
-        window.location.href = res.data.payUrl;
+        ElMessage({
+          message: "支付订单创建成功！正在跳转到支付台....",
+          duration: 1500,
+          type: "success",
+        });
+        // 延迟两秒后再跳转
+        setTimeout(() => {
+          window.location.href = res.data.payUrl;
+        }, 1500);
       } else if (res.data.payForm) {
         // 如果是表单形式（极少见的情况）
         const div = document.createElement("div");
@@ -90,7 +93,6 @@ const handlePay = async () => {
       ElMessage.error(res.msg || "创建订单失败");
     }
   } catch (error) {
-    loading.close();
     console.error(error);
     ElMessage.error("系统繁忙，请稍后再试");
   }

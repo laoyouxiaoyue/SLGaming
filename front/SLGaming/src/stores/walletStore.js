@@ -13,9 +13,15 @@ export const useWalletStore = defineStore(
       walletInfo.value = res.data;
     };
 
+    // 清除钱包信息
+    const clearWallet = () => {
+      walletInfo.value = {};
+    };
+
     return {
       walletInfo,
       getWallet,
+      clearWallet,
     };
   },
   {

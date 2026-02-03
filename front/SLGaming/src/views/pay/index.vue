@@ -88,7 +88,7 @@ const retryQuery = () => {
       <!-- 描述信息 -->
       <div class="desc-area" v-if="status === 'success'">
         <p class="amount" v-if="orderInfo">
-          已成功充值 <span>{{ orderInfo.amount / 100 }}</span> 帅币
+          已成功充值 <span>{{ orderInfo.amount }}</span> 帅币
         </p>
         <p class="sub-desc">您现在可以前往查看钱包余额</p>
       </div>

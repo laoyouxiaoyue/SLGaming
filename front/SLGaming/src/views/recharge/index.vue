@@ -3,16 +3,11 @@ import { RouterView, RouterLink } from "vue-router";
 import { useInfoStore } from "@/stores/infoStore";
 import { useWalletStore } from "@/stores/walletStore";
 import { storeToRefs } from "pinia";
-import { onMounted } from "vue";
 
 const infoStore = useInfoStore();
 const walletStore = useWalletStore();
 const { info } = storeToRefs(infoStore);
 const { walletInfo } = storeToRefs(walletStore);
-
-onMounted(() => {
-  walletStore.getWallet();
-});
 </script>
 
 <template>
@@ -34,7 +29,7 @@ onMounted(() => {
       <div class="menu-list">
         <RouterLink to="/scion/recharge" class="menu-item">
           <sl-icon name="icon-chongzhi1" size="18" />
-          <span>充值页面</span>
+          <span>充值中心</span>
         </RouterLink>
         <RouterLink to="/scion/recond" class="menu-item">
           <sl-icon name="icon-dingdan" size="18" />
