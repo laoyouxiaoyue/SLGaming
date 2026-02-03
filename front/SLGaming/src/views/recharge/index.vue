@@ -3,16 +3,11 @@ import { RouterView, RouterLink } from "vue-router";
 import { useInfoStore } from "@/stores/infoStore";
 import { useWalletStore } from "@/stores/walletStore";
 import { storeToRefs } from "pinia";
-import { onMounted } from "vue";
 
 const infoStore = useInfoStore();
 const walletStore = useWalletStore();
 const { info } = storeToRefs(infoStore);
 const { walletInfo } = storeToRefs(walletStore);
-
-onMounted(() => {
-  walletStore.getWallet();
-});
 </script>
 
 <template>

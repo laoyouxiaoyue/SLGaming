@@ -19,7 +19,6 @@ const status = ref("");
 const statusOptions = [
   { label: "全部", value: "" },
   { label: "在线", value: 1 },
-  { label: "离线", value: 0 },
   { label: "忙碌", value: 2 },
 ];
 

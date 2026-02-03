@@ -13,7 +13,7 @@ const locale = zhCn;
 const queryParams = ref({
   page: 1,
   pageSize: 20,
-  status: null,
+  status: 1,
 });
 
 const total = ref(0);
