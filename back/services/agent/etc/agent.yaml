@@ -19,7 +19,7 @@ Nacos:
 
  #Consul 配置（可选）
 Consul:
-  Address: 127.0.0.1:8500
+  Address: 120.26.29.242:8500
   Token: ""
   Service:
     Name: agent-rpc
