@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onUnmounted } from "vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { codeAPI } from "@/api/user/code";
 import { changePasswordAPI } from "@/api/user/info";
+import { useUserStore } from "@/stores/userStore";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   phone: {
@@ -10,6 +12,9 @@ const props = defineProps({
     required: true,
   },
 });
+
+const userStore = useUserStore();
+const router = useRouter();
 
 // 验证码逻辑
 const countdown = ref(0);
@@ -82,8 +87,17 @@ const handleUpdatePassword = async () => {
           oldCode: pwdForm.value.oldCode,
           newPassword: pwdForm.value.newPassword,
         });
-        ElMessage.success("密码修改成功");
+        ElMessage.success({
+          message: "密码修改成功，请重新登录",
+          duration: 2000,
+        });
         pwdForm.value = { oldCode: "", newPassword: "", confirmPassword: "" };
+
+        // 修改成功后跳转登录页逻辑
+        setTimeout(async () => {
+          await userStore.logout();
+          router.replace("/login");
+        }, 2000);
       } catch (error) {
         console.error(error);
       }

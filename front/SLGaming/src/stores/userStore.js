@@ -1,6 +1,9 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { loginAPI, codeLoginAPI } from "@/api/user/login";
+import { getlogoutAPI } from "@/api/user/logout";
+import { useInfoStore } from "./infoStore";
+import { useWalletStore } from "./walletStore";
 
 export const useUserStore = defineStore(
   "user",
@@ -19,12 +22,31 @@ export const useUserStore = defineStore(
     const clearUserInfo = () => {
       userInfo.value = {};
     };
+
+    // 封装通用退出登录逻辑
+    const logout = async () => {
+      try {
+        await getlogoutAPI();
+      } catch (error) {
+        console.error("Logout API failed:", error);
+      } finally {
+        // 1. 清除当前 store
+        clearUserInfo();
+        // 2. 清除其他关联 store
+        const infoStore = useInfoStore();
+        const walletStore = useWalletStore();
+        infoStore.clearInfo();
+        walletStore.clearWallet();
+      }
+    };
+
     // 3. 以对象的格式把state和action return
     return {
       userInfo,
       getUserInfo,
       getUserInfoByCode,
       clearUserInfo,
+      logout,
     };
   },
   {

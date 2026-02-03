@@ -19,6 +19,15 @@ export const useInfoStore = defineStore(
           if (info.value.avatarUrl && info.value.avatarUrl.includes("http://120.26.29.242")) {
             info.value.avatarUrl = info.value.avatarUrl.replace("http://120.26.29.242", "");
           }
+
+          // 检查图片是否有效，若 404 则清空，防止控制台报错
+          if (info.value.avatarUrl) {
+            const img = new Image();
+            img.src = info.value.avatarUrl;
+            img.onerror = () => {
+              info.value.avatarUrl = "";
+            };
+          }
         }
       } catch (error) {
         console.error("Failed to fetch user info", error);

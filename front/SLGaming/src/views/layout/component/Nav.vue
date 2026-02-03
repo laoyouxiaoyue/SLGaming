@@ -5,7 +5,6 @@ import { useInfoStore } from "@/stores/infoStore";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
-import { getlogoutAPI } from "@/api/user/logout";
 
 const userStore = useUserStore();
 const walletStore = useWalletStore();
@@ -16,22 +15,11 @@ const router = useRouter();
 const { info } = storeToRefs(infoStore);
 const { walletInfo } = storeToRefs(walletStore);
 
-const confirm = async () => {
-  // 退出登录业务逻辑实现
-  try {
-    // 1. 调用退出登录接口 (可选，即使失败也应清除本地数据)
-    await getlogoutAPI();
-  } catch (error) {
-    console.error("Logout API failed:", error);
-  } finally {
-    // 2. 无论接口是否成功，都必须清除本地持久化的 Pinia 数据
-    userStore.clearUserInfo();
-    infoStore.clearInfo();
-    walletStore.clearWallet();
-
-    // 3. 跳转到登录页
-    router.replace("/login");
-  }
+const handleLogout = async () => {
+  // 1. 执行 Store 中的通用退出逻辑
+  await userStore.logout();
+  // 2. 跳转到登录页
+  router.replace("/login");
 };
 
 onMounted(() => {
@@ -84,7 +72,7 @@ onMounted(() => {
                 <a href="javascript:;" class="menu-item" @click="$router.push('/account/setting')">
                   <sl-icon name="iconfont icon-touxiang" size="16" color="#fff" />个人中心
                 </a>
-                <a href="javascript:;" class="menu-item logout" @click="confirm">
+                <a href="javascript:;" class="menu-item logout" @click="handleLogout">
                   <sl-icon name="icon-tuichu" size="16" color="#fff" />退出登录
                 </a>
               </div>
