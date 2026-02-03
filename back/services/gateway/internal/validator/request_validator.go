@@ -72,6 +72,20 @@ func ValidateForgetPasswordRequest(req *types.ForgetPasswordRequest) error {
 	return nil
 }
 
+// ValidateChangePasswordRequest 验证修改密码请求
+func ValidateChangePasswordRequest(req *types.ChangePasswordRequest) error {
+	if err := ValidatePhone(req.OldPhone); err != nil {
+		return err
+	}
+	if err := ValidateCode(req.OldCode); err != nil {
+		return err
+	}
+	if err := ValidatePassword(req.NewPassword); err != nil {
+		return err
+	}
+	return nil
+}
+
 // ValidateUpdateUserRequest 验证更新用户请求
 func ValidateUpdateUserRequest(req *types.UpdateUserRequest) error {
 	if req.Id == 0 {

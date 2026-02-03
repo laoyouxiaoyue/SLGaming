@@ -34,3 +34,9 @@ func (s *AgentServer) AddCompanionToVectorDB(ctx context.Context, in *agent.AddC
 	l := logic.NewAddCompanionToVectorDBLogic(ctx, s.svcCtx)
 	return l.AddCompanionToVectorDB(in)
 }
+
+// 头像多模态审核
+func (s *AgentServer) ModerateAvatar(ctx context.Context, in *agent.ModerateAvatarRequest) (*agent.ModerateAvatarResponse, error) {
+	l := logic.NewModerateAvatarLogic(ctx, s.svcCtx)
+	return l.ModerateAvatar(in)
+}

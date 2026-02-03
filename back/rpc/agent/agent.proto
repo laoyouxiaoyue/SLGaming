@@ -11,6 +11,9 @@ service Agent {
 
   // 添加陪玩信息到向量数据库
   rpc AddCompanionToVectorDB(AddCompanionToVectorDBRequest) returns (AddCompanionToVectorDBResponse);
+
+  // 头像多模态审核
+  rpc ModerateAvatar(ModerateAvatarRequest) returns (ModerateAvatarResponse);
 }
 
 // 推荐陪玩请求
@@ -53,5 +56,30 @@ message AddCompanionToVectorDBResponse {
   uint64 companion_id = 1;  // 陪玩ID（Milvus中的ID）
   bool   success      = 2;  // 是否成功
   string message      = 3;  // 提示信息
+}
+
+// 审核结论
+enum ModerationDecision {
+  DECISION_UNSPECIFIED = 0; // 未知
+  PASS = 1;                 // 通过
+  REJECT = 2;               // 拒绝
+}
+
+// 头像多模态审核请求
+message ModerateAvatarRequest {
+  uint64 user_id      = 1; // 用户ID（可选）
+  string image_url    = 2; // 头像URL（与 image_base64 二选一）
+  string image_base64 = 3; // 头像Base64（与 image_url 二选一）
+  string scene        = 4; // 场景：avatar/profile/companion
+  string request_id   = 5; // 幂等请求ID（可选）
+}
+
+// 头像多模态审核响应
+message ModerateAvatarResponse {
+  ModerationDecision decision = 1; // 审核结论
+  double risk_score           = 2; // 风险分（0-1）
+  repeated string labels      = 3; // 风险标签
+  string suggestion           = 4; // 处理建议（如：请更换头像）
+  string request_id           = 5; // 回传请求ID
 }
 

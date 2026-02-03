@@ -21,6 +21,56 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 审核结论
+type ModerationDecision int32
+
+const (
+	ModerationDecision_DECISION_UNSPECIFIED ModerationDecision = 0 // 未知
+	ModerationDecision_PASS                 ModerationDecision = 1 // 通过
+	ModerationDecision_REJECT               ModerationDecision = 2 // 拒绝
+)
+
+// Enum value maps for ModerationDecision.
+var (
+	ModerationDecision_name = map[int32]string{
+		0: "DECISION_UNSPECIFIED",
+		1: "PASS",
+		2: "REJECT",
+	}
+	ModerationDecision_value = map[string]int32{
+		"DECISION_UNSPECIFIED": 0,
+		"PASS":                 1,
+		"REJECT":               2,
+	}
+)
+
+func (x ModerationDecision) Enum() *ModerationDecision {
+	p := new(ModerationDecision)
+	*p = x
+	return p
+}
+
+func (x ModerationDecision) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ModerationDecision) Descriptor() protoreflect.EnumDescriptor {
+	return file_agent_proto_enumTypes[0].Descriptor()
+}
+
+func (ModerationDecision) Type() protoreflect.EnumType {
+	return &file_agent_proto_enumTypes[0]
+}
+
+func (x ModerationDecision) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ModerationDecision.Descriptor instead.
+func (ModerationDecision) EnumDescriptor() ([]byte, []int) {
+	return file_agent_proto_rawDescGZIP(), []int{0}
+}
+
 // 推荐陪玩请求
 type RecommendCompanionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -382,6 +432,160 @@ func (x *AddCompanionToVectorDBResponse) GetMessage() string {
 	return ""
 }
 
+// 头像多模态审核请求
+type ModerateAvatarRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`               // 用户ID（可选）
+	ImageUrl      string                 `protobuf:"bytes,2,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`          // 头像URL（与 image_base64 二选一）
+	ImageBase64   string                 `protobuf:"bytes,3,opt,name=image_base64,json=imageBase64,proto3" json:"image_base64,omitempty"` // 头像Base64（与 image_url 二选一）
+	Scene         string                 `protobuf:"bytes,4,opt,name=scene,proto3" json:"scene,omitempty"`                                // 场景：avatar/profile/companion
+	RequestId     string                 `protobuf:"bytes,5,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`       // 幂等请求ID（可选）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ModerateAvatarRequest) Reset() {
+	*x = ModerateAvatarRequest{}
+	mi := &file_agent_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModerateAvatarRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModerateAvatarRequest) ProtoMessage() {}
+
+func (x *ModerateAvatarRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModerateAvatarRequest.ProtoReflect.Descriptor instead.
+func (*ModerateAvatarRequest) Descriptor() ([]byte, []int) {
+	return file_agent_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ModerateAvatarRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *ModerateAvatarRequest) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
+}
+
+func (x *ModerateAvatarRequest) GetImageBase64() string {
+	if x != nil {
+		return x.ImageBase64
+	}
+	return ""
+}
+
+func (x *ModerateAvatarRequest) GetScene() string {
+	if x != nil {
+		return x.Scene
+	}
+	return ""
+}
+
+func (x *ModerateAvatarRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+// 头像多模态审核响应
+type ModerateAvatarResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Decision      ModerationDecision     `protobuf:"varint,1,opt,name=decision,proto3,enum=agent.ModerationDecision" json:"decision,omitempty"` // 审核结论
+	RiskScore     float64                `protobuf:"fixed64,2,opt,name=risk_score,json=riskScore,proto3" json:"risk_score,omitempty"`           // 风险分（0-1）
+	Labels        []string               `protobuf:"bytes,3,rep,name=labels,proto3" json:"labels,omitempty"`                                    // 风险标签
+	Suggestion    string                 `protobuf:"bytes,4,opt,name=suggestion,proto3" json:"suggestion,omitempty"`                            // 处理建议（如：请更换头像）
+	RequestId     string                 `protobuf:"bytes,5,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`             // 回传请求ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ModerateAvatarResponse) Reset() {
+	*x = ModerateAvatarResponse{}
+	mi := &file_agent_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModerateAvatarResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModerateAvatarResponse) ProtoMessage() {}
+
+func (x *ModerateAvatarResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModerateAvatarResponse.ProtoReflect.Descriptor instead.
+func (*ModerateAvatarResponse) Descriptor() ([]byte, []int) {
+	return file_agent_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ModerateAvatarResponse) GetDecision() ModerationDecision {
+	if x != nil {
+		return x.Decision
+	}
+	return ModerationDecision_DECISION_UNSPECIFIED
+}
+
+func (x *ModerateAvatarResponse) GetRiskScore() float64 {
+	if x != nil {
+		return x.RiskScore
+	}
+	return 0
+}
+
+func (x *ModerateAvatarResponse) GetLabels() []string {
+	if x != nil {
+		return x.Labels
+	}
+	return nil
+}
+
+func (x *ModerateAvatarResponse) GetSuggestion() string {
+	if x != nil {
+		return x.Suggestion
+	}
+	return ""
+}
+
+func (x *ModerateAvatarResponse) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
 var File_agent_proto protoreflect.FileDescriptor
 
 const file_agent_proto_rawDesc = "" +
@@ -420,10 +624,33 @@ const file_agent_proto_rawDesc = "" +
 	"\x1eAddCompanionToVectorDBResponse\x12!\n" +
 	"\fcompanion_id\x18\x01 \x01(\x04R\vcompanionId\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage2\xc9\x01\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"\xa5\x01\n" +
+	"\x15ModerateAvatarRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1b\n" +
+	"\timage_url\x18\x02 \x01(\tR\bimageUrl\x12!\n" +
+	"\fimage_base64\x18\x03 \x01(\tR\vimageBase64\x12\x14\n" +
+	"\x05scene\x18\x04 \x01(\tR\x05scene\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x05 \x01(\tR\trequestId\"\xc5\x01\n" +
+	"\x16ModerateAvatarResponse\x125\n" +
+	"\bdecision\x18\x01 \x01(\x0e2\x19.agent.ModerationDecisionR\bdecision\x12\x1d\n" +
+	"\n" +
+	"risk_score\x18\x02 \x01(\x01R\triskScore\x12\x16\n" +
+	"\x06labels\x18\x03 \x03(\tR\x06labels\x12\x1e\n" +
+	"\n" +
+	"suggestion\x18\x04 \x01(\tR\n" +
+	"suggestion\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x05 \x01(\tR\trequestId*D\n" +
+	"\x12ModerationDecision\x12\x18\n" +
+	"\x14DECISION_UNSPECIFIED\x10\x00\x12\b\n" +
+	"\x04PASS\x10\x01\x12\n" +
+	"\n" +
+	"\x06REJECT\x10\x022\x98\x02\n" +
 	"\x05Agent\x12Y\n" +
 	"\x12RecommendCompanion\x12 .agent.RecommendCompanionRequest\x1a!.agent.RecommendCompanionResponse\x12e\n" +
-	"\x16AddCompanionToVectorDB\x12$.agent.AddCompanionToVectorDBRequest\x1a%.agent.AddCompanionToVectorDBResponseB\tZ\a./agentb\x06proto3"
+	"\x16AddCompanionToVectorDB\x12$.agent.AddCompanionToVectorDBRequest\x1a%.agent.AddCompanionToVectorDBResponse\x12M\n" +
+	"\x0eModerateAvatar\x12\x1c.agent.ModerateAvatarRequest\x1a\x1d.agent.ModerateAvatarResponseB\tZ\a./agentb\x06proto3"
 
 var (
 	file_agent_proto_rawDescOnce sync.Once
@@ -437,25 +664,32 @@ func file_agent_proto_rawDescGZIP() []byte {
 	return file_agent_proto_rawDescData
 }
 
-var file_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_agent_proto_goTypes = []any{
-	(*RecommendCompanionRequest)(nil),      // 0: agent.RecommendCompanionRequest
-	(*CompanionRecommendation)(nil),        // 1: agent.CompanionRecommendation
-	(*RecommendCompanionResponse)(nil),     // 2: agent.RecommendCompanionResponse
-	(*AddCompanionToVectorDBRequest)(nil),  // 3: agent.AddCompanionToVectorDBRequest
-	(*AddCompanionToVectorDBResponse)(nil), // 4: agent.AddCompanionToVectorDBResponse
+	(ModerationDecision)(0),                // 0: agent.ModerationDecision
+	(*RecommendCompanionRequest)(nil),      // 1: agent.RecommendCompanionRequest
+	(*CompanionRecommendation)(nil),        // 2: agent.CompanionRecommendation
+	(*RecommendCompanionResponse)(nil),     // 3: agent.RecommendCompanionResponse
+	(*AddCompanionToVectorDBRequest)(nil),  // 4: agent.AddCompanionToVectorDBRequest
+	(*AddCompanionToVectorDBResponse)(nil), // 5: agent.AddCompanionToVectorDBResponse
+	(*ModerateAvatarRequest)(nil),          // 6: agent.ModerateAvatarRequest
+	(*ModerateAvatarResponse)(nil),         // 7: agent.ModerateAvatarResponse
 }
 var file_agent_proto_depIdxs = []int32{
-	1, // 0: agent.RecommendCompanionResponse.companions:type_name -> agent.CompanionRecommendation
-	0, // 1: agent.Agent.RecommendCompanion:input_type -> agent.RecommendCompanionRequest
-	3, // 2: agent.Agent.AddCompanionToVectorDB:input_type -> agent.AddCompanionToVectorDBRequest
-	2, // 3: agent.Agent.RecommendCompanion:output_type -> agent.RecommendCompanionResponse
-	4, // 4: agent.Agent.AddCompanionToVectorDB:output_type -> agent.AddCompanionToVectorDBResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: agent.RecommendCompanionResponse.companions:type_name -> agent.CompanionRecommendation
+	0, // 1: agent.ModerateAvatarResponse.decision:type_name -> agent.ModerationDecision
+	1, // 2: agent.Agent.RecommendCompanion:input_type -> agent.RecommendCompanionRequest
+	4, // 3: agent.Agent.AddCompanionToVectorDB:input_type -> agent.AddCompanionToVectorDBRequest
+	6, // 4: agent.Agent.ModerateAvatar:input_type -> agent.ModerateAvatarRequest
+	3, // 5: agent.Agent.RecommendCompanion:output_type -> agent.RecommendCompanionResponse
+	5, // 6: agent.Agent.AddCompanionToVectorDB:output_type -> agent.AddCompanionToVectorDBResponse
+	7, // 7: agent.Agent.ModerateAvatar:output_type -> agent.ModerateAvatarResponse
+	5, // [5:8] is the sub-list for method output_type
+	2, // [2:5] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_agent_proto_init() }
@@ -468,13 +702,14 @@ func file_agent_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_proto_rawDesc), len(file_agent_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   5,
+			NumEnums:      1,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_agent_proto_goTypes,
 		DependencyIndexes: file_agent_proto_depIdxs,
+		EnumInfos:         file_agent_proto_enumTypes,
 		MessageInfos:      file_agent_proto_msgTypes,
 	}.Build()
 	File_agent_proto = out.File

@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Agent_RecommendCompanion_FullMethodName     = "/agent.Agent/RecommendCompanion"
 	Agent_AddCompanionToVectorDB_FullMethodName = "/agent.Agent/AddCompanionToVectorDB"
+	Agent_ModerateAvatar_FullMethodName         = "/agent.Agent/ModerateAvatar"
 )
 
 // AgentClient is the client API for Agent service.
@@ -33,6 +34,8 @@ type AgentClient interface {
 	RecommendCompanion(ctx context.Context, in *RecommendCompanionRequest, opts ...grpc.CallOption) (*RecommendCompanionResponse, error)
 	// 添加陪玩信息到向量数据库
 	AddCompanionToVectorDB(ctx context.Context, in *AddCompanionToVectorDBRequest, opts ...grpc.CallOption) (*AddCompanionToVectorDBResponse, error)
+	// 头像多模态审核
+	ModerateAvatar(ctx context.Context, in *ModerateAvatarRequest, opts ...grpc.CallOption) (*ModerateAvatarResponse, error)
 }
 
 type agentClient struct {
@@ -63,6 +66,16 @@ func (c *agentClient) AddCompanionToVectorDB(ctx context.Context, in *AddCompani
 	return out, nil
 }
 
+func (c *agentClient) ModerateAvatar(ctx context.Context, in *ModerateAvatarRequest, opts ...grpc.CallOption) (*ModerateAvatarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ModerateAvatarResponse)
+	err := c.cc.Invoke(ctx, Agent_ModerateAvatar_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServer is the server API for Agent service.
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility.
@@ -73,6 +86,8 @@ type AgentServer interface {
 	RecommendCompanion(context.Context, *RecommendCompanionRequest) (*RecommendCompanionResponse, error)
 	// 添加陪玩信息到向量数据库
 	AddCompanionToVectorDB(context.Context, *AddCompanionToVectorDBRequest) (*AddCompanionToVectorDBResponse, error)
+	// 头像多模态审核
+	ModerateAvatar(context.Context, *ModerateAvatarRequest) (*ModerateAvatarResponse, error)
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -88,6 +103,9 @@ func (UnimplementedAgentServer) RecommendCompanion(context.Context, *RecommendCo
 }
 func (UnimplementedAgentServer) AddCompanionToVectorDB(context.Context, *AddCompanionToVectorDBRequest) (*AddCompanionToVectorDBResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddCompanionToVectorDB not implemented")
+}
+func (UnimplementedAgentServer) ModerateAvatar(context.Context, *ModerateAvatarRequest) (*ModerateAvatarResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ModerateAvatar not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 func (UnimplementedAgentServer) testEmbeddedByValue()               {}
@@ -146,6 +164,24 @@ func _Agent_AddCompanionToVectorDB_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Agent_ModerateAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ModerateAvatarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).ModerateAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_ModerateAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).ModerateAvatar(ctx, req.(*ModerateAvatarRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Agent_ServiceDesc is the grpc.ServiceDesc for Agent service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -160,6 +196,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddCompanionToVectorDB",
 			Handler:    _Agent_AddCompanionToVectorDB_Handler,
+		},
+		{
+			MethodName: "ModerateAvatar",
+			Handler:    _Agent_ModerateAvatar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -17,6 +17,8 @@ type (
 	AddCompanionToVectorDBRequest  = agent.AddCompanionToVectorDBRequest
 	AddCompanionToVectorDBResponse = agent.AddCompanionToVectorDBResponse
 	CompanionRecommendation        = agent.CompanionRecommendation
+	ModerateAvatarRequest          = agent.ModerateAvatarRequest
+	ModerateAvatarResponse         = agent.ModerateAvatarResponse
 	RecommendCompanionRequest      = agent.RecommendCompanionRequest
 	RecommendCompanionResponse     = agent.RecommendCompanionResponse
 
@@ -25,6 +27,8 @@ type (
 		RecommendCompanion(ctx context.Context, in *RecommendCompanionRequest, opts ...grpc.CallOption) (*RecommendCompanionResponse, error)
 		// 添加陪玩信息到向量数据库
 		AddCompanionToVectorDB(ctx context.Context, in *AddCompanionToVectorDBRequest, opts ...grpc.CallOption) (*AddCompanionToVectorDBResponse, error)
+		// 头像多模态审核
+		ModerateAvatar(ctx context.Context, in *ModerateAvatarRequest, opts ...grpc.CallOption) (*ModerateAvatarResponse, error)
 	}
 
 	defaultAgent struct {
@@ -48,4 +52,10 @@ func (m *defaultAgent) RecommendCompanion(ctx context.Context, in *RecommendComp
 func (m *defaultAgent) AddCompanionToVectorDB(ctx context.Context, in *AddCompanionToVectorDBRequest, opts ...grpc.CallOption) (*AddCompanionToVectorDBResponse, error) {
 	client := agent.NewAgentClient(m.cli.Conn())
 	return client.AddCompanionToVectorDB(ctx, in, opts...)
+}
+
+// 头像多模态审核
+func (m *defaultAgent) ModerateAvatar(ctx context.Context, in *ModerateAvatarRequest, opts ...grpc.CallOption) (*ModerateAvatarResponse, error) {
+	client := agent.NewAgentClient(m.cli.Conn())
+	return client.ModerateAvatar(ctx, in, opts...)
 }
