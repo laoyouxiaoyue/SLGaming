@@ -59,3 +59,34 @@ export const upavatarUrlapi = (avatar) => {
     data: formData,
   });
 };
+
+/**
+ * 修改手机号码
+ * @param {string} oldPhone - 原手机号 (必需)
+ * @param {string} oldCode - 原手机号验证码 (必需)
+ * @param {string} newPhone - 新手机号 (必需)
+ * @param {string} [newCode] - 新手机号验证码 (必须)
+ * @returns {Promise}
+ */
+export const changePhoneAPI = ({ oldPhone, oldCode, newPhone, newCode } = {}) => {
+  return http({
+    url: "/user/change-phone",
+    method: "PUT",
+    data: { oldPhone, oldCode, newPhone, newCode },
+  });
+};
+
+/**
+ * 修改密码（通过手机验证）
+ * @param {string} oldPhone - 原手机号 (必需)
+ * @param {string} oldCode - 原手机号验证码 (必需)
+ * @param {string} newPassword - 新密码 (必需)
+ * @returns {Promise}
+ */
+export const changePasswordAPI = ({ oldPhone, oldCode, newPassword } = {}) => {
+  return http({
+    url: "/user/change-password",
+    method: "PUT",
+    data: { oldPhone, oldCode, newPassword },
+  });
+};

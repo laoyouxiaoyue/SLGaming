@@ -14,15 +14,12 @@ const fileInputRef = ref(null);
 const form = ref({
   id: "",
   nickname: "",
-  phone: "",
-  role: 1, // 默认老板
   avatarUrl: "",
   bio: "",
 });
 
 const rules = {
   nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
-  role: [{ required: true, message: "请选择角色", trigger: "change" }],
 };
 
 const initForm = () => {
@@ -30,8 +27,6 @@ const initForm = () => {
     form.value = {
       id: info.value.id || "",
       nickname: info.value.nickname || "",
-      phone: info.value.phone || "",
-      role: info.value.role || 1,
       avatarUrl: info.value.avatarUrl || "",
       bio: info.value.bio || "",
     };
@@ -65,7 +60,7 @@ const handleFileChange = async (e) => {
 
   const res = await upavatarUrlapi(file);
   if (res.data && res.data.avatarUrl) {
-    form.value.avatarUrl = res.data.avatarUrl;
+    getUserInfo();
     ElMessage.success("头像更换成功");
   }
   e.target.value = "";
@@ -135,10 +130,6 @@ onMounted(() => {
 
         <el-form-item label="昵称" prop="nickname">
           <el-input v-model="form.nickname" placeholder="请输入昵称" />
-        </el-form-item>
-
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号" />
         </el-form-item>
 
         <el-form-item label="个人简介" prop="bio">

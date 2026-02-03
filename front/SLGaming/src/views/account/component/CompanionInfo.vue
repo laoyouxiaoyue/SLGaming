@@ -1,7 +1,11 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { getcompanionapi, updatecompanionapi } from "@/api/companion/companion";
+import { ref, onMounted, watch } from "vue";
+import { useCompanionStore } from "@/stores/companionStore";
+import { storeToRefs } from "pinia";
 import { ElMessage } from "element-plus";
+
+const companionStore = useCompanionStore();
+const { companionInfo } = storeToRefs(companionStore);
 
 const formRef = ref(null);
 const form = ref({
@@ -13,43 +17,44 @@ const form = ref({
   isVerified: false,
 });
 
+// 监听 store 数据变化，同步到表单
+watch(
+  () => companionInfo.value,
+  (newVal) => {
+    form.value = {
+      gameSkill: newVal.gameSkill || "",
+      pricePerHour: newVal.pricePerHour || 0,
+      status: newVal.status ?? 0,
+      rating: newVal.rating || 0,
+      totalOrders: newVal.totalOrders || 0,
+      isVerified: newVal.isVerified || false,
+    };
+  },
+  { immediate: true, deep: true },
+);
+
 const rules = {
   gameSkill: [{ required: true, message: "请输入游戏技能", trigger: "blur" }],
   pricePerHour: [{ required: true, message: "请输入每小时价格", trigger: "blur" }],
   status: [{ required: true, message: "请选择状态", trigger: "change" }],
 };
 
-const getCompanionInfo = async () => {
-  const res = await getcompanionapi();
-  if (res.data) {
-    form.value = {
-      gameSkill: res.data.gameSkill || "",
-      pricePerHour: res.data.pricePerHour || 0,
-      status: res.data.status !== undefined ? res.data.status : 0,
-      rating: res.data.rating || 0,
-      totalOrders: res.data.totalOrders || 0,
-      isVerified: res.data.isVerified || false,
-    };
-  }
-};
-
 const onSave = async () => {
   if (!formRef.value) return;
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      await updatecompanionapi({
+      await companionStore.updateCompanionDetail({
         gameSkill: form.value.gameSkill,
         pricePerHour: Number(form.value.pricePerHour),
         status: form.value.status,
       });
       ElMessage.success("保存成功");
-      getCompanionInfo(); // 刷新数据
     }
   });
 };
 
 onMounted(() => {
-  getCompanionInfo();
+  companionStore.getCompanionDetail();
 });
 </script>
 
