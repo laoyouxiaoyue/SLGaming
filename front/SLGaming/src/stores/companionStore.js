@@ -1,6 +1,10 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { getcompanionapi, updatecompanionapi } from "@/api/companion/companion";
+import {
+  getcompanionapi,
+  updatecompanionapi,
+  updateCompanionStatusAPI,
+} from "@/api/companion/companion";
 
 export const useCompanionStore = defineStore(
   "companion",
@@ -52,6 +56,21 @@ export const useCompanionStore = defineStore(
       }
     };
 
+    // 更新陪玩在线状态
+    const updateStatus = async (status) => {
+      try {
+        const res = await updateCompanionStatusAPI({ status });
+        if (res.code === 0) {
+          // 更新成功后同步本地状态
+          companionInfo.value.status = status;
+        }
+        return res;
+      } catch (error) {
+        console.error("更新状态失败:", error);
+        throw error;
+      }
+    };
+
     // 3. 清除数据 (用于退出登录)
     const clearCompanionInfo = () => {
       companionInfo.value = {
@@ -72,6 +91,7 @@ export const useCompanionStore = defineStore(
       companionInfo,
       getCompanionDetail,
       updateCompanionDetail,
+      updateStatus,
       clearCompanionInfo,
     };
   },
