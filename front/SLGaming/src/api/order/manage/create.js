@@ -6,8 +6,7 @@ import http from "@/utils/http";
  * @param {object} data - 订单请求参数
  * @param {number} data.companionId - 陪玩ID (int64) - 必需
  * @param {string} data.gameName - 游戏名称 - 必需
- * @param {string} [data.gameMode] - 游戏模式/段位 - 可选
- * @param {number} data.durationMinutes - 服务时长（分钟） (int32) - 必需
+ * @param {number} data.durationMinutes - 服务时长（小时） (int32) - 必需
  *
  * @returns {Promise}
  * @returns {object} response.data - OrderInfo

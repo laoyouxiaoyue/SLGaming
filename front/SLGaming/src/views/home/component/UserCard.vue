@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue";
-
+import router from "@/router";
 const props = defineProps({
   user: {
     type: Object,
@@ -105,7 +105,13 @@ const ratingText = computed(() => {
     </div>
 
     <div class="user-card__action">
-      <button class="user-card__button" type="button">去下单</button>
+      <button
+        class="user-card__button"
+        type="button"
+        @click="$router.push(`/detail/${user.userId}`)"
+      >
+        去下单
+      </button>
     </div>
   </div>
 </template>
