@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from "vue";
-import router from "@/router";
 const props = defineProps({
   user: {
     type: Object,
