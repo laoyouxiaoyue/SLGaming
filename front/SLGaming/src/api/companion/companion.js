@@ -1,7 +1,7 @@
 import http from "@/utils/http";
 
 /**
- * 获取陪玩资料
+ * 获取当前登录者的陪玩资料
  * @returns {Promise}
  * @returns {object} data - CompanionInfo
  * @returns {number} data.userId - 用户ID (int64)
@@ -81,5 +81,32 @@ export const updateCompanionStatusAPI = (data) => {
     url: "/user/companion/status",
     method: "PUT",
     data,
+  });
+};
+
+/**
+ * 获取陪玩公共资料 (按 userId)
+ *
+ * @param {object} params - 查询参数
+ * @param {number} params.userId - 目标用户ID (int64) - 必需
+ *
+ * @returns {Promise}
+ * @returns {object} response.data - CompanionInfo
+ * @returns {number} response.data.userId - 用户ID (int64)
+ * @returns {string} response.data.gameSkill - 游戏技能
+ * @returns {number} response.data.pricePerHour - 每小时价格（帅币）
+ * @returns {number} response.data.status - 状态：0=离线, 1=在线, 2=忙碌
+ * @returns {number} response.data.rating - 评分（0-5分）
+ * @returns {number} response.data.totalOrders - 总接单数
+ * @returns {boolean} response.data.isVerified - 是否认证
+ * @returns {string} [response.data.nickname] - 昵称
+ * @returns {string} [response.data.avatarUrl] - 头像URL
+ * @returns {string} [response.data.bio] - 个人简介
+ */
+export const getCompanionPublicProfileAPI = (params) => {
+  return http({
+    url: "/user/companion/profile/public",
+    method: "GET",
+    params,
   });
 };

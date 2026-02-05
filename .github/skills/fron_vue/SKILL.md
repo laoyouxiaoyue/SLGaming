@@ -13,6 +13,7 @@ description: Vue 3前端开发指南，涵盖Composition API、Pinia、Element P
 
 - 遵循项目现有结构（Vue 3 Composition API, Vite, Pinia）。
 - 组件开发使用 <script setup> 语法糖。
+- 组件代码顺序保持一致：先 <script setup>，后 <template>，最后 <style>。
 - UI 组件库优先使用 Element Plus，并保持风格一致。
 - 状态管理使用 Pinia，优先考虑模块化设计。
 - API 请求必须封装在 src/api 目录，禁止在组件内直接调用 axios。

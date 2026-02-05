@@ -15,6 +15,7 @@ import ScionRecord from "@/views/recharge/component/ScionRecord.vue";
 import Pay from "@/views/pay/index.vue";
 import ApplyCompanion from "@/views/account/component/ApplyCompanion.vue";
 import SecuritySetting from "@/views/account/component/SecuritySetting.vue";
+import Detail from "@/views/detail/index.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -25,6 +26,10 @@ const router = createRouter({
         {
           path: "",
           component: Home,
+        },
+        {
+          path: "detail/:id",
+          component: Detail,
         },
         {
           path: "scion",
