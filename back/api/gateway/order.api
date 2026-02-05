@@ -11,7 +11,6 @@ type OrderInfo {
     BossId       uint64 `json:"bossId"`       // 老板ID
     CompanionId  uint64 `json:"companionId"`  // 陪玩ID
     GameName     string `json:"gameName"`     // 游戏名称
-    GameMode     string `json:"gameMode"`     // 游戏模式/段位
     Duration     int32  `json:"duration"`     // 时长（分钟）
     PricePerHour int64  `json:"pricePerHour"` // 每小时价格（帅币）
     TotalAmount  int64  `json:"totalAmount"`  // 订单总价（帅币）
@@ -32,8 +31,7 @@ type OrderInfo {
 type CreateOrderRequest {
     CompanionId     uint64 `json:"companionId"`               // 陪玩ID
     GameName        string `json:"gameName"`                  // 游戏名称
-    GameMode        string `json:"gameMode,optional"`         // 游戏模式/段位
-    DurationMinutes int32  `json:"durationMinutes"`           // 服务时长（分钟）
+    DurationHours   int32  `json:"durationHours"`             // 服务时长（小时）
 }
 
 type CreateOrderResponse {

@@ -19,7 +19,6 @@ func toOrderInfo(o *orderclient.OrderInfo) types.OrderInfo {
 		BossId:       o.BossId,
 		CompanionId:  o.CompanionId,
 		GameName:     o.GameName,
-		GameMode:     o.GameMode,
 		Duration:     o.DurationMinutes,
 		PricePerHour: o.PricePerHour,
 		TotalAmount:  o.TotalAmount,

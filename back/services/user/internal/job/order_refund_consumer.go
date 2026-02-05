@@ -64,7 +64,6 @@ type orderPaymentPendingEventPayload struct {
 	// 扩展字段：用于订单服务的本地事务（user 服务忽略）
 	CompanionID     uint64 `json:"companion_id"`
 	GameName        string `json:"game_name"`
-	GameMode        string `json:"game_mode"`
 	DurationMinutes int32  `json:"duration_minutes"`
 	PricePerHour    int64  `json:"price_per_hour"`
 }

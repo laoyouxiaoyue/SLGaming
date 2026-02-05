@@ -24,29 +24,27 @@ message OrderInfo {
   uint64 companion_id = 4; // 陪玩ID（接单方）
 
   string game_name = 5;      // 游戏名称
-  string game_mode = 6;      // 模式/段位等补充信息（可选）
+  int32 duration_minutes = 6; // 服务时长（分钟）
 
-  int32 duration_minutes = 7; // 服务时长（分钟）
+  int64 price_per_hour = 7; // 单价（每小时帅币）
+  int64 total_amount = 8;   // 订单总价（帅币）
 
-  int64 price_per_hour = 8; // 单价（每小时帅币）
-  int64 total_amount = 9;   // 订单总价（帅币）
-
-  int32 status = 10; // 订单状态（见上方状态说明）
+  int32 status = 9; // 订单状态（见上方状态说明）
 
   // 时间相关（时间戳，单位：秒）
-  int64 created_at = 11;
-  int64 paid_at = 12;
-  int64 accepted_at = 13;
-  int64 start_at = 14;
-  int64 completed_at = 15;
-  int64 cancelled_at = 16;
+  int64 created_at = 10;
+  int64 paid_at = 11;
+  int64 accepted_at = 12;
+  int64 start_at = 13;
+  int64 completed_at = 14;
+  int64 cancelled_at = 15;
 
   // 评价相关
-  double rating = 17;  // 老板对陪玩的评分（0-5）
-  string comment = 18; // 评价内容
+  double rating = 16;  // 老板对陪玩的评分（0-5）
+  string comment = 17; // 评价内容
 
   // 取消相关
-  string cancel_reason = 19; // 取消原因
+  string cancel_reason = 18; // 取消原因
 }
 
 // ---------------- 创建订单 ----------------
@@ -58,8 +56,7 @@ message CreateOrderRequest {
   uint64 companion_id = 2; // 陪玩ID
 
   string game_name = 3;     // 游戏名称
-  string game_mode = 4;     // 模式/段位等补充信息（可选）
-  int32 duration_minutes = 5; // 服务时长（分钟）
+  int32 duration_minutes = 4; // 服务时长（分钟）
 }
 
 message CreateOrderResponse {

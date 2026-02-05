@@ -80,6 +80,27 @@ type CompanionInfo struct {
 	Bio          string  `json:"bio"`          // 个人简介
 }
 
+type CompanionRankingItem struct {
+	UserId      uint64  `json:"userId"`      // 用户ID
+	Nickname    string  `json:"nickname"`    // 昵称
+	AvatarUrl   string  `json:"avatarUrl"`   // 头像URL
+	Rating      float64 `json:"rating"`      // 评分（用于评分排名）
+	TotalOrders int64   `json:"totalOrders"` // 总接单数（用于接单数排名）
+	Rank        int32   `json:"rank"`        // 排名（从1开始）
+	IsVerified  bool    `json:"isVerified"`  // 是否认证
+}
+
+type CompanionRecommendation struct {
+	UserId       uint64  `json:"userId"`       // 陪玩用户ID
+	GameSkill    string  `json:"gameSkill"`    // 游戏技能
+	Gender       string  `json:"gender"`       // 性别
+	Age          int32   `json:"age"`          // 年龄
+	Description  string  `json:"description"`  // 描述
+	PricePerHour int64   `json:"pricePerHour"` // 每小时价格
+	Rating       float64 `json:"rating"`       // 评分
+	Similarity   float64 `json:"similarity"`   // 相似度分数（0-1）
+}
+
 type CompleteOrderRequest struct {
 	OrderId uint64 `json:"orderId"` // 订单ID
 }
@@ -90,10 +111,9 @@ type CompleteOrderResponse struct {
 }
 
 type CreateOrderRequest struct {
-	CompanionId     uint64 `json:"companionId"`       // 陪玩ID
-	GameName        string `json:"gameName"`          // 游戏名称
-	GameMode        string `json:"gameMode,optional"` // 游戏模式/段位
-	DurationMinutes int32  `json:"durationMinutes"`   // 服务时长（分钟）
+	CompanionId   uint64 `json:"companionId"`   // 陪玩ID
+	GameName      string `json:"gameName"`      // 游戏名称
+	DurationHours int32  `json:"durationHours"` // 服务时长（小时）
 }
 
 type CreateOrderResponse struct {
@@ -140,6 +160,23 @@ type GetCompanionListResponse struct {
 	Data GetCompanionListData `json:"data"`
 }
 
+type GetCompanionOrdersRankingData struct {
+	Rankings []CompanionRankingItem `json:"rankings"`
+	Total    int32                  `json:"total"`
+	Page     int32                  `json:"page"`
+	PageSize int32                  `json:"pageSize"`
+}
+
+type GetCompanionOrdersRankingRequest struct {
+	Page     int `form:"page,optional"`     // 页码（从1开始）
+	PageSize int `form:"pageSize,optional"` // 每页数量（默认10，最大100）
+}
+
+type GetCompanionOrdersRankingResponse struct {
+	BaseResp
+	Data GetCompanionOrdersRankingData `json:"data"`
+}
+
 type GetCompanionProfileByIdRequest struct {
 	UserId uint64 `form:"userId"` // 目标用户ID
 }
@@ -147,6 +184,23 @@ type GetCompanionProfileByIdRequest struct {
 type GetCompanionProfileResponse struct {
 	BaseResp
 	Data CompanionInfo `json:"data"`
+}
+
+type GetCompanionRatingRankingData struct {
+	Rankings []CompanionRankingItem `json:"rankings"`
+	Total    int32                  `json:"total"`
+	Page     int32                  `json:"page"`
+	PageSize int32                  `json:"pageSize"`
+}
+
+type GetCompanionRatingRankingRequest struct {
+	Page     int `form:"page,optional"`     // 页码（从1开始）
+	PageSize int `form:"pageSize,optional"` // 每页数量（默认10，最大100）
+}
+
+type GetCompanionRatingRankingResponse struct {
+	BaseResp
+	Data GetCompanionRatingRankingData `json:"data"`
 }
 
 type GetOrderListData struct {
@@ -243,7 +297,6 @@ type OrderInfo struct {
 	BossId       uint64  `json:"bossId"`       // 老板ID
 	CompanionId  uint64  `json:"companionId"`  // 陪玩ID
 	GameName     string  `json:"gameName"`     // 游戏名称
-	GameMode     string  `json:"gameMode"`     // 游戏模式/段位
 	Duration     int32   `json:"duration"`     // 时长（分钟）
 	PricePerHour int64   `json:"pricePerHour"` // 每小时价格（帅币）
 	TotalAmount  int64   `json:"totalAmount"`  // 订单总价（帅币）
@@ -331,6 +384,20 @@ type RechargeQueryRequest struct {
 type RechargeQueryResponse struct {
 	BaseResp
 	Data RechargeQueryData `json:"data"`
+}
+
+type RecommendCompanionData struct {
+	Companions  []CompanionRecommendation `json:"companions"`
+	Explanation string                    `json:"explanation"`
+}
+
+type RecommendCompanionRequest struct {
+	UserInput string `json:"userInput"` // 用户输入内容
+}
+
+type RecommendCompanionResponse struct {
+	BaseResp
+	Data RecommendCompanionData `json:"data"`
 }
 
 type RefreshTokenRequest struct {

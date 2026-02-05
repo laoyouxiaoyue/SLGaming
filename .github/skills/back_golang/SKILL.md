@@ -17,7 +17,6 @@ description: Go服务端开发指南，涵盖go-zero、gRPC、数据一致性及
   - API 定义（_.api / _.proto）
   - 生成代码（goctl / protoc）
   - 文档（swagger / docs），接口变更必须同步 swagger
-- 修改代码后进行编译测试（能跑的情况下优先执行）
 - 关键路径输出可追踪日志（包含 user_id、order_no、amount 等关键字段）。
 - 参数校验要明确返回码和信息，避免吞错。
 
@@ -26,6 +25,7 @@ description: Go服务端开发指南，涵盖go-zero、gRPC、数据一致性及
 - 不要随意改变公共 API 结构或字段含义。
 - 不要引入未被允许的外部依赖。
 - 不要写与需求无关的大范围重构。
+- 不要直接修改生成文件（如 goctl/protoc 生成的代码）；如需变更，先改源定义并重新生成。
 
 ## 假设与默认
 

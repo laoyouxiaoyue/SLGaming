@@ -1,1 +1,39 @@
-// 已移除：不向前端提供头像审核接口
+// api/gateway/agent.api
+syntax = "v1"
+
+import "base.api"
+
+type RecommendCompanionRequest {
+	UserInput string `json:"userInput"` // 用户输入内容
+}
+
+type CompanionRecommendation {
+	UserId       uint64  `json:"userId"` // 陪玩用户ID
+	GameSkill    string  `json:"gameSkill"` // 游戏技能
+	Gender       string  `json:"gender"` // 性别
+	Age          int32   `json:"age"` // 年龄
+	Description  string  `json:"description"` // 描述
+	PricePerHour int64   `json:"pricePerHour"` // 每小时价格
+	Rating       float64 `json:"rating"` // 评分
+	Similarity   float64 `json:"similarity"` // 相似度分数（0-1）
+}
+
+type RecommendCompanionData {
+	Companions  []CompanionRecommendation `json:"companions"`
+	Explanation string                    `json:"explanation"`
+}
+
+type RecommendCompanionResponse {
+	BaseResp
+	Data RecommendCompanionData `json:"data"`
+}
+
+// Agent 服务接口定义
+@server (
+	group: agent
+)
+service gateway {
+	// 推荐陪玩（需要登录）
+	@handler recommendCompanion
+	post /api/agent/recommend (RecommendCompanionRequest) returns (RecommendCompanionResponse)
+}

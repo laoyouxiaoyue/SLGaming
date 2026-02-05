@@ -19,18 +19,20 @@ import (
 
 // 不需要鉴权的路径白名单
 var publicPaths = map[string]bool{
-	"/api/code/send":                     true,
-	"/api/user/register":                 true,
-	"/api/user/login":                    true,
-	"/api/user/login-by-code":            true,
-	"/api/user/forgetPassword":           true,
-	"/api/user/refresh-token":            true, // 刷新Token接口（使用RefreshToken，不需要AccessToken）
-	"/api/user/recharge/alipay/notify":   true, // 支付宝异步通知
-	"/api/user/companions":               true, // 获取陪玩列表
-	"/api/user/companion/profile/public": true, // 公开获取陪玩信息
-	"/api/user/gameskills":               true, // 获取游戏技能列表
-	"/uploads":                           true, // 静态资源访问前缀
-	"/health":                            true, // 健康检查接口
+	"/api/code/send":                       true,
+	"/api/user/register":                   true,
+	"/api/user/login":                      true,
+	"/api/user/login-by-code":              true,
+	"/api/user/forgetPassword":             true,
+	"/api/user/refresh-token":              true, // 刷新Token接口（使用RefreshToken，不需要AccessToken）
+	"/api/user/recharge/alipay/notify":     true, // 支付宝异步通知
+	"/api/user/companions":                 true, // 获取陪玩列表
+	"/api/user/companions/ranking/ratings": true, // 陪玩评分排行榜
+	"/api/user/companions/ranking/orders":  true, // 陪玩接单数排行榜
+	"/api/user/companion/profile/public":   true, // 公开获取陪玩信息
+	"/api/user/gameskills":                 true, // 获取游戏技能列表
+	"/uploads":                             true, // 静态资源访问前缀
+	"/health":                              true, // 健康检查接口
 }
 
 // isPublicPath 检查路径是否需要鉴权

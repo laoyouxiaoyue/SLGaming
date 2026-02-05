@@ -111,10 +111,9 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		return nil, status.Error(codes.FailedPrecondition, "invalid companion price")
 	}
 
-	// 金额按照时长一次性计算（分钟 -> 小时），这里简单用向上取整
+	// 金额按照小时计算（分钟 -> 小时）
 	durationMinutes := in.GetDurationMinutes()
-	hours := (durationMinutes + 59) / 60
-	totalAmount := pricePerHour * int64(hours)
+	totalAmount := pricePerHour * int64(durationMinutes) / 60
 
 	// 2. 检查老板钱包余额是否足够
 	walletResp, err := l.svcCtx.UserRPC.GetWallet(l.ctx, &userclient.GetWalletRequest{
@@ -151,8 +150,7 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		BizOrderID:      orderNo,
 		CompanionID:     in.GetCompanionId(),
 		GameName:        in.GetGameName(),
-		GameMode:        in.GetGameMode(),
-		DurationMinutes: in.GetDurationMinutes(),
+		DurationMinutes: durationMinutes,
 		PricePerHour:    pricePerHour,
 	}
 

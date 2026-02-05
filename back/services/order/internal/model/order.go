@@ -42,7 +42,6 @@ type Order struct {
 
 	// 游戏信息
 	GameName string `gorm:"size:64;not null;comment:游戏名称" json:"game_name"`
-	GameMode string `gorm:"size:64;comment:游戏模式/段位" json:"game_mode"`
 
 	// 服务时长（分钟）
 	DurationMinutes int32 `gorm:"not null;comment:服务时长(分钟)" json:"duration_minutes"`

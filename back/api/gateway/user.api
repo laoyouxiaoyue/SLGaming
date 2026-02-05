@@ -262,6 +262,51 @@ type CompanionInfo {
 	Bio          string  `json:"bio"` // 个人简介
 }
 
+// 陪玩排行榜项
+type CompanionRankingItem {
+	UserId      uint64  `json:"userId"` // 用户ID
+	Nickname    string  `json:"nickname"` // 昵称
+	AvatarUrl   string  `json:"avatarUrl"` // 头像URL
+	Rating      float64 `json:"rating"` // 评分（用于评分排名）
+	TotalOrders int64   `json:"totalOrders"` // 总接单数（用于接单数排名）
+	Rank        int32   `json:"rank"` // 排名（从1开始）
+	IsVerified  bool    `json:"isVerified"` // 是否认证
+}
+
+type GetCompanionRatingRankingRequest {
+	Page     int `form:"page,optional"` // 页码（从1开始）
+	PageSize int `form:"pageSize,optional"` // 每页数量（默认10，最大100）
+}
+
+type GetCompanionRatingRankingData {
+	Rankings []CompanionRankingItem `json:"rankings"`
+	Total    int32                 `json:"total"`
+	Page     int32                 `json:"page"`
+	PageSize int32                 `json:"pageSize"`
+}
+
+type GetCompanionRatingRankingResponse {
+	BaseResp
+	Data GetCompanionRatingRankingData `json:"data"`
+}
+
+type GetCompanionOrdersRankingRequest {
+	Page     int `form:"page,optional"` // 页码（从1开始）
+	PageSize int `form:"pageSize,optional"` // 每页数量（默认10，最大100）
+}
+
+type GetCompanionOrdersRankingData {
+	Rankings []CompanionRankingItem `json:"rankings"`
+	Total    int32                 `json:"total"`
+	Page     int32                 `json:"page"`
+	PageSize int32                 `json:"pageSize"`
+}
+
+type GetCompanionOrdersRankingResponse {
+	BaseResp
+	Data GetCompanionOrdersRankingData `json:"data"`
+}
+
 // 游戏技能（词典）
 type GameSkill {
 	Id          uint64 `json:"id"` // 技能ID
@@ -410,6 +455,14 @@ service gateway {
 	// 获取陪玩列表（公开接口，用于订单匹配）
 	@handler getCompanionList
 	get /api/user/companions (GetCompanionListRequest) returns (GetCompanionListResponse)
+
+	// 陪玩评分排行榜（公开）
+	@handler getCompanionRatingRanking
+	get /api/user/companions/ranking/ratings (GetCompanionRatingRankingRequest) returns (GetCompanionRatingRankingResponse)
+
+	// 陪玩接单数排行榜（公开）
+	@handler getCompanionOrdersRanking
+	get /api/user/companions/ranking/orders (GetCompanionOrdersRankingRequest) returns (GetCompanionOrdersRankingResponse)
 
 	// 获取游戏技能列表（公开，无需登录）
 	@handler listGameSkills

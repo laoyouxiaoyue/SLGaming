@@ -21,7 +21,6 @@ type OrderPaymentPendingPayload struct {
 	// 扩展字段：用于在本地事务中创建订单
 	CompanionID     uint64 `json:"companion_id"`
 	GameName        string `json:"game_name"`
-	GameMode        string `json:"game_mode"`
 	DurationMinutes int32  `json:"duration_minutes"`
 	PricePerHour    int64  `json:"price_per_hour"`
 }
@@ -50,7 +49,6 @@ func ExecuteCreateOrderTx(ctx context.Context, db *gorm.DB, p *OrderPaymentPendi
 			BossID:          p.BossID,
 			CompanionID:     p.CompanionID,
 			GameName:        p.GameName,
-			GameMode:        p.GameMode,
 			DurationMinutes: p.DurationMinutes,
 			PricePerHour:    p.PricePerHour,
 			TotalAmount:     p.Amount,

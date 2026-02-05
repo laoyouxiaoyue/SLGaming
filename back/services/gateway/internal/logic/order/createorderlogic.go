@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"math"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -37,12 +38,24 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderRequest) (resp *typ
 	// 从 context 中获取当前登录用户 ID（老板，由网关鉴权中间件注入）
 	bossID, _ := middleware.GetUserID(l.ctx)
 
+	if req.DurationHours <= 0 {
+		return &types.CreateOrderResponse{
+			BaseResp: types.BaseResp{Code: 400, Msg: "durationHours must be positive"},
+		}, nil
+	}
+
+	durationMinutes64 := int64(req.DurationHours) * 60
+	if durationMinutes64 > math.MaxInt32 {
+		return &types.CreateOrderResponse{
+			BaseResp: types.BaseResp{Code: 400, Msg: "durationHours too large"},
+		}, nil
+	}
+
 	rpcReq := &orderclient.CreateOrderRequest{
-		BossId:          bossID,
-		CompanionId:     req.CompanionId,
-		GameName:        req.GameName,
-		GameMode:        req.GameMode,
-		DurationMinutes: req.DurationMinutes,
+		BossId:        bossID,
+		CompanionId:   req.CompanionId,
+		GameName:      req.GameName,
+		DurationHours: req.DurationHours,
 	}
 
 	rpcResp, err := l.svcCtx.OrderRPC.CreateOrder(l.ctx, rpcReq)

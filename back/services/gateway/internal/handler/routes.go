@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	agent "SLGaming/back/services/gateway/internal/handler/agent"
 	code "SLGaming/back/services/gateway/internal/handler/code"
 	order "SLGaming/back/services/gateway/internal/handler/order"
 	user "SLGaming/back/services/gateway/internal/handler/user"
@@ -15,6 +16,16 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/agent/recommend",
+				Handler: agent.RecommendCompanionHandler(serverCtx),
+			},
+		},
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{
@@ -126,6 +137,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/api/user/companions",
 				Handler: user.GetCompanionListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/companions/ranking/orders",
+				Handler: user.GetCompanionOrdersRankingHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/companions/ranking/ratings",
+				Handler: user.GetCompanionRatingRankingHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPut,

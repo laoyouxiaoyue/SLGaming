@@ -38,7 +38,6 @@ func toOrderInfo(o *model.Order) *order.OrderInfo {
 		BossId:          o.BossID,
 		CompanionId:     o.CompanionID,
 		GameName:        o.GameName,
-		GameMode:        o.GameMode,
 		DurationMinutes: o.DurationMinutes,
 		PricePerHour:    o.PricePerHour,
 		TotalAmount:     o.TotalAmount,
