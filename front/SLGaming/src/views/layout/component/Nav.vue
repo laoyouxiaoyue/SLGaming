@@ -87,7 +87,7 @@ watch(
                     v-if="info.avatarUrl"
                     :style="{ backgroundImage: `url(${info.avatarUrl})` }"
                   ></div>
-                  <sl-icon name="icon-touxiang1" v-else size="32" color="#fff" />
+                  <sl-icon name="icon-touxiang1" v-else size="70" color="#fff" />
                   <!-- 状态展示：小圆点 -->
                   <div v-if="statusClass" class="status-tag" :class="statusClass"></div>
                 </a>
