@@ -28,6 +28,18 @@ const statusMap = {
   3: { text: "关闭", type: "info" },
 };
 
+// 支付类型映射
+const payTypeMap = {
+  'alipay_page': { text: '支付宝PC', type: 'primary' },
+  'alipay_wap': { text: '支付宝H5', type: 'success' },
+  'alipay_app': { text: '支付宝APP', type: 'warning' },
+  '1': { text: '支付宝PC', type: 'primary' },
+  '2': { text: '支付宝H5', type: 'success' },
+  '3': { text: '支付宝APP', type: 'warning' },
+  'Alipay': { text: '支付宝', type: 'primary' },
+  'alipay': { text: '支付宝', type: 'primary' },
+};
+
 // 获取数据
 const fetchRecords = async () => {
   loading.value = true;
@@ -59,10 +71,17 @@ onMounted(() => {
       <div class="panel-title">消费记录</div>
       <div class="setting-content">
         <el-table :data="rechargeList" v-loading="loading" style="width: 100%" border stripe>
-          <el-table-column prop="orderNo" label="订单号" min-width="180" />
-          <el-table-column label="金额" width="120">
+          <el-table-column prop="orderNo" label="订单号" flex="1" show-overflow-tooltip />
+          <el-table-column label="金额" width="150">
             <template #default="{ row }">
               <span class="amount">{{ row.amount.toFixed(2) }} 帅币</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="支付类型" width="120">
+            <template #default="{ row }">
+              <el-tag :type="payTypeMap[row.payType]?.type || 'info'">
+                {{ payTypeMap[row.payType]?.text || "未知" }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column label="状态" width="100">

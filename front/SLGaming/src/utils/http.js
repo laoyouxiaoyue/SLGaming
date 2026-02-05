@@ -36,13 +36,12 @@ http.interceptors.request.use(
     }
 
     // 2. 处理发送给后端的 int64 引号问题
-    // 仅对普通对象进行处理（排除 FormData、Blob 等）
-    if (config.data && typeof config.data === "object" && !(config.data instanceof FormData)) {
-      // 强制手动序列化并替换掉长数字两侧的引号
-      const jsonStr = JSON.stringify(config.data);
-      config.data = jsonStr.replace(/"(\d{16,})"/g, "$1");
-      config.headers["Content-Type"] = "application/json";
-    }
+	// 仅对普通对象进行处理（排除 FormData、Blob 等）
+	if (config.data && typeof config.data === "object" && !(config.data instanceof FormData)) {
+		// 使用 JSONBig 序列化数据，确保大数字被正确处理为数字类型
+		config.data = JSONBigInt.stringify(config.data);
+		config.headers["Content-Type"] = "application/json";
+	}
 
     return config;
   },
