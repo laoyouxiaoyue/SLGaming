@@ -50,7 +50,7 @@ const createOrder = async () => {
     const data = {
       companionId: companionInfo.value.userId,
       gameName: companionInfo.value.gameSkill,
-      durationMinutes: orderForm.value.durationHours * 60,
+      durationHours: orderForm.value.durationHours,
     };
     const res = await createOrderAPI(data);
     ElMessage.success("订单创建成功");
@@ -71,62 +71,66 @@ onMounted(() => {
 <template>
   <div class="companion-detail">
     <div v-if="loading" class="loading">加载中...</div>
-    <div v-else-if="companionInfo">
-      <div class="profile-header">
-        <img :src="companionInfo.avatarUrl" :alt="companionInfo.nickname" class="avatar" />
-        <div class="info">
-          <h1>{{ companionInfo.nickname || "未设置昵称" }}</h1>
-          <p class="game-skill">{{ companionInfo.gameSkill }}</p>
-          <div class="status-rating">
-            <span :class="['status', `status-${companionInfo.status}`]">
-              {{ statusText[companionInfo.status] }}
-            </span>
-            <span class="rating">评分: {{ companionInfo.rating }}/5</span>
-          </div>
-          <p class="price">每小时价格: {{ companionInfo.pricePerHour }} 帅币</p>
-          <p class="orders">总接单数: {{ companionInfo.totalOrders }}</p>
-          <p v-if="companionInfo.isVerified" class="verified">✓ 已认证</p>
-          <div class="bio-content">
-            <h3>个人简介</h3>
-            <p>{{ companionInfo.bio || "暂无简介" }}</p>
+    <div v-else-if="companionInfo" class="content-wrapper">
+      <div class="left-section">
+        <div class="profile-header">
+          <img :src="companionInfo.avatarUrl" :alt="companionInfo.nickname" class="avatar" />
+          <div class="info">
+            <h1>{{ companionInfo.nickname || "未设置昵称" }}</h1>
+            <p class="game-skill">{{ companionInfo.gameSkill }}</p>
+            <div class="status-rating">
+              <span :class="['status', `status-${companionInfo.status}`]">
+                {{ statusText[companionInfo.status] }}
+              </span>
+              <span class="rating">评分: {{ companionInfo.rating }}/5</span>
+            </div>
+            <p class="price">每小时价格: {{ companionInfo.pricePerHour }} 帅币</p>
+            <p class="orders">总接单数: {{ companionInfo.totalOrders }}</p>
+            <p v-if="companionInfo.isVerified" class="verified">✓ 已认证</p>
+            <div class="bio-content">
+              <h3>个人简介</h3>
+              <p>{{ companionInfo.bio || "暂无简介" }}</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="order-section">
-        <h3>下单服务</h3>
-        <div class="order-panel">
-          <el-form :model="orderForm" label-position="top">
-            <el-form-item label="选择服务时长">
-              <div class="duration-selector">
-                <el-input-number
-                  v-model="orderForm.durationHours"
-                  :min="1"
-                  :max="24"
-                  size="large"
-                />
-                <span class="unit">小时</span>
-              </div>
-            </el-form-item>
-          </el-form>
+      <div class="right-section">
+        <div class="order-section">
+          <h3>下单服务</h3>
+          <div class="order-panel">
+            <el-form :model="orderForm" label-position="top">
+              <el-form-item label="选择服务时长">
+                <div class="duration-selector">
+                  <el-input-number
+                    v-model="orderForm.durationHours"
+                    :min="1"
+                    :max="24"
+                    size="large"
+                  />
+                  <span class="unit">小时</span>
+                </div>
+              </el-form-item>
+            </el-form>
 
-          <div class="order-footer">
-            <div class="price-summary">
-              <span class="label">总计费用</span>
-              <div class="amount-group">
-                <span class="number">{{ totalAmount }}</span>
-                <span class="currency">帅币</span>
+            <div class="order-footer">
+              <div class="price-summary">
+                <span class="label">总计费用</span>
+                <div class="amount-group">
+                  <span class="number">{{ totalAmount }}</span>
+                  <span class="currency">帅币</span>
+                </div>
               </div>
+              <el-button
+                type="primary"
+                size="large"
+                class="submit-btn"
+                @click="createOrder"
+                :loading="ordering"
+              >
+                立即下单
+              </el-button>
             </div>
-            <el-button
-              type="primary"
-              size="large"
-              class="submit-btn"
-              @click="createOrder"
-              :loading="ordering"
-            >
-              立即下单
-            </el-button>
           </div>
         </div>
       </div>
@@ -137,7 +141,7 @@ onMounted(() => {
 
 <style scoped>
 .companion-detail {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
   font-family:
@@ -154,6 +158,25 @@ onMounted(() => {
   color: #909399;
 }
 
+/* 左右布局容器 */
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 24px;
+}
+
+/* 左侧个人资料区域 */
+.left-section {
+  flex: 2;
+  min-width: 0;
+}
+
+/* 右侧下单服务区域 */
+.right-section {
+  width: 380px;
+  flex-shrink: 0;
+}
+
 /* 卡片通用样式 */
 .profile-header,
 .order-section {
@@ -161,7 +184,6 @@ onMounted(() => {
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   padding: 32px;
-  margin-bottom: 24px;
   transition: all 0.3s ease;
   border: 1px solid #f0f2f5;
 }
@@ -332,7 +354,7 @@ onMounted(() => {
 }
 
 .order-panel {
-  max-width: 600px;
+  width: 100%;
 }
 
 .duration-selector {
@@ -397,5 +419,16 @@ onMounted(() => {
 .submit-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .right-section {
+    width: 100%;
+  }
 }
 </style>

@@ -23,16 +23,16 @@ const (
 
 // OrderInfo 订单信息（用于对外展示）
 type OrderInfo struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Id              uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                  // 订单ID（内部主键）
-	OrderNo         string                 `protobuf:"bytes,2,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`                          // 订单号（对用户展示）
-	BossId          uint64                 `protobuf:"varint,3,opt,name=boss_id,json=bossId,proto3" json:"boss_id,omitempty"`                            // 老板ID（下单方）
-	CompanionId     uint64                 `protobuf:"varint,4,opt,name=companion_id,json=companionId,proto3" json:"companion_id,omitempty"`             // 陪玩ID（接单方）
-	GameName        string                 `protobuf:"bytes,5,opt,name=game_name,json=gameName,proto3" json:"game_name,omitempty"`                       // 游戏名称
-	DurationMinutes int32                  `protobuf:"varint,6,opt,name=duration_minutes,json=durationMinutes,proto3" json:"duration_minutes,omitempty"` // 服务时长（分钟）
-	PricePerHour    int64                  `protobuf:"varint,7,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"`        // 单价（每小时帅币）
-	TotalAmount     int64                  `protobuf:"varint,8,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`             // 订单总价（帅币）
-	Status          int32                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`                                          // 订单状态（见上方状态说明）
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                            // 订单ID（内部主键）
+	OrderNo       string                 `protobuf:"bytes,2,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`                    // 订单号（对用户展示）
+	BossId        uint64                 `protobuf:"varint,3,opt,name=boss_id,json=bossId,proto3" json:"boss_id,omitempty"`                      // 老板ID（下单方）
+	CompanionId   uint64                 `protobuf:"varint,4,opt,name=companion_id,json=companionId,proto3" json:"companion_id,omitempty"`       // 陪玩ID（接单方）
+	GameName      string                 `protobuf:"bytes,5,opt,name=game_name,json=gameName,proto3" json:"game_name,omitempty"`                 // 游戏名称
+	DurationHours int32                  `protobuf:"varint,6,opt,name=duration_hours,json=durationHours,proto3" json:"duration_hours,omitempty"` // 服务时长（小时）
+	PricePerHour  int64                  `protobuf:"varint,7,opt,name=price_per_hour,json=pricePerHour,proto3" json:"price_per_hour,omitempty"`  // 单价（每小时帅币）
+	TotalAmount   int64                  `protobuf:"varint,8,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`       // 订单总价（帅币）
+	Status        int32                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`                                    // 订单状态（见上方状态说明）
 	// 时间相关（时间戳，单位：秒）
 	CreatedAt   int64 `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	PaidAt      int64 `protobuf:"varint,11,opt,name=paid_at,json=paidAt,proto3" json:"paid_at,omitempty"`
@@ -114,9 +114,9 @@ func (x *OrderInfo) GetGameName() string {
 	return ""
 }
 
-func (x *OrderInfo) GetDurationMinutes() int32 {
+func (x *OrderInfo) GetDurationHours() int32 {
 	if x != nil {
-		return x.DurationMinutes
+		return x.DurationHours
 	}
 	return 0
 }
@@ -208,13 +208,13 @@ func (x *OrderInfo) GetCancelReason() string {
 // CreateOrderRequest 老板创建订单
 // 前提：前端已选定陪玩、游戏和时长
 type CreateOrderRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	BossId          uint64                 `protobuf:"varint,1,opt,name=boss_id,json=bossId,proto3" json:"boss_id,omitempty"`                            // 老板ID（从网关鉴权拿）
-	CompanionId     uint64                 `protobuf:"varint,2,opt,name=companion_id,json=companionId,proto3" json:"companion_id,omitempty"`             // 陪玩ID
-	GameName        string                 `protobuf:"bytes,3,opt,name=game_name,json=gameName,proto3" json:"game_name,omitempty"`                       // 游戏名称
-	DurationMinutes int32                  `protobuf:"varint,4,opt,name=duration_minutes,json=durationMinutes,proto3" json:"duration_minutes,omitempty"` // 服务时长（分钟）
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BossId        uint64                 `protobuf:"varint,1,opt,name=boss_id,json=bossId,proto3" json:"boss_id,omitempty"`                      // 老板ID（从网关鉴权拿）
+	CompanionId   uint64                 `protobuf:"varint,2,opt,name=companion_id,json=companionId,proto3" json:"companion_id,omitempty"`       // 陪玩ID
+	GameName      string                 `protobuf:"bytes,3,opt,name=game_name,json=gameName,proto3" json:"game_name,omitempty"`                 // 游戏名称
+	DurationHours int32                  `protobuf:"varint,4,opt,name=duration_hours,json=durationHours,proto3" json:"duration_hours,omitempty"` // 服务时长（小时）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateOrderRequest) Reset() {
@@ -268,9 +268,9 @@ func (x *CreateOrderRequest) GetGameName() string {
 	return ""
 }
 
-func (x *CreateOrderRequest) GetDurationMinutes() int32 {
+func (x *CreateOrderRequest) GetDurationHours() int32 {
 	if x != nil {
-		return x.DurationMinutes
+		return x.DurationHours
 	}
 	return 0
 }
@@ -1073,14 +1073,14 @@ var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
 	"\n" +
-	"\vorder.proto\x12\x05order\"\xac\x04\n" +
+	"\vorder.proto\x12\x05order\"\xa8\x04\n" +
 	"\tOrderInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x19\n" +
 	"\border_no\x18\x02 \x01(\tR\aorderNo\x12\x17\n" +
 	"\aboss_id\x18\x03 \x01(\x04R\x06bossId\x12!\n" +
 	"\fcompanion_id\x18\x04 \x01(\x04R\vcompanionId\x12\x1b\n" +
-	"\tgame_name\x18\x05 \x01(\tR\bgameName\x12)\n" +
-	"\x10duration_minutes\x18\x06 \x01(\x05R\x0fdurationMinutes\x12$\n" +
+	"\tgame_name\x18\x05 \x01(\tR\bgameName\x12%\n" +
+	"\x0eduration_hours\x18\x06 \x01(\x05R\rdurationHours\x12$\n" +
 	"\x0eprice_per_hour\x18\a \x01(\x03R\fpricePerHour\x12!\n" +
 	"\ftotal_amount\x18\b \x01(\x03R\vtotalAmount\x12\x16\n" +
 	"\x06status\x18\t \x01(\x05R\x06status\x12\x1d\n" +
@@ -1095,12 +1095,12 @@ const file_order_proto_rawDesc = "" +
 	"\fcancelled_at\x18\x0f \x01(\x03R\vcancelledAt\x12\x16\n" +
 	"\x06rating\x18\x10 \x01(\x01R\x06rating\x12\x18\n" +
 	"\acomment\x18\x11 \x01(\tR\acomment\x12#\n" +
-	"\rcancel_reason\x18\x12 \x01(\tR\fcancelReason\"\x98\x01\n" +
+	"\rcancel_reason\x18\x12 \x01(\tR\fcancelReason\"\x94\x01\n" +
 	"\x12CreateOrderRequest\x12\x17\n" +
 	"\aboss_id\x18\x01 \x01(\x04R\x06bossId\x12!\n" +
 	"\fcompanion_id\x18\x02 \x01(\x04R\vcompanionId\x12\x1b\n" +
-	"\tgame_name\x18\x03 \x01(\tR\bgameName\x12)\n" +
-	"\x10duration_minutes\x18\x04 \x01(\x05R\x0fdurationMinutes\"=\n" +
+	"\tgame_name\x18\x03 \x01(\tR\bgameName\x12%\n" +
+	"\x0eduration_hours\x18\x04 \x01(\x05R\rdurationHours\"=\n" +
 	"\x13CreateOrderResponse\x12&\n" +
 	"\x05order\x18\x01 \x01(\v2\x10.order.OrderInfoR\x05order\"R\n" +
 	"\x12AcceptOrderRequest\x12\x19\n" +

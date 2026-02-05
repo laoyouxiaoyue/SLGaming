@@ -16,7 +16,7 @@ import http from "@/utils/http";
  * @returns {number} response.data.companionId - 陪玩ID
  * @returns {string} response.data.gameName - 游戏名称
  * @returns {string} response.data.gameMode - 游戏模式/段位
- * @returns {number} response.data.duration - 时长（分钟）
+ * @returns {number} response.data.durationHours - 时长（小时）
  * @returns {number} response.data.pricePerHour - 每小时价格（帅币）
  * @returns {number} response.data.totalAmount - 订单总价（帅币）
  * @returns {number} response.data.status - 状态：1=CREATED, 2=PAID, 3=ACCEPTED, 4=IN_SERVICE, 5=COMPLETED, 6=CANCELLED, 7=RATED

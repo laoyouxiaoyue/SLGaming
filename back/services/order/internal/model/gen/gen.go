@@ -28,6 +28,14 @@ func main() {
 		log.Panicf("数据库连接失败: %v", err)
 	}
 
+	migrator := db.Migrator()
+	if migrator.HasColumn(&model.Order{}, "duration_minutes") && !migrator.HasColumn(&model.Order{}, "duration_hours") {
+		log.Println("检测到 duration_minutes，正在重命名为 duration_hours...")
+		if err := migrator.RenameColumn(&model.Order{}, "duration_minutes", "duration_hours"); err != nil {
+			log.Panicf("重命名字段失败: %v", err)
+		}
+	}
+
 	log.Println("开始迁移数据库表...")
 	if err := db.AutoMigrate(
 		&model.Order{},

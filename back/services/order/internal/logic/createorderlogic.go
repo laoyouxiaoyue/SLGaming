@@ -40,8 +40,8 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	if in.GetBossId() == 0 || in.GetCompanionId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "boss_id and companion_id are required")
 	}
-	if in.GetDurationMinutes() <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "duration_minutes must be positive")
+	if in.GetDurationHours() <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "duration_hours must be positive")
 	}
 
 	if l.svcCtx.UserRPC == nil {
@@ -111,9 +111,9 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		return nil, status.Error(codes.FailedPrecondition, "invalid companion price")
 	}
 
-	// 金额按照小时计算（分钟 -> 小时）
-	durationMinutes := in.GetDurationMinutes()
-	totalAmount := pricePerHour * int64(durationMinutes) / 60
+	// 金额按照小时计算
+	durationHours := in.GetDurationHours()
+	totalAmount := pricePerHour * int64(durationHours)
 
 	// 2. 检查老板钱包余额是否足够
 	walletResp, err := l.svcCtx.UserRPC.GetWallet(l.ctx, &userclient.GetWalletRequest{
@@ -144,14 +144,14 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 	}
 
 	payload := &tx.OrderPaymentPendingPayload{
-		OrderNo:         orderNo,
-		BossID:          in.GetBossId(),
-		Amount:          totalAmount,
-		BizOrderID:      orderNo,
-		CompanionID:     in.GetCompanionId(),
-		GameName:        in.GetGameName(),
-		DurationMinutes: durationMinutes,
-		PricePerHour:    pricePerHour,
+		OrderNo:       orderNo,
+		BossID:        in.GetBossId(),
+		Amount:        totalAmount,
+		BizOrderID:    orderNo,
+		CompanionID:   in.GetCompanionId(),
+		GameName:      in.GetGameName(),
+		DurationHours: durationHours,
+		PricePerHour:  pricePerHour,
 	}
 
 	// 构造事务消息

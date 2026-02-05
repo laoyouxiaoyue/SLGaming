@@ -43,8 +43,8 @@ type Order struct {
 	// 游戏信息
 	GameName string `gorm:"size:64;not null;comment:游戏名称" json:"game_name"`
 
-	// 服务时长（分钟）
-	DurationMinutes int32 `gorm:"not null;comment:服务时长(分钟)" json:"duration_minutes"`
+	// 服务时长（小时）
+	DurationHours int32 `gorm:"not null;comment:服务时长(小时)" json:"duration_hours"`
 
 	// 金额信息（帅币）
 	PricePerHour int64 `gorm:"not null;default:0;comment:每小时价格(帅币)" json:"price_per_hour"`

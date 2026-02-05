@@ -2,7 +2,6 @@ package order
 
 import (
 	"context"
-	"math"
 
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -41,13 +40,6 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderRequest) (resp *typ
 	if req.DurationHours <= 0 {
 		return &types.CreateOrderResponse{
 			BaseResp: types.BaseResp{Code: 400, Msg: "durationHours must be positive"},
-		}, nil
-	}
-
-	durationMinutes64 := int64(req.DurationHours) * 60
-	if durationMinutes64 > math.MaxInt32 {
-		return &types.CreateOrderResponse{
-			BaseResp: types.BaseResp{Code: 400, Msg: "durationHours too large"},
 		}, nil
 	}
 

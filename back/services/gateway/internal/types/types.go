@@ -292,24 +292,24 @@ type LogoutResponse struct {
 }
 
 type OrderInfo struct {
-	Id           uint64  `json:"id"`           // 订单ID
-	OrderNo      string  `json:"orderNo"`      // 订单号
-	BossId       uint64  `json:"bossId"`       // 老板ID
-	CompanionId  uint64  `json:"companionId"`  // 陪玩ID
-	GameName     string  `json:"gameName"`     // 游戏名称
-	Duration     int32   `json:"duration"`     // 时长（分钟）
-	PricePerHour int64   `json:"pricePerHour"` // 每小时价格（帅币）
-	TotalAmount  int64   `json:"totalAmount"`  // 订单总价（帅币）
-	Status       int32   `json:"status"`       // 状态：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED
-	CreatedAt    int64   `json:"createdAt"`    // 创建时间
-	PaidAt       int64   `json:"paidAt"`       // 支付时间
-	AcceptedAt   int64   `json:"acceptedAt"`   // 接单时间
-	StartAt      int64   `json:"startAt"`      // 开始服务时间
-	CompletedAt  int64   `json:"completedAt"`  // 完成时间
-	CancelledAt  int64   `json:"cancelledAt"`  // 取消时间
-	Rating       float64 `json:"rating"`       // 评分
-	Comment      string  `json:"comment"`      // 评价内容
-	CancelReason string  `json:"cancelReason"` // 取消原因
+	Id            uint64  `json:"id"`            // 订单ID
+	OrderNo       string  `json:"orderNo"`       // 订单号
+	BossId        uint64  `json:"bossId"`        // 老板ID
+	CompanionId   uint64  `json:"companionId"`   // 陪玩ID
+	GameName      string  `json:"gameName"`      // 游戏名称
+	DurationHours int32   `json:"durationHours"` // 时长（小时）
+	PricePerHour  int64   `json:"pricePerHour"`  // 每小时价格（帅币）
+	TotalAmount   int64   `json:"totalAmount"`   // 订单总价（帅币）
+	Status        int32   `json:"status"`        // 状态：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED
+	CreatedAt     int64   `json:"createdAt"`     // 创建时间
+	PaidAt        int64   `json:"paidAt"`        // 支付时间
+	AcceptedAt    int64   `json:"acceptedAt"`    // 接单时间
+	StartAt       int64   `json:"startAt"`       // 开始服务时间
+	CompletedAt   int64   `json:"completedAt"`   // 完成时间
+	CancelledAt   int64   `json:"cancelledAt"`   // 取消时间
+	Rating        float64 `json:"rating"`        // 评分
+	Comment       string  `json:"comment"`       // 评价内容
+	CancelReason  string  `json:"cancelReason"`  // 取消原因
 }
 
 type RateOrderRequest struct {

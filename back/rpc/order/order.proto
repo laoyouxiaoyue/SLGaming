@@ -23,8 +23,8 @@ message OrderInfo {
   uint64 boss_id = 3;      // 老板ID（下单方）
   uint64 companion_id = 4; // 陪玩ID（接单方）
 
-  string game_name = 5;      // 游戏名称
-  int32 duration_minutes = 6; // 服务时长（分钟）
+  string game_name = 5;     // 游戏名称
+  int32 duration_hours = 6; // 服务时长（小时）
 
   int64 price_per_hour = 7; // 单价（每小时帅币）
   int64 total_amount = 8;   // 订单总价（帅币）
@@ -56,7 +56,7 @@ message CreateOrderRequest {
   uint64 companion_id = 2; // 陪玩ID
 
   string game_name = 3;     // 游戏名称
-  int32 duration_minutes = 4; // 服务时长（分钟）
+  int32 duration_hours = 4; // 服务时长（小时）
 }
 
 message CreateOrderResponse {

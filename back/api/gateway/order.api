@@ -11,7 +11,7 @@ type OrderInfo {
     BossId       uint64 `json:"bossId"`       // 老板ID
     CompanionId  uint64 `json:"companionId"`  // 陪玩ID
     GameName     string `json:"gameName"`     // 游戏名称
-    Duration     int32  `json:"duration"`     // 时长（分钟）
+    DurationHours int32  `json:"durationHours"` // 时长（小时）
     PricePerHour int64  `json:"pricePerHour"` // 每小时价格（帅币）
     TotalAmount  int64  `json:"totalAmount"`  // 订单总价（帅币）
     Status       int32  `json:"status"`       // 状态：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED

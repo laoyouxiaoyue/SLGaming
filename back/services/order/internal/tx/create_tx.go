@@ -19,10 +19,10 @@ type OrderPaymentPendingPayload struct {
 	BizOrderID string `json:"biz_order_id"`
 
 	// 扩展字段：用于在本地事务中创建订单
-	CompanionID     uint64 `json:"companion_id"`
-	GameName        string `json:"game_name"`
-	DurationMinutes int32  `json:"duration_minutes"`
-	PricePerHour    int64  `json:"price_per_hour"`
+	CompanionID   uint64 `json:"companion_id"`
+	GameName      string `json:"game_name"`
+	DurationHours int32  `json:"duration_hours"`
+	PricePerHour  int64  `json:"price_per_hour"`
 }
 
 // ExecuteCreateOrderTx 在本地事务中创建订单记录，如果订单已存在则幂等返回。
@@ -45,15 +45,20 @@ func ExecuteCreateOrderTx(ctx context.Context, db *gorm.DB, p *OrderPaymentPendi
 			return err
 		}
 
+		if p.DurationHours <= 0 {
+			logx.Errorf("ExecuteCreateOrderTx: invalid duration_hours: %d", p.DurationHours)
+			return gorm.ErrInvalidData
+		}
+
 		o := &model.Order{
-			BossID:          p.BossID,
-			CompanionID:     p.CompanionID,
-			GameName:        p.GameName,
-			DurationMinutes: p.DurationMinutes,
-			PricePerHour:    p.PricePerHour,
-			TotalAmount:     p.Amount,
-			Status:          model.OrderStatusCreated,
-			OrderNo:         p.OrderNo,
+			BossID:        p.BossID,
+			CompanionID:   p.CompanionID,
+			GameName:      p.GameName,
+			DurationHours: p.DurationHours,
+			PricePerHour:  p.PricePerHour,
+			TotalAmount:   p.Amount,
+			Status:        model.OrderStatusCreated,
+			OrderNo:       p.OrderNo,
 		}
 
 		if err := tx.Create(o).Error; err != nil {

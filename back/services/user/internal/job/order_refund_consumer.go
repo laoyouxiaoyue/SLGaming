@@ -62,10 +62,10 @@ type orderPaymentPendingEventPayload struct {
 	BizOrderID string `json:"biz_order_id"`
 
 	// 扩展字段：用于订单服务的本地事务（user 服务忽略）
-	CompanionID     uint64 `json:"companion_id"`
-	GameName        string `json:"game_name"`
-	DurationMinutes int32  `json:"duration_minutes"`
-	PricePerHour    int64  `json:"price_per_hour"`
+	CompanionID   uint64 `json:"companion_id"`
+	GameName      string `json:"game_name"`
+	DurationHours int32  `json:"duration_hours"`
+	PricePerHour  int64  `json:"price_per_hour"`
 }
 
 // StartOrderRefundConsumer 启动消费订单取消事件的 RocketMQ Consumer
