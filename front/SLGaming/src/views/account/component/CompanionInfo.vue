@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from "vue";
 import { useCompanionStore } from "@/stores/companionStore";
 import { storeToRefs } from "pinia";
 import { ElMessage } from "element-plus";
+import { getgameskillapi } from "@/api/home/gameskill";
 
 const companionStore = useCompanionStore();
 const { companionInfo } = storeToRefs(companionStore);
@@ -16,6 +17,10 @@ const form = ref({
   totalOrders: 0,
   isVerified: false,
 });
+
+// 游戏技能列表
+const gameSkills = ref([]);
+const loadingSkills = ref(false);
 
 // 监听 store 数据变化，同步到表单
 watch(
@@ -53,8 +58,25 @@ const onSave = async () => {
   });
 };
 
-onMounted(() => {
+// 获取游戏技能列表
+const fetchGameSkills = async () => {
+  loadingSkills.value = true;
+  try {
+    const res = await getgameskillapi();
+    if (res.code === 0) {
+      gameSkills.value = res.data || [];
+    }
+  } catch (error) {
+    console.error("获取游戏技能列表失败:", error);
+    ElMessage.error("获取游戏技能列表失败");
+  } finally {
+    loadingSkills.value = false;
+  }
+};
+
+onMounted(async () => {
   companionStore.getCompanionDetail();
+  await fetchGameSkills();
 });
 </script>
 
@@ -99,9 +121,16 @@ onMounted(() => {
         <el-divider content-position="left">服务设置</el-divider>
 
         <!-- 可编辑区域 -->
-        <el-form-item label="游戏技能" prop="gameSkill">
-          <el-input v-model="form.gameSkill" placeholder="请输入擅长的游戏，如：王者荣耀" />
-        </el-form-item>
+           <el-form-item label="游戏技能" prop="gameSkill">
+             <el-select v-model="form.gameSkill" placeholder="请选择擅长的游戏" filterable>
+               <el-option
+                 v-for="skill in gameSkills"
+                 :key="skill.id"
+                 :label="skill.name"
+                 :value="skill.name"
+               />
+             </el-select>
+           </el-form-item>
 
         <el-form-item label="服务价格" prop="pricePerHour">
           <el-input-number
