@@ -22,7 +22,6 @@ const statusOptions = [
 
 // 从 Store 获取角色：1=老板, 2=陪玩
 const userRole = computed(() => infoStore.info.role ?? 1);
-const roleTabsVisible = computed(() => userRole.value === 2);
 const queryStatus = computed(() =>
   activeStatus.value === "all" ? undefined : Number(activeStatus.value),
 );
@@ -31,14 +30,6 @@ const queryStatus = computed(() =>
 const formatTime = (timestamp) => {
   if (!timestamp) return "-";
   return new Date(timestamp).toLocaleString();
-};
-
-// 格式化时长 (分钟 -> 小时/分)
-const formatDuration = (minutes) => {
-  if (!minutes) return "-";
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return h > 0 ? `${h}小时${m > 0 ? ` ${m}分` : ""}` : `${m}分`;
 };
 
 // 获取状态文本
