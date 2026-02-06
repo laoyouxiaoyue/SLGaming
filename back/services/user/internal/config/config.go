@@ -18,12 +18,18 @@ type NacosConf struct {
 
 type Config struct {
 	zrpc.RpcServerConf
-	Nacos  NacosConf  `json:",optional"` // Nacos 配置
-	Mysql  MysqlConf  `json:",optional"` // Mysql 配置
-	Consul ConsulConf `json:",optional"`
+	Nacos    NacosConf    `json:",optional"` // Nacos 配置
+	Mysql    MysqlConf    `json:",optional"` // Mysql 配置
+	Consul   ConsulConf   `json:",optional"`
+	Upstream UpstreamConf `json:",optional"` // 上游服务配置
 
 	// RocketMQ 消息队列配置（用于钱包变动、订单结算等异步处理）
 	RocketMQ RocketMQConf `json:",optional"`
+}
+
+// UpstreamConf 上游服务配置
+type UpstreamConf struct {
+	AgentService string `json:",optional"` // 智能服务名称（用于 Consul 服务发现）
 }
 
 // MysqlConf MySQL 数据库配置

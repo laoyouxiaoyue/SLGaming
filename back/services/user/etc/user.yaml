@@ -31,6 +31,9 @@ Consul:
     CheckInterval: 10s
     CheckTimeout: 5s
 
+Upstream:
+  AgentService: agent-rpc
+
 # RocketMQ 配置（预留，用于钱包变动、订单结算等异步处理）
 RocketMQ:
   NameServers:

@@ -79,10 +79,11 @@ type RateLimitConf struct {
 
 // UploadConf 上传配置
 type UploadConf struct {
-	LocalDir   string   `json:",default=uploads"`  // 本地保存目录（相对运行目录）
-	BaseURL    string   `json:",default=/uploads"` // 对外访问前缀
-	MaxSizeMB  int64    `json:",default=5"`        // 单文件最大大小（MB）
-	AllowedExt []string `json:",optional"`         // 允许的扩展名，如 [".jpg",".png"]
+	LocalDir         string   `json:",default=uploads"`  // 本地保存目录（相对运行目录）
+	BaseURL          string   `json:",default=/uploads"` // 对外访问前缀
+	DefaultAvatarURL string   `json:",optional"`         // 审核中默认头像
+	MaxSizeMB        int64    `json:",default=5"`        // 单文件最大大小（MB）
+	AllowedExt       []string `json:",optional"`         // 允许的扩展名，如 [".jpg",".png"]
 }
 
 // AlipayConf 支付宝配置

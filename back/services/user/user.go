@@ -95,6 +95,7 @@ func main() {
 	defer cancel()
 	job.StartOrderRefundConsumer(rootCtx, ctx)
 	job.StartRechargeEventConsumer(rootCtx, ctx)
+	job.StartAvatarModerationConsumer(rootCtx, ctx)
 
 	s := zrpc.MustNewServer(cfg.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))

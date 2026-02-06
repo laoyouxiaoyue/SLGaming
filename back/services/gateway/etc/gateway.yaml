@@ -83,6 +83,7 @@ RateLimit:
 Upload:
   LocalDir: "uploads"          # 本地保存目录（相对运行目录）
   BaseURL: "http://120.26.29.242/uploads"  # 对外访问前缀
+  DefaultAvatarURL: "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/samantha/logo-icon-white-bg.png" # 审核中默认头像
   MaxSizeMB: 5                  # 单文件最大大小（MB）
   AllowedExt: [".jpg", ".jpeg", ".png", ".gif", ".webp"]
 

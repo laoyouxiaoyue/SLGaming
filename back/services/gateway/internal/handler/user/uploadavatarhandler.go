@@ -5,6 +5,7 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,14 +14,13 @@ import (
 	"strings"
 	"time"
 
-	"SLGaming/back/services/agent/agent"
-	"SLGaming/back/services/agent/agentclient"
-	"SLGaming/back/services/gateway/internal/logic/user"
+	"SLGaming/back/pkg/avatarmq"
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
 
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
@@ -105,14 +105,6 @@ func UploadAvatarHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 		avatarUrl := fmt.Sprintf("%s/avatars/%s", baseURL, filename)
 
-		if svcCtx.AgentRPC == nil {
-			_ = os.Remove(filePath)
-			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
-				BaseResp: types.BaseResp{Code: 503, Msg: "审核服务暂时不可用"},
-			})
-			return
-		}
-
 		userID, err := middleware.GetUserID(r.Context())
 		if err != nil {
 			_ = os.Remove(filePath)
@@ -122,45 +114,58 @@ func UploadAvatarHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		requestID := fmt.Sprintf("avatar-%d", time.Now().UnixNano())
-		moderateCtx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
-		defer cancel()
-		moderateResp, err := svcCtx.AgentRPC.ModerateAvatar(moderateCtx, &agentclient.ModerateAvatarRequest{
-			UserId:    userID,
-			ImageUrl:  avatarUrl,
-			Scene:     "avatar",
-			RequestId: requestID,
-		})
-		if err != nil {
+		if svcCtx.EventProducer == nil {
 			_ = os.Remove(filePath)
-			code, msg := utils.HandleRPCError(err, logx.WithContext(r.Context()), "Agent.ModerateAvatar")
+			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
+				BaseResp: types.BaseResp{Code: 503, Msg: "审核服务暂时不可用"},
+			})
+			return
+		}
+
+		defaultAvatarURL := strings.TrimSpace(svcCtx.Config.Upload.DefaultAvatarURL)
+		if defaultAvatarURL == "" {
+			defaultAvatarURL = "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/samantha/logo-icon-white-bg.png"
+		}
+
+		requestID := fmt.Sprintf("avatar-%d", time.Now().UnixNano())
+		payload := &avatarmq.AvatarModerationPayload{
+			UserID:           userID,
+			AvatarURL:        avatarUrl,
+			DefaultAvatarURL: defaultAvatarURL,
+			RequestID:        requestID,
+			SubmittedAt:      time.Now().Unix(),
+		}
+		if err := publishAvatarEvent(r.Context(), svcCtx, payload); err != nil {
+			_ = os.Remove(filePath)
+			code, msg := utils.HandleError(err, logx.WithContext(r.Context()), "PublishAvatarEvent")
 			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
 				BaseResp: types.BaseResp{Code: code, Msg: msg},
 			})
 			return
 		}
-		if moderateResp != nil && moderateResp.GetDecision() == agent.ModerationDecision_REJECT {
-			_ = os.Remove(filePath)
-			msg := strings.TrimSpace(moderateResp.GetSuggestion())
-			if msg == "" {
-				msg = "头像不合规，请更换"
-			}
-			httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
-				BaseResp: types.BaseResp{Code: 400, Msg: msg},
-			})
-			return
-		}
 
-		l := user.NewUploadAvatarLogic(r.Context(), svcCtx)
-		resp, err := l.UploadAvatar(&types.UploadAvatarRequest{Avatar: avatarUrl})
-		if err != nil {
-			_ = os.Remove(filePath)
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			if resp != nil && resp.Code != 0 {
-				_ = os.Remove(filePath)
-			}
-			httpx.OkJsonCtx(r.Context(), w, resp)
-		}
+		httpx.OkJsonCtx(r.Context(), w, &types.UploadAvatarResponse{
+			BaseResp: types.BaseResp{Code: 0, Msg: "头像已提交审核"},
+			Data: types.UploadAvatarData{
+				AvatarUrl: defaultAvatarURL,
+			},
+		})
 	}
+}
+
+func publishAvatarEvent(ctx context.Context, svcCtx *svc.ServiceContext, payload *avatarmq.AvatarModerationPayload) error {
+	if svcCtx.EventProducer == nil {
+		return fmt.Errorf("rocketmq producer not initialized")
+	}
+	if payload == nil {
+		return fmt.Errorf("payload is nil")
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	msg := primitive.NewMessage(avatarmq.AvatarEventTopic(), body)
+	msg.WithTag(avatarmq.EventTypeAvatarSubmit())
+	_, err = svcCtx.EventProducer.SendSync(ctx, msg)
+	return err
 }

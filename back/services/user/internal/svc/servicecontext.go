@@ -2,9 +2,11 @@ package svc
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
+	"SLGaming/back/services/agent/agentclient"
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
 	userMQ "SLGaming/back/services/user/internal/mq"
@@ -13,6 +15,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
+	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
 )
 
@@ -29,6 +32,9 @@ type ServiceContext struct {
 
 	// RocketMQ 事务生产者（用于用户领域事件的半消息，如 ORDER_REFUND_SUCCEEDED）
 	EventTxProducer rocketmq.TransactionProducer
+
+	// Agent RPC 客户端（用于头像审核等异步任务）
+	AgentRPC agentclient.Agent
 }
 
 // NewServiceContext 根据配置初始化所有依赖。
@@ -96,7 +102,39 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		}
 	}
 
+	// 初始化 Agent RPC 客户端
+	if c.Upstream.AgentService != "" {
+		if cli, err := newRPCClient(c.Consul, c.Upstream.AgentService); err != nil {
+			logx.Errorf("init agent rpc client failed: service=%s, err=%v", c.Upstream.AgentService, err)
+		} else {
+			ctx.AgentRPC = agentclient.NewAgent(cli)
+			logx.Infof("init agent rpc client success: service=%s", c.Upstream.AgentService)
+		}
+	}
+
 	return ctx
+}
+
+func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
+	if serviceName == "" {
+		return nil, fmt.Errorf("service name is empty")
+	}
+	if consulConf.Address == "" {
+		return nil, fmt.Errorf("consul address not configured")
+	}
+	adapter := &pkgIoc.ConsulConfigAdapter{
+		Address: consulConf.Address,
+		Token:   consulConf.Token,
+	}
+	endpoints, err := pkgIoc.ResolveServiceEndpoints(adapter, serviceName)
+	if err != nil {
+		return nil, err
+	}
+	client := zrpc.MustNewClient(zrpc.RpcClientConf{
+		Endpoints: endpoints,
+		NonBlock:  true,
+	})
+	return client, nil
 }
 
 // Config returns the latest configuration snapshot.
