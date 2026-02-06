@@ -51,6 +51,8 @@ func (l *CreateOrderLogic) CreateOrder(req *types.CreateOrderRequest) (resp *typ
 	}
 
 	rpcResp, err := l.svcCtx.OrderRPC.CreateOrder(l.ctx, rpcReq)
+	logx.Infof("rpcResp: %#v", rpcResp)
+	logx.Error(err)
 	if err != nil {
 		code, msg := utils.HandleRPCError(err, l.Logger, "CreateOrder")
 		return &types.CreateOrderResponse{

@@ -1,6 +1,7 @@
 package logic
 
 import (
+	orderioc "SLGaming/back/services/order/internal/ioc"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -17,6 +18,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/google/uuid"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
@@ -30,10 +32,38 @@ type CreateOrderLogic struct {
 
 func NewCreateOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateOrderLogic {
 	return &CreateOrderLogic{
+		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
-		Logger: logx.WithContext(ctx),
 	}
+}
+
+// reinitUserRPC 尝试重新初始化 UserRPC
+func (l *CreateOrderLogic) reinitUserRPC() error {
+	cfg := l.svcCtx.Config
+	if cfg.Upstream.UserService == "" {
+		l.Errorf("user service not configured")
+		return fmt.Errorf("user service not configured")
+	}
+
+	// 使用 Consul 服务发现重新解析用户服务端点
+	endpoints, err := orderioc.ResolveServiceEndpoints(cfg.Consul, cfg.Upstream.UserService)
+	if err != nil {
+		l.Errorf("resolve user service endpoints failed: %v", err)
+		return err
+	}
+
+	// 创建新的 RPC 客户端
+	client := zrpc.MustNewClient(zrpc.RpcClientConf{
+		Endpoints: endpoints,
+		NonBlock:  true,
+	})
+
+	// 初始化 UserRPC
+	l.svcCtx.UserRPC = userclient.NewUser(client)
+	l.Infof("reinit user rpc client success: service=%s, endpoints=%v", cfg.Upstream.UserService, endpoints)
+
+	return nil
 }
 
 func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
@@ -45,7 +75,10 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	}
 
 	if l.svcCtx.UserRPC == nil {
-		return nil, status.Error(codes.FailedPrecondition, "user rpc client not initialized")
+		// 尝试重新初始化 UserRPC
+		if err := l.reinitUserRPC(); err != nil {
+			return nil, status.Error(codes.FailedPrecondition, "user rpc client not initialized")
+		}
 	}
 
 	// 使用双重分布式锁防止并发创建订单
