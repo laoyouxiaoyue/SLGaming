@@ -21,7 +21,6 @@ const statusOptions = [
 ];
 
 // 从 Store 获取角色：1=老板, 2=陪玩
-const userRole = computed(() => infoStore.info.role ?? 1);
 const queryStatus = computed(() =>
   activeStatus.value === "all" ? undefined : Number(activeStatus.value),
 );
