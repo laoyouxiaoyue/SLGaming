@@ -40,12 +40,10 @@ http.interceptors.request.use(
     // 2. 处理发送给后端的 int64 引号问题
     // 仅对普通对象进行处理（排除 FormData、Blob 等）
     if (config.data && typeof config.data === "object" && !(config.data instanceof FormData)) {
-      console.log("【请求拦截】原始数据:", config.data);
       // 使用 JSONBigInt 序列化
       const jsonStr = JSONBigInt.stringify(config.data);
       // 替换长数字字符串为数字类型，支持可能存在的空格
       config.data = jsonStr.replace(/:\s*"(\d{16,})"/g, ":$1");
-      console.log("【请求拦截】处理后JSON:", config.data);
       config.headers["Content-Type"] = "application/json";
     }
 
@@ -53,7 +51,7 @@ http.interceptors.request.use(
   },
   (e) => {
     return Promise.reject(e);
-  },
+  }
 );
 
 // axios响应拦截器
@@ -72,7 +70,7 @@ http.interceptors.response.use(
       userStore.clearUserInfo();
     }
     return Promise.reject(e);
-  },
+  }
 );
 
 export default http;

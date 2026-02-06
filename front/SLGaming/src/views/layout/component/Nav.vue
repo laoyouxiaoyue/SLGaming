@@ -87,7 +87,7 @@ watch(
                     v-if="info.avatarUrl"
                     :style="{ backgroundImage: `url(${info.avatarUrl})` }"
                   ></div>
-                  <sl-icon name="icon-touxiang1" v-else size="70" color="#fff" />
+                  <sl-icon name="icon-touxiang1" v-else size="60" color="#fff" />
                   <!-- 状态展示：小圆点 -->
                   <div v-if="statusClass" class="status-tag" :class="statusClass"></div>
                 </a>
@@ -187,8 +187,8 @@ watch(
       &.user-info {
         .avatar-link {
           position: relative;
-          width: 52px;
-          height: 52px;
+          width: 46px;
+          height: 46px;
           border-radius: 50%;
           border: 2px solid #fff;
           background-color: rgba(255, 255, 255, 0.2);
@@ -196,6 +196,7 @@ watch(
           align-items: center;
           justify-content: center;
           padding: 0; // 清除默认 padding
+          margin-right: 30px;
 
           .avatar-box {
             width: 100%;
@@ -207,10 +208,10 @@ watch(
 
           .status-tag {
             position: absolute;
-            top: 37px;
+            top: 31px;
             right: -2px;
-            width: 12px;
-            height: 12px;
+            width: 13px;
+            height: 13px;
             border-radius: 50%;
             border: 1.5px solid #fff;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);

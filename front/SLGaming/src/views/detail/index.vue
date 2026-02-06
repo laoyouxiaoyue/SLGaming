@@ -36,7 +36,6 @@ const fetchCompanionInfo = async () => {
     companionInfo.value = res.data;
   } catch (error) {
     console.error("获取陪玩信息失败:", error);
-    ElMessage.error("获取陪玩信息失败");
   } finally {
     loading.value = false;
   }
@@ -54,7 +53,6 @@ const createOrder = async () => {
     };
     const res = await createOrderAPI(data);
     ElMessage.success("订单创建成功");
-    console.log("订单信息:", res.data);
     // 可以跳转到订单详情页或订单列表页
   } catch (error) {
     console.error("创建订单失败:", error);
@@ -143,8 +141,8 @@ onMounted(() => {
   max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
 }
 
 .loading,
