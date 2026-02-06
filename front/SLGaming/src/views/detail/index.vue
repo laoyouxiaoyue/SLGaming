@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
 
 const route = useRoute();
+const router = useRouter();
 const loading = ref(true);
 const ordering = ref(false);
 const companionInfo = ref(null);
@@ -47,13 +48,19 @@ const createOrder = async () => {
   try {
     ordering.value = true;
     const data = {
-      companionId: String(companionInfo.value.userId),
+      companionId: companionInfo.value.userId,
       gameName: companionInfo.value.gameSkill,
       durationHours: orderForm.value.durationHours,
     };
     await createOrderAPI(data);
-    ElMessage.success("订单创建成功");
+    ElMessage.success({
+      message: "支付成功！",
+      duration: 1500,
+    });
     // 可以跳转到订单详情页或订单列表页
+    setTimeout(async () => {
+      router.replace("/order/boss");
+    }, 1200);
   } catch (error) {
     console.error("创建订单失败:", error);
   } finally {

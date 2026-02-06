@@ -211,13 +211,12 @@ watch([activeStatus], () => {
   padding: 0 10px;
 
   .setting-content {
-    padding-top: 20px;
+    padding-bottom: 20px;
   }
 
   .role-tabs,
   .status-tabs {
-    font-size: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 1px;
   }
 
   .order-list {
