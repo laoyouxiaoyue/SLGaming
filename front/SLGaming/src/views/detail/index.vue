@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
-import { createOrderAPI } from "@/api/order/manage/create.js";
+import { createOrderAPI } from "@/api/order/order";
 
 const route = useRoute();
 const loading = ref(true);

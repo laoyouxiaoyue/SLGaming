@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI } from "@/api/order/manage/order";
+import { getOrderListAPI } from "@/api/order";
 
 const infoStore = useInfoStore();
 const activeRole = ref("boss");
