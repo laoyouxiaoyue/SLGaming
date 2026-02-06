@@ -51,7 +51,7 @@ http.interceptors.request.use(
   },
   (e) => {
     return Promise.reject(e);
-  }
+  },
 );
 
 // axios响应拦截器
@@ -70,7 +70,7 @@ http.interceptors.response.use(
       userStore.clearUserInfo();
     }
     return Promise.reject(e);
-  }
+  },
 );
 
 export default http;
