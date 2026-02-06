@@ -51,7 +51,7 @@ const createOrder = async () => {
       gameName: companionInfo.value.gameSkill,
       durationHours: orderForm.value.durationHours,
     };
-    const res = await createOrderAPI(data);
+    await createOrderAPI(data);
     ElMessage.success("订单创建成功");
     // 可以跳转到订单详情页或订单列表页
   } catch (error) {
@@ -141,8 +141,8 @@ onMounted(() => {
   max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .loading,
