@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"SLGaming/back/services/agent/agent"
 	"SLGaming/back/services/agent/internal/embedder"
@@ -34,8 +35,15 @@ func NewRecommendCompanionLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 
 // 根据用户输入推荐陪玩
 func (l *RecommendCompanionLogic) RecommendCompanion(in *agent.RecommendCompanionRequest) (*agent.RecommendCompanionResponse, error) {
+	start := time.Now()
+	userID := in.GetUserId()
+	userInput := in.GetUserInput()
+
+	l.Infof("RecommendCompanion start user_id=%d user_input=%.150s", userID, userInput)
+
 	// 检查 Milvus 客户端是否已初始化
 	if l.svcCtx.MilvusClient == nil {
+		l.Errorf("RecommendCompanion milvus client not initialized user_id=%d", userID)
 		return &agent.RecommendCompanionResponse{
 			Companions:  nil,
 			Explanation: "Milvus 客户端未初始化",
@@ -45,11 +53,13 @@ func (l *RecommendCompanionLogic) RecommendCompanion(in *agent.RecommendCompanio
 	// 检查 LLM 配置
 	cfg := l.svcCtx.Config()
 	if cfg.LLM.APIKey == "" {
+		l.Errorf("RecommendCompanion llm config incomplete user_id=%d", userID)
 		return &agent.RecommendCompanionResponse{
 			Companions:  nil,
 			Explanation: "LLM 配置不完整",
 		}, fmt.Errorf("llm config incomplete")
 	}
+	l.Infof("RecommendCompanion llm config loaded user_id=%d model=%s", userID, cfg.LLM.Model)
 
 	// 1. 使用千问大模型格式化过滤条件
 	chatAPIKey := cfg.LLM.ChatAPIKey
@@ -223,6 +233,8 @@ func (l *RecommendCompanionLogic) RecommendCompanion(in *agent.RecommendCompanio
 	if filterExpr != "" {
 		explanation += fmt.Sprintf("（已应用过滤条件：%s）", filterExpr)
 	}
+
+	l.Infof("RecommendCompanion done user_id=%d companion_count=%d filter_expr=%s duration=%s", in.GetUserId(), len(companions), filterExpr, time.Since(start))
 
 	return &agent.RecommendCompanionResponse{
 		Companions:  companions,

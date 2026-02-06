@@ -34,8 +34,18 @@ func NewModerateAvatarLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Mo
 
 // 头像多模态审核
 func (l *ModerateAvatarLogic) ModerateAvatar(in *agent.ModerateAvatarRequest) (*agent.ModerateAvatarResponse, error) {
+	start := time.Now()
+	requestID := strings.TrimSpace(in.GetRequestId())
+	scene := strings.TrimSpace(in.GetScene())
+	if scene == "" {
+		scene = "avatar"
+	}
+	userID := in.GetUserId()
+	//l.Infof("ModerateAvatar start user_id=%d request_id=%s scene=%s image_url_len=%d image_base64_len=%d", userID, requestID, scene, len(in.GetImageUrl()), len(in.GetImageBase64()))
+	logx.Infof("ModerateAvatar start user_id=%d request_id=%s scene=%s image_url_len=%d image_base64_len=%d", userID, requestID, scene, len(in.GetImageUrl()), len(in.GetImageBase64()))
 	imageURL, err := l.resolveImageURL(in)
 	if err != nil {
+		l.Errorf("ModerateAvatar resolve image url failed user_id=%d request_id=%s err=%v", userID, requestID, err)
 		return &agent.ModerateAvatarResponse{
 			Decision:  agent.ModerationDecision_REJECT,
 			RiskScore: 1,
@@ -50,6 +60,13 @@ func (l *ModerateAvatarLogic) ModerateAvatar(in *agent.ModerateAvatarRequest) (*
 		}, nil
 	}
 
+	l.Infof("ModerateAvatar image resolved user_id=%d request_id=%s image_kind=%s", userID, requestID, func() string {
+		if strings.HasPrefix(imageURL, "data:image") {
+			return "data_url"
+		}
+		return "url"
+	}())
+
 	cfg := l.svcCtx.Config()
 	apiKey := strings.TrimSpace(os.Getenv("ARK_API_KEY"))
 	if apiKey == "" {
@@ -59,6 +76,7 @@ func (l *ModerateAvatarLogic) ModerateAvatar(in *agent.ModerateAvatarRequest) (*
 		apiKey = cfg.LLM.APIKey
 	}
 	if apiKey == "" {
+		l.Errorf("ModerateAvatar api key missing user_id=%d request_id=%s", userID, requestID)
 		return &agent.ModerateAvatarResponse{
 			Decision:   agent.ModerationDecision_REJECT,
 			RiskScore:  1,
@@ -67,13 +85,14 @@ func (l *ModerateAvatarLogic) ModerateAvatar(in *agent.ModerateAvatarRequest) (*
 			RequestId:  in.GetRequestId(),
 		}, nil
 	}
+	// 固定API Key
 	apiKey = "4080e00c-d706-474e-a68c-cbee598c9001"
-	model := strings.TrimSpace(cfg.LLM.ChatModel)
-	model = "doubao-seed-1-6-lite-251015"
+	model := "doubao-seed-1-6-lite-251015"
 
-	result, callErr := l.callModerationModel(apiKey, model, imageURL, in.GetScene())
+	l.Infof("ModerateAvatar calling model user_id=%d request_id=%s model=%s", userID, requestID, model)
+	result, callErr := l.callModerationModel(apiKey, model, imageURL, scene)
 	if callErr != nil {
-		l.Errorf("moderation model call failed: %v", callErr)
+		l.Errorf("ModerateAvatar model call failed user_id=%d request_id=%s scene=%s err=%v", userID, requestID, scene, callErr)
 		return &agent.ModerateAvatarResponse{
 			Decision:   agent.ModerationDecision_REJECT,
 			RiskScore:  1,
@@ -82,6 +101,8 @@ func (l *ModerateAvatarLogic) ModerateAvatar(in *agent.ModerateAvatarRequest) (*
 			RequestId:  in.GetRequestId(),
 		}, nil
 	}
+
+	l.Infof("ModerateAvatar model response received user_id=%d request_id=%s raw_decision=%s risk_score=%.2f", userID, requestID, result.Decision, result.RiskScore)
 
 	decision := agent.ModerationDecision_REJECT
 	if strings.EqualFold(result.Decision, "pass") {
@@ -103,6 +124,8 @@ func (l *ModerateAvatarLogic) ModerateAvatar(in *agent.ModerateAvatarRequest) (*
 			suggestion = "头像不合规，请更换"
 		}
 	}
+
+	l.Infof("ModerateAvatar done user_id=%d request_id=%s scene=%s decision=%s risk=%.2f labels=%v duration=%s", userID, requestID, scene, decision.String(), riskScore, result.Labels, time.Since(start))
 
 	return &agent.ModerateAvatarResponse{
 		Decision:   decision,

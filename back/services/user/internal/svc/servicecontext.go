@@ -119,21 +119,25 @@ func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client
 	if serviceName == "" {
 		return nil, fmt.Errorf("service name is empty")
 	}
-	if consulConf.Address == "" {
-		return nil, fmt.Errorf("consul address not configured")
-	}
+
+	// 通过Consul服务发现获取Agent服务地址
 	adapter := &pkgIoc.ConsulConfigAdapter{
 		Address: consulConf.Address,
 		Token:   consulConf.Token,
 	}
+
 	endpoints, err := pkgIoc.ResolveServiceEndpoints(adapter, serviceName)
 	if err != nil {
+		logx.Errorf("resolve service endpoints failed: service=%s, err=%v", serviceName, err)
 		return nil, err
 	}
+
 	client := zrpc.MustNewClient(zrpc.RpcClientConf{
 		Endpoints: endpoints,
 		NonBlock:  true,
 	})
+	logx.Infof("create rpc client success: service=%s, endpoints=%v", serviceName, endpoints)
+
 	return client, nil
 }
 

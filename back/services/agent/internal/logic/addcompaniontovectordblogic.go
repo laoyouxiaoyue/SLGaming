@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"SLGaming/back/services/agent/agent"
 	"SLGaming/back/services/agent/internal/svc"
@@ -35,8 +36,13 @@ func NewAddCompanionToVectorDBLogic(ctx context.Context, svcCtx *svc.ServiceCont
 
 // 添加陪玩信息到向量数据库
 func (l *AddCompanionToVectorDBLogic) AddCompanionToVectorDB(in *agent.AddCompanionToVectorDBRequest) (*agent.AddCompanionToVectorDBResponse, error) {
+	start := time.Now()
+	userID := in.GetUserId()
+	l.Infof("AddCompanionToVectorDB start user_id=%d game_skill=%s age=%d price_per_hour=%d", userID, in.GetGameSkill(), in.GetAge(), in.GetPricePerHour())
+
 	// 检查 Milvus 客户端是否已初始化
 	if l.svcCtx.MilvusClient == nil {
+		l.Errorf("AddCompanionToVectorDB milvus client not initialized user_id=%d", userID)
 		return &agent.AddCompanionToVectorDBResponse{
 			Success: false,
 			Message: "Milvus 客户端未初始化",
@@ -46,11 +52,13 @@ func (l *AddCompanionToVectorDBLogic) AddCompanionToVectorDB(in *agent.AddCompan
 	// 检查 LLM 配置
 	cfg := l.svcCtx.Config()
 	if cfg.LLM.APIKey == "" || cfg.LLM.Model == "" {
+		l.Errorf("AddCompanionToVectorDB llm config incomplete user_id=%d", userID)
 		return &agent.AddCompanionToVectorDBResponse{
 			Success: false,
 			Message: "LLM 配置不完整，需要 APIKey 和 Model",
 		}, fmt.Errorf("llm config incomplete")
 	}
+	l.Infof("AddCompanionToVectorDB llm config loaded user_id=%d model=%s", userID, cfg.LLM.Model)
 
 	// 初始化自定义 DashScope 嵌入器
 	emb, err := embedder.NewDashScopeEmbedder(l.ctx, cfg.LLM.APIKey, cfg.LLM.Model)
@@ -126,6 +134,8 @@ func (l *AddCompanionToVectorDBLogic) AddCompanionToVectorDB(in *agent.AddCompan
 
 	companionIDUint := uint64(in.UserId)
 	l.Infof("成功存储陪玩信息到向量数据库, companion_id=%d (user_id)", companionIDUint)
+
+	l.Infof("AddCompanionToVectorDB done user_id=%d companion_id=%d duration=%s", in.GetUserId(), companionIDUint, time.Since(start))
 
 	return &agent.AddCompanionToVectorDBResponse{
 		CompanionId: companionIDUint, // 返回 UserID 作为 companion_id

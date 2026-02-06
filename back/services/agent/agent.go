@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -93,6 +92,7 @@ func main() {
 
 	defer stopServer()
 
-	fmt.Printf("Starting rpc server at %s...\n", cfg.ListenOn)
+	//logx.Infof("starting agent rpc server at %s", cfg.ListenOn)
+	logx.Infof("Starting rpc server at %s...", cfg.ListenOn)
 	s.Start()
 }

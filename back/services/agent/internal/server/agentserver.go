@@ -30,10 +30,16 @@ func NewAgentServer(svcCtx *svc.ServiceContext) *AgentServer {
 func (s *AgentServer) RecommendCompanion(ctx context.Context, in *agent.RecommendCompanionRequest) (*agent.RecommendCompanionResponse, error) {
 	logger := logx.WithContext(ctx)
 	start := time.Now()
-	logger.Infof("rpc=RecommendCompanion user_id=%d user_input_len=%d", in.GetUserId(), len(in.GetUserInput()))
+	userID := in.GetUserId()
+	userInput := in.GetUserInput()
+	logger.Infof("rpc=RecommendCompanion start user_id=%d user_input_len=%d user_input=%.100s", userID, len(userInput), userInput)
 	l := logic.NewRecommendCompanionLogic(ctx, s.svcCtx)
 	resp, err := l.RecommendCompanion(in)
-	logger.Infof("rpc=RecommendCompanion done err=%v duration=%s", err, time.Since(start))
+	companionCount := 0
+	if resp != nil && resp.Companions != nil {
+		companionCount = len(resp.Companions)
+	}
+	logger.Infof("rpc=RecommendCompanion done user_id=%d companion_count=%d err=%v duration=%s", userID, companionCount, err, time.Since(start))
 	return resp, err
 }
 
@@ -41,10 +47,17 @@ func (s *AgentServer) RecommendCompanion(ctx context.Context, in *agent.Recommen
 func (s *AgentServer) AddCompanionToVectorDB(ctx context.Context, in *agent.AddCompanionToVectorDBRequest) (*agent.AddCompanionToVectorDBResponse, error) {
 	logger := logx.WithContext(ctx)
 	start := time.Now()
-	logger.Infof("rpc=AddCompanionToVectorDB user_id=%d game_skill=%s", in.GetUserId(), in.GetGameSkill())
+	userID := in.GetUserId()
+	gameSkill := in.GetGameSkill()
+	age := in.GetAge()
+	logger.Infof("rpc=AddCompanionToVectorDB start user_id=%d game_skill=%s age=%d price_per_hour=%d", userID, gameSkill, age, in.GetPricePerHour())
 	l := logic.NewAddCompanionToVectorDBLogic(ctx, s.svcCtx)
 	resp, err := l.AddCompanionToVectorDB(in)
-	logger.Infof("rpc=AddCompanionToVectorDB done err=%v duration=%s", err, time.Since(start))
+	success := false
+	if resp != nil {
+		success = resp.Success
+	}
+	logger.Infof("rpc=AddCompanionToVectorDB done user_id=%d success=%v err=%v duration=%s", userID, success, err, time.Since(start))
 	return resp, err
 }
 
@@ -52,13 +65,15 @@ func (s *AgentServer) AddCompanionToVectorDB(ctx context.Context, in *agent.AddC
 func (s *AgentServer) ModerateAvatar(ctx context.Context, in *agent.ModerateAvatarRequest) (*agent.ModerateAvatarResponse, error) {
 	logger := logx.WithContext(ctx)
 	start := time.Now()
-	logger.Infof("rpc=ModerateAvatar user_id=%d scene=%s request_id=%s image_url_len=%d image_base64_len=%d", in.GetUserId(), in.GetScene(), in.GetRequestId(), len(in.GetImageUrl()), len(in.GetImageBase64()))
+	userID := in.GetUserId()
+	requestID := in.GetRequestId()
+	logger.Infof("rpc=ModerateAvatar start user_id=%d request_id=%s image_url_len=%d image_base64_len=%d", userID, requestID, len(in.GetImageUrl()), len(in.GetImageBase64()))
 	l := logic.NewModerateAvatarLogic(ctx, s.svcCtx)
 	resp, err := l.ModerateAvatar(in)
-	decision := ""
+	decision := "unknown"
 	if resp != nil {
-		decision = resp.GetDecision().String()
+		decision = resp.Decision.String()
 	}
-	logger.Infof("rpc=ModerateAvatar done err=%v decision=%s duration=%s", err, decision, time.Since(start))
+	logger.Infof("rpc=ModerateAvatar done user_id=%d request_id=%s decision=%s err=%v duration=%s", userID, requestID, decision, err, time.Since(start))
 	return resp, err
 }

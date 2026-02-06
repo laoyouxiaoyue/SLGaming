@@ -32,6 +32,8 @@ var configFile = flag.String("f", "etc/user.yaml", "the config file")
 func main() {
 	flag.Parse()
 
+	// 配置日志
+
 	// 先加载本地配置
 	var cfg config.Config
 	conf.MustLoad(*configFile, &cfg)
