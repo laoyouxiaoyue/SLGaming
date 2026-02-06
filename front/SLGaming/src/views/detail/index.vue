@@ -48,7 +48,7 @@ const createOrder = async () => {
   try {
     ordering.value = true;
     const data = {
-      companionId: companionInfo.value.userId,
+      companionId: String(companionInfo.value.userId),
       gameName: companionInfo.value.gameSkill,
       durationHours: orderForm.value.durationHours,
     };
@@ -58,7 +58,6 @@ const createOrder = async () => {
     // 可以跳转到订单详情页或订单列表页
   } catch (error) {
     console.error("创建订单失败:", error);
-    ElMessage.error("创建订单失败");
   } finally {
     ordering.value = false;
   }
@@ -426,7 +425,7 @@ onMounted(() => {
   .content-wrapper {
     flex-direction: column;
   }
-  
+
   .right-section {
     width: 100%;
   }
