@@ -123,7 +123,7 @@ func UploadAvatarHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		requestID := fmt.Sprintf("avatar-%d", time.Now().UnixNano())
-		moderateCtx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+		moderateCtx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
 		defer cancel()
 		moderateResp, err := svcCtx.AgentRPC.ModerateAvatar(moderateCtx, &agentclient.ModerateAvatarRequest{
 			UserId:    userID,
