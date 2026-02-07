@@ -59,7 +59,7 @@ const createOrder = async () => {
           type: "warning",
         },
       );
-      router.push("/wallet");
+      router.push("/scion/recharge");
     } catch {
       // 用户点击取消，不做操作
     }
