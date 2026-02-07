@@ -8,6 +8,7 @@ package order
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -43,6 +44,7 @@ type OrderClient interface {
 	// 查询相关
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
 	GetOrderList(ctx context.Context, in *GetOrderListRequest, opts ...grpc.CallOption) (*GetOrderListResponse, error)
+	// 获取指定陪玩的订单评价列表（仅返回已评价订单）
 }
 
 type orderClient struct {
@@ -147,6 +149,7 @@ type OrderServer interface {
 	// 查询相关
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
 	GetOrderList(context.Context, *GetOrderListRequest) (*GetOrderListResponse, error)
+	// 获取指定陪玩的订单评价列表（仅返回已评价订单）
 	mustEmbedUnimplementedOrderServer()
 }
 

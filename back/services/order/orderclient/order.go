@@ -43,6 +43,7 @@ type (
 		// 查询相关
 		GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
 		GetOrderList(ctx context.Context, in *GetOrderListRequest, opts ...grpc.CallOption) (*GetOrderListResponse, error)
+		// 获取指定陪玩的订单评价列表（仅返回已评价订单）
 	}
 
 	defaultOrder struct {
@@ -97,3 +98,5 @@ func (m *defaultOrder) GetOrderList(ctx context.Context, in *GetOrderListRequest
 	client := order.NewOrderClient(m.cli.Conn())
 	return client.GetOrderList(ctx, in, opts...)
 }
+
+// 获取指定陪玩的订单评价列表（仅返回已评价订单）

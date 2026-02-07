@@ -9,6 +9,7 @@ import (
 	"SLGaming/back/services/order/internal/svc"
 	"SLGaming/back/services/order/internal/tx"
 	"SLGaming/back/services/order/order"
+	"SLGaming/back/services/user/userclient"
 
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -35,6 +36,9 @@ func (l *CompleteOrderLogic) CompleteOrder(in *order.CompleteOrderRequest) (*ord
 	if in.GetOrderId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "order_id is required")
 	}
+	if in.GetOperatorId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "operator_id is required")
+	}
 
 	db := l.svcCtx.DB.WithContext(l.ctx)
 
@@ -45,6 +49,20 @@ func (l *CompleteOrderLogic) CompleteOrder(in *order.CompleteOrderRequest) (*ord
 		}
 		l.Errorf("get order failed: %v", err)
 		return nil, status.Error(codes.Internal, "get order failed")
+	}
+
+	if o.BossID != in.GetOperatorId() {
+		if l.svcCtx.UserRPC == nil {
+			return nil, status.Error(codes.PermissionDenied, "only boss or admin can complete order")
+		}
+		userResp, err := l.svcCtx.UserRPC.GetUser(l.ctx, &userclient.GetUserRequest{Id: in.GetOperatorId()})
+		if err != nil {
+			l.Errorf("get operator role failed: %v", err)
+			return nil, status.Error(codes.Internal, "get operator role failed")
+		}
+		if userResp.GetUser() == nil || userResp.GetUser().GetRole() != 3 {
+			return nil, status.Error(codes.PermissionDenied, "only boss or admin can complete order")
+		}
 	}
 
 	if o.Status != model.OrderStatusInService && o.Status != model.OrderStatusAccepted {

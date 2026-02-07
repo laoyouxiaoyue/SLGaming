@@ -566,7 +566,7 @@
       "post": {
         "tags": ["订单状态流转"],
         "summary": "完成订单",
-        "description": "完成订单（需登录，陪玩/系统）",
+        "description": "完成订单（需登录，老板/管理员）",
         "operationId": "completeOrder",
         "security": [
           {

@@ -64,3 +64,5 @@ func (s *OrderServer) GetOrderList(ctx context.Context, in *order.GetOrderListRe
 	l := logic.NewGetOrderListLogic(ctx, s.svcCtx)
 	return l.GetOrderList(in)
 }
+
+// 获取指定陪玩的订单评价列表（仅返回已评价订单）

@@ -1148,7 +1148,7 @@ const file_order_proto_rawDesc = "" +
 	"\x06orders\x18\x01 \x03(\v2\x10.order.OrderInfoR\x06orders\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\xae\x04\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize2\x81\x05\n" +
 	"\x05Order\x12D\n" +
 	"\vCreateOrder\x12\x19.order.CreateOrderRequest\x1a\x1a.order.CreateOrderResponse\x12D\n" +
 	"\vAcceptOrder\x12\x19.order.AcceptOrderRequest\x1a\x1a.order.AcceptOrderResponse\x12A\n" +
@@ -1158,7 +1158,8 @@ const file_order_proto_rawDesc = "" +
 	"\vCancelOrder\x12\x19.order.CancelOrderRequest\x1a\x1a.order.CancelOrderResponse\x12>\n" +
 	"\tRateOrder\x12\x17.order.RateOrderRequest\x1a\x18.order.RateOrderResponse\x12;\n" +
 	"\bGetOrder\x12\x16.order.GetOrderRequest\x1a\x17.order.GetOrderResponse\x12G\n" +
-	"\fGetOrderList\x12\x1a.order.GetOrderListRequest\x1a\x1b.order.GetOrderListResponseB\tZ\a./orderb\x06proto3"
+	"\fGetOrderList\x12\x1a.order.GetOrderListRequest\x1a\x1b.order.GetOrderListResponse\x12Q\n" +
+	"\x16GetCompanionRatingList\x12\x1a.order.GetOrderListRequest\x1a\x1b.order.GetOrderListResponseB\tZ\a./orderb\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once
@@ -1209,16 +1210,18 @@ var file_order_proto_depIdxs = []int32{
 	11, // 13: order.Order.RateOrder:input_type -> order.RateOrderRequest
 	13, // 14: order.Order.GetOrder:input_type -> order.GetOrderRequest
 	15, // 15: order.Order.GetOrderList:input_type -> order.GetOrderListRequest
-	2,  // 16: order.Order.CreateOrder:output_type -> order.CreateOrderResponse
-	4,  // 17: order.Order.AcceptOrder:output_type -> order.AcceptOrderResponse
-	6,  // 18: order.Order.StartOrder:output_type -> order.StartOrderResponse
-	8,  // 19: order.Order.CompleteOrder:output_type -> order.CompleteOrderResponse
-	10, // 20: order.Order.CancelOrder:output_type -> order.CancelOrderResponse
-	12, // 21: order.Order.RateOrder:output_type -> order.RateOrderResponse
-	14, // 22: order.Order.GetOrder:output_type -> order.GetOrderResponse
-	16, // 23: order.Order.GetOrderList:output_type -> order.GetOrderListResponse
-	16, // [16:24] is the sub-list for method output_type
-	8,  // [8:16] is the sub-list for method input_type
+	15, // 16: order.Order.GetCompanionRatingList:input_type -> order.GetOrderListRequest
+	2,  // 17: order.Order.CreateOrder:output_type -> order.CreateOrderResponse
+	4,  // 18: order.Order.AcceptOrder:output_type -> order.AcceptOrderResponse
+	6,  // 19: order.Order.StartOrder:output_type -> order.StartOrderResponse
+	8,  // 20: order.Order.CompleteOrder:output_type -> order.CompleteOrderResponse
+	10, // 21: order.Order.CancelOrder:output_type -> order.CancelOrderResponse
+	12, // 22: order.Order.RateOrder:output_type -> order.RateOrderResponse
+	14, // 23: order.Order.GetOrder:output_type -> order.GetOrderResponse
+	16, // 24: order.Order.GetOrderList:output_type -> order.GetOrderListResponse
+	16, // 25: order.Order.GetCompanionRatingList:output_type -> order.GetOrderListResponse
+	17, // [17:26] is the sub-list for method output_type
+	8,  // [8:17] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
 	8,  // [8:8] is the sub-list for extension extendee
 	0,  // [0:8] is the sub-list for field type_name
