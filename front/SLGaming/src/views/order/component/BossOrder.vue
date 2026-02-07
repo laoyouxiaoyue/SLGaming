@@ -28,7 +28,8 @@ const queryStatus = computed(() =>
 // 格式化时间
 const formatTime = (timestamp) => {
   if (!timestamp) return "-";
-  return new Date(timestamp).toLocaleString();
+  // 传入的是秒级时间戳，需要乘以1000转换为毫秒
+  return new Date(Number(timestamp) * 1000).toLocaleString();
 };
 
 // 获取状态文本
