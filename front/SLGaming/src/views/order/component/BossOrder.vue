@@ -11,8 +11,7 @@ const orders = ref([]);
 
 const statusOptions = [
   { label: "全部", value: "all" },
-  { label: "待支付", value: "1" },
-  { label: "待接单", value: "2" },
+  { label: "待接单", value: "1" },
   { label: "已接单", value: "3" },
   { label: "服务中", value: "4" },
   { label: "已完成", value: "5" },
@@ -42,7 +41,7 @@ const getStatusText = (status) => {
 const getStatusType = (status) => {
   // 1=CREATED, 2=PAID, 3=ACCEPTED, 4=IN_SERVICE, 5=COMPLETED, 6=CANCELLED, 7=RATED
   const map = {
-    1: "info",
+    1: "warning",
     2: "warning",
     3: "primary",
     4: "success",
@@ -54,7 +53,6 @@ const getStatusType = (status) => {
 };
 
 // 按钮操作逻辑 (需对接具体API)
-const handlePay = (order) => console.log("Pay", order.id);
 const handleCancel = (order) => console.log("Cancel", order.id);
 const handleComplete = (order) => console.log("Complete", order.id);
 const handleRate = (order) => console.log("Rate", order.id);
@@ -167,14 +165,6 @@ watch([activeStatus], () => {
             <div class="card-footer">
               <!-- 老板视角 (下单方) -->
 
-              <el-button
-                v-if="item.status === 1"
-                type="primary"
-                size="small"
-                @click="handlePay(item)"
-              >
-                去支付
-              </el-button>
               <el-button
                 v-if="[1, 2].includes(item.status)"
                 type="danger"

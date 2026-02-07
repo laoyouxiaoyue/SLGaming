@@ -11,8 +11,7 @@ const orders = ref([]);
 
 const statusOptions = [
   { label: "全部", value: "all" },
-  { label: "待支付", value: "1" },
-  { label: "待接单", value: "2" },
+  { label: "待接单", value: "1" },
   { label: "已接单", value: "3" },
   { label: "服务中", value: "4" },
   { label: "已完成", value: "5" },
@@ -41,8 +40,7 @@ const getStatusText = (status) => {
 const getStatusType = (status) => {
   // 1=CREATED, 2=PAID, 3=ACCEPTED, 4=IN_SERVICE, 5=COMPLETED, 6=CANCELLED, 7=RATED
   const map = {
-    1: "info",
-    2: "warning",
+    1: "warning",
     3: "primary",
     4: "success",
     5: "success",
@@ -164,12 +162,20 @@ watch([activeStatus], () => {
 
             <div class="card-footer">
               <el-button
-                v-if="item.status === 2"
+                v-if="item.status === 1"
                 type="primary"
                 size="small"
                 @click="handleAccept(item)"
               >
                 接单
+              </el-button>
+              <el-button
+                v-if="item.status === 1"
+                type="danger"
+                size="small"
+                @click="handleCancel(item)"
+              >
+                取消订单
               </el-button>
               <el-button
                 v-if="item.status === 3"
