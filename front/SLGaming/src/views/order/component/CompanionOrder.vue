@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI, cancelOrderAPI } from "@/api/order/order";
+import { getOrderListAPI, cancelOrderAPI, acceptOrderAPI } from "@/api/order/order";
 import { ElMessageBox, ElMessage } from "element-plus";
 import "element-plus/theme-chalk/el-message-box.css";
 const infoStore = useInfoStore();
@@ -52,8 +52,7 @@ const getStatusType = (status) => {
   return map[status] || "";
 };
 
-// 按钮操作逻辑 (需对接具体API)
-// 按钮操作逻辑 (需对接具体API)
+// 取消按钮操作逻辑
 const handleCancel = async (order) => {
   try {
     const { value } = await ElMessageBox.prompt("请输入取消原因", "确认取消订单", {
@@ -76,7 +75,24 @@ const handleCancel = async (order) => {
     }
   }
 };
-const handleAccept = (order) => console.log("Accept", order.id);
+//
+const handleAccept = async (order) => {
+  try {
+    await ElMessageBox.confirm(`确认接单吗？\n一旦确认不可以取消了哦`, "接单确认", {
+      confirmButtonText: "确认接单",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+
+    await acceptOrderAPI({ orderId: order.id });
+    ElMessage.success("接单成功！");
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("接单失败:", error);
+    }
+  }
+};
 const handleStart = (order) => console.log("Start", order.id);
 
 const loadOrders = async () => {

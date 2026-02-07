@@ -22,8 +22,22 @@ const handleTabClick = (tab) => {
 <template>
   <div class="order-layout">
     <el-tabs v-model="activeTab" class="order-tabs" @tab-click="handleTabClick">
-      <el-tab-pane label="我的订单" name="boss"> <RouterView /> </el-tab-pane>
-      <el-tab-pane v-if="isCompanion" label="陪玩订单" name="companion">
+      <el-tab-pane name="boss">
+        <template #label>
+          <span class="custom-tabs-label">
+            <sl-icon name="icon-dingdan" size="18" />
+            <span>我的订单</span>
+          </span>
+        </template>
+        <RouterView />
+      </el-tab-pane>
+      <el-tab-pane v-if="isCompanion" name="companion">
+        <template #label>
+          <span class="custom-tabs-label">
+            <sl-icon name="icon-dingdan2" size="18" />
+            <span>陪玩订单</span>
+          </span>
+        </template>
         <RouterView />
       </el-tab-pane>
     </el-tabs>
@@ -44,6 +58,11 @@ const handleTabClick = (tab) => {
     margin-bottom: 20px;
     border-radius: 8px;
     border: 1px solid #eeeded;
+  }
+  .custom-tabs-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 }
 </style>
