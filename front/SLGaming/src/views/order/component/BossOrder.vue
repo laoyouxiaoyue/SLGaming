@@ -116,7 +116,7 @@ watch([activeStatus], () => {
   <div class="setting-info">
     <div class="setting-content">
       <!-- 订单状态筛选 -->
-      <el-tabs v-model="activeStatus" class="status-tabs">
+      <el-tabs v-model="activeStatus" class="status-tabs" type="card">
         <el-tab-pane
           v-for="item in statusOptions"
           :key="item.value"

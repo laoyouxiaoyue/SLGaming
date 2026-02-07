@@ -1,7 +1,12 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI, cancelOrderAPI, acceptOrderAPI } from "@/api/order/order";
+import {
+  getOrderListAPI,
+  cancelOrderAPI,
+  acceptOrderAPI,
+  startOrderServiceAPI,
+} from "@/api/order/order";
 import { ElMessageBox, ElMessage } from "element-plus";
 import "element-plus/theme-chalk/el-message-box.css";
 const infoStore = useInfoStore();
@@ -75,13 +80,14 @@ const handleCancel = async (order) => {
     }
   }
 };
-//
+//接单按钮操作逻辑
 const handleAccept = async (order) => {
   try {
-    await ElMessageBox.confirm(`确认接单吗？\n一旦确认不可以取消了哦`, "接单确认", {
+    await ElMessageBox.confirm(`确认接单吗？<br>一旦确认不可以取消了哦`, "接单确认", {
       confirmButtonText: "确认接单",
       cancelButtonText: "取消",
       type: "warning",
+      dangerouslyUseHTMLString: true,
     });
 
     await acceptOrderAPI({ orderId: order.id });
@@ -93,7 +99,28 @@ const handleAccept = async (order) => {
     }
   }
 };
-const handleStart = (order) => console.log("Start", order.id);
+const handleStart = async (order) => {
+  try {
+    await ElMessageBox.confirm(
+      `确认开始服务吗？<br>请确保您已经做好准备开始陪玩服务`,
+      "开始服务确认",
+      {
+        confirmButtonText: "立即开始",
+        cancelButtonText: "稍后",
+        type: "success",
+        dangerouslyUseHTMLString: true,
+      },
+    );
+
+    await startOrderServiceAPI({ orderId: order.id });
+    ElMessage.success("服务已开始！");
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("开始服务失败:", error);
+    }
+  }
+};
 
 const loadOrders = async () => {
   loading.value = true;
@@ -131,7 +158,7 @@ watch([activeStatus], () => {
   <div class="setting-info">
     <div class="setting-content">
       <!-- 订单状态筛选 -->
-      <el-tabs v-model="activeStatus" class="status-tabs">
+      <el-tabs v-model="activeStatus" class="status-tabs" type="card">
         <el-tab-pane
           v-for="item in statusOptions"
           :key="item.value"
