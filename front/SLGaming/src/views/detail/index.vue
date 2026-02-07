@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
+import "element-plus/theme-chalk/el-message-box.css";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
 import { useWalletStore } from "@/stores/walletStore";
@@ -60,10 +61,10 @@ const createOrder = async () => {
         },
       );
       router.push("/scion/recharge");
+      return;
     } catch {
-      // 用户点击取消，不做操作
+      return;
     }
-    return;
   }
 
   // 2. 余额充足，二次确认
