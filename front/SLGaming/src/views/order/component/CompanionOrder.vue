@@ -1,8 +1,9 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI } from "@/api/order/order";
-
+import { getOrderListAPI, cancelOrderAPI } from "@/api/order/order";
+import { ElMessageBox, ElMessage } from "element-plus";
+import "element-plus/theme-chalk/el-message-box.css";
 const infoStore = useInfoStore();
 const activeRole = ref("companion");
 const activeStatus = ref("all");
@@ -27,7 +28,8 @@ const queryStatus = computed(() =>
 // 格式化时间
 const formatTime = (timestamp) => {
   if (!timestamp) return "-";
-  return new Date(timestamp).toLocaleString();
+  // 传入的是秒级时间戳，需要乘以1000转换为毫秒
+  return new Date(Number(timestamp) * 1000).toLocaleString();
 };
 
 // 获取状态文本
@@ -51,9 +53,31 @@ const getStatusType = (status) => {
 };
 
 // 按钮操作逻辑 (需对接具体API)
+// 按钮操作逻辑 (需对接具体API)
+const handleCancel = async (order) => {
+  try {
+    const { value } = await ElMessageBox.prompt("请输入取消原因", "确认取消订单", {
+      confirmButtonText: "确认取消",
+      cancelButtonText: "暂不取消",
+      inputPlaceholder: "请输入取消原因（选填）",
+    });
+
+    await cancelOrderAPI({
+      orderId: order.id,
+      reason: value || "陪玩者取消订单",
+    });
+
+    ElMessage.success("订单取消成功");
+    // 刷新列表
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("取消订单失败:", error);
+    }
+  }
+};
 const handleAccept = (order) => console.log("Accept", order.id);
 const handleStart = (order) => console.log("Start", order.id);
-const handleComplete = (order) => console.log("Complete", order.id);
 
 const loadOrders = async () => {
   loading.value = true;
@@ -114,7 +138,7 @@ watch([activeStatus], () => {
               </div>
             </template>
 
-            <el-descriptions :column="2" border size="small">
+            <el-descriptions :column="2" border size="default">
               <el-descriptions-item label="游戏名称">
                 {{ item.gameName }}
               </el-descriptions-item>
@@ -184,14 +208,6 @@ watch([activeStatus], () => {
                 @click="handleStart(item)"
               >
                 开始服务
-              </el-button>
-              <el-button
-                v-if="item.status === 4"
-                type="warning"
-                size="small"
-                @click="handleComplete(item)"
-              >
-                结束服务
               </el-button>
             </div>
           </el-card>

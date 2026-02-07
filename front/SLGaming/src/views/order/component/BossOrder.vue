@@ -1,8 +1,11 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
+import { ElMessageBox, ElMessage } from "element-plus";
+import "element-plus/theme-chalk/el-message-box.css";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI } from "@/api/order/order";
-
+import { getOrderListAPI, cancelOrderAPI } from "@/api/order/order";
+import { useWalletStore } from "@/stores/walletStore";
+const walletStore = useWalletStore();
 const infoStore = useInfoStore();
 const activeRole = ref("boss");
 const activeStatus = ref("all");
@@ -52,7 +55,28 @@ const getStatusType = (status) => {
 };
 
 // 按钮操作逻辑 (需对接具体API)
-const handleCancel = (order) => console.log("Cancel", order.id);
+const handleCancel = async (order) => {
+  try {
+    const { value } = await ElMessageBox.prompt("请输入取消原因", "确认取消订单", {
+      confirmButtonText: "确认取消",
+      cancelButtonText: "暂不取消",
+      inputPlaceholder: "请输入取消原因（选填）",
+    });
+
+    await cancelOrderAPI({
+      orderId: order.id,
+      reason: value || "用户取消订单",
+    });
+    walletStore.getWallet();
+    ElMessage.success("订单取消成功");
+    // 刷新列表
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("取消订单失败:", error);
+    }
+  }
+};
 const handleComplete = (order) => console.log("Complete", order.id);
 const handleRate = (order) => console.log("Rate", order.id);
 
@@ -115,7 +139,7 @@ watch([activeStatus], () => {
               </div>
             </template>
 
-            <el-descriptions :column="2" border size="Default">
+            <el-descriptions :column="2" border size="default">
               <el-descriptions-item label="游戏名称">
                 {{ item.gameName }}
               </el-descriptions-item>

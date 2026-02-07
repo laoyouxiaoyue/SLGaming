@@ -90,6 +90,7 @@ const createOrder = async () => {
       durationHours: orderForm.value.durationHours,
     };
     await createOrderAPI(data);
+    walletStore.getWallet();
     ElMessage.success({
       message: "支付成功！",
       duration: 1500,
@@ -99,7 +100,7 @@ const createOrder = async () => {
       router.replace("/order/boss");
     }, 1200);
   } catch (error) {
-    console.error("创建订单失败:", error);
+    console.error("支付失败:", error);
   } finally {
     ordering.value = false;
   }
