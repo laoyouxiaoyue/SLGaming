@@ -1,9 +1,9 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import { ElMessageBox, ElMessage } from "element-plus";
+import { ref, computed, onMounted, watch, h } from "vue";
+import { ElMessageBox, ElMessage, ElRate, ElInput } from "element-plus";
 import "element-plus/theme-chalk/el-message-box.css";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI, cancelOrderAPI } from "@/api/order/order";
+import { getOrderListAPI, cancelOrderAPI, completeOrderAPI, rateOrderAPI } from "@/api/order/order";
 import { useWalletStore } from "@/stores/walletStore";
 const walletStore = useWalletStore();
 const infoStore = useInfoStore();
@@ -54,7 +54,7 @@ const getStatusType = (status) => {
   return map[status] || "";
 };
 
-// 按钮操作逻辑 (需对接具体API)
+// 取消按钮操作逻辑
 const handleCancel = async (order) => {
   try {
     const { value } = await ElMessageBox.prompt("请输入取消原因", "确认取消订单", {
@@ -77,8 +77,75 @@ const handleCancel = async (order) => {
     }
   }
 };
-const handleComplete = (order) => console.log("Complete", order.id);
-const handleRate = (order) => console.log("Rate", order.id);
+//完成按钮操作逻辑
+const handleComplete = async (order) => {
+  try {
+    await ElMessageBox.confirm("确认服务已完成吗？<br>确认后将结算订单金额给陪玩师", "完成确认", {
+      confirmButtonText: "确认完成",
+      cancelButtonText: "取消",
+      type: "success",
+      dangerouslyUseHTMLString: true,
+    });
+
+    await completeOrderAPI({ orderId: order.id });
+    ElMessage.success("订单已确认完成");
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("确认完成失败:", error);
+    }
+  }
+};
+const handleRate = (order) => {
+  const ratingData = ref(5);
+  const commentData = ref("");
+  ElMessageBox({
+    title: "评价订单",
+    message: () =>
+      h("div", { style: "padding: 0 10px" }, [
+        h("div", { style: "margin-bottom: 15px; text-align: center;" }, [
+          h(ElRate, {
+            modelValue: ratingData.value,
+            "onUpdate:modelValue": (val) => (ratingData.value = val),
+            size: "large",
+            allowHalf: true,
+          }),
+        ]),
+        h(ElInput, {
+          modelValue: commentData.value,
+          "onUpdate:modelValue": (val) => (commentData.value = val),
+          type: "textarea",
+          rows: 3,
+          placeholder: "请输入评价内容（选填）",
+        }),
+      ]),
+    showCancelButton: true,
+    confirmButtonText: "提交评价",
+    cancelButtonText: "取消",
+    beforeClose: async (action, instance, done) => {
+      if (action === "confirm") {
+        instance.confirmButtonLoading = true;
+        try {
+          await rateOrderAPI({
+            orderId: order.id,
+            rating: ratingData.value,
+            comment: commentData.value,
+          });
+          ElMessage.success("评价成功");
+          loadOrders();
+          done();
+        } catch (error) {
+          console.error("评价失败:", error);
+          ElMessage.error("评价提交失败");
+        } finally {
+          instance.confirmButtonLoading = false;
+        }
+      } else {
+        done();
+      }
+    },
+  });
+};
 
 const loadOrders = async () => {
   loading.value = true;
