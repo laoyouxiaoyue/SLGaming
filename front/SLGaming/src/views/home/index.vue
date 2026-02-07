@@ -62,7 +62,6 @@ const loadCompanions = async () => {
     page.value = (payload.page ?? page.value) + 1;
 
     if (companions.value.length >= total.value || list.length < pageSize.value) {
-      console.log("chufala");
       finished.value = true;
     }
   } catch (error) {
