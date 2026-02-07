@@ -42,7 +42,6 @@ const getStatusType = (status) => {
   // 1=CREATED, 2=PAID, 3=ACCEPTED, 4=IN_SERVICE, 5=COMPLETED, 6=CANCELLED, 7=RATED
   const map = {
     1: "warning",
-    2: "warning",
     3: "primary",
     4: "success",
     5: "success",

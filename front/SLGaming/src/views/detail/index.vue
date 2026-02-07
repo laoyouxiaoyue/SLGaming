@@ -4,12 +4,13 @@ import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
-
+import { useWalletStore } from "@/stores/walletStore";
 const route = useRoute();
 const router = useRouter();
 const loading = ref(true);
 const ordering = ref(false);
 const companionInfo = ref(null);
+const walletStore = useWalletStore();
 
 const statusText = {
   0: "离线",
@@ -44,6 +45,41 @@ const fetchCompanionInfo = async () => {
 
 const createOrder = async () => {
   if (!companionInfo.value) return;
+  const balance = Number(walletStore.walletInfo.balance || 0);
+  const price = totalAmount.value;
+
+  if (balance < price) {
+    try {
+      await ElMessageBox.confirm(
+        `当前余额不足 (余额: ${balance} 帅币, 需支付: ${price} 帅币)，是否前往充值？`,
+        "余额不足",
+        {
+          confirmButtonText: "去充值",
+          cancelButtonText: "取消",
+          type: "warning",
+        },
+      );
+      router.push("/wallet");
+    } catch {
+      // 用户点击取消，不做操作
+    }
+    return;
+  }
+
+  // 2. 余额充足，二次确认
+  try {
+    await ElMessageBox.confirm(
+      `当前余额: ${balance} 帅币\n本次支付: ${price} 帅币\n确认支付吗？`,
+      "确认支付",
+      {
+        confirmButtonText: "确定支付",
+        cancelButtonText: "取消",
+        type: "success",
+      },
+    );
+  } catch {
+    return; // 用户取消支付
+  }
 
   try {
     ordering.value = true;
