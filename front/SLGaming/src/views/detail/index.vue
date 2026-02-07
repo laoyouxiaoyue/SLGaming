@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
-import { createOrderAPI } from "@/api/order/manage/create.js";
+import { createOrderAPI } from "@/api/order/order";
 
 const route = useRoute();
+const router = useRouter();
 const loading = ref(true);
 const ordering = ref(false);
 const companionInfo = ref(null);
@@ -36,7 +37,6 @@ const fetchCompanionInfo = async () => {
     companionInfo.value = res.data;
   } catch (error) {
     console.error("获取陪玩信息失败:", error);
-    ElMessage.error("获取陪玩信息失败");
   } finally {
     loading.value = false;
   }
@@ -52,13 +52,17 @@ const createOrder = async () => {
       gameName: companionInfo.value.gameSkill,
       durationHours: orderForm.value.durationHours,
     };
-    const res = await createOrderAPI(data);
-    ElMessage.success("订单创建成功");
-    console.log("订单信息:", res.data);
+    await createOrderAPI(data);
+    ElMessage.success({
+      message: "支付成功！",
+      duration: 1500,
+    });
     // 可以跳转到订单详情页或订单列表页
+    setTimeout(async () => {
+      router.replace("/order/boss");
+    }, 1200);
   } catch (error) {
     console.error("创建订单失败:", error);
-    ElMessage.error("创建订单失败");
   } finally {
     ordering.value = false;
   }
@@ -426,7 +430,7 @@ onMounted(() => {
   .content-wrapper {
     flex-direction: column;
   }
-  
+
   .right-section {
     width: 100%;
   }
