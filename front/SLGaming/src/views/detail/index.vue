@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
 import { useWalletStore } from "@/stores/walletStore";
