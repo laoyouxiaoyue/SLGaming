@@ -97,13 +97,14 @@ const handleComplete = async (order) => {
   }
 };
 const handleRate = (order) => {
-  const ratingData = ref(5);
+  const ratingData = ref(0);
   const commentData = ref("");
   ElMessageBox({
     title: "评价订单",
     message: () =>
       h("div", { style: "padding: 0 10px" }, [
-        h("div", { style: "margin-bottom: 15px; text-align: center;" }, [
+        h("div", { style: "margin-bottom: 15px; " }, [
+          h("span", { style: "margin-right: 10px" }, "服务态度"),
           h(ElRate, {
             modelValue: ratingData.value,
             "onUpdate:modelValue": (val) => (ratingData.value = val),
@@ -116,6 +117,7 @@ const handleRate = (order) => {
           "onUpdate:modelValue": (val) => (commentData.value = val),
           type: "textarea",
           rows: 3,
+          style: "width: 282px",
           placeholder: "请输入评价内容（选填）",
         }),
       ]),
