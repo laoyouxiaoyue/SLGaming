@@ -80,7 +80,7 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 			return nil, status.Error(codes.FailedPrecondition, "user rpc client not initialized")
 		}
 	}
-
+	fmt.Printf("-----------------------------------------\n")
 	// 使用双重分布式锁防止并发创建订单
 	// 第一层锁：基于 boss_id 和 companion_id，防止同一老板对同一陪玩并发创建多个订单
 	// 第二层锁：基于 companion_id，防止多个老板同时对同一陪玩下单（串行化处理）
@@ -119,7 +119,7 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 			return nil, status.Error(codes.DeadlineExceeded, "acquire lock timeout, please try again later")
 		}
 		l.Errorf("create order with lock failed: %v", err)
-		return nil, status.Error(codes.Internal, "create order failed")
+		return nil, status.Error(codes.Internal, "cre111111ate order failed")
 	}
 
 	return result, createErr

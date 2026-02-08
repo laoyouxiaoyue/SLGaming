@@ -44,6 +44,7 @@ func ExecuteCreateOrderTx(ctx context.Context, db *gorm.DB, p *OrderPaymentPendi
 		} else if err != nil && err != gorm.ErrRecordNotFound {
 			return err
 		}
+		// 订单不存在，继续创建新订单（gorm.ErrRecordNotFound 是预期情况）
 
 		if p.DurationHours <= 0 {
 			logx.Errorf("ExecuteCreateOrderTx: invalid duration_hours: %d", p.DurationHours)

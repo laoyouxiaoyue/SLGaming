@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/order/internal/config"
 	orderioc "SLGaming/back/services/order/internal/ioc"
+	"SLGaming/back/services/order/internal/job"
 	"SLGaming/back/services/order/internal/server"
 	"SLGaming/back/services/order/internal/svc"
 	"SLGaming/back/services/order/order"
@@ -42,6 +44,11 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 
+	// 启动支付状态消费者
+	consumerCtx, cancel := context.WithCancel(context.Background())
+	job.StartPaymentStatusConsumer(consumerCtx, ctx)
+
+	// 创建 gRPC 服务器
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		order.RegisterOrderServer(grpcServer, server.NewOrderServer(ctx))
 
@@ -55,6 +62,7 @@ func main() {
 	stopServer := func() {
 		stopOnce.Do(func() {
 			fmt.Println("shutting down order rpc server")
+			cancel() // 停止消费者
 			s.Stop()
 			if registrar != nil {
 				registrar.Deregister()

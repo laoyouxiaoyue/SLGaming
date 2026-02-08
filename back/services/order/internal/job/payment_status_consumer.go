@@ -18,6 +18,7 @@ import (
 const (
 	eventTypePaymentSucceeded = "ORDER_PAYMENT_SUCCEEDED"
 	eventTypePaymentFailed    = "ORDER_PAYMENT_FAILED"
+	eventTypeRefundSucceeded  = "ORDER_REFUND_SUCCEEDED"
 )
 
 // orderPaymentSucceededEventPayload 订单支付成功事件负载（与用户服务中构造的 payload 对应）
@@ -37,6 +38,15 @@ type orderPaymentFailedEventPayload struct {
 	Amount     int64  `json:"amount"`
 	BizOrderID string `json:"biz_order_id"`
 	Reason     string `json:"reason"`
+}
+
+// orderRefundSucceededEventPayload 订单退款成功事件负载（与用户服务中构造的 payload 对应）
+type orderRefundSucceededEventPayload struct {
+	OrderID    uint64 `json:"order_id"`
+	OrderNo    string `json:"order_no"`
+	BizOrderID string `json:"biz_order_id"`
+	UserID     uint64 `json:"user_id"`
+	Amount     int64  `json:"amount"`
 }
 
 // StartPaymentStatusConsumer 启动消费订单支付状态事件的 Consumer
@@ -82,6 +92,8 @@ func handlePaymentStatusEvent(ctx context.Context, svcCtx *svc.ServiceContext, m
 		return handlePaymentSucceeded(ctx, svcCtx, msg)
 	case eventTypePaymentFailed:
 		return handlePaymentFailed(ctx, svcCtx, msg)
+	case eventTypeRefundSucceeded:
+		return handleRefundSucceeded(ctx, svcCtx, msg)
 	default:
 		return nil
 	}
@@ -194,6 +206,61 @@ func handlePaymentFailed(ctx context.Context, svcCtx *svc.ServiceContext, msg *p
 		}
 
 		logx.Infof("order payment failed, order_id=%d, order_no=%s, reason=%s", o.ID, o.OrderNo, payload.Reason)
+		return nil
+	})
+}
+
+// handleRefundSucceeded 处理 ORDER_REFUND_SUCCEEDED 事件，更新订单状态为 CANCELLED
+func handleRefundSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
+	var payload orderRefundSucceededEventPayload
+	if err := json.Unmarshal(msg.Body, &payload); err != nil {
+		logx.Errorf("unmarshal ORDER_REFUND_SUCCEEDED payload failed: %v, body=%s", err, string(msg.Body))
+		return nil
+	}
+
+	if payload.OrderID == 0 && payload.OrderNo == "" {
+		logx.Errorf("invalid ORDER_REFUND_SUCCEEDED payload: order_id=0 and order_no empty")
+		return nil
+	}
+
+	// 在一个事务中更新订单状态为已取消
+	return svcCtx.DB.Transaction(func(tx *gorm.DB) error {
+		var o model.Order
+		var err error
+		if payload.OrderID != 0 {
+			err = tx.Where("id = ?", payload.OrderID).First(&o).Error
+		} else {
+			err = tx.Where("order_no = ?", payload.OrderNo).First(&o).Error
+		}
+
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				logx.Errorf("order not found when handling ORDER_REFUND_SUCCEEDED, order_id=%d, order_no=%s",
+					payload.OrderID, payload.OrderNo)
+				return nil
+			}
+			logx.Errorf("get order failed when handling ORDER_REFUND_SUCCEEDED: %v", err)
+			return err
+		}
+
+		// 只有在 CANCEL_REFUNDING 状态时才更新为已取消（幂等）
+		if o.Status != model.OrderStatusCancelRefunding {
+			// 状态不符，直接返回，不视为错误，避免重复处理
+			logx.Infof("order status is not CANCEL_REFUNDING when handling ORDER_REFUND_SUCCEEDED, order_id=%d, status=%d",
+				o.ID, o.Status)
+			return nil
+		}
+
+		now := time.Now()
+		o.Status = model.OrderStatusCancelled
+		o.CancelledAt = &now
+
+		if err := tx.Save(&o).Error; err != nil {
+			logx.Errorf("update order status to CANCELLED failed: %v", err)
+			return err
+		}
+
+		logx.Infof("order refund succeeded, order_id=%d, order_no=%s, amount=%d", o.ID, o.OrderNo, payload.Amount)
 		return nil
 	})
 }
