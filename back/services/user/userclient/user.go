@@ -18,6 +18,8 @@ type (
 	ChangePasswordResponse            = user.ChangePasswordResponse
 	ChangePhoneRequest                = user.ChangePhoneRequest
 	ChangePhoneResponse               = user.ChangePhoneResponse
+	CheckFollowStatusRequest          = user.CheckFollowStatusRequest
+	CheckFollowStatusResponse         = user.CheckFollowStatusResponse
 	CompanionInfo                     = user.CompanionInfo
 	CompanionRankingItem              = user.CompanionRankingItem
 	ConsumeRequest                    = user.ConsumeRequest
@@ -28,6 +30,8 @@ type (
 	CreateRechargeOrderResponse       = user.CreateRechargeOrderResponse
 	DeleteGameSkillRequest            = user.DeleteGameSkillRequest
 	DeleteGameSkillResponse           = user.DeleteGameSkillResponse
+	FollowUserRequest                 = user.FollowUserRequest
+	FollowUserResponse                = user.FollowUserResponse
 	ForgetPasswordRequest             = user.ForgetPasswordRequest
 	ForgetPasswordResponse            = user.ForgetPasswordResponse
 	GameSkill                         = user.GameSkill
@@ -39,6 +43,12 @@ type (
 	GetCompanionProfileResponse       = user.GetCompanionProfileResponse
 	GetCompanionRatingRankingRequest  = user.GetCompanionRatingRankingRequest
 	GetCompanionRatingRankingResponse = user.GetCompanionRatingRankingResponse
+	GetMutualFollowListRequest        = user.GetMutualFollowListRequest
+	GetMutualFollowListResponse       = user.GetMutualFollowListResponse
+	GetMyFollowersListRequest         = user.GetMyFollowersListRequest
+	GetMyFollowersListResponse        = user.GetMyFollowersListResponse
+	GetMyFollowingListRequest         = user.GetMyFollowingListRequest
+	GetMyFollowingListResponse        = user.GetMyFollowingListResponse
 	GetUserRequest                    = user.GetUserRequest
 	GetUserResponse                   = user.GetUserResponse
 	GetWalletRequest                  = user.GetWalletRequest
@@ -56,6 +66,8 @@ type (
 	RechargeResponse                  = user.RechargeResponse
 	RegisterRequest                   = user.RegisterRequest
 	RegisterResponse                  = user.RegisterResponse
+	UnfollowUserRequest               = user.UnfollowUserRequest
+	UnfollowUserResponse              = user.UnfollowUserResponse
 	UpdateCompanionProfileRequest     = user.UpdateCompanionProfileRequest
 	UpdateCompanionProfileResponse    = user.UpdateCompanionProfileResponse
 	UpdateCompanionStatsRequest       = user.UpdateCompanionStatsRequest
@@ -66,6 +78,7 @@ type (
 	UpdateRechargeOrderStatusResponse = user.UpdateRechargeOrderStatusResponse
 	UpdateUserRequest                 = user.UpdateUserRequest
 	UpdateUserResponse                = user.UpdateUserResponse
+	UserFollowInfo                    = user.UserFollowInfo
 	UserInfo                          = user.UserInfo
 	WalletInfo                        = user.WalletInfo
 
@@ -98,6 +111,13 @@ type (
 		CreateGameSkill(ctx context.Context, in *CreateGameSkillRequest, opts ...grpc.CallOption) (*CreateGameSkillResponse, error)
 		UpdateGameSkill(ctx context.Context, in *UpdateGameSkillRequest, opts ...grpc.CallOption) (*UpdateGameSkillResponse, error)
 		DeleteGameSkill(ctx context.Context, in *DeleteGameSkillRequest, opts ...grpc.CallOption) (*DeleteGameSkillResponse, error)
+		// 关注相关接口
+		FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*FollowUserResponse, error)
+		UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*UnfollowUserResponse, error)
+		GetMyFollowingList(ctx context.Context, in *GetMyFollowingListRequest, opts ...grpc.CallOption) (*GetMyFollowingListResponse, error)
+		GetMyFollowersList(ctx context.Context, in *GetMyFollowersListRequest, opts ...grpc.CallOption) (*GetMyFollowersListResponse, error)
+		GetMutualFollowList(ctx context.Context, in *GetMutualFollowListRequest, opts ...grpc.CallOption) (*GetMutualFollowListResponse, error)
+		CheckFollowStatus(ctx context.Context, in *CheckFollowStatusRequest, opts ...grpc.CallOption) (*CheckFollowStatusResponse, error)
 	}
 
 	defaultUser struct {
@@ -233,4 +253,35 @@ func (m *defaultUser) UpdateGameSkill(ctx context.Context, in *UpdateGameSkillRe
 func (m *defaultUser) DeleteGameSkill(ctx context.Context, in *DeleteGameSkillRequest, opts ...grpc.CallOption) (*DeleteGameSkillResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.DeleteGameSkill(ctx, in, opts...)
+}
+
+// 关注相关接口
+func (m *defaultUser) FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*FollowUserResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.FollowUser(ctx, in, opts...)
+}
+
+func (m *defaultUser) UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*UnfollowUserResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UnfollowUser(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetMyFollowingList(ctx context.Context, in *GetMyFollowingListRequest, opts ...grpc.CallOption) (*GetMyFollowingListResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetMyFollowingList(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetMyFollowersList(ctx context.Context, in *GetMyFollowersListRequest, opts ...grpc.CallOption) (*GetMyFollowersListResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetMyFollowersList(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetMutualFollowList(ctx context.Context, in *GetMutualFollowListRequest, opts ...grpc.CallOption) (*GetMutualFollowListResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetMutualFollowList(ctx, in, opts...)
+}
+
+func (m *defaultUser) CheckFollowStatus(ctx context.Context, in *CheckFollowStatusRequest, opts ...grpc.CallOption) (*CheckFollowStatusResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.CheckFollowStatus(ctx, in, opts...)
 }

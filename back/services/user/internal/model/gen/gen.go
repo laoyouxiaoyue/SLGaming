@@ -21,6 +21,7 @@ func main() {
 		&model.RechargeOrder{},
 		&model.CompanionProfile{},
 		&model.GameSkill{},
+		&model.FollowRelation{},
 	)
 	if err != nil {
 		log.Panicf("database migration failed: %v", err)

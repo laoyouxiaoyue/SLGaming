@@ -340,6 +340,99 @@ message GetCompanionOrdersRankingResponse {
   int32 page_size = 4;                        // 每页数量
 }
 
+// ---------------- 关注相关接口 ----------------
+
+// 关注用户
+message FollowUserRequest {
+  uint64 operator_id = 1; // 操作人ID（关注者）
+  uint64 user_id = 2;     // 被关注的用户ID
+}
+
+message FollowUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 取消关注用户
+message UnfollowUserRequest {
+  uint64 operator_id = 1; // 操作人ID（关注者）
+  uint64 user_id = 2;     // 要取消关注的用户ID
+}
+
+message UnfollowUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 获取我的关注列表
+message GetMyFollowingListRequest {
+  uint64 operator_id = 1;   // 操作人ID
+  int32 page = 2;           // 页码（从1开始）
+  int32 page_size = 3;      // 每页数量
+  int32 user_role = 4;      // 可选，过滤用户角色：1=老板, 2=陪玩
+}
+
+// 获取我的粉丝列表
+message GetMyFollowersListRequest {
+  uint64 operator_id = 1;   // 操作人ID
+  int32 page = 2;           // 页码（从1开始）
+  int32 page_size = 3;      // 每页数量
+  int32 user_role = 4;      // 可选，过滤用户角色：1=老板, 2=陪玩
+}
+
+// 获取互相关注列表
+message GetMutualFollowListRequest {
+  uint64 operator_id = 1;   // 操作人ID
+  int32 page = 2;           // 页码（从1开始）
+  int32 page_size = 3;      // 每页数量
+}
+
+// 检查关注状态
+message CheckFollowStatusRequest {
+  uint64 operator_id = 1;   // 操作人ID
+  uint64 target_user_id = 2; // 目标用户ID
+}
+
+message CheckFollowStatusResponse {
+  bool is_following = 1;     // 当前用户是否关注了目标用户
+  bool is_followed = 2;      // 目标用户是否关注了当前用户
+  bool is_mutual = 3;        // 是否互相关注
+}
+
+// 用户关注信息
+message UserFollowInfo {
+  uint64 user_id = 1;
+  string nickname = 2;
+  string avatar_url = 3;
+  int32 role = 4;            // 用户角色：1=老板, 2=陪玩
+  bool is_verified = 5;      // 是否验证（仅陪玩）
+  double rating = 6;           // 评分（仅陪玩）
+  int64 total_orders = 7;     // 总订单数（仅陪玩）
+  bool is_mutual = 8;         // 是否互相关注
+  int64 followed_at = 9;      // 关注时间戳
+}
+
+message GetMyFollowingListResponse {
+  repeated UserFollowInfo users = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message GetMyFollowersListResponse {
+  repeated UserFollowInfo users = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message GetMutualFollowListResponse {
+  repeated UserFollowInfo users = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
 service User {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
@@ -373,4 +466,12 @@ service User {
   rpc CreateGameSkill(CreateGameSkillRequest) returns (CreateGameSkillResponse);
   rpc UpdateGameSkill(UpdateGameSkillRequest) returns (UpdateGameSkillResponse);
   rpc DeleteGameSkill(DeleteGameSkillRequest) returns (DeleteGameSkillResponse);
+
+  // 关注相关接口
+  rpc FollowUser(FollowUserRequest) returns (FollowUserResponse);
+  rpc UnfollowUser(UnfollowUserRequest) returns (UnfollowUserResponse);
+  rpc GetMyFollowingList(GetMyFollowingListRequest) returns (GetMyFollowingListResponse);
+  rpc GetMyFollowersList(GetMyFollowersListRequest) returns (GetMyFollowersListResponse);
+  rpc GetMutualFollowList(GetMutualFollowListRequest) returns (GetMutualFollowListResponse);
+  rpc CheckFollowStatus(CheckFollowStatusRequest) returns (CheckFollowStatusResponse);
 }
