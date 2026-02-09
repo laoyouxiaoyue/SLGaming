@@ -1,8 +1,11 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, h } from "vue";
+import { ElMessageBox, ElMessage, ElRate, ElInput } from "element-plus";
+import "element-plus/theme-chalk/el-message-box.css";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI } from "@/api/order/order";
-
+import { getOrderListAPI, cancelOrderAPI, completeOrderAPI, rateOrderAPI } from "@/api/order/order";
+import { useWalletStore } from "@/stores/walletStore";
+const walletStore = useWalletStore();
 const infoStore = useInfoStore();
 const activeRole = ref("boss");
 const activeStatus = ref("all");
@@ -11,8 +14,7 @@ const orders = ref([]);
 
 const statusOptions = [
   { label: "全部", value: "all" },
-  { label: "待支付", value: "1" },
-  { label: "待接单", value: "2" },
+  { label: "待接单", value: "1" },
   { label: "已接单", value: "3" },
   { label: "服务中", value: "4" },
   { label: "已完成", value: "5" },
@@ -42,8 +44,7 @@ const getStatusText = (status) => {
 const getStatusType = (status) => {
   // 1=CREATED, 2=PAID, 3=ACCEPTED, 4=IN_SERVICE, 5=COMPLETED, 6=CANCELLED, 7=RATED
   const map = {
-    1: "info",
-    2: "warning",
+    1: "warning",
     3: "primary",
     4: "success",
     5: "success",
@@ -53,11 +54,100 @@ const getStatusType = (status) => {
   return map[status] || "";
 };
 
-// 按钮操作逻辑 (需对接具体API)
-const handlePay = (order) => console.log("Pay", order.id);
-const handleCancel = (order) => console.log("Cancel", order.id);
-const handleComplete = (order) => console.log("Complete", order.id);
-const handleRate = (order) => console.log("Rate", order.id);
+// 取消按钮操作逻辑
+const handleCancel = async (order) => {
+  try {
+    const { value } = await ElMessageBox.prompt("请输入取消原因", "确认取消订单", {
+      confirmButtonText: "确认取消",
+      cancelButtonText: "暂不取消",
+      inputPlaceholder: "请输入取消原因（选填）",
+    });
+
+    await cancelOrderAPI({
+      orderId: order.id,
+      reason: value || "用户取消订单",
+    });
+    walletStore.getWallet();
+    ElMessage.success("订单取消成功");
+    // 刷新列表
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("取消订单失败:", error);
+    }
+  }
+};
+//完成按钮操作逻辑
+const handleComplete = async (order) => {
+  try {
+    await ElMessageBox.confirm("确认服务已完成吗？<br>确认后将结算订单金额给陪玩师", "完成确认", {
+      confirmButtonText: "确认完成",
+      cancelButtonText: "取消",
+      type: "success",
+      dangerouslyUseHTMLString: true,
+    });
+
+    await completeOrderAPI({ orderId: order.id });
+    ElMessage.success("订单已确认完成");
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("确认完成失败:", error);
+    }
+  }
+};
+const handleRate = (order) => {
+  const ratingData = ref(0);
+  const commentData = ref("");
+  ElMessageBox({
+    title: "评价订单",
+    message: () =>
+      h("div", { style: "padding: 0 10px" }, [
+        h("div", { style: "margin-bottom: 15px; " }, [
+          h("span", { style: "margin-right: 10px" }, "服务态度"),
+          h(ElRate, {
+            modelValue: ratingData.value,
+            "onUpdate:modelValue": (val) => (ratingData.value = val),
+            size: "large",
+            allowHalf: true,
+          }),
+        ]),
+        h(ElInput, {
+          modelValue: commentData.value,
+          "onUpdate:modelValue": (val) => (commentData.value = val),
+          type: "textarea",
+          rows: 3,
+          style: "width: 282px",
+          placeholder: "请输入评价内容（选填）",
+        }),
+      ]),
+    showCancelButton: true,
+    confirmButtonText: "提交评价",
+    cancelButtonText: "取消",
+    beforeClose: async (action, instance, done) => {
+      if (action === "confirm") {
+        instance.confirmButtonLoading = true;
+        try {
+          await rateOrderAPI({
+            orderId: order.id,
+            rating: ratingData.value,
+            comment: commentData.value,
+          });
+          ElMessage.success("评价成功");
+          loadOrders();
+          done();
+        } catch (error) {
+          console.error("评价失败:", error);
+          ElMessage.error("评价提交失败");
+        } finally {
+          instance.confirmButtonLoading = false;
+        }
+      } else {
+        done();
+      }
+    },
+  });
+};
 
 const loadOrders = async () => {
   loading.value = true;
@@ -95,7 +185,7 @@ watch([activeStatus], () => {
   <div class="setting-info">
     <div class="setting-content">
       <!-- 订单状态筛选 -->
-      <el-tabs v-model="activeStatus" class="status-tabs">
+      <el-tabs v-model="activeStatus" class="status-tabs" type="card">
         <el-tab-pane
           v-for="item in statusOptions"
           :key="item.value"
@@ -118,7 +208,7 @@ watch([activeStatus], () => {
               </div>
             </template>
 
-            <el-descriptions :column="2" border size="Default">
+            <el-descriptions :column="2" border size="default">
               <el-descriptions-item label="游戏名称">
                 {{ item.gameName }}
               </el-descriptions-item>
@@ -167,14 +257,6 @@ watch([activeStatus], () => {
             <div class="card-footer">
               <!-- 老板视角 (下单方) -->
 
-              <el-button
-                v-if="item.status === 1"
-                type="primary"
-                size="small"
-                @click="handlePay(item)"
-              >
-                去支付
-              </el-button>
               <el-button
                 v-if="[1, 2].includes(item.status)"
                 type="danger"

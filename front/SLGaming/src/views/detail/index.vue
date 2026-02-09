@@ -1,15 +1,17 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
+import "element-plus/theme-chalk/el-message-box.css";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
-
+import { useWalletStore } from "@/stores/walletStore";
 const route = useRoute();
 const router = useRouter();
 const loading = ref(true);
 const ordering = ref(false);
 const companionInfo = ref(null);
+const walletStore = useWalletStore();
 
 const statusText = {
   0: "离线",
@@ -44,6 +46,41 @@ const fetchCompanionInfo = async () => {
 
 const createOrder = async () => {
   if (!companionInfo.value) return;
+  const balance = Number(walletStore.walletInfo.balance || 0);
+  const price = totalAmount.value;
+
+  if (balance < price) {
+    try {
+      await ElMessageBox.confirm(
+        `当前余额不足 (余额: ${balance} 帅币, 需支付: ${price} 帅币)，是否前往充值？`,
+        "余额不足",
+        {
+          confirmButtonText: "去充值",
+          cancelButtonText: "取消",
+          type: "warning",
+        },
+      );
+      router.push("/scion/recharge");
+      return;
+    } catch {
+      return;
+    }
+  }
+
+  // 2. 余额充足，二次确认
+  try {
+    await ElMessageBox.confirm(
+      `当前余额: ${balance} 帅币\n本次支付: ${price} 帅币\n确认支付吗？`,
+      "确认支付",
+      {
+        confirmButtonText: "确定支付",
+        cancelButtonText: "取消",
+        type: "success",
+      },
+    );
+  } catch {
+    return; // 用户取消支付
+  }
 
   try {
     ordering.value = true;
@@ -53,6 +90,7 @@ const createOrder = async () => {
       durationHours: orderForm.value.durationHours,
     };
     await createOrderAPI(data);
+    walletStore.getWallet();
     ElMessage.success({
       message: "支付成功！",
       duration: 1500,
@@ -62,7 +100,7 @@ const createOrder = async () => {
       router.replace("/order/boss");
     }, 1200);
   } catch (error) {
-    console.error("创建订单失败:", error);
+    console.error("支付失败:", error);
   } finally {
     ordering.value = false;
   }

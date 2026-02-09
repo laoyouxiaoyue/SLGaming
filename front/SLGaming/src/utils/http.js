@@ -1,9 +1,7 @@
 import axios from "axios";
 import JSONBig from "json-bigint";
 import { useUserStore } from "@/stores/userStore";
-
 import { ElMessage } from "element-plus";
-import "element-plus/theme-chalk/el-message.css";
 
 const JSONBigInt = JSONBig({ storeAsString: true });
 

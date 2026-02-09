@@ -1,8 +1,14 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useInfoStore } from "@/stores/infoStore";
-import { getOrderListAPI } from "@/api/order/order";
-
+import {
+  getOrderListAPI,
+  cancelOrderAPI,
+  acceptOrderAPI,
+  startOrderServiceAPI,
+} from "@/api/order/order";
+import { ElMessageBox, ElMessage } from "element-plus";
+import "element-plus/theme-chalk/el-message-box.css";
 const infoStore = useInfoStore();
 const activeRole = ref("companion");
 const activeStatus = ref("all");
@@ -11,8 +17,7 @@ const orders = ref([]);
 
 const statusOptions = [
   { label: "全部", value: "all" },
-  { label: "待支付", value: "1" },
-  { label: "待接单", value: "2" },
+  { label: "待接单", value: "1" },
   { label: "已接单", value: "3" },
   { label: "服务中", value: "4" },
   { label: "已完成", value: "5" },
@@ -28,7 +33,8 @@ const queryStatus = computed(() =>
 // 格式化时间
 const formatTime = (timestamp) => {
   if (!timestamp) return "-";
-  return new Date(timestamp).toLocaleString();
+  // 传入的是秒级时间戳，需要乘以1000转换为毫秒
+  return new Date(Number(timestamp) * 1000).toLocaleString();
 };
 
 // 获取状态文本
@@ -41,8 +47,7 @@ const getStatusText = (status) => {
 const getStatusType = (status) => {
   // 1=CREATED, 2=PAID, 3=ACCEPTED, 4=IN_SERVICE, 5=COMPLETED, 6=CANCELLED, 7=RATED
   const map = {
-    1: "info",
-    2: "warning",
+    1: "warning",
     3: "primary",
     4: "success",
     5: "success",
@@ -52,10 +57,70 @@ const getStatusType = (status) => {
   return map[status] || "";
 };
 
-// 按钮操作逻辑 (需对接具体API)
-const handleAccept = (order) => console.log("Accept", order.id);
-const handleStart = (order) => console.log("Start", order.id);
-const handleComplete = (order) => console.log("Complete", order.id);
+// 取消按钮操作逻辑
+const handleCancel = async (order) => {
+  try {
+    const { value } = await ElMessageBox.prompt("请输入取消原因", "确认取消订单", {
+      confirmButtonText: "确认取消",
+      cancelButtonText: "暂不取消",
+      inputPlaceholder: "请输入取消原因（选填）",
+    });
+
+    await cancelOrderAPI({
+      orderId: order.id,
+      reason: value || "陪玩者取消订单",
+    });
+
+    ElMessage.success("订单取消成功");
+    // 刷新列表
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("取消订单失败:", error);
+    }
+  }
+};
+//接单按钮操作逻辑
+const handleAccept = async (order) => {
+  try {
+    await ElMessageBox.confirm(`确认接单吗？<br>一旦确认不可以取消了哦`, "接单确认", {
+      confirmButtonText: "确认接单",
+      cancelButtonText: "取消",
+      type: "warning",
+      dangerouslyUseHTMLString: true,
+    });
+
+    await acceptOrderAPI({ orderId: order.id });
+    ElMessage.success("接单成功！");
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("接单失败:", error);
+    }
+  }
+};
+const handleStart = async (order) => {
+  try {
+    await ElMessageBox.confirm(
+      `确认开始服务吗？<br>请确保您已经做好准备开始陪玩服务`,
+      "开始服务确认",
+      {
+        confirmButtonText: "立即开始",
+        cancelButtonText: "稍后",
+        type: "success",
+        dangerouslyUseHTMLString: true,
+      },
+    );
+
+    await startOrderServiceAPI({ orderId: order.id });
+    ElMessage.success("服务已开始！");
+    loadOrders();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("开始服务失败:", error);
+    }
+  }
+};
 
 const loadOrders = async () => {
   loading.value = true;
@@ -93,7 +158,7 @@ watch([activeStatus], () => {
   <div class="setting-info">
     <div class="setting-content">
       <!-- 订单状态筛选 -->
-      <el-tabs v-model="activeStatus" class="status-tabs">
+      <el-tabs v-model="activeStatus" class="status-tabs" type="card">
         <el-tab-pane
           v-for="item in statusOptions"
           :key="item.value"
@@ -116,7 +181,7 @@ watch([activeStatus], () => {
               </div>
             </template>
 
-            <el-descriptions :column="2" border size="small">
+            <el-descriptions :column="2" border size="default">
               <el-descriptions-item label="游戏名称">
                 {{ item.gameName }}
               </el-descriptions-item>
@@ -164,12 +229,20 @@ watch([activeStatus], () => {
 
             <div class="card-footer">
               <el-button
-                v-if="item.status === 2"
+                v-if="item.status === 1"
                 type="primary"
                 size="small"
                 @click="handleAccept(item)"
               >
                 接单
+              </el-button>
+              <el-button
+                v-if="item.status === 1"
+                type="danger"
+                size="small"
+                @click="handleCancel(item)"
+              >
+                取消订单
               </el-button>
               <el-button
                 v-if="item.status === 3"
@@ -178,14 +251,6 @@ watch([activeStatus], () => {
                 @click="handleStart(item)"
               >
                 开始服务
-              </el-button>
-              <el-button
-                v-if="item.status === 4"
-                type="warning"
-                size="small"
-                @click="handleComplete(item)"
-              >
-                结束服务
               </el-button>
             </div>
           </el-card>
