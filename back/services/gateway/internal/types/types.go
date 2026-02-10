@@ -74,7 +74,6 @@ type CheckFollowStatusData struct {
 }
 
 type CheckFollowStatusRequest struct {
-	OperatorId   uint64 `form:"operatorId"`   // 操作人ID
 	TargetUserId uint64 `form:"targetUserId"` // 目标用户ID
 }
 
@@ -143,8 +142,7 @@ type FollowUserData struct {
 }
 
 type FollowUserRequest struct {
-	OperatorId uint64 `json:"operatorId"` // 操作人ID（关注者）
-	UserId     uint64 `json:"userId"`     // 被关注的用户ID
+	UserId uint64 `json:"userId"` // 被关注的用户ID
 }
 
 type FollowUserResponse struct {
@@ -242,9 +240,8 @@ type GetMutualFollowListData struct {
 }
 
 type GetMutualFollowListRequest struct {
-	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
-	Page       int    `form:"page,optional"`
-	PageSize   int    `form:"pageSize,optional"`
+	Page     int `form:"page,optional"`
+	PageSize int `form:"pageSize,optional"`
 }
 
 type GetMutualFollowListResponse struct {
@@ -260,10 +257,9 @@ type GetMyFollowersListData struct {
 }
 
 type GetMyFollowersListRequest struct {
-	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
-	Page       int    `form:"page,optional"`
-	PageSize   int    `form:"pageSize,optional"`
-	UserRole   int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
+	Page     int `form:"page,optional"`
+	PageSize int `form:"pageSize,optional"`
+	UserRole int `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
 }
 
 type GetMyFollowersListResponse struct {
@@ -279,10 +275,9 @@ type GetMyFollowingListData struct {
 }
 
 type GetMyFollowingListRequest struct {
-	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
-	Page       int    `form:"page,optional"`
-	PageSize   int    `form:"pageSize,optional"`
-	UserRole   int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
+	Page     int `form:"page,optional"`
+	PageSize int `form:"pageSize,optional"`
+	UserRole int `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
 }
 
 type GetMyFollowingListResponse struct {
@@ -544,8 +539,7 @@ type UnfollowUserData struct {
 }
 
 type UnfollowUserRequest struct {
-	OperatorId uint64 `json:"operatorId"` // 操作人ID（关注者）
-	UserId     uint64 `json:"userId"`     // 要取消关注的用户ID
+	UserId uint64 `json:"userId"` // 要取消关注的用户ID
 }
 
 type UnfollowUserResponse struct {
@@ -614,10 +608,10 @@ type UserFollowInfo struct {
 }
 
 type UserInfo struct {
-	Id             uint64 `json:"id"`
-	Uid            uint64 `json:"uid"`
-	Nickname       string `json:"nickname"`
-	Phone          string `json:"phone"`
+	Id             uint64 `json:"id"`             // 用户ID
+	Uid            uint64 `json:"uid"`            // 用户唯一标识
+	Nickname       string `json:"nickname"`       // 用户昵称
+	Phone          string `json:"phone"`          // 手机号码
 	Role           int    `json:"role"`           // 用户角色：1=老板, 2=陪玩, 3=管理员
 	AvatarUrl      string `json:"avatarUrl"`      // 头像URL
 	Bio            string `json:"bio"`            // 个人简介

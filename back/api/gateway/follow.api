@@ -17,7 +17,7 @@ type UserFollowInfo {
 }
 
 type FollowUserRequest {
-	OperatorId uint64 `json:"operatorId"` // 操作人ID（关注者）
+	// 操作人ID由后端从token获取
 	UserId     uint64 `json:"userId"`     // 被关注的用户ID
 }
 
@@ -32,7 +32,7 @@ type FollowUserData {
 }
 
 type UnfollowUserRequest {
-	OperatorId uint64 `json:"operatorId"` // 操作人ID（关注者）
+	// 操作人ID由后端从token获取
 	UserId     uint64 `json:"userId"`     // 要取消关注的用户ID
 }
 
@@ -47,21 +47,21 @@ type UnfollowUserData {
 }
 
 type GetMyFollowingListRequest {
-	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
+	// 操作人ID由后端从token获取
 	Page       int    `form:"page,optional"`
 	PageSize   int    `form:"pageSize,optional"`
 	UserRole   int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
 }
 
 type GetMyFollowersListRequest {
-	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
+	// 操作人ID由后端从token获取
 	Page       int    `form:"page,optional"`
 	PageSize   int    `form:"pageSize,optional"`
 	UserRole   int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
 }
 
 type GetMutualFollowListRequest {
-	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
+	// 操作人ID由后端从token获取
 	Page       int    `form:"page,optional"`
 	PageSize   int    `form:"pageSize,optional"`
 }
@@ -103,7 +103,7 @@ type GetMutualFollowListResponse {
 }
 
 type CheckFollowStatusRequest {
-	OperatorId    uint64 `form:"operatorId"`    // 操作人ID
+	// 操作人ID由后端从token获取
 	TargetUserId  uint64 `form:"targetUserId"`  // 目标用户ID
 }
 

@@ -6,6 +6,7 @@ package follow
 import (
 	"context"
 
+	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
@@ -34,8 +35,15 @@ func (l *FollowUserLogic) FollowUser(req *types.FollowUserRequest) (resp *types.
 		return &types.FollowUserResponse{BaseResp: types.BaseResp{Code: code, Msg: msg}}, nil
 	}
 
+	userID, err := middleware.GetUserID(l.ctx)
+	if err != nil || userID == 0 {
+		return &types.FollowUserResponse{
+			BaseResp: types.BaseResp{Code: 401, Msg: "未登录或认证失败"},
+		}, nil
+	}
+
 	rpcResp, err := l.svcCtx.UserRPC.FollowUser(l.ctx, &userclient.FollowUserRequest{
-		OperatorId: req.OperatorId,
+		OperatorId: userID,
 		UserId:     req.UserId,
 	})
 	if err != nil {

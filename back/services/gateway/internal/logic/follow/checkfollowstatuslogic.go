@@ -6,6 +6,7 @@ package follow
 import (
 	"context"
 
+	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
@@ -34,8 +35,15 @@ func (l *CheckFollowStatusLogic) CheckFollowStatus(req *types.CheckFollowStatusR
 		return &types.CheckFollowStatusResponse{BaseResp: types.BaseResp{Code: code, Msg: msg}}, nil
 	}
 
+	userID, err := middleware.GetUserID(l.ctx)
+	if err != nil || userID == 0 {
+		return &types.CheckFollowStatusResponse{
+			BaseResp: types.BaseResp{Code: 401, Msg: "未登录或认证失败"},
+		}, nil
+	}
+
 	rpcResp, err := l.svcCtx.UserRPC.CheckFollowStatus(l.ctx, &userclient.CheckFollowStatusRequest{
-		OperatorId:   req.OperatorId,
+		OperatorId:   userID,
 		TargetUserId: req.TargetUserId,
 	})
 	if err != nil {
@@ -46,9 +54,9 @@ func (l *CheckFollowStatusLogic) CheckFollowStatus(req *types.CheckFollowStatusR
 	return &types.CheckFollowStatusResponse{
 		BaseResp: types.BaseResp{Code: 0, Msg: "success"},
 		Data: types.CheckFollowStatusData{
-			IsFollowing: rpcResp.IsFollowing,
-			IsFollowed:  rpcResp.IsFollowed,
-			IsMutual:    rpcResp.IsMutual,
+			IsFollowing: rpcResp.GetIsFollowing(),
+			IsFollowed:  rpcResp.GetIsFollowed(),
+			IsMutual:    rpcResp.GetIsMutual(),
 		},
 	}, nil
 }
