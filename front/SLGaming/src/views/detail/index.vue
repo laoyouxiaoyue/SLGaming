@@ -12,6 +12,16 @@ const loading = ref(true);
 const ordering = ref(false);
 const companionInfo = ref(null);
 const walletStore = useWalletStore();
+const isFollowed = ref(false);
+
+const toggleFollow = () => {
+  isFollowed.value = !isFollowed.value;
+  if (isFollowed.value) {
+    ElMessage.success("关注成功");
+  } else {
+    ElMessage.info("已取消关注");
+  }
+};
 
 const statusText = {
   0: "离线",
@@ -118,7 +128,12 @@ onMounted(() => {
         <div class="profile-header">
           <img :src="companionInfo.avatarUrl" :alt="companionInfo.nickname" class="avatar" />
           <div class="info">
-            <h1>{{ companionInfo.nickname || "未设置昵称" }}</h1>
+            <div class="name-header">
+              <h1>{{ companionInfo.nickname || "未设置昵称" }}</h1>
+              <div class="follow-btn" :class="{ 'is-followed': isFollowed }" @click="toggleFollow">
+                {{ isFollowed ? "已关注" : "+ 关注" }}
+              </div>
+            </div>
             <p class="game-skill">{{ companionInfo.gameSkill }}</p>
             <div class="status-rating">
               <span :class="['status', `status-${companionInfo.status}`]">
@@ -256,11 +271,49 @@ onMounted(() => {
 }
 
 .info h1 {
-  margin: 0 0 12px 0;
+  margin: 0;
   font-size: 32px;
   color: #303133;
   font-weight: 700;
   letter-spacing: -0.5px;
+}
+
+.name-header {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 12px;
+}
+
+.follow-btn {
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #ef93a2;
+  color: #ffffff;
+  border: 1px solid #ef93a2;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.follow-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.follow-btn:active {
+  transform: scale(0.98);
+}
+
+.follow-btn.is-followed {
+  background: transparent;
+  color: #ef93a2;
+  border: 1px solid #ef93a2;
 }
 
 .game-skill {
