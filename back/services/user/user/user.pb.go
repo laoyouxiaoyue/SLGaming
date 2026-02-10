@@ -306,18 +306,20 @@ func (x *GetUserRequest) GetPhone() string {
 }
 
 type UserInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Uid           uint64                 `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`
-	Nickname      string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
-	Phone         string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
-	Role          int32                  `protobuf:"varint,5,opt,name=role,proto3" json:"role,omitempty"`                                        // 用户角色：1=老板, 2=陪玩, 3=管理员
-	AvatarUrl     string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`              // 头像URL
-	Bio           string                 `protobuf:"bytes,7,opt,name=bio,proto3" json:"bio,omitempty"`                                           // 个人简介
-	Balance       int64                  `protobuf:"varint,8,opt,name=balance,proto3" json:"balance,omitempty"`                                  // 帅币可用余额
-	FrozenBalance int64                  `protobuf:"varint,9,opt,name=frozen_balance,json=frozenBalance,proto3" json:"frozen_balance,omitempty"` // 冻结帅币余额（预留）
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Uid            uint64                 `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	Nickname       string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Phone          string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
+	Role           int32                  `protobuf:"varint,5,opt,name=role,proto3" json:"role,omitempty"`                                            // 用户角色：1=老板, 2=陪玩, 3=管理员
+	AvatarUrl      string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`                  // 头像URL
+	Bio            string                 `protobuf:"bytes,7,opt,name=bio,proto3" json:"bio,omitempty"`                                               // 个人简介
+	Balance        int64                  `protobuf:"varint,8,opt,name=balance,proto3" json:"balance,omitempty"`                                      // 帅币可用余额
+	FrozenBalance  int64                  `protobuf:"varint,9,opt,name=frozen_balance,json=frozenBalance,proto3" json:"frozen_balance,omitempty"`     // 冻结帅币余额（预留）
+	FollowerCount  int64                  `protobuf:"varint,10,opt,name=follower_count,json=followerCount,proto3" json:"follower_count,omitempty"`    // 粉丝数（冗余展示，最终以 follows 表为准）
+	FollowingCount int64                  `protobuf:"varint,11,opt,name=following_count,json=followingCount,proto3" json:"following_count,omitempty"` // 关注数（冗余展示）
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *UserInfo) Reset() {
@@ -409,6 +411,20 @@ func (x *UserInfo) GetBalance() int64 {
 func (x *UserInfo) GetFrozenBalance() int64 {
 	if x != nil {
 		return x.FrozenBalance
+	}
+	return 0
+}
+
+func (x *UserInfo) GetFollowerCount() int64 {
+	if x != nil {
+		return x.FollowerCount
+	}
+	return 0
+}
+
+func (x *UserInfo) GetFollowingCount() int64 {
+	if x != nil {
+		return x.FollowingCount
 	}
 	return 0
 }
@@ -4065,7 +4081,7 @@ const file_user_proto_rawDesc = "" +
 	"\x0eGetUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x04R\x03uid\x12\x14\n" +
-	"\x05phone\x18\x03 \x01(\tR\x05phone\"\xe4\x01\n" +
+	"\x05phone\x18\x03 \x01(\tR\x05phone\"\xb4\x02\n" +
 	"\bUserInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x10\n" +
 	"\x03uid\x18\x02 \x01(\x04R\x03uid\x12\x1a\n" +
@@ -4076,7 +4092,10 @@ const file_user_proto_rawDesc = "" +
 	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\x12\x10\n" +
 	"\x03bio\x18\a \x01(\tR\x03bio\x12\x18\n" +
 	"\abalance\x18\b \x01(\x03R\abalance\x12%\n" +
-	"\x0efrozen_balance\x18\t \x01(\x03R\rfrozenBalance\"5\n" +
+	"\x0efrozen_balance\x18\t \x01(\x03R\rfrozenBalance\x12%\n" +
+	"\x0efollower_count\x18\n" +
+	" \x01(\x03R\rfollowerCount\x12'\n" +
+	"\x0ffollowing_count\x18\v \x01(\x03R\x0efollowingCount\"5\n" +
 	"\x0fGetUserResponse\x12\"\n" +
 	"\x04user\x18\x01 \x01(\v2\x0e.user.UserInfoR\x04user\"\xb6\x01\n" +
 	"\x11UpdateUserRequest\x12\x0e\n" +

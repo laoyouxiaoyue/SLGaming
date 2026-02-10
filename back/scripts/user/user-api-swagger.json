@@ -279,7 +279,11 @@
                   "phone": "13800138000",
                   "role": 1,
                   "avatarUrl": "https://example.com/avatar/1.jpg",
-                  "bio": "这是一个测试用户"
+                  "bio": "这是一个测试用户",
+                  "balance": 10000,
+                  "frozenBalance": 500,
+                  "follower_count": 10,
+                  "following_count": 5
                 }
               }
             }
@@ -347,7 +351,11 @@
                   "phone": "13800138000",
                   "role": 1,
                   "avatarUrl": "https://example.com/avatar/1.jpg",
-                  "bio": "更新后的个人简介"
+                  "bio": "更新后的个人简介",
+                  "balance": 10000,
+                  "frozenBalance": 500,
+                  "follower_count": 10,
+                  "following_count": 5
                 }
               }
             }
@@ -1239,7 +1247,11 @@
                   "phone": "13800138000",
                   "role": 2,
                   "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
-                  "bio": "专业陪玩，技术过硬，带你上分！"
+                  "bio": "专业陪玩，技术过硬，带你上分！",
+                  "balance": 10000,
+                  "frozenBalance": 500,
+                  "follower_count": 10,
+                  "following_count": 5
                 }
               }
             }
@@ -2041,7 +2053,25 @@
         "bio": {
           "type": "string",
           "description": "个人简介"
-        }
+        },
+        "balance": {
+          "type": "integer",
+          "format": "int64",
+          "description": "帅币可用余额"
+        },
+        "frozenBalance": {
+          "type": "integer",
+          "format": "int64",
+          "description": "冻结帅币余额（预留）"
+        },
+        "follower_count": {
+          "type": "integer",
+           "description": "粉丝数量"
+        },
+        "following_count": {
+          "type": "integer",
+          "description": "关注数量"
+        }     
       }
     },
     "GetUserRequest": {

@@ -40,6 +40,8 @@ message UserInfo {
   string bio = 7;        // 个人简介
   int64  balance = 8;    // 帅币可用余额
   int64  frozen_balance = 9; // 冻结帅币余额（预留）
+  int64  follower_count = 10; // 粉丝数（冗余展示，最终以 follows 表为准）
+  int64  following_count = 11; // 关注数（冗余展示）
 }
 
 message GetUserResponse {

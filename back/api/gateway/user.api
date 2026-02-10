@@ -39,15 +39,17 @@ type LoginResponse {
 }
 
 type UserInfo {
-	Id            uint64 `json:"id"`
-	Uid           uint64 `json:"uid"`
-	Nickname      string `json:"nickname"`
-	Phone         string `json:"phone"`
-	Role          int    `json:"role"` // 用户角色：1=老板, 2=陪玩, 3=管理员
-	AvatarUrl     string `json:"avatarUrl"` // 头像URL
-	Bio           string `json:"bio"` // 个人简介
-	Balance       int64  `json:"balance"` // 帅币可用余额
-	FrozenBalance int64  `json:"frozenBalance"` // 冻结帅币余额（预留）
+	Id             uint64 `json:"id"` // 用户ID
+	Uid            uint64 `json:"uid"` // 用户唯一标识
+	Nickname       string `json:"nickname"` // 用户昵称
+	Phone          string `json:"phone"` // 手机号码
+	Role           int    `json:"role"` // 用户角色：1=老板, 2=陪玩, 3=管理员
+	AvatarUrl      string `json:"avatarUrl"` // 头像URL
+	Bio            string `json:"bio"` // 个人简介
+	Balance        int64  `json:"balance"` // 帅币可用余额
+	FrozenBalance  int64  `json:"frozenBalance"` // 冻结帅币余额（预留）
+	FollowerCount  int64  `json:"followerCount"` // 粉丝数
+	FollowingCount int64  `json:"followingCount"` // 关注数
 }
 
 type GetUserRequest {
@@ -178,16 +180,16 @@ type GetWalletResponse {
 
 // ---------------- 余额充值 ----------------
 type RechargeCreateRequest {
-	Amount   int64  `json:"amount"` // 充值金额（分/帅币）
-	PayType  string `json:"payType"` // 支付方式：alipay_wap / alipay_page / alipay_app
+	Amount    int64  `json:"amount"` // 充值金额（分/帅币）
+	PayType   string `json:"payType"` // 支付方式：alipay_wap / alipay_page / alipay_app
 	ReturnUrl string `json:"returnUrl,optional"` // 同步回跳地址（可选）
 }
 
 type RechargeCreateData {
-	OrderNo  string `json:"orderNo"` // 充值单号
-	PayUrl   string `json:"payUrl"` // 支付跳转URL（WAP/PC）
-	PayForm  string `json:"payForm"` // 支付表单（APP/PC场景可选）
-	ExpiresIn int64 `json:"expiresIn"` // 订单有效期（秒）
+	OrderNo   string `json:"orderNo"` // 充值单号
+	PayUrl    string `json:"payUrl"` // 支付跳转URL（WAP/PC）
+	PayForm   string `json:"payForm"` // 支付表单（APP/PC场景可选）
+	ExpiresIn int64  `json:"expiresIn"` // 订单有效期（秒）
 }
 
 type RechargeCreateResponse {
@@ -200,10 +202,10 @@ type RechargeQueryRequest {
 }
 
 type RechargeQueryData {
-	OrderNo string `json:"orderNo"`
-	Status  int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
-	Amount  int64  `json:"amount"`
-	PaidAt  string `json:"paidAt,optional"` // 支付完成时间（格式化时间）
+	OrderNo   string `json:"orderNo"`
+	Status    int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+	Amount    int64  `json:"amount"`
+	PaidAt    string `json:"paidAt,optional"` // 支付完成时间（格式化时间）
 	CreatedAt string `json:"createdAt"` // 创建时间（格式化时间）
 }
 
@@ -213,12 +215,12 @@ type RechargeQueryResponse {
 }
 
 type RechargeOrderInfo {
-	OrderNo string `json:"orderNo"`
-	Status  int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
-	Amount  int64  `json:"amount"`
-	PayType string `json:"payType"`
-	TradeNo string `json:"tradeNo,optional"`
-	PaidAt  string `json:"paidAt,optional"` // 支付完成时间（格式化时间）
+	OrderNo   string `json:"orderNo"`
+	Status    int    `json:"status"` // 订单状态：0=待支付,1=成功,2=失败,3=关闭
+	Amount    int64  `json:"amount"`
+	PayType   string `json:"payType"`
+	TradeNo   string `json:"tradeNo,optional"`
+	PaidAt    string `json:"paidAt,optional"` // 支付完成时间（格式化时间）
 	CreatedAt string `json:"createdAt"` // 创建时间（格式化时间）
 }
 
@@ -280,9 +282,9 @@ type GetCompanionRatingRankingRequest {
 
 type GetCompanionRatingRankingData {
 	Rankings []CompanionRankingItem `json:"rankings"`
-	Total    int32                 `json:"total"`
-	Page     int32                 `json:"page"`
-	PageSize int32                 `json:"pageSize"`
+	Total    int32                  `json:"total"`
+	Page     int32                  `json:"page"`
+	PageSize int32                  `json:"pageSize"`
 }
 
 type GetCompanionRatingRankingResponse {
@@ -297,9 +299,9 @@ type GetCompanionOrdersRankingRequest {
 
 type GetCompanionOrdersRankingData {
 	Rankings []CompanionRankingItem `json:"rankings"`
-	Total    int32                 `json:"total"`
-	Page     int32                 `json:"page"`
-	PageSize int32                 `json:"pageSize"`
+	Total    int32                  `json:"total"`
+	Page     int32                  `json:"page"`
+	PageSize int32                  `json:"pageSize"`
 }
 
 type GetCompanionOrdersRankingResponse {
@@ -467,6 +469,5 @@ service gateway {
 	// 获取游戏技能列表（公开，无需登录）
 	@handler listGameSkills
 	get /api/user/gameskills returns (ListGameSkillsResponse)
-
 }
 
