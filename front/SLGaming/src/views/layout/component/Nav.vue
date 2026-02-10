@@ -2,17 +2,12 @@
 import { useUserStore } from "@/stores/userStore";
 import { useWalletStore } from "@/stores/walletStore";
 import { useInfoStore } from "@/stores/infoStore";
-import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 import InfoPopver from "./InfoPopver.vue";
 
 const userStore = useUserStore();
 const walletStore = useWalletStore();
 const infoStore = useInfoStore();
-
-// 使用 storeToRefs 获取响应式 state
-const { info } = storeToRefs(infoStore);
-const { walletInfo } = storeToRefs(walletStore);
 
 onMounted(() => {
   if (userStore.userInfo?.accessToken) {
