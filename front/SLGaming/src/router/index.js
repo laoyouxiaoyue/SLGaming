@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, routeLocationKey } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Login from "@/views/login/UserLogin.vue";
 import Home from "@/views/home/index.vue";
 import Layout from "@/views/layout/index.vue";
