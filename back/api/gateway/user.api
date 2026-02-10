@@ -467,5 +467,6 @@ service gateway {
 	// 获取游戏技能列表（公开，无需登录）
 	@handler listGameSkills
 	get /api/user/gameskills returns (ListGameSkillsResponse)
+
 }
 

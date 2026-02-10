@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -94,6 +95,16 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUs
 		}
 		if err := db.Where("id = ?", u.ID).First(&u).Error; err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		// 清除用户缓存，确保信息立即更新
+		if l.svcCtx.Redis != nil {
+			cacheKey := bloom.GetUserCacheKey(int64(u.ID))
+			if _, err := l.svcCtx.Redis.Del(cacheKey); err != nil {
+				l.Logger.Errorf("delete user cache failed: %v", err)
+			} else {
+				l.Logger.Infof("user cache deleted successfully: %s", cacheKey)
+			}
 		}
 	}
 

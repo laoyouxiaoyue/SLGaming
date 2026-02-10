@@ -2,8 +2,10 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
+	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -19,6 +21,7 @@ type GetUserLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
+	bloom *bloom.BloomFilter
 }
 
 func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLogic {
@@ -26,17 +29,22 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
+		bloom:  bloom.NewBloomFilter(svcCtx),
 	}
 }
 
 func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, error) {
+	// 处理ID查询的缓存和布隆过滤器逻辑
+	if in.GetId() != 0 {
+		return l.getUserById(int64(in.GetId()))
+	}
+
+	// 其他查询条件（uid、phone）走原有逻辑
 	db := l.svcCtx.DB().WithContext(l.ctx)
 	var u model.User
 	var err error
 
 	switch {
-	case in.GetId() != 0:
-		err = db.Where("id = ?", in.GetId()).First(&u).Error
 	case in.GetUid() != 0:
 		err = db.Where("uid = ?", in.GetUid()).First(&u).Error
 	case in.GetPhone() != "":
@@ -56,6 +64,80 @@ func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, 
 	userInfo := helper.ToUserInfo(&u)
 
 	// 获取钱包信息
+	l.getUserWalletInfo(&u, userInfo)
+
+	return &user.GetUserResponse{
+		User: userInfo,
+	}, nil
+}
+
+// getUserById 根据ID获取用户，集成布隆过滤器和缓存
+func (l *GetUserLogic) getUserById(userID int64) (*user.GetUserResponse, error) {
+	// 步骤1：布隆过滤器判断
+	exists, err := l.bloom.MightContainUserID(userID)
+	if err != nil {
+		l.Errorf("bloom filter check failed: %v", err)
+		// 布隆过滤器查询失败，降级到正常流程
+	} else if !exists {
+		// 用户ID肯定不存在，直接返回
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	// 步骤2：尝试从缓存获取
+	cacheKey := bloom.GetUserCacheKey(userID)
+	var cachedUser user.UserInfo
+
+	if l.svcCtx.Redis != nil {
+		cacheData, err := l.svcCtx.Redis.Get(cacheKey)
+		if err == nil && cacheData != "" {
+			if err := json.Unmarshal([]byte(cacheData), &cachedUser); err == nil {
+				return &user.GetUserResponse{
+					User: &cachedUser,
+				}, nil
+			}
+		}
+	}
+
+	// 步骤3：缓存未命中，查询数据库
+	db := l.svcCtx.DB().WithContext(l.ctx)
+	var u model.User
+	err = db.Where("id = ?", userID).First(&u).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// 数据库未命中，缓存空值
+			if l.svcCtx.Redis != nil {
+				if err := l.svcCtx.Redis.Setex(cacheKey, "", bloom.EmptyCacheTTL); err != nil {
+					l.Errorf("set empty user cache failed: %v", err)
+				}
+			}
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// 步骤4：数据库命中，构建响应
+	userInfo := helper.ToUserInfo(&u)
+	l.getUserWalletInfo(&u, userInfo)
+
+	// 步骤5：更新缓存
+	if l.svcCtx.Redis != nil {
+		userInfoJSON, err := json.Marshal(userInfo)
+		if err == nil {
+			if err := l.svcCtx.Redis.Setex(cacheKey, string(userInfoJSON), bloom.UserCacheTTL); err != nil {
+				l.Errorf("set user cache failed: %v", err)
+			}
+		}
+	}
+
+	return &user.GetUserResponse{
+		User: userInfo,
+	}, nil
+}
+
+// getUserWalletInfo 获取用户钱包信息
+func (l *GetUserLogic) getUserWalletInfo(u *model.User, userInfo *user.UserInfo) {
+	db := l.svcCtx.DB().WithContext(l.ctx)
 	var wallet model.UserWallet
 	walletErr := db.Where("user_id = ?", u.ID).First(&wallet).Error
 	if errors.Is(walletErr, gorm.ErrRecordNotFound) {
@@ -72,8 +154,4 @@ func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, 
 		userInfo.Balance = wallet.Balance
 		userInfo.FrozenBalance = wallet.FrozenBalance
 	}
-
-	return &user.GetUserResponse{
-		User: userInfo,
-	}, nil
 }

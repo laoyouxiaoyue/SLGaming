@@ -1,6 +1,13 @@
 package main
 
 import (
+	"SLGaming/back/services/user/internal/bloom"
+	"SLGaming/back/services/user/internal/config"
+	"SLGaming/back/services/user/internal/ioc"
+	"SLGaming/back/services/user/internal/job"
+	"SLGaming/back/services/user/internal/server"
+	"SLGaming/back/services/user/internal/svc"
+	"SLGaming/back/services/user/user"
 	"context"
 	"flag"
 	"fmt"
@@ -9,13 +16,6 @@ import (
 	"strings"
 	"sync"
 	"syscall"
-
-	"SLGaming/back/services/user/internal/config"
-	"SLGaming/back/services/user/internal/ioc"
-	"SLGaming/back/services/user/internal/job"
-	"SLGaming/back/services/user/internal/server"
-	"SLGaming/back/services/user/internal/svc"
-	"SLGaming/back/services/user/user"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/zeromicro/go-zero/core/conf"
@@ -98,6 +98,11 @@ func main() {
 	job.StartOrderRefundConsumer(rootCtx, ctx)
 	job.StartRechargeEventConsumer(rootCtx, ctx)
 	job.StartAvatarModerationConsumer(rootCtx, ctx)
+
+	// 初始化布隆过滤器
+	if err := bloom.InitBloomFilter(ctx); err != nil {
+		logx.Errorf("initialize bloom filter failed: %v", err)
+	}
 
 	s := zrpc.MustNewServer(cfg.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))

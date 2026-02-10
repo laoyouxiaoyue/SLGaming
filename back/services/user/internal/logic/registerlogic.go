@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -20,6 +21,7 @@ type RegisterLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
+	bloom *bloom.BloomFilter
 }
 
 func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RegisterLogic {
@@ -27,6 +29,7 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
+		bloom:  bloom.NewBloomFilter(svcCtx),
 	}
 }
 
@@ -85,6 +88,14 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 			"phone": phone,
 		})
 		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// 将新用户ID添加到布隆过滤器
+	if err := l.bloom.AddUserID(int64(userModel.ID)); err != nil {
+		// 记录错误但不影响注册流程
+		helper.LogError(l.Logger, helper.OpRegister, "add user to bloom filter failed", err, map[string]interface{}{
+			"user_id": userModel.ID,
+		})
 	}
 
 	// 记录成功日志

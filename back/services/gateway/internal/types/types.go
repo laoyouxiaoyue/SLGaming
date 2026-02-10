@@ -67,6 +67,22 @@ type ChangePhoneResponse struct {
 	BaseResp
 }
 
+type CheckFollowStatusData struct {
+	IsFollowing bool `json:"isFollowing"` // 当前用户是否关注目标用户
+	IsFollowed  bool `json:"isFollowed"`  // 目标用户是否关注当前用户
+	IsMutual    bool `json:"isMutual"`    // 是否互相关注
+}
+
+type CheckFollowStatusRequest struct {
+	OperatorId   uint64 `form:"operatorId"`   // 操作人ID
+	TargetUserId uint64 `form:"targetUserId"` // 目标用户ID
+}
+
+type CheckFollowStatusResponse struct {
+	BaseResp
+	Data CheckFollowStatusData `json:"data"`
+}
+
 type CompanionInfo struct {
 	UserId       uint64  `json:"userId"`       // 用户ID
 	GameSkill    string  `json:"gameSkill"`    // 游戏技能（单个游戏名称）
@@ -119,6 +135,21 @@ type CreateOrderRequest struct {
 type CreateOrderResponse struct {
 	BaseResp
 	Data OrderInfo `json:"data"`
+}
+
+type FollowUserData struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type FollowUserRequest struct {
+	OperatorId uint64 `json:"operatorId"` // 操作人ID（关注者）
+	UserId     uint64 `json:"userId"`     // 被关注的用户ID
+}
+
+type FollowUserResponse struct {
+	BaseResp
+	Data FollowUserData `json:"data"`
 }
 
 type ForgetPasswordRequest struct {
@@ -201,6 +232,62 @@ type GetCompanionRatingRankingRequest struct {
 type GetCompanionRatingRankingResponse struct {
 	BaseResp
 	Data GetCompanionRatingRankingData `json:"data"`
+}
+
+type GetMutualFollowListData struct {
+	Users    []UserFollowInfo `json:"users"`
+	Total    int              `json:"total"`
+	Page     int              `json:"page"`
+	PageSize int              `json:"pageSize"`
+}
+
+type GetMutualFollowListRequest struct {
+	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
+	Page       int    `form:"page,optional"`
+	PageSize   int    `form:"pageSize,optional"`
+}
+
+type GetMutualFollowListResponse struct {
+	BaseResp
+	Data GetMutualFollowListData `json:"data"`
+}
+
+type GetMyFollowersListData struct {
+	Users    []UserFollowInfo `json:"users"`
+	Total    int              `json:"total"`
+	Page     int              `json:"page"`
+	PageSize int              `json:"pageSize"`
+}
+
+type GetMyFollowersListRequest struct {
+	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
+	Page       int    `form:"page,optional"`
+	PageSize   int    `form:"pageSize,optional"`
+	UserRole   int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
+}
+
+type GetMyFollowersListResponse struct {
+	BaseResp
+	Data GetMyFollowersListData `json:"data"`
+}
+
+type GetMyFollowingListData struct {
+	Users    []UserFollowInfo `json:"users"`
+	Total    int              `json:"total"`
+	Page     int              `json:"page"`
+	PageSize int              `json:"pageSize"`
+}
+
+type GetMyFollowingListRequest struct {
+	OperatorId uint64 `form:"operatorId,optional"` // 操作人ID
+	Page       int    `form:"page,optional"`
+	PageSize   int    `form:"pageSize,optional"`
+	UserRole   int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
+}
+
+type GetMyFollowingListResponse struct {
+	BaseResp
+	Data GetMyFollowingListData `json:"data"`
 }
 
 type GetOrderListData struct {
@@ -451,6 +538,21 @@ type StartOrderResponse struct {
 	Data OrderInfo `json:"data"`
 }
 
+type UnfollowUserData struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type UnfollowUserRequest struct {
+	OperatorId uint64 `json:"operatorId"` // 操作人ID（关注者）
+	UserId     uint64 `json:"userId"`     // 要取消关注的用户ID
+}
+
+type UnfollowUserResponse struct {
+	BaseResp
+	Data UnfollowUserData `json:"data"`
+}
+
 type UpdateCompanionProfileRequest struct {
 	GameSkill    string `json:"gameSkill,optional"`    // 游戏技能（单个游戏名称）
 	PricePerHour int64  `json:"pricePerHour,optional"` // 每小时价格（帅币）
@@ -497,6 +599,18 @@ type UploadAvatarRequest struct {
 type UploadAvatarResponse struct {
 	BaseResp
 	Data UploadAvatarData `json:"data"`
+}
+
+type UserFollowInfo struct {
+	UserId      uint64  `json:"userId"`      // 用户ID
+	Nickname    string  `json:"nickname"`    // 昵称
+	AvatarUrl   string  `json:"avatarUrl"`   // 头像URL
+	Role        int     `json:"role"`        // 用户角色：1=老板,2=陪玩
+	IsVerified  bool    `json:"isVerified"`  // 是否验证（仅陪玩）
+	Rating      float64 `json:"rating"`      // 评分（仅陪玩）
+	TotalOrders int64   `json:"totalOrders"` // 总接单数（仅陪玩）
+	IsMutual    bool    `json:"isMutual"`    // 是否互相关注
+	FollowedAt  int64   `json:"followedAt"`  // 关注时间戳
 }
 
 type UserInfo struct {
