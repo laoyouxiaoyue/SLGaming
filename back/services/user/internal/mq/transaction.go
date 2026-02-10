@@ -14,7 +14,10 @@ import (
 
 const (
 	userEventTopic           = "order_events"           // 与订单服务共用 topic，靠 Tag 区分
+	followEventTopic         = "follow_events"          // 关注事件独立 topic
 	eventTypeRefundSucceeded = "ORDER_REFUND_SUCCEEDED" // 退款成功事件
+	eventTypeFollowUser      = "USER_FOLLOW"            // 关注用户事件
+	eventTypeUnfollowUser    = "USER_UNFOLLOW"          // 取消关注用户事件
 )
 
 // UserEventTopic 返回用户领域事件使用的 RocketMQ Topic
@@ -22,9 +25,24 @@ func UserEventTopic() string {
 	return userEventTopic
 }
 
+// FollowEventTopic 返回关注事件使用的 RocketMQ Topic
+func FollowEventTopic() string {
+	return followEventTopic
+}
+
 // EventTypeRefundSucceeded 返回退款成功事件类型
 func EventTypeRefundSucceeded() string {
 	return eventTypeRefundSucceeded
+}
+
+// EventTypeFollowUser 返回关注用户事件类型
+func EventTypeFollowUser() string {
+	return eventTypeFollowUser
+}
+
+// EventTypeUnfollowUser 返回取消关注用户事件类型
+func EventTypeUnfollowUser() string {
+	return eventTypeUnfollowUser
 }
 
 // RefundSucceededPayload 用户退款成功事件负载
@@ -37,12 +55,25 @@ type RefundSucceededPayload struct {
 	Amount     int64  `json:"amount"`
 }
 
+// FollowUserPayload 关注用户事件负载
+type FollowUserPayload struct {
+	FollowerID  uint64 `json:"follower_id"`  // 关注者ID
+	FollowingID uint64 `json:"following_id"` // 被关注者ID
+}
+
+// UnfollowUserPayload 取消关注用户事件负载
+type UnfollowUserPayload struct {
+	FollowerID  uint64 `json:"follower_id"`  // 关注者ID
+	FollowingID uint64 `json:"following_id"` // 被关注者ID
+}
+
 // ExecuteUserEventTx 用户领域事件本地事务执行器
-// 当前仅处理 ORDER_REFUND_SUCCEEDED：在一个本地事务中完成钱包退款和流水记录。
+// 处理 ORDER_REFUND_SUCCEEDED：在一个本地事务中完成钱包退款和流水记录
 func ExecuteUserEventTx(ctx context.Context, db *gorm.DB, msg *primitive.Message) primitive.LocalTransactionState {
 	if msg == nil || db == nil {
 		return primitive.RollbackMessageState
 	}
+
 	if msg.GetTags() != eventTypeRefundSucceeded {
 		// 非当前支持的事件类型，直接回滚
 		return primitive.RollbackMessageState
@@ -123,11 +154,12 @@ func ExecuteUserEventTx(ctx context.Context, db *gorm.DB, msg *primitive.Message
 }
 
 // CheckUserEventTx 用户领域事件本地事务回查
-// 对于 ORDER_REFUND_SUCCEEDED：根据钱包流水表中是否存在 REFUND + biz_order_id 判断事务是否成功。
+// 对于 ORDER_REFUND_SUCCEEDED：根据钱包流水表中是否存在 REFUND + biz_order_id 判断事务是否成功
 func CheckUserEventTx(ctx context.Context, db *gorm.DB, msg *primitive.Message) primitive.LocalTransactionState {
 	if msg == nil || db == nil {
 		return primitive.UnknowState
 	}
+
 	if msg.GetTags() != eventTypeRefundSucceeded {
 		return primitive.RollbackMessageState
 	}

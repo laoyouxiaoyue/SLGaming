@@ -2,12 +2,15 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	"SLGaming/back/services/user/internal/model"
+	userMQ "SLGaming/back/services/user/internal/mq"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
 
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -70,6 +73,35 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 	if err := l.svcCtx.DB().Create(&followRelation).Error; err != nil {
 		l.Errorf("create follow relation failed: %v", err)
 		return nil, status.Error(codes.Internal, "create follow relation failed")
+	}
+
+	// 更新Redis缓存中的粉丝数和关注数
+	if l.svcCtx.UserCache != nil {
+		// 增加被关注用户的粉丝数
+		if err := l.svcCtx.UserCache.IncrFollowerCount(int64(in.UserId)); err != nil {
+			l.Errorf("incr follower count cache failed: %v", err)
+		}
+		// 增加关注者的关注数
+		if err := l.svcCtx.UserCache.IncrFollowingCount(int64(in.OperatorId)); err != nil {
+			l.Errorf("incr following count cache failed: %v", err)
+		}
+	}
+
+	// 发送关注事件到消息队列，异步更新数据库计数
+	if l.svcCtx.EventProducer != nil {
+		payload := userMQ.FollowUserPayload{
+			FollowerID:  in.OperatorId,
+			FollowingID: in.UserId,
+		}
+		payloadJSON, err := json.Marshal(payload)
+		if err == nil {
+			msg := primitive.NewMessage(userMQ.FollowEventTopic(), payloadJSON)
+			msg.WithTag(userMQ.EventTypeFollowUser())
+			_, err := l.svcCtx.EventProducer.SendSync(l.ctx, msg)
+			if err != nil {
+				l.Errorf("send follow user event failed: %v", err)
+			}
+		}
 	}
 
 	l.Infof("user %d followed user %d", in.OperatorId, in.UserId)

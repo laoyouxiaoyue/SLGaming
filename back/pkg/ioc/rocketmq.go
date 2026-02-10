@@ -67,6 +67,14 @@ func ShutdownRocketMQProducer(p rocketmq.Producer) {
 // group 为消费者分组名称；topics 为需要订阅的主题列表
 // handler 为业务处理函数，返回 error 时 RocketMQ 会按配置进行重试
 func InitRocketMQConsumer(cfg RocketMQConfig, group string, topics []string, handler func(context.Context, *primitive.MessageExt) error) (rocketmq.PushConsumer, error) {
+	return InitRocketMQConsumerWithSelector(cfg, group, topics, "", handler)
+}
+
+// InitRocketMQConsumerWithSelector 根据配置初始化一个 RocketMQ PushConsumer，支持 Tag 过滤
+// group 为消费者分组名称；topics 为需要订阅的主题列表
+// tagSelector 为 Tag 过滤表达式，如 "USER_FOLLOW||USER_UNFOLLOW"，空字符串表示不过滤
+// handler 为业务处理函数，返回 error 时 RocketMQ 会按配置进行重试
+func InitRocketMQConsumerWithSelector(cfg RocketMQConfig, group string, topics []string, tagSelector string, handler func(context.Context, *primitive.MessageExt) error) (rocketmq.PushConsumer, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("rocketmq config is nil")
 	}
@@ -106,12 +114,21 @@ func InitRocketMQConsumer(cfg RocketMQConfig, group string, topics []string, han
 		return nil, fmt.Errorf("new rocketmq consumer: %w", err)
 	}
 
-	// 订阅多个 topic，使用全量 tag（*），后续如果需要再细化 tag 区分
+	// 构建 MessageSelector
+	selector := consumer.MessageSelector{}
+	if tagSelector != "" {
+		selector = consumer.MessageSelector{
+			Type:       consumer.TAG,
+			Expression: tagSelector,
+		}
+	}
+
+	// 订阅多个 topic
 	for _, topic := range topics {
 		if topic == "" {
 			continue
 		}
-		if err := c.Subscribe(topic, consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
+		if err := c.Subscribe(topic, selector, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 			for _, msg := range msgs {
 				if handler != nil {
 					if err := handler(ctx, msg); err != nil {

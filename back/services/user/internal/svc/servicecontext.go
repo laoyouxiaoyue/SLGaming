@@ -7,6 +7,7 @@ import (
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/agent/agentclient"
+	"SLGaming/back/services/user/internal/cache"
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
 	userMQ "SLGaming/back/services/user/internal/mq"
@@ -26,6 +27,12 @@ type ServiceContext struct {
 
 	// Redis 客户端（用于排名 ZSet）
 	Redis *redis.Redis
+
+	// 缓存管理器
+	CacheManager *cache.Manager
+
+	// 用户缓存服务
+	UserCache *cache.UserCache
 
 	// RocketMQ 普通生产者（用于发送非事务事件）
 	EventProducer rocketmq.Producer
@@ -50,6 +57,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	// 初始化 Redis（使用 zrpc.RpcServerConf 中的 Redis 配置）
+	var redisClient *redis.Redis
 	if c.Redis.Host != "" {
 		redisAdapter := &pkgIoc.RedisConfigAdapter{
 			Host: c.Redis.Host,
@@ -57,7 +65,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			Pass: c.Redis.Pass,
 			Tls:  c.Redis.Tls,
 		}
-		redisClient, err := pkgIoc.InitRedis(redisAdapter)
+		redisClient, err = pkgIoc.InitRedis(redisAdapter)
 		if err != nil {
 			logx.Errorf("init redis failed: %v", err)
 		} else {
@@ -67,6 +75,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	} else {
 		logx.Infof("Redis 未配置，排名功能不可用")
 	}
+
+	// 初始化缓存管理器和用户缓存服务
+	ctx.CacheManager = cache.NewManager(redisClient)
+	ctx.UserCache = cache.NewUserCache(ctx.CacheManager)
+	logx.Infof("缓存服务已初始化")
 
 	// 初始化 RocketMQ Producer（如果配置了）
 	if len(c.RocketMQ.NameServers) > 0 {

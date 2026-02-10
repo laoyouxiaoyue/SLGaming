@@ -98,6 +98,7 @@ func main() {
 	job.StartOrderRefundConsumer(rootCtx, ctx)
 	job.StartRechargeEventConsumer(rootCtx, ctx)
 	job.StartAvatarModerationConsumer(rootCtx, ctx)
+	job.StartFollowEventConsumer(rootCtx, ctx)
 
 	// 初始化布隆过滤器
 	if err := bloom.InitBloomFilter(ctx); err != nil {

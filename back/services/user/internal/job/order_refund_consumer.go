@@ -83,10 +83,11 @@ func StartOrderRefundConsumer(ctx context.Context, svcCtx *svc.ServiceContext) {
 		SecretKey:   cfg.SecretKey,
 	}
 
-	consumer, err := pkgIoc.InitRocketMQConsumer(
+	consumer, err := pkgIoc.InitRocketMQConsumerWithSelector(
 		mqCfg,
 		"user-refund-consumer",
 		[]string{orderEventTopic},
+		eventTypeOrderCancelled+"||"+eventTypeOrderCompleted+"||"+eventTypePaymentPending+"||"+eventTypePaymentSucceeded+"||"+eventTypePaymentFailed+"||"+eventTypeRefundSucceeded,
 		func(c context.Context, msg *primitive.MessageExt) error {
 			return handleOrderEvent(c, svcCtx, msg)
 		},

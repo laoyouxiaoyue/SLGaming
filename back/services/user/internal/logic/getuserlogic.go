@@ -63,6 +63,9 @@ func (l *GetUserLogic) GetUser(in *user.GetUserRequest) (*user.GetUserResponse, 
 	// 获取用户信息
 	userInfo := helper.ToUserInfo(&u)
 
+	// 从数据库获取的用户信息已经包含最新的粉丝数和关注数
+	// 不需要再从Redis缓存获取，避免覆盖最新值
+
 	// 获取钱包信息
 	l.getUserWalletInfo(&u, userInfo)
 
@@ -91,6 +94,15 @@ func (l *GetUserLogic) getUserById(userID int64) (*user.GetUserResponse, error) 
 		cacheData, err := l.svcCtx.Redis.Get(cacheKey)
 		if err == nil && cacheData != "" {
 			if err := json.Unmarshal([]byte(cacheData), &cachedUser); err == nil {
+				// 从计数缓存获取最新的粉丝数和关注数
+				if l.svcCtx.UserCache != nil {
+					if followerCount, err := l.svcCtx.UserCache.GetFollowerCount(userID); err == nil && followerCount > 0 {
+						cachedUser.FollowerCount = followerCount
+					}
+					if followingCount, err := l.svcCtx.UserCache.GetFollowingCount(userID); err == nil && followingCount > 0 {
+						cachedUser.FollowingCount = followingCount
+					}
+				}
 				return &user.GetUserResponse{
 					User: &cachedUser,
 				}, nil
@@ -118,6 +130,11 @@ func (l *GetUserLogic) getUserById(userID int64) (*user.GetUserResponse, error) 
 
 	// 步骤4：数据库命中，构建响应
 	userInfo := helper.ToUserInfo(&u)
+
+	// 从数据库获取的用户信息已经包含最新的粉丝数和关注数
+	// 不需要再从Redis缓存获取，避免覆盖最新值
+
+	// 获取钱包信息
 	l.getUserWalletInfo(&u, userInfo)
 
 	// 步骤5：更新缓存
