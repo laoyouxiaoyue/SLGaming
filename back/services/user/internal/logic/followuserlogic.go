@@ -64,7 +64,37 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.Internal, "check follow status failed")
 	}
 
-	// 5. 创建关注关系
+	// 5. 检查关注人数上限（最多1000人）
+	const maxFollowingCount = 1000
+	var followingCount int64
+
+	// 优先从Redis获取关注数
+	if l.svcCtx.UserCache != nil {
+		count, err := l.svcCtx.UserCache.GetFollowingCount(int64(in.OperatorId))
+		if err == nil && count > 0 {
+			followingCount = count
+		} else {
+			// Redis未命中，从数据库查询
+			if err := l.svcCtx.DB().Model(&model.FollowRelation{}).Where("follower_id = ?", in.OperatorId).Count(&followingCount).Error; err != nil {
+				l.Errorf("get following count from db failed: %v", err)
+				return nil, status.Error(codes.Internal, "get following count failed")
+			}
+			// 回写Redis
+			l.svcCtx.UserCache.SetFollowingCount(int64(in.OperatorId), followingCount)
+		}
+	} else {
+		// Redis不可用，从数据库查询
+		if err := l.svcCtx.DB().Model(&model.FollowRelation{}).Where("follower_id = ?", in.OperatorId).Count(&followingCount).Error; err != nil {
+			l.Errorf("get following count from db failed: %v", err)
+			return nil, status.Error(codes.Internal, "get following count failed")
+		}
+	}
+
+	if followingCount >= maxFollowingCount {
+		return nil, status.Error(codes.ResourceExhausted, "you can only follow up to 1000 users")
+	}
+
+	// 6. 创建关注关系
 	followRelation := model.FollowRelation{
 		FollowerID:  in.OperatorId,
 		FollowingID: in.UserId,
@@ -75,7 +105,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.Internal, "create follow relation failed")
 	}
 
-	// 更新Redis缓存中的粉丝数和关注数
+	// 7. 更新Redis缓存中的粉丝数和关注数
 	if l.svcCtx.UserCache != nil {
 		// 增加被关注用户的粉丝数
 		if err := l.svcCtx.UserCache.IncrFollowerCount(int64(in.UserId)); err != nil {
@@ -87,7 +117,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		}
 	}
 
-	// 发送关注事件到消息队列，异步更新数据库计数
+	// 8. 发送关注事件到消息队列，异步更新数据库计数
 	if l.svcCtx.EventProducer != nil {
 		payload := userMQ.FollowUserPayload{
 			FollowerID:  in.OperatorId,
