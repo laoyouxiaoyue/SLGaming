@@ -102,7 +102,7 @@ watch(
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item" @click="$router.push('/account/fans')">
-            <div class="stat-num">{{ info.fansCount || 0 }}</div>
+            <div class="stat-num">{{ info.followerCount || 0 }}</div>
             <div class="stat-label">粉丝</div>
           </div>
         </div>

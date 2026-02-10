@@ -48,12 +48,12 @@ onMounted(() => {
         </template>
         <template v-else>
           <li>
-            <a href="javascript:;" @click="$router.push('/')"><sl-icon name="icon-shouye" />首页</a>
-          </li>
-          <li>
             <a href="javascript:;" @click="$router.push('/login')"
               ><sl-icon name="icon-qudenglu" />去登录</a
             >
+          </li>
+          <li>
+            <a href="javascript:;" @click="$router.push('/')"><sl-icon name="icon-shouye" />首页</a>
           </li>
         </template>
         <li>

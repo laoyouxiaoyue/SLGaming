@@ -6,20 +6,38 @@ import "element-plus/theme-chalk/el-message-box.css";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
 import { useWalletStore } from "@/stores/walletStore";
+import { checkFollowStatusAPI, followUserAPI, unfollowUserAPI } from "@/api/relation";
+import { useUserStore } from "@/stores/userStore";
+
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 const loading = ref(true);
 const ordering = ref(false);
 const companionInfo = ref(null);
 const walletStore = useWalletStore();
 const isFollowed = ref(false);
 
-const toggleFollow = () => {
-  isFollowed.value = !isFollowed.value;
-  if (isFollowed.value) {
-    ElMessage.success("关注成功");
-  } else {
-    ElMessage.info("已取消关注");
+const toggleFollow = async () => {
+  if (!userStore.userInfo?.accessToken) {
+    ElMessage.warning("请先登录后操作");
+    router.push("/login");
+    return;
+  }
+
+  const userId = route.params.id;
+  try {
+    if (isFollowed.value) {
+      await unfollowUserAPI({ targetUserId: userId });
+      isFollowed.value = false;
+      ElMessage.info("已取消关注");
+    } else {
+      await followUserAPI({ targetUserId: userId });
+      isFollowed.value = true;
+      ElMessage.success("关注成功");
+    }
+  } catch (error) {
+    console.error("关注操作失败:", error);
   }
 };
 
@@ -47,10 +65,22 @@ const fetchCompanionInfo = async () => {
     }
     const res = await getCompanionPublicProfileAPI({ userId });
     companionInfo.value = res.data;
-  } catch (error) {
-    console.error("获取陪玩信息失败:", error);
   } finally {
     loading.value = false;
+  }
+};
+
+const fetchFollowStatus = async () => {
+  if (!userStore.userInfo?.accessToken) return;
+
+  try {
+    const userId = route.params.id;
+    if (!userId) return;
+
+    const res = await checkFollowStatusAPI({ targetUserId: userId });
+    isFollowed.value = res.data.following;
+  } catch (error) {
+    console.error("获取关注状态失败:", error);
   }
 };
 
@@ -109,8 +139,6 @@ const createOrder = async () => {
     setTimeout(async () => {
       router.replace("/order/boss");
     }, 1200);
-  } catch (error) {
-    console.error("支付失败:", error);
   } finally {
     ordering.value = false;
   }
@@ -118,6 +146,7 @@ const createOrder = async () => {
 
 onMounted(() => {
   fetchCompanionInfo();
+  fetchFollowStatus();
 });
 </script>
 <template>
