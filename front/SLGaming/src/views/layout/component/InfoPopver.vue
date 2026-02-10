@@ -96,12 +96,12 @@ watch(
       <div class="user-stats-card">
         <!-- 数据统计区 -->
         <div class="stats-grid">
-          <div class="stat-item" @click="$router.push('/account/follows')">
+          <div class="stat-item" @click="$router.push('/relation/follow')">
             <div class="stat-num">{{ info.followingCount || 0 }}</div>
             <div class="stat-label">关注</div>
           </div>
           <div class="stat-divider"></div>
-          <div class="stat-item" @click="$router.push('/account/fans')">
+          <div class="stat-item" @click="$router.push('/relation/fans')">
             <div class="stat-num">{{ info.followerCount || 0 }}</div>
             <div class="stat-label">粉丝</div>
           </div>

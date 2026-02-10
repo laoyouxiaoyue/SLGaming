@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, routeLocationKey } from "vue-router";
 import Login from "@/views/login/UserLogin.vue";
 import Home from "@/views/home/index.vue";
 import Layout from "@/views/layout/index.vue";
@@ -18,6 +18,9 @@ import Detail from "@/views/detail/index.vue";
 import CompanionOrder from "@/views/order/component/CompanionOrder.vue";
 import BossOrder from "@/views/order/component/BossOrder.vue";
 import Order from "@/views/order/index.vue";
+import Relation from "@/views/relation/index.vue";
+import FansList from "@/views/relation/component/FansList.vue";
+import FollowList from "@/views/relation/component/FollowList.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -44,6 +47,20 @@ const router = createRouter({
             {
               path: "recond",
               component: ScionRecord,
+            },
+          ],
+        },
+        {
+          path: "relation",
+          component: Relation,
+          children: [
+            {
+              path: "fans",
+              component: FansList,
+            },
+            {
+              path: "follow",
+              component: FollowList,
             },
           ],
         },
