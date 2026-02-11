@@ -15,6 +15,17 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// LogoutHandler 用户登出
+// @Summary 用户登出
+// @Description 退出当前登录状态，使 token 失效
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.LogoutRequest true "登出请求"
+// @Success 200 {object} types.LogoutResponse "成功"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/user/logout [post]
+// @Security BearerAuth
 func LogoutHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.LogoutRequest

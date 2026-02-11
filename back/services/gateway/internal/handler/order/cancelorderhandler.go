@@ -14,6 +14,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// CancelOrderHandler 取消订单
+// @Summary 取消订单
+// @Description 取消待接单或待支付状态的订单
+// @Tags 订单
+// @Accept json
+// @Produce json
+// @Param request body types.CancelOrderRequest true "取消订单请求"
+// @Success 200 {object} types.CancelOrderResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/order/cancel [put]
+// @Security BearerAuth
 func CancelOrderHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.CancelOrderRequest

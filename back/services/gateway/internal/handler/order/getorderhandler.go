@@ -14,6 +14,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// GetOrderHandler 获取订单详情
+// @Summary 获取订单详情
+// @Description 根据订单ID获取订单详细信息
+// @Tags 订单
+// @Accept json
+// @Produce json
+// @Param orderId query string true "订单ID"
+// @Success 200 {object} types.GetOrderResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/order [get]
+// @Security BearerAuth
 func GetOrderHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.GetOrderRequest

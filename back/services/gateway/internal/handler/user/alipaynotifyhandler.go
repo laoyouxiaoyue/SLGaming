@@ -12,6 +12,15 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// AlipayNotifyHandler 支付宝支付回调
+// @Summary 支付宝支付回调
+// @Description 支付宝异步通知回调接口，用于处理支付结果
+// @Tags 用户
+// @Accept application/x-www-form-urlencoded
+// @Produce text/plain
+// @Param payload body map[string]string true "支付宝回调参数"
+// @Success 200 {string} string "success"
+// @Router /api/user/recharge/alipay/notify [post]
 func AlipayNotifyHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_ = r.ParseForm()

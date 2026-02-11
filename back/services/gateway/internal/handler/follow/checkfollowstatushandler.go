@@ -12,6 +12,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// CheckFollowStatusHandler 检查关注状态
+// @Summary 检查关注状态
+// @Description 检查当前用户与目标用户的关注关系状态
+// @Tags 关注
+// @Accept json
+// @Produce json
+// @Param targetUserId query uint64 true "目标用户ID"
+// @Success 200 {object} types.CheckFollowStatusResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/user/follow/status [get]
+// @Security BearerAuth
 func CheckFollowStatusHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.CheckFollowStatusRequest

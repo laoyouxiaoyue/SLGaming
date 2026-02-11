@@ -15,6 +15,16 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// LoginHandler 用户登录
+// @Summary 用户登录
+// @Description 使用手机号和密码登录
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.LoginRequest true "登录请求"
+// @Success 200 {object} types.LoginResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Router /api/user/login [post]
 func LoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.LoginRequest

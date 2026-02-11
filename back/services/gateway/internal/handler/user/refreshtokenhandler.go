@@ -14,6 +14,16 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// RefreshTokenHandler 刷新 Token
+// @Summary 刷新 Token
+// @Description 使用 Refresh Token 获取新的 Access Token
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.RefreshTokenRequest true "刷新 Token 请求"
+// @Success 200 {object} types.RefreshTokenResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Router /api/user/refresh-token [post]
 func RefreshTokenHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.RefreshTokenRequest

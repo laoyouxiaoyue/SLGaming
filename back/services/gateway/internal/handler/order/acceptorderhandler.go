@@ -14,6 +14,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// AcceptOrderHandler 接单
+// @Summary 接单
+// @Description 陪玩接单，将订单状态从待接单改为服务中
+// @Tags 订单
+// @Accept json
+// @Produce json
+// @Param request body types.AcceptOrderRequest true "接单请求"
+// @Success 200 {object} types.AcceptOrderResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/order/accept [put]
+// @Security BearerAuth
 func AcceptOrderHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.AcceptOrderRequest

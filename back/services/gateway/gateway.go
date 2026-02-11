@@ -1,6 +1,16 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
+// @title 陪玩平台 API
+// @version 1.0
+// @description 陪玩平台 Gateway 服务 API 文档
+// @host localhost:8888
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description JWT Token，格式: Bearer {token}
+
 package main
 
 import (
@@ -17,11 +27,13 @@ import (
 	"syscall"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
+	_ "SLGaming/back/services/gateway/docs"
 	"SLGaming/back/services/gateway/internal/handler"
 	"SLGaming/back/services/gateway/internal/ioc"
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 
+	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -83,6 +95,32 @@ func main() {
 
 	// 注册路由处理器
 	handler.RegisterHandlers(server, ctx)
+
+	// 注册 Swagger UI 路由
+	// Swagger UI 入口
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/index.html",
+		Handler: httpSwagger.WrapHandler,
+	})
+	// Swagger JSON 文档
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/doc.json",
+		Handler: httpSwagger.WrapHandler,
+	})
+	// Swagger YAML 文档
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/doc.yaml",
+		Handler: httpSwagger.WrapHandler,
+	})
+	// Swagger UI 静态资源
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/:path",
+		Handler: httpSwagger.WrapHandler,
+	})
 
 	// 提供本地上传文件访问
 	baseURLRaw := strings.TrimSpace(c.Upload.BaseURL)

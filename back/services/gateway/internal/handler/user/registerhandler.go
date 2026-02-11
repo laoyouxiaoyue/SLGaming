@@ -15,6 +15,16 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// RegisterHandler 用户注册
+// @Summary 用户注册
+// @Description 使用手机号、验证码和密码注册新用户
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.RegisterRequest true "注册请求"
+// @Success 200 {object} types.RegisterResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Router /api/user/register [post]
 func RegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.RegisterRequest

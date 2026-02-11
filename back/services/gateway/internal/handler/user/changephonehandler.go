@@ -12,6 +12,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// ChangePhoneHandler 更换手机号
+// @Summary 更换手机号
+// @Description 更换当前登录用户的手机号，需要验证旧手机号和新手机号的验证码
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.ChangePhoneRequest true "更换手机号请求"
+// @Success 200 {object} types.ChangePhoneResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/user/change-phone [put]
+// @Security BearerAuth
 func ChangePhoneHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.ChangePhoneRequest
