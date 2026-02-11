@@ -2,8 +2,8 @@ package logic
 
 import (
 	"context"
+	"strconv"
 
-	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -12,6 +12,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+// 缓存相关常量
+const userCachePrefix3 = "user:info:"
+
+// getUserCacheKey 获取用户缓存键
+func getUserCacheKey3(userID int64) string {
+	return userCachePrefix3 + strconv.FormatInt(userID, 10)
+}
 
 type ConsumeLogic struct {
 	ctx    context.Context
@@ -63,7 +71,7 @@ func (l *ConsumeLogic) Consume(in *user.ConsumeRequest) (*user.ConsumeResponse, 
 
 	// 清除用户缓存，确保余额立即更新
 	if l.svcCtx.Redis != nil {
-		cacheKey := bloom.GetUserCacheKey(int64(userID))
+		cacheKey := getUserCacheKey3(int64(userID))
 		if _, err := l.svcCtx.Redis.Del(cacheKey); err != nil {
 			l.Logger.Errorf("delete user cache failed: %v", err)
 		} else {

@@ -3,9 +3,9 @@ package logic
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
-	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -16,6 +16,14 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
+
+// 缓存相关常量
+const userCachePrefix2 = "user:info:"
+
+// getUserCacheKey 获取用户缓存键
+func getUserCacheKey2(userID int64) string {
+	return userCachePrefix2 + strconv.FormatInt(userID, 10)
+}
 
 type RechargeLogic struct {
 	ctx    context.Context
@@ -97,7 +105,7 @@ func (l *RechargeLogic) Recharge(in *user.RechargeRequest) (*user.RechargeRespon
 
 	// 清除用户缓存，确保余额立即更新
 	if l.svcCtx.Redis != nil {
-		cacheKey := bloom.GetUserCacheKey(int64(userID))
+		cacheKey := getUserCacheKey2(int64(userID))
 		if _, err := l.svcCtx.Redis.Del(cacheKey); err != nil {
 			l.Logger.Errorf("delete user cache failed: %v", err)
 		} else {

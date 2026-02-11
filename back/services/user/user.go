@@ -1,7 +1,6 @@
 package main
 
 import (
-	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
 	"SLGaming/back/services/user/internal/job"
@@ -100,10 +99,12 @@ func main() {
 	job.StartAvatarModerationConsumer(rootCtx, ctx)
 	job.StartFollowEventConsumer(rootCtx, ctx)
 
-	// 初始化布隆过滤器
-	if err := bloom.InitBloomFilter(ctx); err != nil {
-		logx.Errorf("initialize bloom filter failed: %v", err)
-	}
+	// 注意：布隆过滤器数据已持久化在 Redis 中（RDB/AOF），正常重启不需要重新加载
+	// 只有在以下情况才需要手动初始化：
+	// 1. 首次部署（Redis 中还没有布隆过滤器数据）
+	// 2. Redis 数据被清空
+	// 3. 需要重建布隆过滤器
+	// 如需初始化，请使用命令行工具或管理接口执行，不要在启动时全量加载
 
 	s := zrpc.MustNewServer(cfg.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))

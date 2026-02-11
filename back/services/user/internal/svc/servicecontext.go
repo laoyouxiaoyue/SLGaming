@@ -7,6 +7,7 @@ import (
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/agent/agentclient"
+	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/cache"
 	"SLGaming/back/services/user/internal/config"
 	"SLGaming/back/services/user/internal/ioc"
@@ -33,6 +34,9 @@ type ServiceContext struct {
 
 	// 用户缓存服务
 	UserCache *cache.UserCache
+
+	// 布隆过滤器
+	BloomFilter *bloom.UserBloomFilters
 
 	// RocketMQ 普通生产者（用于发送非事务事件）
 	EventProducer rocketmq.Producer
@@ -80,6 +84,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	ctx.CacheManager = cache.NewManager(redisClient)
 	ctx.UserCache = cache.NewUserCache(ctx.CacheManager)
 	logx.Infof("缓存服务已初始化")
+
+	// 初始化布隆过滤器（如果为空会自动从数据库导入）
+	ctx.BloomFilter = bloom.NewUserBloomFilters(redisClient, db)
+	logx.Infof("布隆过滤器已初始化")
 
 	// 初始化 RocketMQ Producer（如果配置了）
 	if len(c.RocketMQ.NameServers) > 0 {

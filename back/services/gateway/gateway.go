@@ -40,11 +40,19 @@ func main() {
 	// Consul 注册器（用于退出时注销）
 	var registrar *pkgIoc.ConsulRegistrar
 
+	// 限流器中间件（用于优雅停止）
+	var rateLimiterMiddleware *middleware.RateLimiterMiddleware
+
 	// 优雅停机：确保信号时只 Stop/Deregister 一次
 	var stopOnce sync.Once
 	stopServer := func() {
 		stopOnce.Do(func() {
 			logx.Info("shutting down gateway server")
+			// 停止限流器清理协程
+			if rateLimiterMiddleware != nil {
+				rateLimiterMiddleware.Stop()
+				logx.Info("rate limiter stopped")
+			}
 			server.Stop()
 			if registrar != nil {
 				registrar.Deregister()
@@ -66,7 +74,9 @@ func main() {
 	server.Use(middleware.CORSMiddleware(nil))
 
 	// 全局应用限流中间件（在鉴权之前，避免无效请求占用资源）
-	server.Use(middleware.RateLimitMiddleware(&c.RateLimit))
+	// 使用可管理的限流器，支持优雅停止
+	rateLimiterMiddleware = middleware.NewRateLimiterMiddleware(&c.RateLimit)
+	server.Use(rateLimiterMiddleware.Handler)
 
 	// 全局应用鉴权中间件（公开接口会在中间件中自动跳过）
 	server.Use(middleware.AuthMiddleware(ctx))

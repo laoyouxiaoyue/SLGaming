@@ -3,9 +3,9 @@ package logic
 import (
 	"context"
 	"errors"
+	"strconv"
 	"strings"
 
-	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -16,6 +16,14 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
+
+// 缓存相关常量
+const userCachePrefix = "user:info:"
+
+// getUserCacheKey 获取用户缓存键
+func getUserCacheKey(userID int64) string {
+	return userCachePrefix + strconv.FormatInt(userID, 10)
+}
 
 type UpdateUserLogic struct {
 	ctx    context.Context
@@ -99,7 +107,7 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserRequest) (*user.UpdateUs
 
 		// 清除用户缓存，确保信息立即更新
 		if l.svcCtx.Redis != nil {
-			cacheKey := bloom.GetUserCacheKey(int64(u.ID))
+			cacheKey := getUserCacheKey(int64(u.ID))
 			if _, err := l.svcCtx.Redis.Del(cacheKey); err != nil {
 				l.Logger.Errorf("delete user cache failed: %v", err)
 			} else {
