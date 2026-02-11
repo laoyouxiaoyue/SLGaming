@@ -1824,7 +1824,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: 获取当前登录用户的关注列表，支持分页和角色筛选
+      description: 获取当前登录用户的关注列表，支持分页、角色筛选和昵称搜索
       parameters:
       - default: 1
         description: 页码（从1开始）
@@ -1840,6 +1840,10 @@ paths:
         in: query
         name: userRole
         type: integer
+      - description: 搜索关键词（昵称模糊匹配）
+        in: query
+        name: keyword
+        type: string
       produces:
       - application/json
       responses:

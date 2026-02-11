@@ -1301,7 +1301,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "获取当前登录用户的关注列表，支持分页和角色筛选",
+                "description": "获取当前登录用户的关注列表，支持分页、角色筛选和昵称搜索",
                 "consumes": [
                     "application/json"
                 ],
@@ -1331,6 +1331,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "过滤用户角色：1=老板,2=陪玩",
                         "name": "userRole",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索关键词（昵称模糊匹配）",
+                        "name": "keyword",
                         "in": "query"
                     }
                 ],

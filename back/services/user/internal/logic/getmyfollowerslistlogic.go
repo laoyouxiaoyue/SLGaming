@@ -26,10 +26,28 @@ func NewGetMyFollowersListLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *GetMyFollowersListLogic) GetMyFollowersList(in *user.GetMyFollowersListRequest) (*user.GetMyFollowersListResponse, error) {
+	const maxFollowersLimit = 1000 // 最多只能查看前1000名粉丝
+
 	// 分页参数处理
 	page := max(int64(in.Page), 1)
 	pageSize := clamp(int64(in.PageSize), 1, 100)
+
+	// 检查是否超出最大限制
 	offset := (page - 1) * pageSize
+	if offset >= maxFollowersLimit {
+		// 超出限制，返回空列表
+		return &user.GetMyFollowersListResponse{
+			Users:    []*user.UserFollowInfo{},
+			Total:    int32(maxFollowersLimit),
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		}, nil
+	}
+
+	// 调整 pageSize，确保不超过限制
+	if offset+pageSize > maxFollowersLimit {
+		pageSize = maxFollowersLimit - offset
+	}
 
 	// 1. 查询关注关系并关联用户信息（减少N+1查询）
 	type FollowerWithUser struct {
@@ -82,6 +100,11 @@ func (l *GetMyFollowersListLogic) GetMyFollowersList(in *user.GetMyFollowersList
 		l.svcCtx.DB().Model(&model.FollowRelation{}).Where("following_id = ?", in.OperatorId).Count(&total)
 	}()
 	wg.Wait()
+
+	// 限制返回的总数不超过最大值
+	if total > maxFollowersLimit {
+		total = maxFollowersLimit
+	}
 
 	return &user.GetMyFollowersListResponse{
 		Users:    userInfos,

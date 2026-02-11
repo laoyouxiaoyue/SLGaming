@@ -372,6 +372,7 @@ message GetMyFollowingListRequest {
   int32 page = 2;           // 页码（从1开始）
   int32 page_size = 3;      // 每页数量
   int32 user_role = 4;      // 可选，过滤用户角色：1=老板, 2=陪玩
+  string keyword = 5;       // 可选，搜索关键词（昵称模糊匹配）
 }
 
 // 获取我的粉丝列表

@@ -71,7 +71,8 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 	// 优先从Redis获取关注数
 	if l.svcCtx.UserCache != nil {
 		count, err := l.svcCtx.UserCache.GetFollowingCount(int64(in.OperatorId))
-		if err == nil && count > 0 {
+		if err == nil {
+			// 缓存命中
 			followingCount = count
 		} else {
 			// Redis未命中，从数据库查询

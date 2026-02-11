@@ -14,13 +14,14 @@ import (
 
 // GetMyFollowingListHandler 获取我的关注列表
 // @Summary 获取我的关注列表
-// @Description 获取当前登录用户的关注列表，支持分页和角色筛选
+// @Description 获取当前登录用户的关注列表，支持分页、角色筛选和昵称搜索
 // @Tags 关注
 // @Accept json
 // @Produce json
 // @Param page query int false "页码（从1开始）" default(1)
 // @Param pageSize query int false "每页数量" default(10)
 // @Param userRole query int false "过滤用户角色：1=老板,2=陪玩"
+// @Param keyword query string false "搜索关键词（昵称模糊匹配）"
 // @Success 200 {object} types.GetMyFollowingListResponse "成功"
 // @Failure 401 {object} types.BaseResp "未授权"
 // @Router /api/user/following [get]

@@ -87,3 +87,11 @@ func (m *Manager) DeleteMultiple(keys []string) error {
 	}
 	return nil
 }
+
+// Eval 执行 Lua 脚本
+func (m *Manager) Eval(script string, keys []string, args ...interface{}) (interface{}, error) {
+	if m.redis == nil {
+		return nil, nil
+	}
+	return m.redis.Eval(script, keys, args...)
+}

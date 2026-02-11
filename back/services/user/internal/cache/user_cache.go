@@ -81,16 +81,25 @@ func (c *UserCache) IncrFollowerCount(userId int64) error {
 	return c.manager.Expire(key, CountCacheExpire)
 }
 
-// DecrFollowerCount 减少用户粉丝数
+// DecrFollowerCount 减少用户粉丝数（使用Lua脚本确保不小于0）
 func (c *UserCache) DecrFollowerCount(userId int64) error {
 	key := fmt.Sprintf(FollowerCountKey, userId)
-	_, err := c.manager.Decr(key)
-	if err != nil {
-		return err
-	}
 
-	// 重新设置过期时间
-	return c.manager.Expire(key, CountCacheExpire)
+	// Lua脚本：如果当前值存在且大于0，则减1；否则设置为0
+	script := `
+		local current = redis.call('GET', KEYS[1])
+		if current and tonumber(current) > 0 then
+			redis.call('DECR', KEYS[1])
+			redis.call('EXPIRE', KEYS[1], ARGV[1])
+			return tonumber(current) - 1
+		else
+			redis.call('SET', KEYS[1], 0)
+			redis.call('EXPIRE', KEYS[1], ARGV[1])
+			return 0
+		end
+	`
+	_, err := c.manager.Eval(script, []string{key}, int(CountCacheExpire.Seconds()))
+	return err
 }
 
 // IncrFollowingCount 增加用户关注数
@@ -105,16 +114,25 @@ func (c *UserCache) IncrFollowingCount(userId int64) error {
 	return c.manager.Expire(key, CountCacheExpire)
 }
 
-// DecrFollowingCount 减少用户关注数
+// DecrFollowingCount 减少用户关注数（使用Lua脚本确保不小于0）
 func (c *UserCache) DecrFollowingCount(userId int64) error {
 	key := fmt.Sprintf(FollowingCountKey, userId)
-	_, err := c.manager.Decr(key)
-	if err != nil {
-		return err
-	}
 
-	// 重新设置过期时间
-	return c.manager.Expire(key, CountCacheExpire)
+	// Lua脚本：如果当前值存在且大于0，则减1；否则设置为0
+	script := `
+		local current = redis.call('GET', KEYS[1])
+		if current and tonumber(current) > 0 then
+			redis.call('DECR', KEYS[1])
+			redis.call('EXPIRE', KEYS[1], ARGV[1])
+			return tonumber(current) - 1
+		else
+			redis.call('SET', KEYS[1], 0)
+			redis.call('EXPIRE', KEYS[1], ARGV[1])
+			return 0
+		end
+	`
+	_, err := c.manager.Eval(script, []string{key}, int(CountCacheExpire.Seconds()))
+	return err
 }
 
 // DeleteCountCache 删除用户计数缓存

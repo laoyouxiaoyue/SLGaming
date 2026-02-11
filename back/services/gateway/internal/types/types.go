@@ -275,9 +275,10 @@ type GetMyFollowingListData struct {
 }
 
 type GetMyFollowingListRequest struct {
-	Page     int `form:"page,optional"`
-	PageSize int `form:"pageSize,optional"`
-	UserRole int `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
+	Page     int    `form:"page,optional"`
+	PageSize int    `form:"pageSize,optional"`
+	UserRole int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
+	Keyword  string `form:"keyword,optional"`  // 搜索关键词（昵称模糊匹配）
 }
 
 type GetMyFollowingListResponse struct {

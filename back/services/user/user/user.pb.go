@@ -3440,6 +3440,7 @@ type GetMyFollowingListRequest struct {
 	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`                               // 页码（从1开始）
 	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`       // 每页数量
 	UserRole      int32                  `protobuf:"varint,4,opt,name=user_role,json=userRole,proto3" json:"user_role,omitempty"`       // 可选，过滤用户角色：1=老板, 2=陪玩
+	Keyword       string                 `protobuf:"bytes,5,opt,name=keyword,proto3" json:"keyword,omitempty"`                          // 可选，搜索关键词（昵称模糊匹配）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3500,6 +3501,13 @@ func (x *GetMyFollowingListRequest) GetUserRole() int32 {
 		return x.UserRole
 	}
 	return 0
+}
+
+func (x *GetMyFollowingListRequest) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
 }
 
 // 获取我的粉丝列表
@@ -4305,13 +4313,14 @@ const file_user_proto_rawDesc = "" +
 	"\auser_id\x18\x02 \x01(\x04R\x06userId\"J\n" +
 	"\x14UnfollowUserResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x8a\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xa4\x01\n" +
 	"\x19GetMyFollowingListRequest\x12\x1f\n" +
 	"\voperator_id\x18\x01 \x01(\x04R\n" +
 	"operatorId\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
 	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\x12\x1b\n" +
-	"\tuser_role\x18\x04 \x01(\x05R\buserRole\"\x8a\x01\n" +
+	"\tuser_role\x18\x04 \x01(\x05R\buserRole\x12\x18\n" +
+	"\akeyword\x18\x05 \x01(\tR\akeyword\"\x8a\x01\n" +
 	"\x19GetMyFollowersListRequest\x12\x1f\n" +
 	"\voperator_id\x18\x01 \x01(\x04R\n" +
 	"operatorId\x12\x12\n" +

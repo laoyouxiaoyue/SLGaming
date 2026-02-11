@@ -41,20 +41,47 @@ func (l *GetMyFollowingListLogic) GetMyFollowingList(in *user.GetMyFollowingList
 	// 3. 查询关注关系
 	db := l.svcCtx.DB().WithContext(l.ctx)
 
-	// 4. 并发查询总数
+	// 4. 处理搜索关键词
+	var matchedUserIds []uint64
+	if in.Keyword != "" {
+		// 先搜索昵称匹配的用户
+		if err := db.Model(&model.User{}).
+			Where("nickname LIKE ?", "%"+in.Keyword+"%").
+			Pluck("id", &matchedUserIds).Error; err != nil {
+			l.Errorf("search users by keyword failed: %v", err)
+			return nil, status.Error(codes.Internal, "search users failed")
+		}
+		// 如果没有匹配的用户，直接返回空结果
+		if len(matchedUserIds) == 0 {
+			return &user.GetMyFollowingListResponse{
+				Users:    []*user.UserFollowInfo{},
+				Total:    0,
+				Page:     int32(page),
+				PageSize: int32(pageSize),
+			}, nil
+		}
+	}
+
+	// 5. 构建查询条件
+	query := db.Model(&model.FollowRelation{}).Where("follower_id = ?", in.OperatorId)
+	if len(matchedUserIds) > 0 {
+		query = query.Where("following_id IN ?", matchedUserIds)
+	}
+
+	// 6. 并发查询总数
 	var total int64
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := db.Model(&model.FollowRelation{}).Where("follower_id = ?", in.OperatorId).Count(&total).Error; err != nil {
+		if err := query.Count(&total).Error; err != nil {
 			l.Errorf("get following total failed: %v", err)
 		}
 	}()
 
-	// 5. 查询关注列表，按关注时间倒序排序
+	// 7. 查询关注列表，按关注时间倒序排序
 	var followRelations []model.FollowRelation
-	if err := db.Where("follower_id = ?", in.OperatorId).Offset(int(offset)).Limit(int(pageSize)).Order("followed_at DESC").Find(&followRelations).Error; err != nil {
+	if err := query.Offset(int(offset)).Limit(int(pageSize)).Order("followed_at DESC").Find(&followRelations).Error; err != nil {
 		l.Errorf("get following list failed: %v", err)
 		return nil, status.Error(codes.Internal, "get following list failed")
 	}
@@ -150,8 +177,8 @@ func (l *GetMyFollowingListLogic) GetMyFollowingList(in *user.GetMyFollowingList
 		userInfos = append(userInfos, userInfo)
 	}
 
-	l.Infof("get following list: operator=%d, page=%d, page_size=%d, total=%d, result=%d",
-		in.OperatorId, page, pageSize, total, len(userInfos))
+	l.Infof("get following list: operator=%d, keyword=%s, page=%d, page_size=%d, total=%d, result=%d",
+		in.OperatorId, in.Keyword, page, pageSize, total, len(userInfos))
 
 	return &user.GetMyFollowingListResponse{
 		Users:    userInfos,

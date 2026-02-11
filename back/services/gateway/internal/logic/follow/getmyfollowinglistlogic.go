@@ -47,6 +47,7 @@ func (l *GetMyFollowingListLogic) GetMyFollowingList(req *types.GetMyFollowingLi
 		Page:       int32(req.Page),
 		PageSize:   int32(req.PageSize),
 		UserRole:   int32(req.UserRole),
+		Keyword:    req.Keyword,
 	})
 	if err != nil {
 		code, msg := utils.HandleRPCError(err, l.Logger, "GetMyFollowingList")
