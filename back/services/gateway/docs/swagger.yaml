@@ -1,0 +1,2213 @@
+basePath: /
+definitions:
+  types.AcceptOrderRequest:
+    properties:
+      orderId:
+        description: 订单ID
+        type: integer
+    type: object
+  types.AcceptOrderResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.OrderInfo'
+      msg:
+        type: string
+    type: object
+  types.ApplyCompanionRequest:
+    properties:
+      bio:
+        description: 个人简介
+        type: string
+      gameSkill:
+        description: 游戏技能（单个游戏名称）
+        type: string
+      pricePerHour:
+        description: 每小时价格（帅币）
+        type: integer
+    type: object
+  types.ApplyCompanionResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.UserInfo'
+      msg:
+        type: string
+    type: object
+  types.BaseResp:
+    properties:
+      code:
+        type: integer
+      msg:
+        type: string
+    type: object
+  types.CancelOrderRequest:
+    properties:
+      orderId:
+        description: 订单ID
+        type: integer
+      reason:
+        description: 取消原因
+        type: string
+    type: object
+  types.CancelOrderResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.OrderInfo'
+      msg:
+        type: string
+    type: object
+  types.ChangePasswordRequest:
+    properties:
+      newPassword:
+        type: string
+      oldCode:
+        type: string
+      oldPhone:
+        type: string
+    type: object
+  types.ChangePasswordResponse:
+    properties:
+      code:
+        type: integer
+      msg:
+        type: string
+    type: object
+  types.ChangePhoneRequest:
+    properties:
+      newCode:
+        type: string
+      newPhone:
+        type: string
+      oldCode:
+        type: string
+      oldPhone:
+        type: string
+    type: object
+  types.ChangePhoneResponse:
+    properties:
+      code:
+        type: integer
+      msg:
+        type: string
+    type: object
+  types.CheckFollowStatusData:
+    properties:
+      isFollowed:
+        description: 目标用户是否关注当前用户
+        type: boolean
+      isFollowing:
+        description: 当前用户是否关注目标用户
+        type: boolean
+      isMutual:
+        description: 是否互相关注
+        type: boolean
+    type: object
+  types.CheckFollowStatusResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.CheckFollowStatusData'
+      msg:
+        type: string
+    type: object
+  types.CompanionInfo:
+    properties:
+      avatarUrl:
+        description: 头像URL
+        type: string
+      bio:
+        description: 个人简介
+        type: string
+      gameSkill:
+        description: 游戏技能（单个游戏名称）
+        type: string
+      isVerified:
+        description: 是否认证
+        type: boolean
+      nickname:
+        description: 昵称
+        type: string
+      pricePerHour:
+        description: 每小时价格（帅币）
+        type: integer
+      rating:
+        description: 评分（0-5分）
+        type: number
+      status:
+        description: 状态：0=离线, 1=在线, 2=忙碌
+        type: integer
+      totalOrders:
+        description: 总接单数
+        type: integer
+      userId:
+        description: 用户ID
+        type: integer
+    type: object
+  types.CompanionRankingItem:
+    properties:
+      avatarUrl:
+        description: 头像URL
+        type: string
+      isVerified:
+        description: 是否认证
+        type: boolean
+      nickname:
+        description: 昵称
+        type: string
+      rank:
+        description: 排名（从1开始）
+        type: integer
+      rating:
+        description: 评分（用于评分排名）
+        type: number
+      totalOrders:
+        description: 总接单数（用于接单数排名）
+        type: integer
+      userId:
+        description: 用户ID
+        type: integer
+    type: object
+  types.CompanionRecommendation:
+    properties:
+      age:
+        description: 年龄
+        type: integer
+      description:
+        description: 描述
+        type: string
+      gameSkill:
+        description: 游戏技能
+        type: string
+      gender:
+        description: 性别
+        type: string
+      pricePerHour:
+        description: 每小时价格
+        type: integer
+      rating:
+        description: 评分
+        type: number
+      similarity:
+        description: 相似度分数（0-1）
+        type: number
+      userId:
+        description: 陪玩用户ID
+        type: integer
+    type: object
+  types.CompleteOrderRequest:
+    properties:
+      orderId:
+        description: 订单ID
+        type: integer
+    type: object
+  types.CompleteOrderResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.OrderInfo'
+      msg:
+        type: string
+    type: object
+  types.CreateOrderRequest:
+    properties:
+      companionId:
+        description: 陪玩ID
+        type: integer
+      durationHours:
+        description: 服务时长（小时）
+        type: integer
+      gameName:
+        description: 游戏名称
+        type: string
+    type: object
+  types.CreateOrderResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.OrderInfo'
+      msg:
+        type: string
+    type: object
+  types.FollowUserData:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  types.FollowUserRequest:
+    properties:
+      userId:
+        description: 被关注的用户ID
+        type: integer
+    type: object
+  types.FollowUserResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.FollowUserData'
+      msg:
+        type: string
+    type: object
+  types.ForgetPasswordRequest:
+    properties:
+      code:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  types.ForgetPasswordResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.LoginData'
+      msg:
+        type: string
+    type: object
+  types.GameSkill:
+    properties:
+      description:
+        description: 技能描述
+        type: string
+      id:
+        description: 技能ID
+        type: integer
+      name:
+        description: 技能名称
+        type: string
+    type: object
+  types.GetCompanionListData:
+    properties:
+      companions:
+        description: 陪玩列表
+        items:
+          $ref: '#/definitions/types.CompanionInfo'
+        type: array
+      page:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页数量
+        type: integer
+      total:
+        description: 总数
+        type: integer
+    type: object
+  types.GetCompanionListResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.GetCompanionListData'
+      msg:
+        type: string
+    type: object
+  types.GetCompanionOrdersRankingData:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      rankings:
+        items:
+          $ref: '#/definitions/types.CompanionRankingItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  types.GetCompanionOrdersRankingResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.GetCompanionOrdersRankingData'
+      msg:
+        type: string
+    type: object
+  types.GetCompanionProfileResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.CompanionInfo'
+      msg:
+        type: string
+    type: object
+  types.GetCompanionRatingRankingData:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      rankings:
+        items:
+          $ref: '#/definitions/types.CompanionRankingItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  types.GetCompanionRatingRankingResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.GetCompanionRatingRankingData'
+      msg:
+        type: string
+    type: object
+  types.GetMutualFollowListData:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/types.UserFollowInfo'
+        type: array
+    type: object
+  types.GetMutualFollowListResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.GetMutualFollowListData'
+      msg:
+        type: string
+    type: object
+  types.GetMyFollowersListData:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/types.UserFollowInfo'
+        type: array
+    type: object
+  types.GetMyFollowersListResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.GetMyFollowersListData'
+      msg:
+        type: string
+    type: object
+  types.GetMyFollowingListData:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/types.UserFollowInfo'
+        type: array
+    type: object
+  types.GetMyFollowingListResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.GetMyFollowingListData'
+      msg:
+        type: string
+    type: object
+  types.GetOrderResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.OrderInfo'
+      msg:
+        type: string
+    type: object
+  types.GetUserResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.UserInfo'
+      msg:
+        type: string
+    type: object
+  types.GetWalletResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.WalletInfo'
+      msg:
+        type: string
+    type: object
+  types.ListGameSkillsResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/types.GameSkill'
+        type: array
+      msg:
+        type: string
+    type: object
+  types.LoginByCodeRequest:
+    properties:
+      code:
+        type: string
+      phone:
+        type: string
+    type: object
+  types.LoginByCodeResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.LoginData'
+      msg:
+        type: string
+    type: object
+  types.LoginData:
+    properties:
+      accessToken:
+        description: Access Token（短期，15分钟）
+        type: string
+      expiresIn:
+        description: Access Token 过期时间（秒）
+        type: integer
+      refreshToken:
+        description: Refresh Token（长期，7天）
+        type: string
+    type: object
+  types.LoginRequest:
+    properties:
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  types.LoginResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.LoginData'
+      msg:
+        type: string
+    type: object
+  types.LogoutData:
+    properties:
+      success:
+        type: boolean
+    type: object
+  types.LogoutRequest:
+    type: object
+  types.LogoutResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.LogoutData'
+      msg:
+        type: string
+    type: object
+  types.OrderInfo:
+    properties:
+      acceptedAt:
+        description: 接单时间
+        type: integer
+      bossId:
+        description: 老板ID
+        type: integer
+      cancelReason:
+        description: 取消原因
+        type: string
+      cancelledAt:
+        description: 取消时间
+        type: integer
+      comment:
+        description: 评价内容
+        type: string
+      companionId:
+        description: 陪玩ID
+        type: integer
+      completedAt:
+        description: 完成时间
+        type: integer
+      createdAt:
+        description: 创建时间
+        type: integer
+      durationHours:
+        description: 时长（小时）
+        type: integer
+      gameName:
+        description: 游戏名称
+        type: string
+      id:
+        description: 订单ID
+        type: integer
+      orderNo:
+        description: 订单号
+        type: string
+      paidAt:
+        description: 支付时间
+        type: integer
+      pricePerHour:
+        description: 每小时价格（帅币）
+        type: integer
+      rating:
+        description: 评分
+        type: number
+      startAt:
+        description: 开始服务时间
+        type: integer
+      status:
+        description: 状态：1=CREATED,2=PAID,3=ACCEPTED,4=IN_SERVICE,5=COMPLETED,6=CANCELLED,7=RATED
+        type: integer
+      totalAmount:
+        description: 订单总价（帅币）
+        type: integer
+    type: object
+  types.RateOrderRequest:
+    properties:
+      comment:
+        description: 评价内容
+        type: string
+      orderId:
+        description: 订单ID
+        type: integer
+      rating:
+        description: 评分（0-5）
+        type: number
+    type: object
+  types.RateOrderResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.OrderInfo'
+      msg:
+        type: string
+    type: object
+  types.RechargeCreateData:
+    properties:
+      expiresIn:
+        description: 订单有效期（秒）
+        type: integer
+      orderNo:
+        description: 充值单号
+        type: string
+      payForm:
+        description: 支付表单（APP/PC场景可选）
+        type: string
+      payUrl:
+        description: 支付跳转URL（WAP/PC）
+        type: string
+    type: object
+  types.RechargeCreateRequest:
+    properties:
+      amount:
+        description: 充值金额（分/帅币）
+        type: integer
+      payType:
+        description: 支付方式：alipay_wap / alipay_page / alipay_app
+        type: string
+      returnUrl:
+        description: 同步回跳地址（可选）
+        type: string
+    type: object
+  types.RechargeCreateResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.RechargeCreateData'
+      msg:
+        type: string
+    type: object
+  types.RechargeListData:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/types.RechargeOrderInfo'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+    type: object
+  types.RechargeListResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.RechargeListData'
+      msg:
+        type: string
+    type: object
+  types.RechargeOrderInfo:
+    properties:
+      amount:
+        type: integer
+      createdAt:
+        description: 创建时间（格式化时间）
+        type: string
+      orderNo:
+        type: string
+      paidAt:
+        description: 支付完成时间（格式化时间）
+        type: string
+      payType:
+        type: string
+      status:
+        description: 订单状态：0=待支付,1=成功,2=失败,3=关闭
+        type: integer
+      tradeNo:
+        type: string
+    type: object
+  types.RechargeQueryData:
+    properties:
+      amount:
+        type: integer
+      createdAt:
+        description: 创建时间（格式化时间）
+        type: string
+      orderNo:
+        type: string
+      paidAt:
+        description: 支付完成时间（格式化时间）
+        type: string
+      status:
+        description: 订单状态：0=待支付,1=成功,2=失败,3=关闭
+        type: integer
+    type: object
+  types.RechargeQueryResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.RechargeQueryData'
+      msg:
+        type: string
+    type: object
+  types.RecommendCompanionData:
+    properties:
+      companions:
+        items:
+          $ref: '#/definitions/types.CompanionRecommendation'
+        type: array
+      explanation:
+        type: string
+    type: object
+  types.RecommendCompanionRequest:
+    properties:
+      userInput:
+        description: 用户输入内容
+        type: string
+    type: object
+  types.RecommendCompanionResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.RecommendCompanionData'
+      msg:
+        type: string
+    type: object
+  types.RefreshTokenRequest:
+    properties:
+      refreshToken:
+        type: string
+    type: object
+  types.RefreshTokenResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.LoginData'
+      msg:
+        type: string
+    type: object
+  types.RegisterData:
+    properties:
+      accessToken:
+        description: Access Token（短期，15分钟）
+        type: string
+      expiresIn:
+        description: Access Token 过期时间（秒）
+        type: integer
+      refreshToken:
+        description: Refresh Token（长期，7天）
+        type: string
+    type: object
+  types.RegisterRequest:
+    properties:
+      code:
+        type: string
+      nickname:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        description: 用户角色：1=老板, 2=陪玩, 3=管理员（默认1）
+        type: integer
+    type: object
+  types.RegisterResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.RegisterData'
+      msg:
+        type: string
+    type: object
+  types.SendCodeData:
+    properties:
+      success:
+        type: boolean
+    type: object
+  types.SendCodeRequest:
+    properties:
+      phone:
+        type: string
+      purpose:
+        type: string
+    type: object
+  types.SendCodeResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.SendCodeData'
+      msg:
+        type: string
+    type: object
+  types.StartOrderRequest:
+    properties:
+      orderId:
+        description: 订单ID
+        type: integer
+    type: object
+  types.StartOrderResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.OrderInfo'
+      msg:
+        type: string
+    type: object
+  types.UnfollowUserData:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  types.UnfollowUserRequest:
+    properties:
+      userId:
+        description: 要取消关注的用户ID
+        type: integer
+    type: object
+  types.UnfollowUserResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.UnfollowUserData'
+      msg:
+        type: string
+    type: object
+  types.UpdateCompanionProfileRequest:
+    properties:
+      gameSkill:
+        description: 游戏技能（单个游戏名称）
+        type: string
+      pricePerHour:
+        description: 每小时价格（帅币）
+        type: integer
+      status:
+        description: 状态：0=离线, 1=在线, 2=忙碌
+        type: integer
+    type: object
+  types.UpdateCompanionProfileResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.CompanionInfo'
+      msg:
+        type: string
+    type: object
+  types.UpdateCompanionStatusRequest:
+    properties:
+      status:
+        description: 状态：0=离线, 1=在线, 2=忙碌
+        type: integer
+    type: object
+  types.UpdateCompanionStatusResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.CompanionInfo'
+      msg:
+        type: string
+    type: object
+  types.UpdateUserRequest:
+    properties:
+      avatarUrl:
+        description: 头像URL
+        type: string
+      bio:
+        description: 个人简介
+        type: string
+      id:
+        type: integer
+      nickname:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        description: 用户角色
+        type: integer
+    type: object
+  types.UpdateUserResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.UserInfo'
+      msg:
+        type: string
+    type: object
+  types.UploadAvatarData:
+    properties:
+      avatarUrl:
+        description: 头像URL
+        type: string
+    type: object
+  types.UploadAvatarResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/types.UploadAvatarData'
+      msg:
+        type: string
+    type: object
+  types.UserFollowInfo:
+    properties:
+      avatarUrl:
+        description: 头像URL
+        type: string
+      followedAt:
+        description: 关注时间戳
+        type: integer
+      isMutual:
+        description: 是否互相关注
+        type: boolean
+      isVerified:
+        description: 是否验证（仅陪玩）
+        type: boolean
+      nickname:
+        description: 昵称
+        type: string
+      rating:
+        description: 评分（仅陪玩）
+        type: number
+      role:
+        description: 用户角色：1=老板,2=陪玩
+        type: integer
+      totalOrders:
+        description: 总接单数（仅陪玩）
+        type: integer
+      userId:
+        description: 用户ID
+        type: integer
+    type: object
+  types.UserInfo:
+    properties:
+      avatarUrl:
+        description: 头像URL
+        type: string
+      balance:
+        description: 帅币可用余额
+        type: integer
+      bio:
+        description: 个人简介
+        type: string
+      followerCount:
+        description: 粉丝数
+        type: integer
+      followingCount:
+        description: 关注数
+        type: integer
+      frozenBalance:
+        description: 冻结帅币余额（预留）
+        type: integer
+      id:
+        description: 用户ID
+        type: integer
+      nickname:
+        description: 用户昵称
+        type: string
+      phone:
+        description: 手机号码
+        type: string
+      role:
+        description: 用户角色：1=老板, 2=陪玩, 3=管理员
+        type: integer
+      uid:
+        description: 用户唯一标识
+        type: integer
+    type: object
+  types.WalletInfo:
+    properties:
+      balance:
+        type: integer
+      frozenBalance:
+        type: integer
+      userId:
+        type: integer
+    type: object
+host: localhost:8888
+info:
+  contact: {}
+  description: 陪玩平台 Gateway 服务 API 文档
+  title: 陪玩平台 API
+  version: "1.0"
+paths:
+  /api/agent/recommend:
+    post:
+      consumes:
+      - application/json
+      description: 根据用户需求，使用AI智能推荐合适的陪玩
+      parameters:
+      - description: AI推荐陪玩请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.RecommendCompanionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.RecommendCompanionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: AI推荐陪玩
+      tags:
+      - AI助手
+  /api/code/send:
+    post:
+      consumes:
+      - application/json
+      description: 向指定手机号发送短信验证码，用于注册、登录、修改密码等场景
+      parameters:
+      - description: 发送验证码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.SendCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.SendCodeResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      summary: 发送验证码
+      tags:
+      - 验证码
+  /api/order:
+    get:
+      consumes:
+      - application/json
+      description: 根据订单ID获取订单详细信息
+      parameters:
+      - description: 订单ID
+        in: query
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetOrderResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取订单详情
+      tags:
+      - 订单
+    post:
+      consumes:
+      - application/json
+      description: 老板向陪玩下单，创建陪玩订单
+      parameters:
+      - description: 创建订单请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.CreateOrderResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 创建订单
+      tags:
+      - 订单
+  /api/order/accept:
+    put:
+      consumes:
+      - application/json
+      description: 陪玩接单，将订单状态从待接单改为服务中
+      parameters:
+      - description: 接单请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.AcceptOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.AcceptOrderResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 接单
+      tags:
+      - 订单
+  /api/order/cancel:
+    put:
+      consumes:
+      - application/json
+      description: 取消待接单或待支付状态的订单
+      parameters:
+      - description: 取消订单请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.CancelOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.CancelOrderResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 取消订单
+      tags:
+      - 订单
+  /api/order/complete:
+    put:
+      consumes:
+      - application/json
+      description: 完成服务中的订单
+      parameters:
+      - description: 完成订单请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.CompleteOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.CompleteOrderResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 完成订单
+      tags:
+      - 订单
+  /api/order/rate:
+    post:
+      consumes:
+      - application/json
+      description: 对已完成的订单进行评价，包括评分和评论
+      parameters:
+      - description: 评价订单请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.RateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.RateOrderResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 评价订单
+      tags:
+      - 订单
+  /api/order/start:
+    put:
+      consumes:
+      - application/json
+      description: 开始服务订单，将订单状态从待支付改为服务中
+      parameters:
+      - description: 开始服务请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.StartOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.StartOrderResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 开始服务
+      tags:
+      - 订单
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户或指定用户的详细信息
+      parameters:
+      - description: 用户ID（可选，不传则获取当前用户）
+        format: int64
+        in: query
+        name: id
+        type: integer
+      - description: 用户UID（可选）
+        format: int64
+        in: query
+        name: uid
+        type: integer
+      - description: 手机号（可选）
+        in: query
+        name: phone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetUserResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取用户信息
+      tags:
+      - 用户
+    put:
+      consumes:
+      - application/json
+      description: 更新当前登录用户的个人信息
+      parameters:
+      - description: 更新用户信息请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.UpdateUserResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 更新用户信息
+      tags:
+      - 用户
+  /api/user/avatar:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传用户头像，支持 jpg、png、gif、webp 格式，最大 5MB
+      parameters:
+      - description: 头像文件
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.UploadAvatarResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 上传头像
+      tags:
+      - 用户
+  /api/user/change-password:
+    put:
+      consumes:
+      - application/json
+      description: 修改当前登录用户的密码，需要验证旧手机号和验证码
+      parameters:
+      - description: 修改密码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.ChangePasswordResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 修改密码
+      tags:
+      - 用户
+  /api/user/change-phone:
+    put:
+      consumes:
+      - application/json
+      description: 更换当前登录用户的手机号，需要验证旧手机号和新手机号的验证码
+      parameters:
+      - description: 更换手机号请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.ChangePhoneRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.ChangePhoneResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 更换手机号
+      tags:
+      - 用户
+  /api/user/companion/apply:
+    post:
+      consumes:
+      - application/json
+      description: 申请成为陪玩，需要设置游戏技能和价格
+      parameters:
+      - description: 申请陪玩请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.ApplyCompanionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.ApplyCompanionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 申请成为陪玩
+      tags:
+      - 用户
+  /api/user/companion/profile:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的陪玩资料信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetCompanionProfileResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取陪玩资料
+      tags:
+      - 用户
+    put:
+      consumes:
+      - application/json
+      description: 更新当前登录用户的陪玩资料信息
+      parameters:
+      - description: 更新陪玩资料请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateCompanionProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.UpdateCompanionProfileResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 更新陪玩资料
+      tags:
+      - 用户
+  /api/user/companion/profile/public:
+    get:
+      consumes:
+      - application/json
+      description: 根据用户ID获取指定陪玩的公开资料信息
+      parameters:
+      - description: 用户ID
+        format: int64
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetCompanionProfileResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      summary: 获取指定陪玩资料
+      tags:
+      - 用户
+  /api/user/companion/status:
+    put:
+      consumes:
+      - application/json
+      description: 更新陪玩的在线状态：0=离线, 1=在线, 2=忙碌
+      parameters:
+      - description: 更新陪玩状态请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateCompanionStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.UpdateCompanionStatusResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 更新陪玩状态
+      tags:
+      - 用户
+  /api/user/companions:
+    get:
+      consumes:
+      - application/json
+      description: 获取陪玩列表，支持按游戏技能、价格、状态等筛选
+      parameters:
+      - description: 游戏技能筛选
+        in: query
+        name: gameSkill
+        type: string
+      - description: 最低价格
+        in: query
+        name: minPrice
+        type: integer
+      - description: 最高价格
+        in: query
+        name: maxPrice
+        type: integer
+      - default: 1
+        description: 状态筛选：0=离线, 1=在线, 2=忙碌
+        in: query
+        name: status
+        type: integer
+      - description: 是否只返回认证陪玩
+        in: query
+        name: isVerified
+        type: boolean
+      - default: 1
+        description: 页码（从1开始）
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetCompanionListResponse'
+      summary: 获取陪玩列表
+      tags:
+      - 用户
+  /api/user/companions/ranking/orders:
+    get:
+      consumes:
+      - application/json
+      description: 获取陪玩按接单数排名的排行榜
+      parameters:
+      - default: 1
+        description: 页码（从1开始）
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetCompanionOrdersRankingResponse'
+      summary: 获取陪玩接单数排行榜
+      tags:
+      - 用户
+  /api/user/companions/ranking/ratings:
+    get:
+      consumes:
+      - application/json
+      description: 获取陪玩按评分排名的排行榜
+      parameters:
+      - default: 1
+        description: 页码（从1开始）
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetCompanionRatingRankingResponse'
+      summary: 获取陪玩评分排行榜
+      tags:
+      - 用户
+  /api/user/follow:
+    post:
+      consumes:
+      - application/json
+      description: 关注指定用户，需要登录
+      parameters:
+      - description: 关注请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.FollowUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.FollowUserResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 关注用户
+      tags:
+      - 关注
+  /api/user/follow/mutual:
+    get:
+      consumes:
+      - application/json
+      description: 获取与当前用户互相关注的用户列表
+      parameters:
+      - default: 1
+        description: 页码（从1开始）
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetMutualFollowListResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取互相关注列表
+      tags:
+      - 关注
+  /api/user/follow/status:
+    get:
+      consumes:
+      - application/json
+      description: 检查当前用户与目标用户的关注关系状态
+      parameters:
+      - description: 目标用户ID
+        format: int64
+        in: query
+        name: targetUserId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.CheckFollowStatusResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 检查关注状态
+      tags:
+      - 关注
+  /api/user/followers:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的粉丝列表，支持分页和角色筛选
+      parameters:
+      - default: 1
+        description: 页码（从1开始）
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 过滤用户角色：1=老板,2=陪玩
+        in: query
+        name: userRole
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetMyFollowersListResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取我的粉丝列表
+      tags:
+      - 关注
+  /api/user/following:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的关注列表，支持分页和角色筛选
+      parameters:
+      - default: 1
+        description: 页码（从1开始）
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 过滤用户角色：1=老板,2=陪玩
+        in: query
+        name: userRole
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetMyFollowingListResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取我的关注列表
+      tags:
+      - 关注
+  /api/user/forgetPassword:
+    put:
+      consumes:
+      - application/json
+      description: 通过手机号和验证码重置密码
+      parameters:
+      - description: 忘记密码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.ForgetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.ForgetPasswordResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      summary: 忘记密码
+      tags:
+      - 用户
+  /api/user/gameskills:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有支持的游戏技能列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.ListGameSkillsResponse'
+      summary: 获取游戏技能列表
+      tags:
+      - 用户
+  /api/user/login:
+    post:
+      consumes:
+      - application/json
+      description: 使用手机号和密码登录
+      parameters:
+      - description: 登录请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.LoginResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      summary: 用户登录
+      tags:
+      - 用户
+  /api/user/login-by-code:
+    post:
+      consumes:
+      - application/json
+      description: 使用手机号和验证码登录
+      parameters:
+      - description: 验证码登录请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginByCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.LoginByCodeResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      summary: 验证码登录
+      tags:
+      - 用户
+  /api/user/logout:
+    post:
+      consumes:
+      - application/json
+      description: 退出当前登录状态，使 token 失效
+      parameters:
+      - description: 登出请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.LogoutResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 用户登出
+      tags:
+      - 用户
+  /api/user/recharge:
+    get:
+      consumes:
+      - application/json
+      description: 根据订单号查询充值订单状态
+      parameters:
+      - description: 充值订单号
+        in: query
+        name: orderNo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.RechargeQueryResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 查询充值订单
+      tags:
+      - 用户
+    post:
+      consumes:
+      - application/json
+      description: 创建帅币充值订单，支持支付宝支付
+      parameters:
+      - description: 创建充值订单请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.RechargeCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.RechargeCreateResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 创建充值订单
+      tags:
+      - 用户
+  /api/user/recharge/alipay/notify:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 支付宝异步通知回调接口，用于处理支付结果
+      parameters:
+      - description: 支付宝回调参数
+        in: body
+        name: payload
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      summary: 支付宝支付回调
+      tags:
+      - 用户
+  /api/user/recharge/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前用户的充值记录列表，支持分页
+      parameters:
+      - description: 订单状态筛选
+        in: query
+        name: status
+        type: integer
+      - default: 1
+        description: 页码（从1开始）
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.RechargeListResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取充值记录列表
+      tags:
+      - 用户
+  /api/user/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: 使用 Refresh Token 获取新的 Access Token
+      parameters:
+      - description: 刷新 Token 请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.RefreshTokenResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      summary: 刷新 Token
+      tags:
+      - 用户
+  /api/user/register:
+    post:
+      consumes:
+      - application/json
+      description: 使用手机号、验证码和密码注册新用户
+      parameters:
+      - description: 注册请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.RegisterResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      summary: 用户注册
+      tags:
+      - 用户
+  /api/user/unfollow:
+    post:
+      consumes:
+      - application/json
+      description: 取消关注指定用户，需要登录
+      parameters:
+      - description: 取消关注请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UnfollowUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.UnfollowUserResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 取消关注
+      tags:
+      - 关注
+  /api/user/wallet:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的钱包余额信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/types.GetWalletResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.BaseResp'
+      security:
+      - BearerAuth: []
+      summary: 获取钱包信息
+      tags:
+      - 用户
+securityDefinitions:
+  BearerAuth:
+    description: 'JWT Token，格式: Bearer {token}'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
