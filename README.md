@@ -299,7 +299,7 @@ npm run build
 ### 6. 访问系统
 
 - 🌐 **前端页面**: http://localhost:5173/ (开发) / http://localhost:9090/ (生产)
-- 📘 **API 文档**: http://localhost:8888/swagger/
+- 📘 **API 文档**: http://localhost:8888/swagger/ (OpenAPI 3.0)
 - 🔍 **Nacos 控制台**: http://localhost:8848/nacos/ (nacos/nacos)
 - 🔍 **Consul 控制台**: http://localhost:8500/
 - 📊 **RocketMQ Dashboard**: http://localhost:8082/
