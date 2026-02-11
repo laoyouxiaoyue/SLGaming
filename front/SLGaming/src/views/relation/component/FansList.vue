@@ -16,32 +16,32 @@ const params = ref({
 const fetchFollowers = async () => {
   loading.value = true;
   try {
-    // 模拟数据 仅供测试
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const mockData = [
-      {
-        userId: 1,
-        nickname: "测试粉丝1",
-        avatarUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-        isMutual: false,
-      },
-      {
-        userId: 2,
-        nickname: "互关大神",
-        avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-        isMutual: true,
-      },
-      {
-        userId: 3,
-        nickname: "萌新小弟",
-        avatarUrl: "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
-        isMutual: false,
-      },
-    ];
+    //   // 模拟数据 仅供测试
+    //   await new Promise((resolve) => setTimeout(resolve, 500));
+    //   const mockData = [
+    //     {
+    //       userId: 1,
+    //       nickname: "测试粉丝1",
+    //       avatarUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+    //       isMutual: false,
+    //     },
+    //     {
+    //       userId: 2,
+    //       nickname: "互关大神",
+    //       avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+    //       isMutual: true,
+    //     },
+    //     {
+    //       userId: 3,
+    //       nickname: "萌新小弟",
+    //       avatarUrl: "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
+    //       isMutual: false,
+    //     },
+    //   ];
 
-    // const res = await getFollowersAPI(params.value);
-    // followers.value = res.data.users || [];
-    // total.value = res.data.total;
+    const res = await getFollowersAPI(params.value);
+    followers.value = res.data.users || [];
+    total.value = res.data.total;
 
     followers.value = mockData;
     total.value = mockData.length;

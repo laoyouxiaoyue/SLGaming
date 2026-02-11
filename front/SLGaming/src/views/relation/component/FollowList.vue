@@ -17,31 +17,31 @@ const fetchFollowings = async () => {
   loading.value = true;
   try {
     // 模拟数据 仅供测试
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const mockData = [
-      {
-        userId: 1,
-        nickname: "女神",
-        avatarUrl: "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
-        isMutual: false,
-      },
-      {
-        userId: 2,
-        nickname: "互关的大神",
-        avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-        isMutual: true,
-      },
-      {
-        userId: 3,
-        nickname: "技术博主",
-        avatarUrl: "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
-        isMutual: false,
-      },
-    ];
+    // await new Promise((resolve) => setTimeout(resolve, 500));
+    // const mockData = [
+    //   {
+    //     userId: 1,
+    //     nickname: "女神",
+    //     avatarUrl: "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
+    //     isMutual: false,
+    //   },
+    //   {
+    //     userId: 2,
+    //     nickname: "互关的大神",
+    //     avatarUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+    //     isMutual: true,
+    //   },
+    //   {
+    //     userId: 3,
+    //     nickname: "技术博主",
+    //     avatarUrl: "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
+    //     isMutual: false,
+    //   },
+    // ];
 
-    // const res = await getFollowingsAPI(params.value);
-    // followings.value = (res.data.users || []).map((u) => ({ ...u, isFollowed: true }));
-    // total.value = res.data.total;
+    const res = await getFollowingsAPI(params.value);
+    followings.value = (res.data.users || []).map((u) => ({ ...u, isFollowed: true }));
+    total.value = res.data.total;
 
     followings.value = mockData.map((u) => ({ ...u, isFollowed: true }));
     total.value = mockData.length;
