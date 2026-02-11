@@ -28,11 +28,11 @@ const toggleFollow = async () => {
   const userId = route.params.id;
   try {
     if (isFollowed.value) {
-      await unfollowUserAPI({ targetUserId: userId });
+      await unfollowUserAPI({ userId: userId });
       isFollowed.value = false;
       ElMessage.info("已取消关注");
     } else {
-      await followUserAPI({ targetUserId: userId });
+      await followUserAPI({ userId: userId });
       isFollowed.value = true;
       ElMessage.success("关注成功");
     }
@@ -78,7 +78,7 @@ const fetchFollowStatus = async () => {
     if (!userId) return;
 
     const res = await checkFollowStatusAPI({ targetUserId: userId });
-    isFollowed.value = res.data.following;
+    isFollowed.value = res.data.isFollowing;
   } catch (error) {
     console.error("获取关注状态失败:", error);
   }
