@@ -1,5 +1,5 @@
 Name: user.rpc
-ListenOn: 0.0.0.0:8086
+ListenOn: 0.0.0.0:8089
 
 Nacos:
   Hosts:
@@ -23,7 +23,8 @@ Consul:
   Token: ""
   Service:
     Name: user-rpc
-    ID: user-rpc-1
+    # ID 留空，自动生成唯一标识（支持多实例）
+    ID: ""
     Address: 0.0.0.0
     Tags:
       - rpc
@@ -33,6 +34,13 @@ Consul:
 
 Upstream:
   AgentService: agent-rpc
+
+# CacheRedis 配置（用于排行榜、缓存、布隆过滤器）
+CacheRedis:
+  Host: 120.26.29.242:6379
+  Type: node
+  Pass: ""
+  Tls: false
 
 # RocketMQ 配置（预留，用于钱包变动、订单结算等异步处理）
 RocketMQ:

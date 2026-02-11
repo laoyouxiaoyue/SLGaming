@@ -60,24 +60,14 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		db:     db,
 	}
 
-	// 初始化 Redis（使用 zrpc.RpcServerConf 中的 Redis 配置）
+	// 初始化 Redis（用于排行榜、缓存、布隆过滤器）
 	var redisClient *redis.Redis
-	if c.Redis.Host != "" {
-		redisAdapter := &pkgIoc.RedisConfigAdapter{
-			Host: c.Redis.Host,
-			Type: c.Redis.Type,
-			Pass: c.Redis.Pass,
-			Tls:  c.Redis.Tls,
-		}
-		redisClient, err = pkgIoc.InitRedis(redisAdapter)
-		if err != nil {
-			logx.Errorf("init redis failed: %v", err)
-		} else {
-			ctx.Redis = redisClient
-			logx.Infof("Redis 已初始化")
-		}
+	if c.CacheRedis.Host != "" {
+		redisClient = redis.MustNewRedis(c.CacheRedis.RedisConf)
+		ctx.Redis = redisClient
+		logx.Infof("Redis 已初始化: %s", c.CacheRedis.Host)
 	} else {
-		logx.Infof("Redis 未配置，排名功能不可用")
+		logx.Infof("Redis 未配置，排名功能、缓存、布隆过滤器将不可用")
 	}
 
 	// 初始化缓存管理器和用户缓存服务
