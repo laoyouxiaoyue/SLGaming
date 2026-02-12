@@ -43,9 +43,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config: c,
 	}
 
-	// 初始化 Code RPC 客户端（支持动态服务发现和负载均衡）
+	rpcTimeout := c.Upstream.RPCTimeout
+	if rpcTimeout <= 0 {
+		rpcTimeout = 10 * time.Second
+	}
+
 	if c.Upstream.CodeService != "" {
-		if cli, err := newRPCClient(c.Consul, c.Upstream.CodeService); err != nil {
+		if cli, err := newRPCClient(c.Consul, c.Upstream.CodeService, rpcTimeout); err != nil {
 			logx.Errorf("初始化 Code RPC 客户端失败: service=%s, error=%v", c.Upstream.CodeService, err)
 		} else {
 			ctx.CodeRPC = codeclient.NewCode(cli)
@@ -53,9 +57,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		}
 	}
 
-	// 初始化 User RPC 客户端（支持动态服务发现和负载均衡）
 	if c.Upstream.UserService != "" {
-		if cli, err := newRPCClient(c.Consul, c.Upstream.UserService); err != nil {
+		if cli, err := newRPCClient(c.Consul, c.Upstream.UserService, rpcTimeout); err != nil {
 			logx.Errorf("初始化 User RPC 客户端失败: service=%s, error=%v", c.Upstream.UserService, err)
 		} else {
 			ctx.UserRPC = userclient.NewUser(cli)
@@ -63,9 +66,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		}
 	}
 
-	// 初始化 Order RPC 客户端（支持动态服务发现和负载均衡）
 	if c.Upstream.OrderService != "" {
-		if cli, err := newRPCClient(c.Consul, c.Upstream.OrderService); err != nil {
+		if cli, err := newRPCClient(c.Consul, c.Upstream.OrderService, rpcTimeout); err != nil {
 			logx.Errorf("初始化 Order RPC 客户端失败: service=%s, error=%v", c.Upstream.OrderService, err)
 		} else {
 			ctx.OrderRPC = orderclient.NewOrder(cli)
@@ -73,9 +75,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		}
 	}
 
-	// 初始化 Agent RPC 客户端（支持动态服务发现和负载均衡）
 	if c.Upstream.AgentService != "" {
-		if cli, err := newRPCClient(c.Consul, c.Upstream.AgentService); err != nil {
+		if cli, err := newRPCClient(c.Consul, c.Upstream.AgentService, rpcTimeout); err != nil {
 			logx.Errorf("初始化 Agent RPC 客户端失败: service=%s, error=%v", c.Upstream.AgentService, err)
 		} else {
 			ctx.AgentRPC = agentclient.NewAgent(cli)
@@ -148,7 +149,8 @@ type DynamicRPCClient struct {
 	client      zrpc.Client
 	watcher     *ioc.ConsulWatcher
 	serviceName string
-	endpoints   []string // 记录当前 endpoints，用于日志
+	endpoints   []string
+	timeout     time.Duration
 }
 
 // GetClient 获取当前的 RPC 客户端
@@ -170,17 +172,14 @@ func (d *DynamicRPCClient) updateClient(endpoints []string) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	// 记录旧的 endpoints（用于日志）
 	oldEndpoints := d.endpoints
 
-	// 创建新客户端，使用新的 endpoints
-	// go-zero 的 zrpc.Client 会创建新的 gRPC 连接
 	d.client = zrpc.MustNewClient(zrpc.RpcClientConf{
 		Endpoints: endpoints,
 		NonBlock:  true,
+		Timeout:   int64(d.timeout / time.Millisecond),
 	})
 
-	// 更新 endpoints 记录
 	d.endpoints = endpoints
 
 	logx.Infof("[dynamic_rpc] 更新客户端: service=%s, old_endpoints=%v, new_endpoints=%v",
@@ -195,68 +194,59 @@ func (d *DynamicRPCClient) Stop() {
 	// go-zero 的 zrpc.Client 会在服务停止时自动关闭连接
 }
 
-func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
-	// 如果配置了 Consul，使用动态监听
+func newRPCClient(consulConf config.ConsulConf, serviceName string, timeout time.Duration) (zrpc.Client, error) {
 	if consulConf.Address != "" {
-		return newConsulDynamicRPCClient(consulConf, serviceName)
+		return newConsulDynamicRPCClient(consulConf, serviceName, timeout)
 	}
 
-	// 否则使用静态解析（不支持动态更新）
-	return newConsulStaticRPCClient(consulConf, serviceName)
+	return newConsulStaticRPCClient(consulConf, serviceName, timeout)
 }
 
 // newConsulDynamicRPCClient 使用 Consul Watch 创建动态更新的 RPC 客户端
-func newConsulDynamicRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
+func newConsulDynamicRPCClient(consulConf config.ConsulConf, serviceName string, timeout time.Duration) (zrpc.Client, error) {
 	adapter := &ioc.ConsulConfigAdapter{
 		Address: consulConf.Address,
 		Token:   consulConf.Token,
 	}
 
-	// 初始解析一次（允许失败，服务可能还没启动）
 	endpoints, err := ioc.ResolveServiceEndpoints(adapter, serviceName)
 	if err != nil {
 		logx.Infof("初始解析服务端点失败（服务可能未启动）: service=%s, error=%v，将等待服务注册后自动发现", serviceName, err)
-		endpoints = []string{} // 使用空数组，稍后通过 watch 更新
+		endpoints = []string{}
 	}
 
 	var client zrpc.Client
 	if len(endpoints) > 0 {
-		// 如果初始解析成功，创建客户端
 		client = zrpc.MustNewClient(zrpc.RpcClientConf{
 			Endpoints: endpoints,
 			NonBlock:  true,
+			Timeout:   int64(timeout / time.Millisecond),
 		})
 		logx.Infof("成功创建动态 Consul RPC 客户端: service=%s, initial_endpoints=%v", serviceName, endpoints)
 	} else {
-		// 如果初始解析失败，创建一个占位符客户端（使用无效地址，但不会报错）
-		// 注意：zrpc 不支持空 endpoints，所以我们使用一个占位符
-		// 这个客户端在第一次实际调用时会失败，但 watch 会很快更新它
 		client = zrpc.MustNewClient(zrpc.RpcClientConf{
-			Endpoints: []string{"127.0.0.1:0"}, // 占位符，不会实际连接
+			Endpoints: []string{"127.0.0.1:0"},
 			NonBlock:  true,
+			Timeout:   int64(timeout / time.Millisecond),
 		})
 		logx.Infof("创建动态 Consul RPC 客户端（等待服务注册）: service=%s, 将自动发现服务端点", serviceName)
 	}
 
-	// 创建动态客户端包装器
 	dynamicClient := &DynamicRPCClient{
 		client:      client,
 		serviceName: serviceName,
 		endpoints:   endpoints,
+		timeout:     timeout,
 	}
 
-	// 启动监听，当端点变化时更新客户端
-	// 注意：即使初始解析失败，也要创建 watcher，这样可以在服务注册后自动发现
 	watcher, err := ioc.NewConsulWatcher(adapter, serviceName, func(newEndpoints []string) {
 		if len(newEndpoints) > 0 {
-			// 只有当发现有效 endpoints 时才更新客户端
 			dynamicClient.updateClient(newEndpoints)
 		} else {
 			logx.Infof("[dynamic_rpc] 服务暂未注册: service=%s，继续等待...", serviceName)
 		}
 	})
 	if err != nil {
-		// 如果创建 watcher 失败，仍然返回客户端（使用初始解析的结果）
 		logx.Errorf("创建 Consul watcher 失败: service=%s, error=%v，将使用静态端点", serviceName, err)
 		return &dynamicRPCClientWrapper{client: dynamicClient}, nil
 	}
@@ -264,7 +254,6 @@ func newConsulDynamicRPCClient(consulConf config.ConsulConf, serviceName string)
 	dynamicClient.watcher = watcher
 	logx.Infof("成功创建动态 Consul RPC 客户端: service=%s (支持动态更新和负载均衡)", serviceName)
 
-	// 返回一个包装器，实现 zrpc.Client 接口
 	return &dynamicRPCClientWrapper{client: dynamicClient}, nil
 }
 
@@ -286,7 +275,7 @@ func (w *dynamicRPCClientWrapper) Close() error {
 }
 
 // newConsulStaticRPCClient 使用 Consul 静态解析创建 RPC 客户端（不支持动态更新）
-func newConsulStaticRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
+func newConsulStaticRPCClient(consulConf config.ConsulConf, serviceName string, timeout time.Duration) (zrpc.Client, error) {
 	adapter := &ioc.ConsulConfigAdapter{
 		Address: consulConf.Address,
 		Token:   consulConf.Token,
@@ -301,6 +290,7 @@ func newConsulStaticRPCClient(consulConf config.ConsulConf, serviceName string) 
 	client := zrpc.MustNewClient(zrpc.RpcClientConf{
 		Endpoints: endpoints,
 		NonBlock:  true,
+		Timeout:   int64(timeout / time.Millisecond),
 	})
 
 	logx.Infof("成功创建静态 Consul RPC 客户端: service=%s, endpoints=%v", serviceName, endpoints)
