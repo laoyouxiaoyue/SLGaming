@@ -28,7 +28,7 @@ export const followUserAPI = (data) => {
 export const unfollowUserAPI = (params) => {
   return http({
     url: "/user/follow",
-    method: "DELETE",
+    method: "POST",
     params,
   });
 };
@@ -106,7 +106,7 @@ export const getFollowersAPI = (params) => {
  */
 export const getFollowingsAPI = (params) => {
   return http({
-    url: "/user/followings",
+    url: "/user/following",
     method: "GET",
     params,
   });

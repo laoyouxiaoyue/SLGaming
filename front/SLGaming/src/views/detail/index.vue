@@ -8,6 +8,7 @@ import { createOrderAPI } from "@/api/order/order";
 import { useWalletStore } from "@/stores/walletStore";
 import { checkFollowStatusAPI, followUserAPI, unfollowUserAPI } from "@/api/relation";
 import { useUserStore } from "@/stores/userStore";
+import { useInfoStore } from "@/stores/infoStore";
 
 const route = useRoute();
 const router = useRouter();
@@ -17,6 +18,7 @@ const ordering = ref(false);
 const companionInfo = ref(null);
 const walletStore = useWalletStore();
 const isFollowed = ref(false);
+const InfoStore = useInfoStore();
 
 const toggleFollow = async () => {
   if (!userStore.userInfo?.accessToken) {
@@ -36,6 +38,7 @@ const toggleFollow = async () => {
       isFollowed.value = true;
       ElMessage.success("关注成功");
     }
+    InfoStore.getUserDetail();
   } catch (error) {
     console.error("关注操作失败:", error);
   }
@@ -86,6 +89,11 @@ const fetchFollowStatus = async () => {
 
 const createOrder = async () => {
   if (!companionInfo.value) return;
+  if (InfoStore.info?.id === route.params.id) {
+    ElMessage.error("自己不可以给自己下单哦");
+    return;
+  }
+
   const balance = Number(walletStore.walletInfo.balance || 0);
   const price = totalAmount.value;
 
@@ -147,6 +155,8 @@ const createOrder = async () => {
 onMounted(() => {
   fetchCompanionInfo();
   fetchFollowStatus();
+  console.log(InfoStore.info?.id);
+  console.log(route.params.id);
 });
 </script>
 <template>
@@ -159,7 +169,12 @@ onMounted(() => {
           <div class="info">
             <div class="name-header">
               <h1>{{ companionInfo.nickname || "未设置昵称" }}</h1>
-              <div class="follow-btn" :class="{ 'is-followed': isFollowed }" @click="toggleFollow">
+              <div
+                v-if="InfoStore.info?.id != route.params.id"
+                class="follow-btn"
+                :class="{ 'is-followed': isFollowed }"
+                @click="toggleFollow"
+              >
                 {{ isFollowed ? "已关注" : "+ 关注" }}
               </div>
             </div>
