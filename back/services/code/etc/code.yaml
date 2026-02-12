@@ -38,3 +38,5 @@ Consul:
 RateLimit:
   PhoneSendInterval: 60   # 手机号发送间隔（秒），默认60秒
   VerifyPhoneDailyLimit: 50 # 验证操作单个手机号每日次数上限
+
+MetricsPort: 9085  # Prometheus metrics 端口
