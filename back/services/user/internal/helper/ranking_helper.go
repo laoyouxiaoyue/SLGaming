@@ -37,7 +37,7 @@ func NormalizePaginationWithDefault(page, pageSize int32, defaultPageSize int) P
 		ps = defaultPageSize
 	}
 	if ps > 100 {
-		ps = 100 // 最大100条
+		ps = 100
 	}
 	start := (p - 1) * ps
 	end := start + ps - 1
@@ -50,11 +50,8 @@ func NormalizePaginationWithDefault(page, pageSize int32, defaultPageSize int) P
 }
 
 // RankingItemBuilder 排名项构建器接口
-// 用于将 Redis 的 score 转换为排名项的具体字段
 type RankingItemBuilder interface {
-	// BuildRating 构建评分（从 Redis score 计算）
 	BuildRating(score int64) float64
-	// GetRatingFromProfile 从 profile 获取评分（如果 score 不包含评分信息）
 	GetRatingFromProfile(profile *model.CompanionProfile) float64
 }
 
@@ -62,12 +59,10 @@ type RankingItemBuilder interface {
 type RatingRankingBuilder struct{}
 
 func (b *RatingRankingBuilder) BuildRating(score int64) float64 {
-	// 从 score 还原 rating（之前乘以了 10000）
 	return float64(score) / 10000.0
 }
 
 func (b *RatingRankingBuilder) GetRatingFromProfile(profile *model.CompanionProfile) float64 {
-	// 评分排名中，rating 从 score 计算，不使用 profile
 	return 0
 }
 
@@ -75,7 +70,6 @@ func (b *RatingRankingBuilder) GetRatingFromProfile(profile *model.CompanionProf
 type OrdersRankingBuilder struct{}
 
 func (b *OrdersRankingBuilder) BuildRating(score int64) float64 {
-	// 接单数排名中，score 就是 total_orders，rating 从 profile 获取
 	return 0
 }
 
@@ -91,51 +85,83 @@ type RankingQueryResult struct {
 	PageSize int32
 }
 
-// QueryRankingWithProfiles 查询排名并关联用户和陪玩信息（使用 JOIN 优化性能）
+// QueryRankingWithProfiles 查询排行榜（ZSet只存前100）
 func QueryRankingWithProfiles(
 	ctx context.Context,
 	svcCtx *svc.ServiceContext,
 	logger logx.Logger,
 	redisKey string,
-	pagination PaginationParams,
+	page, pageSize int32,
 	builder RankingItemBuilder,
 ) (*RankingQueryResult, error) {
-	// 从 Redis ZSet 中查询排名（降序，从高到低）
-	members, err := svcCtx.Redis.ZrevrangeWithScores(redisKey, int64(pagination.Start), int64(pagination.End))
-	if err != nil {
-		LogError(logger, OpGetCompanionRatingRanking, "query ranking from redis failed", err, map[string]interface{}{
-			"redis_key": redisKey,
-		})
-		return nil, status.Error(codes.Internal, "query ranking failed")
+	// 规范化分页参数
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+	if pageSize > 100 {
+		pageSize = 100
 	}
 
-	// 获取总数
-	total, err := svcCtx.Redis.Zcard(redisKey)
-	if err != nil {
-		LogError(logger, OpGetCompanionRatingRanking, "get ranking total from redis failed", err, map[string]interface{}{
-			"redis_key": redisKey,
-		})
-		return nil, status.Error(codes.Internal, "query ranking total failed")
+	start := (page - 1) * pageSize
+	end := start + pageSize - 1
+
+	// 限制最多100条（ZSet只存前100）
+	if start >= 100 {
+		return &RankingQueryResult{
+			Rankings: []*user.CompanionRankingItem{},
+			Total:    100,
+			Page:     page,
+			PageSize: pageSize,
+		}, nil
+	}
+	if end >= 100 {
+		end = 99
 	}
 
-	// 如果没有数据，直接返回空列表
+	// 检查预热状态
+	if !IsWarmupDone() {
+		if IsWarmupRunning() {
+			LogInfo(logger, OpGetCompanionRatingRanking, "ranking warmup in progress, query from mysql directly", nil)
+		} else {
+			LogInfo(logger, OpGetCompanionRatingRanking, "ranking warmup not started or failed, query from mysql directly", nil)
+		}
+		// 预热未完成，直接走MySQL查询（避免查询空的Redis）
+		return queryRankingFromMySQL(ctx, svcCtx, logger, redisKey, start, end, builder)
+	}
+
+	// 从Redis查询（ZSet只存前100名）
+	members, err := svcCtx.Redis.ZrevrangeWithScores(redisKey, int64(start), int64(end))
+	if err != nil {
+		LogError(logger, OpGetCompanionRatingRanking, "query ranking from redis failed, fallback to mysql", err, map[string]interface{}{
+			"redis_key": redisKey,
+		})
+		// Redis故障，降级到MySQL查询
+		return queryRankingFromMySQL(ctx, svcCtx, logger, redisKey, start, end, builder)
+	}
+
+	// 获取总数（最多100）
+	total, _ := svcCtx.Redis.Zcard(redisKey)
+	if total > 100 {
+		total = 100
+	}
+
 	if len(members) == 0 {
 		return &RankingQueryResult{
 			Rankings: []*user.CompanionRankingItem{},
 			Total:    int32(total),
-			Page:     int32(pagination.Page),
-			PageSize: int32(pagination.PageSize),
+			Page:     page,
+			PageSize: pageSize,
 		}, nil
 	}
 
-	// 收集所有 user_id
+	// 收集user_ids
 	userIDs := make([]uint64, 0, len(members))
 	for _, member := range members {
 		userID, err := strconv.ParseUint(member.Key, 10, 64)
 		if err != nil {
-			LogError(logger, OpGetCompanionRatingRanking, "parse user_id from redis member failed", err, map[string]interface{}{
-				"member_key": member.Key,
-			})
 			continue
 		}
 		userIDs = append(userIDs, userID)
@@ -145,79 +171,61 @@ func QueryRankingWithProfiles(
 		return &RankingQueryResult{
 			Rankings: []*user.CompanionRankingItem{},
 			Total:    int32(total),
-			Page:     int32(pagination.Page),
-			PageSize: int32(pagination.PageSize),
+			Page:     page,
+			PageSize: pageSize,
 		}, nil
 	}
 
-	// 使用 JOIN 优化：一次查询获取用户和陪玩信息
+	// 使用JOIN一次性查询（避免多次查询）
+	type RankingUser struct {
+		ID          uint64  `gorm:"column:id"`
+		Nickname    string  `gorm:"column:nickname"`
+		AvatarURL   string  `gorm:"column:avatar_url"`
+		Rating      float64 `gorm:"column:rating"`
+		TotalOrders int64   `gorm:"column:total_orders"`
+		IsVerified  bool    `gorm:"column:is_verified"`
+	}
+
 	db := svcCtx.DB().WithContext(ctx)
-	
-	// 分别查询用户和陪玩信息（避免 JSON 标签冲突）
-	var users []model.User
-	if err := db.Where("id IN ?", userIDs).Find(&users).Error; err != nil {
-		LogError(logger, OpGetCompanionRatingRanking, "query users failed", err, map[string]interface{}{
-			"user_count": len(userIDs),
-		})
-		return nil, status.Error(codes.Internal, "query users failed")
+	var rankingUsers []RankingUser
+
+	queryErr := db.Table("users").
+		Select("users.id, users.nickname, users.avatar_url, "+
+			"companion_profiles.rating, companion_profiles.total_orders, companion_profiles.is_verified").
+		Joins("INNER JOIN companion_profiles ON users.id = companion_profiles.user_id").
+		Where("users.id IN ?", userIDs).
+		Find(&rankingUsers).Error
+
+	if queryErr != nil {
+		LogError(logger, OpGetCompanionRatingRanking, "query ranking users failed", queryErr, nil)
+		return nil, status.Error(codes.Internal, "query ranking users failed")
 	}
 
-	var profiles []model.CompanionProfile
-	if err := db.Where("user_id IN ?", userIDs).Find(&profiles).Error; err != nil {
-		LogError(logger, OpGetCompanionRatingRanking, "query companion profiles failed", err, map[string]interface{}{
-			"user_count": len(userIDs),
-		})
-		return nil, status.Error(codes.Internal, "query companion profiles failed")
+	// 构建user_id -> user信息的map
+	userMap := make(map[uint64]*RankingUser)
+	for i := range rankingUsers {
+		userMap[rankingUsers[i].ID] = &rankingUsers[i]
 	}
 
-	// 构建 user_id -> 用户信息的映射
-	userMap := make(map[uint64]*model.User)
-	for i := range users {
-		userMap[users[i].ID] = &users[i]
-	}
-
-	// 构建 user_id -> 陪玩信息的映射
-	profileMap := make(map[uint64]*model.CompanionProfile)
-	for i := range profiles {
-		profileMap[profiles[i].UserID] = &profiles[i]
-	}
-
-	// 组装排名列表（按照 Redis 返回的顺序）
+	// 组装结果（保持Redis返回的顺序）
 	rankings := make([]*user.CompanionRankingItem, 0, len(members))
 	for i, member := range members {
-		userID, err := strconv.ParseUint(member.Key, 10, 64)
-		if err != nil {
-			LogError(logger, OpGetCompanionRatingRanking, "parse user_id from redis member failed", err, map[string]interface{}{
-				"member_key": member.Key,
-			})
-			continue
-		}
-		rank := int32(pagination.Start + i + 1)
+		userID, _ := strconv.ParseUint(member.Key, 10, 64)
+		rank := int32(int(start) + i + 1)
 
-		u := userMap[userID]
-		if u == nil {
-			logger.Infof("user not found: user_id=%d", userID)
+		u, ok := userMap[userID]
+		if !ok {
 			continue
 		}
 
-		p := profileMap[userID]
-		// 如果陪玩信息不存在，跳过（排名只显示陪玩）
-		if p == nil {
-			logger.Infof("companion profile not found: user_id=%d", userID)
-			continue
-		}
-
-		// 构建评分：优先从 score 计算，如果 builder 返回 0，则从 profile 获取
 		rating := builder.BuildRating(member.Score)
 		if rating == 0 {
-			rating = builder.GetRatingFromProfile(p)
+			rating = u.Rating
 		}
 
-		// score 作为 total_orders（对于接单数排名）或用于计算 rating（对于评分排名）
 		totalOrders := int64(member.Score)
-		// 对于评分排名，total_orders 从 profile 获取
 		if _, ok := builder.(*RatingRankingBuilder); ok {
-			totalOrders = p.TotalOrders
+			totalOrders = u.TotalOrders
 		}
 
 		item := &user.CompanionRankingItem{
@@ -227,7 +235,7 @@ func QueryRankingWithProfiles(
 			Rating:      rating,
 			TotalOrders: totalOrders,
 			Rank:        rank,
-			IsVerified:  p.IsVerified,
+			IsVerified:  u.IsVerified,
 		}
 
 		rankings = append(rankings, item)
@@ -236,7 +244,111 @@ func QueryRankingWithProfiles(
 	return &RankingQueryResult{
 		Rankings: rankings,
 		Total:    int32(total),
-		Page:     int32(pagination.Page),
-		PageSize: int32(pagination.PageSize),
+		Page:     page,
+		PageSize: pageSize,
+	}, nil
+}
+
+// queryRankingFromMySQL Redis故障时从MySQL查询（降级方案）
+func queryRankingFromMySQL(
+	ctx context.Context,
+	svcCtx *svc.ServiceContext,
+	logger logx.Logger,
+	rankingType string,
+	start, end int32,
+	builder RankingItemBuilder,
+) (*RankingQueryResult, error) {
+	LogInfo(logger, OpGetCompanionRatingRanking, "fallback to mysql for ranking", map[string]interface{}{
+		"ranking_type": rankingType,
+	})
+
+	// 确定排序字段
+	orderBy := "rating"
+	if rankingType == "ranking:orders" {
+		orderBy = "total_orders"
+	}
+
+	db := svcCtx.DB().WithContext(ctx)
+
+	// 从MySQL查询前100名
+	type RankingUser struct {
+		ID          uint64  `gorm:"column:id"`
+		Nickname    string  `gorm:"column:nickname"`
+		AvatarURL   string  `gorm:"column:avatar_url"`
+		Rating      float64 `gorm:"column:rating"`
+		TotalOrders int64   `gorm:"column:total_orders"`
+		IsVerified  bool    `gorm:"column:is_verified"`
+	}
+
+	var rankingUsers []RankingUser
+	err := db.Table("users").
+		Select("users.id, users.nickname, users.avatar_url, " +
+			"companion_profiles.rating, companion_profiles.total_orders, companion_profiles.is_verified").
+		Joins("INNER JOIN companion_profiles ON users.id = companion_profiles.user_id").
+		Where("companion_profiles.total_orders > 0"). // 只查有订单的陪玩
+		Order(orderBy + " DESC").
+		Limit(100).
+		Find(&rankingUsers).Error
+
+	if err != nil {
+		LogError(logger, OpGetCompanionRatingRanking, "query ranking from mysql failed", err, nil)
+		return nil, status.Error(codes.Internal, "query ranking failed")
+	}
+
+	total := int32(len(rankingUsers))
+	if total > 100 {
+		total = 100
+	}
+
+	// 分页
+	if int(start) >= len(rankingUsers) {
+		return &RankingQueryResult{
+			Rankings: []*user.CompanionRankingItem{},
+			Total:    total,
+			Page:     int32(start/int32(10)) + 1,
+			PageSize: int32(end - start + 1),
+		}, nil
+	}
+
+	endIdx := int(end) + 1
+	if endIdx > len(rankingUsers) {
+		endIdx = len(rankingUsers)
+	}
+
+	pageUsers := rankingUsers[start:endIdx]
+
+	// 组装结果
+	rankings := make([]*user.CompanionRankingItem, 0, len(pageUsers))
+	for i, u := range pageUsers {
+		rank := int32(int(start) + i + 1)
+
+		rating := u.Rating
+		totalOrders := u.TotalOrders
+		if rankingType == "ranking:rating" {
+			// 评分榜需要特殊处理rating显示
+			rating = u.Rating
+		} else if rankingType == "ranking:orders" {
+			// 接单榜显示评分从profile获取
+			rating = u.Rating
+		}
+
+		item := &user.CompanionRankingItem{
+			UserId:      u.ID,
+			Nickname:    u.Nickname,
+			AvatarUrl:   u.AvatarURL,
+			Rating:      rating,
+			TotalOrders: totalOrders,
+			Rank:        rank,
+			IsVerified:  u.IsVerified,
+		}
+
+		rankings = append(rankings, item)
+	}
+
+	return &RankingQueryResult{
+		Rankings: rankings,
+		Total:    total,
+		Page:     int32(start/int32(10)) + 1,
+		PageSize: int32(end - start + 1),
 	}, nil
 }

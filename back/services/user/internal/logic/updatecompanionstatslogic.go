@@ -71,29 +71,9 @@ func (l *UpdateCompanionStatsLogic) UpdateCompanionStats(in *user.UpdateCompanio
 		return nil, status.Error(codes.Internal, "update companion stats failed")
 	}
 
-	// 直接更新 Redis 排名 ZSet（如果配置了 Redis）
-	// 失败只记录日志，不影响主流程
+	// 更新 Redis 排名 ZSet（只维护前100名）
 	if l.svcCtx.Redis != nil {
-		userIDStr := strconv.FormatUint(p.UserID, 10)
-
-		// 更新评分排名 ZSet（乘以 10000 转为整数，保持精度）
-		ratingScore := int64(p.Rating * 10000)
-		_, err := l.svcCtx.Redis.Zadd("ranking:rating", ratingScore, userIDStr)
-		if err != nil {
-			helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "update rating ranking failed", err, map[string]interface{}{
-				"user_id": p.UserID,
-				"rating":  p.Rating,
-			})
-		}
-
-		// 更新接单数排名 ZSet
-		_, err = l.svcCtx.Redis.Zadd("ranking:orders", p.TotalOrders, userIDStr)
-		if err != nil {
-			helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "update orders ranking failed", err, map[string]interface{}{
-				"user_id":     p.UserID,
-				"total_orders": p.TotalOrders,
-			})
-		}
+		l.updateRankingZSet(p.UserID, p.Rating, p.TotalOrders)
 	}
 
 	// 记录成功日志
@@ -106,4 +86,71 @@ func (l *UpdateCompanionStatsLogic) UpdateCompanionStats(in *user.UpdateCompanio
 	return &user.UpdateCompanionStatsResponse{
 		Profile: helper.ToCompanionInfo(&p),
 	}, nil
+}
+
+// updateRankingZSet 更新排行榜ZSet（只维护前100名）
+func (l *UpdateCompanionStatsLogic) updateRankingZSet(userID uint64, rating float64, totalOrders int64) {
+	userIDStr := strconv.FormatUint(userID, 10)
+
+	// 更新评分排名
+	ratingScore := int64(rating * 10000)
+	l.updateZSet("ranking:rating", ratingScore, userIDStr)
+
+	// 更新接单数排名
+	l.updateZSet("ranking:orders", totalOrders, userIDStr)
+}
+
+// updateZSet 更新单个ZSet（只保留前100名）
+func (l *UpdateCompanionStatsLogic) updateZSet(key string, score int64, member string) {
+	// 1. 先获取当前第100名的分数（门槛）
+	lastMembers, err := l.svcCtx.Redis.ZrevrangeWithScores(key, 99, 99)
+	if err != nil {
+		helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "get ranking threshold failed", err, map[string]interface{}{
+			"key": key,
+		})
+		return
+	}
+
+	// 2. 判断是否进入前100
+	shouldAdd := false
+	if len(lastMembers) == 0 {
+		// ZSet为空，直接加入
+		shouldAdd = true
+	} else if len(lastMembers) < 100 {
+		// 不满100人，直接加入
+		shouldAdd = true
+	} else {
+		// 已满100人，比较分数
+		if score > lastMembers[0].Score {
+			shouldAdd = true
+		}
+	}
+
+	if shouldAdd {
+		// 3. 加入ZSet
+		_, err := l.svcCtx.Redis.Zadd(key, score, member)
+		if err != nil {
+			helper.LogError(l.Logger, helper.OpUpdateCompanionStats, "zadd failed", err, map[string]interface{}{
+				"key":    key,
+				"score":  score,
+				"member": member,
+			})
+			return
+		}
+
+		// 4. 如果超过100人，删除第101名及以后
+		count, _ := l.svcCtx.Redis.Zcard(key)
+		if count > 100 {
+			l.svcCtx.Redis.Zremrangebyrank(key, 0, -(101))
+			helper.LogInfo(l.Logger, helper.OpUpdateCompanionStats, "trimmed ranking to top 100", map[string]interface{}{
+				"key": key,
+			})
+		}
+
+		helper.LogInfo(l.Logger, helper.OpUpdateCompanionStats, "entered top 100", map[string]interface{}{
+			"key":    key,
+			"member": member,
+			"score":  score,
+		})
+	}
 }

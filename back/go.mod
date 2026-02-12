@@ -15,6 +15,7 @@ require (
 	github.com/hashicorp/consul/api v1.29.1
 	github.com/milvus-io/milvus-sdk-go/v2 v2.4.2
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/smartwalle/alipay/v3 v3.2.28
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggo/http-swagger v1.3.4

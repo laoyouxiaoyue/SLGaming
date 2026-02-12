@@ -2,6 +2,7 @@ package main
 
 import (
 	"SLGaming/back/services/user/internal/config"
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/ioc"
 	"SLGaming/back/services/user/internal/job"
 	"SLGaming/back/services/user/internal/server"
@@ -105,6 +106,9 @@ func main() {
 	// 2. Redis 数据被清空
 	// 3. 需要重建布隆过滤器
 	// 如需初始化，请使用命令行工具或管理接口执行，不要在启动时全量加载
+
+	// 排行榜异步预热（从MySQL加载数据到Redis，不阻塞启动）
+	helper.WarmupRankingFromMySQLAsync(ctx, logx.WithContext(rootCtx))
 
 	s := zrpc.MustNewServer(cfg.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))
