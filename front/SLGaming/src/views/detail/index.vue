@@ -155,8 +155,6 @@ const createOrder = async () => {
 onMounted(() => {
   fetchCompanionInfo();
   fetchFollowStatus();
-  console.log(InfoStore.info?.id);
-  console.log(route.params.id);
 });
 </script>
 <template>

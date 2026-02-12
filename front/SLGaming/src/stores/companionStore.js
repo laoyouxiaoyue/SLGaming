@@ -10,6 +10,21 @@ export const useCompanionStore = defineStore(
   "companion",
   () => {
     // 1. 定义 state
+    /**
+     * companionInfo存放内容形式:
+     * {
+     *   gameSkill: string,      // 游戏技能名称，例如 "三角洲行动"
+     *   pricePerHour: number,   // 每小时价格，例如 50
+     *   status: number,         // 状态（1:在线, 0:离线等），例如 1
+     *   rating: number,         // 评分，例如 5
+     *   totalOrders: number,    // 总订单数，例如 1
+     *   isVerified: boolean,    // 是否认证，例如 false
+     *   userId: string,         // 用户ID，例如 "1996080936390758400"
+     *   nickname: string,       // 昵称，例如 "王者"
+     *   avatarUrl: string,      // 头像链接
+     *   bio: string             // 简介，例如 "老司机，懂就上车"
+     * }
+     */
     const companionInfo = ref({
       gameSkill: "",
       pricePerHour: 0,
