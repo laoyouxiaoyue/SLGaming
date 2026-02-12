@@ -292,7 +292,20 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 		Address: serviceAddr,
 		Port:    port,
 		Tags:    cfg.GetServiceTags(),
+		Meta:    cfg.GetServiceMeta(),
 		Check:   check,
+	}
+
+	// 如果配置了额外的 HTTP 健康检查（用于 metrics），添加 Checks
+	if cfg.GetCheckHTTP() != "" {
+		reg.Checks = []*api.AgentServiceCheck{
+			check,
+			{
+				HTTP:     cfg.GetCheckHTTP(),
+				Interval: checkInterval,
+				Timeout:  checkTimeout,
+			},
+		}
 	}
 
 	if err := client.Agent().ServiceRegister(reg); err != nil {
