@@ -358,7 +358,6 @@ jobs:
                 --name slgaming-agent \
                 --restart unless-stopped \
                 -p 8090:8090 \
-                -p 9090:9090 \
                 ${{ env.IMAGE_PREFIX }}/agent:latest
             fi
             
