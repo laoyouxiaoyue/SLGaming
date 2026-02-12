@@ -59,29 +59,59 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="fans-list" v-loading="loading">
-    <div v-if="followers.length === 0 && !loading" class="empty-state">暂无粉丝</div>
-    <div v-for="item in followers" :key="item.userId" class="follower-card">
-      <div class="left-section">
-        <el-avatar :size="60" :src="item.avatarUrl" />
+  <div class="setting-info">
+    <div class="panel-title">我的粉丝</div>
+    <div class="fans-list" v-loading="loading">
+      <div v-if="followers.length === 0 && !loading" class="empty-container">
+        <el-empty description="暂无粉丝" />
       </div>
-      <div class="right-section">
-        <div class="nickname">{{ item.nickname }}</div>
-        <div class="action-btn" :class="{ 'is-mutual': item.isMutual }" @click="handleAction(item)">
-          <el-icon class="icon"><Menu /></el-icon>
-          <span>{{ item.isMutual ? "已互关" : "回  关" }}</span>
+      <div v-for="item in followers" :key="item.userId" class="follower-card">
+        <div class="left-section">
+          <el-avatar :size="60" :src="item.avatarUrl" />
+        </div>
+        <div class="right-section">
+          <div class="nickname">{{ item.nickname }}</div>
+          <div
+            class="action-btn"
+            :class="{ 'is-mutual': item.isMutual }"
+            @click="handleAction(item)"
+          >
+            <el-icon class="icon"><Menu /></el-icon>
+            <span>{{ item.isMutual ? "已互关" : "回  关" }}</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.setting-info {
+  padding: 0 10px;
+
+  .panel-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #333;
+    border-left: 4px solid #ff6b35;
+    padding-left: 12px;
+  }
+}
+
 .fans-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   padding: 16px;
+}
+
+.empty-container {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
 }
 
 @media screen and (max-width: 1200px) {
@@ -158,11 +188,5 @@ onMounted(() => {
 
 .icon {
   font-size: 14px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #909399;
 }
 </style>

@@ -59,29 +59,55 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="follow-list" v-loading="loading">
-    <div v-if="followings.length === 0 && !loading" class="empty-state">暂无关注</div>
-    <div v-for="item in followings" :key="item.userId" class="follow-card">
-      <div class="left-section">
-        <el-avatar :size="60" :src="item.avatarUrl" />
+  <div class="setting-info">
+    <div class="panel-title">我的关注</div>
+    <div class="follow-list" v-loading="loading">
+      <div v-if="followings.length === 0 && !loading" class="empty-container">
+        <el-empty description="暂无关注" />
       </div>
-      <div class="right-section">
-        <div class="nickname">{{ item.nickname }}</div>
-        <div class="action-btn" @click="handleAction(item)">
-          <el-icon class="icon"><Menu /></el-icon>
-          <span>{{ !item.isFollowed ? "关注" : item.isMutual ? "已互关" : "已关注" }}</span>
+      <div v-for="item in followings" :key="item.userId" class="follow-card">
+        <div class="left-section">
+          <el-avatar :size="60" :src="item.avatarUrl" />
+        </div>
+        <div class="right-section">
+          <div class="nickname">{{ item.nickname }}</div>
+          <div class="action-btn" @click="handleAction(item)">
+            <el-icon class="icon"><Menu /></el-icon>
+            <span>{{ !item.isFollowed ? "关注" : item.isMutual ? "已互关" : "已关注" }}</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.setting-info {
+  padding: 0 10px;
+
+  .panel-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #333;
+    border-left: 4px solid #ff6b35;
+    padding-left: 12px;
+  }
+}
+
 .follow-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   padding: 16px;
+}
+
+.empty-container {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
 }
 
 @media screen and (max-width: 1200px) {
@@ -147,11 +173,5 @@ onMounted(() => {
 
 .icon {
   font-size: 14px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #909399;
 }
 </style>
