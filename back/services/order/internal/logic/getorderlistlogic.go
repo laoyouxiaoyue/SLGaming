@@ -38,10 +38,12 @@ func (l *GetOrderListLogic) GetOrderList(in *order.GetOrderListRequest) (*order.
 	query := db.Model(&model.Order{})
 
 	if in.GetBossId() != 0 {
-		query = query.Where("boss_id = ?", in.GetBossId())
+		// 老板视角：只查自己没删除的订单
+		query = query.Where("boss_id = ? AND boss_deleted_at IS NULL", in.GetBossId())
 	}
 	if in.GetCompanionId() != 0 {
-		query = query.Where("companion_id = ?", in.GetCompanionId())
+		// 陪玩视角：只查自己没删除的订单
+		query = query.Where("companion_id = ? AND companion_deleted_at IS NULL", in.GetCompanionId())
 	}
 	if in.GetStatus() != 0 {
 		query = query.Where("status = ?", in.GetStatus())

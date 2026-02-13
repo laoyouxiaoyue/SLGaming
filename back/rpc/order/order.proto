@@ -118,11 +118,24 @@ message RateOrderResponse {
   OrderInfo order = 1;
 }
 
+// ---------------- 删除订单 ----------------
+
+// DeleteOrderRequest 删除订单（软删除）
+message DeleteOrderRequest {
+  uint64 order_id = 1;     // 订单ID
+  uint64 operator_id = 2;  // 操作人ID（老板或陪玩）
+}
+
+message DeleteOrderResponse {
+  bool success = 1;  // 是否删除成功
+}
+
 // ---------------- 查询接口 ----------------
 
 message GetOrderRequest {
   uint64 id = 1;        // 订单ID
   string order_no = 2;  // 或者订单号
+  uint64 operator_id = 3; // 查询者ID（用于判断订单是否对该用户已删除）
 }
 
 message GetOrderResponse {
@@ -161,6 +174,9 @@ service Order {
   // 查询相关
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
   rpc GetOrderList(GetOrderListRequest) returns (GetOrderListResponse);
+
+  // 删除订单
+  rpc DeleteOrder(DeleteOrderRequest) returns (DeleteOrderResponse);
 }
 
 

@@ -101,6 +101,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/api/order/delete",
+				Handler: order.DeleteOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/api/order/rate",
 				Handler: order.RateOrderHandler(serverCtx),
 			},

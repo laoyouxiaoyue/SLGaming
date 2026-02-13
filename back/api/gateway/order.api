@@ -125,6 +125,20 @@ type RateOrderResponse {
     Data OrderInfo `json:"data"`
 }
 
+// 删除订单
+type DeleteOrderRequest {
+    OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type DeleteOrderData {
+    Success bool `json:"success"`
+}
+
+type DeleteOrderResponse {
+    BaseResp
+    Data DeleteOrderData `json:"data"`
+}
+
 // ---------------- 服务定义 ----------------
 
 @server(
@@ -162,6 +176,10 @@ service gateway {
     // 老板评价订单（需登录）
     @handler rateOrder
     post /api/order/rate (RateOrderRequest) returns (RateOrderResponse)
+
+    // 删除订单（需登录，老板/陪玩）
+    @handler deleteOrder
+    post /api/order/delete (DeleteOrderRequest) returns (DeleteOrderResponse)
 }
 
 

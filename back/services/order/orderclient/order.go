@@ -22,6 +22,8 @@ type (
 	CompleteOrderResponse = order.CompleteOrderResponse
 	CreateOrderRequest    = order.CreateOrderRequest
 	CreateOrderResponse   = order.CreateOrderResponse
+	DeleteOrderRequest    = order.DeleteOrderRequest
+	DeleteOrderResponse   = order.DeleteOrderResponse
 	GetOrderListRequest   = order.GetOrderListRequest
 	GetOrderListResponse  = order.GetOrderListResponse
 	GetOrderRequest       = order.GetOrderRequest
@@ -43,6 +45,8 @@ type (
 		// 查询相关
 		GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
 		GetOrderList(ctx context.Context, in *GetOrderListRequest, opts ...grpc.CallOption) (*GetOrderListResponse, error)
+		// 删除订单
+		DeleteOrder(ctx context.Context, in *DeleteOrderRequest, opts ...grpc.CallOption) (*DeleteOrderResponse, error)
 		// 获取指定陪玩的订单评价列表（仅返回已评价订单）
 	}
 
@@ -97,6 +101,12 @@ func (m *defaultOrder) GetOrder(ctx context.Context, in *GetOrderRequest, opts .
 func (m *defaultOrder) GetOrderList(ctx context.Context, in *GetOrderListRequest, opts ...grpc.CallOption) (*GetOrderListResponse, error) {
 	client := order.NewOrderClient(m.cli.Conn())
 	return client.GetOrderList(ctx, in, opts...)
+}
+
+// 删除订单
+func (m *defaultOrder) DeleteOrder(ctx context.Context, in *DeleteOrderRequest, opts ...grpc.CallOption) (*DeleteOrderResponse, error) {
+	client := order.NewOrderClient(m.cli.Conn())
+	return client.DeleteOrder(ctx, in, opts...)
 }
 
 // 获取指定陪玩的订单评价列表（仅返回已评价订单）

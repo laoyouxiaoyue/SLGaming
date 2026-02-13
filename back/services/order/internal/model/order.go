@@ -66,6 +66,10 @@ type Order struct {
 
 	// 取消信息
 	CancelReason string `gorm:"size:255;comment:取消原因" json:"cancel_reason"`
+
+	// 删除标记（软删除，双方独立控制）
+	BossDeletedAt      *time.Time `gorm:"index;comment:老板删除时间" json:"boss_deleted_at"`
+	CompanionDeletedAt *time.Time `gorm:"index;comment:陪玩删除时间" json:"companion_deleted_at"`
 }
 
 func (o *Order) TableName() string {
