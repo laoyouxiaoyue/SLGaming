@@ -4,12 +4,44 @@ import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
+import { useWalletStore } from "@/stores/walletStore";
+import { checkFollowStatusAPI, followUserAPI, unfollowUserAPI } from "@/api/relation";
+import { useUserStore } from "@/stores/userStore";
+import { useInfoStore } from "@/stores/infoStore";
 
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 const loading = ref(true);
 const ordering = ref(false);
 const companionInfo = ref(null);
+const walletStore = useWalletStore();
+const isFollowed = ref(false);
+const InfoStore = useInfoStore();
+
+const toggleFollow = async () => {
+  if (!userStore.userInfo?.accessToken) {
+    ElMessage.warning("请先登录后操作");
+    router.push("/login");
+    return;
+  }
+
+  const userId = route.params.id;
+  try {
+    if (isFollowed.value) {
+      await unfollowUserAPI({ userId: userId });
+      isFollowed.value = false;
+      ElMessage.info("已取消关注");
+    } else {
+      await followUserAPI({ userId: userId });
+      isFollowed.value = true;
+      ElMessage.success("关注成功");
+    }
+    InfoStore.getUserDetail();
+  } catch (error) {
+    console.error("关注操作失败:", error);
+  }
+};
 
 const statusText = {
   0: "离线",
@@ -35,15 +67,67 @@ const fetchCompanionInfo = async () => {
     }
     const res = await getCompanionPublicProfileAPI({ userId });
     companionInfo.value = res.data;
-  } catch (error) {
-    console.error("获取陪玩信息失败:", error);
   } finally {
     loading.value = false;
   }
 };
 
+const fetchFollowStatus = async () => {
+  if (!userStore.userInfo?.accessToken) return;
+
+  try {
+    const userId = route.params.id;
+    if (!userId) return;
+
+    const res = await checkFollowStatusAPI({ targetUserId: userId });
+    isFollowed.value = res.data.isFollowing;
+  } catch (error) {
+    console.error("获取关注状态失败:", error);
+  }
+};
+
 const createOrder = async () => {
   if (!companionInfo.value) return;
+  if (InfoStore.info?.id === route.params.id) {
+    ElMessage.error("自己不可以给自己下单哦");
+    return;
+  }
+
+  const balance = Number(walletStore.walletInfo.balance || 0);
+  const price = totalAmount.value;
+
+  if (balance < price) {
+    try {
+      await ElMessageBox.confirm(
+        `当前余额不足 (余额: ${balance} 帅币, 需支付: ${price} 帅币)，是否前往充值？`,
+        "余额不足",
+        {
+          confirmButtonText: "去充值",
+          cancelButtonText: "取消",
+          type: "warning",
+        },
+      );
+      router.push("/scion/recharge");
+      return;
+    } catch {
+      return;
+    }
+  }
+
+  // 2. 余额充足，二次确认
+  try {
+    await ElMessageBox.confirm(
+      `当前余额: ${balance} 帅币\n本次支付: ${price} 帅币\n确认支付吗？`,
+      "确认支付",
+      {
+        confirmButtonText: "确定支付",
+        cancelButtonText: "取消",
+        type: "success",
+      },
+    );
+  } catch {
+    return; // 用户取消支付
+  }
 
   try {
     ordering.value = true;
@@ -61,8 +145,6 @@ const createOrder = async () => {
     setTimeout(async () => {
       router.replace("/order/boss");
     }, 1200);
-  } catch (error) {
-    console.error("创建订单失败:", error);
   } finally {
     ordering.value = false;
   }
@@ -70,6 +152,7 @@ const createOrder = async () => {
 
 onMounted(() => {
   fetchCompanionInfo();
+  fetchFollowStatus();
 });
 </script>
 <template>
@@ -80,7 +163,17 @@ onMounted(() => {
         <div class="profile-header">
           <img :src="companionInfo.avatarUrl" :alt="companionInfo.nickname" class="avatar" />
           <div class="info">
-            <h1>{{ companionInfo.nickname || "未设置昵称" }}</h1>
+            <div class="name-header">
+              <h1>{{ companionInfo.nickname || "未设置昵称" }}</h1>
+              <div
+                v-if="InfoStore.info?.id != route.params.id"
+                class="follow-btn"
+                :class="{ 'is-followed': isFollowed }"
+                @click="toggleFollow"
+              >
+                {{ isFollowed ? "已关注" : "+ 关注" }}
+              </div>
+            </div>
             <p class="game-skill">{{ companionInfo.gameSkill }}</p>
             <div class="status-rating">
               <span :class="['status', `status-${companionInfo.status}`]">
@@ -218,11 +311,49 @@ onMounted(() => {
 }
 
 .info h1 {
-  margin: 0 0 12px 0;
+  margin: 0;
   font-size: 32px;
   color: #303133;
   font-weight: 700;
   letter-spacing: -0.5px;
+}
+
+.name-header {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 12px;
+}
+
+.follow-btn {
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #ef93a2;
+  color: #ffffff;
+  border: 1px solid #ef93a2;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.follow-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.follow-btn:active {
+  transform: scale(0.98);
+}
+
+.follow-btn.is-followed {
+  background: transparent;
+  color: #ef93a2;
+  border: 1px solid #ef93a2;
 }
 
 .game-skill {
