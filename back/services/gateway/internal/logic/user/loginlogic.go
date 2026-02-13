@@ -66,7 +66,7 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 	return &types.LoginResponse{
 		BaseResp: types.BaseResp{
 			Code: 0,
-			Msg:  "success",
+			Msg:  utils.GetSuccessMsg("Login"),
 		},
 		Data: *tokenData,
 	}, nil

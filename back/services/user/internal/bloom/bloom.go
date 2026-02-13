@@ -126,7 +126,14 @@ func (bf *GenericBloomFilter[T]) Info(ctx context.Context) (map[string]interface
 		return nil, fmt.Errorf("redis not initialized")
 	}
 
-	result, err := bf.redis.Eval("return redis.call('BF.INFO', KEYS[1])", []string{bf.key})
+	// 使用 pcall 调用 BF.INFO，避免脚本错误
+	result, err := bf.redis.Eval(`
+		local ok, res = pcall(redis.call, 'BF.INFO', KEYS[1])
+		if not ok then
+			return nil
+		end
+		return res
+	`, []string{bf.key})
 	if err != nil {
 		return nil, err
 	}

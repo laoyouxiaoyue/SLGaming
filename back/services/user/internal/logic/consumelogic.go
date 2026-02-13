@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
 
@@ -66,8 +67,12 @@ func (l *ConsumeLogic) Consume(in *user.ConsumeRequest) (*user.ConsumeResponse, 
 		Logger:     l.Logger,
 	})
 	if err != nil {
+		metrics.WalletConsumeTotal.WithLabelValues("error").Inc()
 		return nil, err
 	}
+
+	metrics.WalletConsumeTotal.WithLabelValues("success").Inc()
+	metrics.WalletConsumeAmount.Observe(float64(amount))
 
 	// 清除用户缓存，确保余额立即更新
 	if l.svcCtx.Redis != nil {

@@ -5,12 +5,15 @@ import (
 	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/ioc"
 	"SLGaming/back/services/user/internal/job"
+	_ "SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/server"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
 	"context"
 	"flag"
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -18,6 +21,7 @@ import (
 	"syscall"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
@@ -28,6 +32,39 @@ import (
 )
 
 var configFile = flag.String("f", "etc/user.yaml", "the config file")
+
+func getAvailablePort() (int, error) {
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		return 0, fmt.Errorf("failed to listen: %w", err)
+	}
+	defer listener.Close()
+	addr := listener.Addr().(*net.TCPAddr)
+	return addr.Port, nil
+}
+
+func startMetricsServer(preferredPort int) (int, error) {
+	port := preferredPort
+	if port <= 0 {
+		var err error
+		port, err = getAvailablePort()
+		if err != nil {
+			return 0, fmt.Errorf("failed to get available port: %w", err)
+		}
+		logx.Infof("Auto-assigned metrics port: %d", port)
+	}
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		addr := fmt.Sprintf(":%d", port)
+		logx.Infof("Starting metrics server at %s", addr)
+		if err := http.ListenAndServe(addr, nil); err != nil {
+			logx.Errorf("metrics server failed: %v", err)
+		}
+	}()
+
+	return port, nil
+}
 
 func main() {
 	flag.Parse()
@@ -66,7 +103,12 @@ func main() {
 
 	ctx := svc.NewServiceContext(cfg)
 
-	registrar, err := ioc.RegisterConsul(cfg.Consul, cfg.ListenOn)
+	metricsPort, err := startMetricsServer(cfg.MetricsPort)
+	if err != nil {
+		logx.Errorf("failed to start metrics server: %v", err)
+	}
+
+	registrar, err := ioc.RegisterConsul(cfg.Consul, cfg.ListenOn, metricsPort)
 	if err != nil {
 		logx.Errorf("consul register failed: %v", err)
 	}
@@ -141,6 +183,6 @@ func main() {
 
 	defer stopServer()
 
-	fmt.Printf("Starting rpc server at %s...\n", cfg.ListenOn)
+	fmt.Printf("Starting rpc server at %s, metrics at :%d\n", cfg.ListenOn, metricsPort)
 	s.Start()
 }

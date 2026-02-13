@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/services/agent/agentclient"
@@ -115,18 +116,22 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	// 初始化 Agent RPC 客户端
 	if c.Upstream.AgentService != "" {
-		if cli, err := newRPCClient(c.Consul, c.Upstream.AgentService); err != nil {
+		rpcTimeout := c.Upstream.RPCTimeout
+		if rpcTimeout <= 0 {
+			rpcTimeout = 10 * time.Second
+		}
+		if cli, err := newRPCClient(c.Consul, c.Upstream.AgentService, rpcTimeout); err != nil {
 			logx.Errorf("init agent rpc client failed: service=%s, err=%v", c.Upstream.AgentService, err)
 		} else {
 			ctx.AgentRPC = agentclient.NewAgent(cli)
-			logx.Infof("init agent rpc client success: service=%s", c.Upstream.AgentService)
+			logx.Infof("init agent rpc client success: service=%s (timeout=%v)", c.Upstream.AgentService, rpcTimeout)
 		}
 	}
 
 	return ctx
 }
 
-func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
+func newRPCClient(consulConf config.ConsulConf, serviceName string, timeout time.Duration) (zrpc.Client, error) {
 	if serviceName == "" {
 		return nil, fmt.Errorf("service name is empty")
 	}
@@ -146,8 +151,9 @@ func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client
 	client := zrpc.MustNewClient(zrpc.RpcClientConf{
 		Endpoints: endpoints,
 		NonBlock:  true,
+		Timeout:   int64(timeout / time.Millisecond),
 	})
-	logx.Infof("create rpc client success: service=%s, endpoints=%v", serviceName, endpoints)
+	logx.Infof("create rpc client success: service=%s, endpoints=%v, timeout=%v", serviceName, endpoints, timeout)
 
 	return client, nil
 }

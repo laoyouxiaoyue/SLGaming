@@ -2,8 +2,10 @@ package logic
 
 import (
 	"context"
+	"time"
 
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
 
@@ -28,7 +30,14 @@ func NewGetCompanionRatingRankingLogic(ctx context.Context, svcCtx *svc.ServiceC
 
 // 陪玩排名相关接口
 func (l *GetCompanionRatingRankingLogic) GetCompanionRatingRanking(in *user.GetCompanionRatingRankingRequest) (*user.GetCompanionRatingRankingResponse, error) {
+	startTime := time.Now()
+	defer func() {
+		duration := time.Since(startTime).Seconds()
+		metrics.RankingQueryDuration.WithLabelValues("rating").Observe(duration)
+	}()
+
 	if l.svcCtx.Redis == nil {
+		metrics.RankingQueryTotal.WithLabelValues("rating", "error").Inc()
 		return nil, status.Error(codes.FailedPrecondition, "redis not configured")
 	}
 
@@ -43,8 +52,11 @@ func (l *GetCompanionRatingRankingLogic) GetCompanionRatingRanking(in *user.GetC
 		&helper.RatingRankingBuilder{},
 	)
 	if err != nil {
+		metrics.RankingQueryTotal.WithLabelValues("rating", "error").Inc()
 		return nil, err
 	}
+
+	metrics.RankingQueryTotal.WithLabelValues("rating", "success").Inc()
 
 	return &user.GetCompanionRatingRankingResponse{
 		Rankings: result.Rankings,

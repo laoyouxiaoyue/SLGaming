@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/model"
 	userMQ "SLGaming/back/services/user/internal/mq"
 	"SLGaming/back/services/user/internal/svc"
@@ -25,10 +26,29 @@ type FollowUserLogic struct {
 
 func NewFollowUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FollowUserLogic {
 	return &FollowUserLogic{
+		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
-		Logger: logx.WithContext(ctx),
 	}
+}
+
+// fallbackUpdateFollowCounts 降级处理：直接同步更新数据库中的粉丝数和关注数
+func (l *FollowUserLogic) fallbackUpdateFollowCounts(followerID, followingID uint64) error {
+	return l.svcCtx.DB().Transaction(func(tx *gorm.DB) error {
+		// 增加被关注用户的粉丝数
+		if err := tx.Model(&model.User{}).Where("id = ?", followingID).
+			UpdateColumn("follower_count", gorm.Expr("follower_count + ?", 1)).Error; err != nil {
+			return err
+		}
+
+		// 增加关注者的关注数
+		if err := tx.Model(&model.User{}).Where("id = ?", followerID).
+			UpdateColumn("following_count", gorm.Expr("following_count + ?", 1)).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUserResponse, error) {
@@ -42,6 +62,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 
 	// 2. 防止自我关注
 	if in.OperatorId == in.UserId {
+		metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
 		return nil, status.Error(codes.InvalidArgument, "cannot follow yourself")
 	}
 
@@ -49,18 +70,22 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 	var targetUser model.User
 	if err := l.svcCtx.DB().Where("id = ?", in.UserId).First(&targetUser).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
 			return nil, status.Error(codes.NotFound, "target user not found")
 		}
 		l.Errorf("get target user failed: %v", err)
+		metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
 		return nil, status.Error(codes.Internal, "get target user failed")
 	}
 
 	// 4. 检查是否已经关注
 	var existing model.FollowRelation
 	if err := l.svcCtx.DB().Where("follower_id = ? AND following_id = ?", in.OperatorId, in.UserId).First(&existing).Error; err == nil {
+		metrics.FollowTotal.WithLabelValues("duplicate", "follow").Inc()
 		return nil, status.Error(codes.AlreadyExists, "you have already followed this user")
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		l.Errorf("check follow status failed: %v", err)
+		metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
 		return nil, status.Error(codes.Internal, "check follow status failed")
 	}
 
@@ -103,6 +128,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 
 	if err := l.svcCtx.DB().Create(&followRelation).Error; err != nil {
 		l.Errorf("create follow relation failed: %v", err)
+		metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
 		return nil, status.Error(codes.Internal, "create follow relation failed")
 	}
 
@@ -119,6 +145,8 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 	}
 
 	// 8. 发送关注事件到消息队列，异步更新数据库计数
+	// 降级策略：如果MQ发送失败，直接同步更新数据库计数
+	mqSendSuccess := false
 	if l.svcCtx.EventProducer != nil {
 		payload := userMQ.FollowUserPayload{
 			FollowerID:  in.OperatorId,
@@ -130,12 +158,25 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 			msg.WithTag(userMQ.EventTypeFollowUser())
 			_, err := l.svcCtx.EventProducer.SendSync(l.ctx, msg)
 			if err != nil {
-				l.Errorf("send follow user event failed: %v", err)
+				l.Errorf("send follow user event failed: %v, will fallback to direct db update", err)
+			} else {
+				mqSendSuccess = true
 			}
 		}
 	}
 
+	// 降级处理：MQ发送失败时，直接同步更新数据库计数
+	if !mqSendSuccess {
+		l.Infof("mq send failed or producer not available, fallback to direct db update for follow: follower_id=%d, following_id=%d", in.OperatorId, in.UserId)
+		if err := l.fallbackUpdateFollowCounts(in.OperatorId, in.UserId); err != nil {
+			l.Errorf("fallback update follow counts failed: %v", err)
+			// 降级失败不影响主流程，只是记录错误
+		}
+	}
+
 	l.Infof("user %d followed user %d", in.OperatorId, in.UserId)
+
+	metrics.FollowTotal.WithLabelValues("success", "follow").Inc()
 
 	return &user.FollowUserResponse{
 		Success: true,

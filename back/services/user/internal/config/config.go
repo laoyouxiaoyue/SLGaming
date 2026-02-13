@@ -19,10 +19,11 @@ type NacosConf struct {
 
 type Config struct {
 	zrpc.RpcServerConf
-	Nacos    NacosConf    `json:",optional"` // Nacos 配置
-	Mysql    MysqlConf    `json:",optional"` // Mysql 配置
-	Consul   ConsulConf   `json:",optional"`
-	Upstream UpstreamConf `json:",optional"` // 上游服务配置
+	Nacos       NacosConf    `json:",optional"` // Nacos 配置
+	Mysql       MysqlConf    `json:",optional"` // Mysql 配置
+	Consul      ConsulConf   `json:",optional"`
+	Upstream    UpstreamConf `json:",optional"` // 上游服务配置
+	MetricsPort int          `json:",optional"` // Prometheus metrics 端口
 
 	// CacheRedis 配置（用于排行榜、缓存、布隆过滤器）
 	// 注意：不能命名为 Redis，因为 zrpc.RpcServerConf 已包含 Redis 字段
@@ -39,7 +40,8 @@ type RedisConf struct {
 
 // UpstreamConf 上游服务配置
 type UpstreamConf struct {
-	AgentService string `json:",optional"` // 智能服务名称（用于 Consul 服务发现）
+	AgentService string        `json:",optional"`    // 智能服务名称（用于 Consul 服务发现）
+	RPCTimeout   time.Duration `json:",default=10s"` // RPC 调用超时时间，默认 10 秒
 }
 
 // MysqlConf MySQL 数据库配置

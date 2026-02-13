@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"log"
+	"time"
 
 	"SLGaming/back/pkg/ioc"
 	"SLGaming/back/pkg/lock"
@@ -106,18 +107,22 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	// 初始化 User RPC 客户端（通过 Consul 服务发现）
 	if c.Upstream.UserService != "" {
-		if cli, err := newRPCClient(c.Consul, c.Upstream.UserService); err != nil {
+		rpcTimeout := c.Upstream.RPCTimeout
+		if rpcTimeout <= 0 {
+			rpcTimeout = 10 * time.Second
+		}
+		if cli, err := newRPCClient(c.Consul, c.Upstream.UserService, rpcTimeout); err != nil {
 			logx.Errorf("init user rpc client failed: service=%s, err=%v", c.Upstream.UserService, err)
 		} else {
 			ctx.UserRPC = userclient.NewUser(cli)
-			logx.Infof("init user rpc client success: service=%s", c.Upstream.UserService)
+			logx.Infof("init user rpc client success: service=%s (timeout=%v)", c.Upstream.UserService, rpcTimeout)
 		}
 	}
 
 	return ctx
 }
 
-func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client, error) {
+func newRPCClient(consulConf config.ConsulConf, serviceName string, timeout time.Duration) (zrpc.Client, error) {
 	endpoints, err := orderioc.ResolveServiceEndpoints(consulConf, serviceName)
 	if err != nil {
 		logx.Errorf("resolve service endpoints failed: service=%s, err=%v", serviceName, err)
@@ -127,8 +132,9 @@ func newRPCClient(consulConf config.ConsulConf, serviceName string) (zrpc.Client
 	client := zrpc.MustNewClient(zrpc.RpcClientConf{
 		Endpoints: endpoints,
 		NonBlock:  true,
+		Timeout:   int64(timeout / time.Millisecond),
 	})
 
-	logx.Infof("create rpc client success: service=%s, endpoints=%v", serviceName, endpoints)
+	logx.Infof("create rpc client success: service=%s, endpoints=%v, timeout=%v", serviceName, endpoints, timeout)
 	return client, nil
 }

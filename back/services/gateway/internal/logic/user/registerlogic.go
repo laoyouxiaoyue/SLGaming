@@ -95,7 +95,7 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 	return &types.RegisterResponse{
 		BaseResp: types.BaseResp{
 			Code: 0,
-			Msg:  "success",
+			Msg:  utils.GetSuccessMsg("Register"),
 		},
 		Data: types.RegisterData{
 			AccessToken:  tokenData.AccessToken,

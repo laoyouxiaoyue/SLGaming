@@ -122,7 +122,7 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 			return nil, status.Error(codes.DeadlineExceeded, "acquire lock timeout, please try again later")
 		}
 		l.Errorf("create order with lock failed: %v", err)
-		return nil, status.Error(codes.Internal, "cre111111ate order failed")
+		return nil, status.Error(codes.Internal, "create order failed")
 	}
 
 	return result, createErr

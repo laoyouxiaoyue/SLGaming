@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -73,6 +74,7 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 			helper.LogWarning(l.Logger, helper.OpRegister, "phone already registered", map[string]interface{}{
 				"phone": phone,
 			})
+			metrics.UserRegisterTotal.WithLabelValues("duplicate").Inc()
 			return nil, status.Error(codes.AlreadyExists, "phone already registered")
 		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 			helper.LogError(l.Logger, helper.OpRegister, "check phone exists failed", err, map[string]interface{}{
@@ -109,6 +111,7 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		helper.LogError(l.Logger, helper.OpRegister, "create user failed", err, map[string]interface{}{
 			"phone": phone,
 		})
+		metrics.UserRegisterTotal.WithLabelValues("error").Inc()
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -140,6 +143,8 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		"uid":     userModel.UID,
 		"phone":   phone,
 	})
+
+	metrics.UserRegisterTotal.WithLabelValues("success").Inc()
 
 	return &user.RegisterResponse{
 		Id:  userModel.ID,

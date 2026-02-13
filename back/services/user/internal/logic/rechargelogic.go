@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -61,8 +62,12 @@ func (l *RechargeLogic) Recharge(in *user.RechargeRequest) (*user.RechargeRespon
 		Logger:     l.Logger,
 	})
 	if err != nil {
+		metrics.WalletRechargeTotal.WithLabelValues("error").Inc()
 		return nil, err
 	}
+
+	metrics.WalletRechargeTotal.WithLabelValues("success").Inc()
+	metrics.WalletRechargeAmount.Observe(float64(amount))
 
 	// 落库充值订单（成功态）。若重复回调，做幂等更新。
 	if in.GetBizOrderId() != "" {

@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -30,6 +32,12 @@ func NewLoginByCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Login
 }
 
 func (l *LoginByCodeLogic) LoginByCode(in *user.LoginByCodeRequest) (*user.LoginByCodeResponse, error) {
+	startTime := time.Now()
+	defer func() {
+		duration := time.Since(startTime).Seconds()
+		metrics.UserLoginDuration.WithLabelValues("code").Observe(duration)
+	}()
+
 	phone := strings.TrimSpace(in.GetPhone())
 	if phone == "" {
 		return nil, status.Error(codes.InvalidArgument, "phone is required")
@@ -54,10 +62,14 @@ func (l *LoginByCodeLogic) LoginByCode(in *user.LoginByCodeRequest) (*user.Login
 	var u model.User
 	if err := db.Where("phone = ?", phone).First(&u).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			metrics.UserLoginTotal.WithLabelValues("not_found", "code").Inc()
 			return nil, status.Error(codes.NotFound, "user not found")
 		}
+		metrics.UserLoginTotal.WithLabelValues("error", "code").Inc()
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+
+	metrics.UserLoginTotal.WithLabelValues("success", "code").Inc()
 
 	return &user.LoginByCodeResponse{
 		Id:  u.ID,

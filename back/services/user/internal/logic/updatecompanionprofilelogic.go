@@ -7,6 +7,7 @@ import (
 
 	"SLGaming/back/pkg/snowflake"
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -34,6 +35,7 @@ func NewUpdateCompanionProfileLogic(ctx context.Context, svcCtx *svc.ServiceCont
 func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(in *user.UpdateCompanionProfileRequest) (*user.UpdateCompanionProfileResponse, error) {
 	userID := in.GetUserId()
 	if userID == 0 {
+		metrics.CompanionProfileUpdateTotal.WithLabelValues("error").Inc()
 		return nil, status.Error(codes.InvalidArgument, "user_id is required")
 	}
 
@@ -43,12 +45,15 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(in *user.UpdateComp
 	var u model.User
 	if err := db.Where("id = ?", userID).First(&u).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			metrics.CompanionProfileUpdateTotal.WithLabelValues("error").Inc()
 			return nil, status.Error(codes.NotFound, "user not found")
 		}
+		metrics.CompanionProfileUpdateTotal.WithLabelValues("error").Inc()
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	if !u.IsCompanion() {
+		metrics.CompanionProfileUpdateTotal.WithLabelValues("error").Inc()
 		return nil, status.Error(codes.FailedPrecondition, "user is not a companion")
 	}
 
@@ -100,14 +105,18 @@ func (l *UpdateCompanionProfileLogic) UpdateCompanionProfile(in *user.UpdateComp
 		// 使用明确的 WHERE 条件更新，避免 GORM 报错
 		if err := db.Model(&model.CompanionProfile{}).Where("user_id = ?", userID).Updates(updates).Error; err != nil {
 			l.Errorf("update companion profile failed: user_id=%d, error=%v", userID, err)
+			metrics.CompanionProfileUpdateTotal.WithLabelValues("error").Inc()
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 		// 重新查询获取最新数据
 		if err := db.Where("user_id = ?", userID).First(&profile).Error; err != nil {
 			l.Errorf("query updated companion profile failed: user_id=%d, error=%v", userID, err)
+			metrics.CompanionProfileUpdateTotal.WithLabelValues("error").Inc()
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
+
+	metrics.CompanionProfileUpdateTotal.WithLabelValues("success").Inc()
 
 	return &user.UpdateCompanionProfileResponse{
 		Profile: helper.ToCompanionInfo(&profile),

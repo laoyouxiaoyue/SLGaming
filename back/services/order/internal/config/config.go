@@ -46,7 +46,8 @@ type ConsulServiceConf struct {
 
 // UpstreamConf 上游服务配置
 type UpstreamConf struct {
-	UserService string `json:",optional"` // 用户服务名称（用于 Consul 服务发现）
+	UserService string        `json:",optional"`    // 用户服务名称（用于 Consul 服务发现）
+	RPCTimeout  time.Duration `json:",default=10s"` // RPC 调用超时时间，默认 10 秒
 }
 
 type Config struct {

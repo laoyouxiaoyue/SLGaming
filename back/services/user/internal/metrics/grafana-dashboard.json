@@ -1,0 +1,284 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "User Service Metrics",
+    "tags": ["user-service", "microservices"],
+    "timezone": "Asia/Shanghai",
+    "schemaVersion": 36,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "User Registration Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(user_register_total[5m])) by (status)",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "red", "value": 80}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "User Login Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(user_login_total[5m])) by (status, type)",
+            "legendFormat": "{{status}} - {{type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Login Duration (P99)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(user_login_duration_seconds_bucket[5m])) by (le, type))",
+            "legendFormat": "P99 - {{type}}"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(user_login_duration_seconds_bucket[5m])) by (le, type))",
+            "legendFormat": "P95 - {{type}}"
+          }
+        ],
+        "yAxes": [
+          {"label": "Duration (s)", "min": 0}
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Wallet Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(wallet_recharge_total[5m])) by (status)",
+            "legendFormat": "Recharge {{status}}"
+          },
+          {
+            "expr": "sum(rate(wallet_consume_total[5m])) by (status)",
+            "legendFormat": "Consume {{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 5,
+        "title": "Wallet Amount Distribution",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "sum(rate(wallet_recharge_amount_bucket[5m])) by (le)",
+            "legendFormat": "Recharge",
+            "format": "heatmap"
+          },
+          {
+            "expr": "sum(rate(wallet_consume_amount_bucket[5m])) by (le)",
+            "legendFormat": "Consume",
+            "format": "heatmap"
+          }
+        ],
+        "dataFormat": "tsbuckets",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "Follow/Unfollow Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(user_follow_total[5m])) by (status, action)",
+            "legendFormat": "{{action}} - {{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 7,
+        "title": "Follow Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(user_follow_total{status=\"success\"}[5m])) / sum(rate(user_follow_total[5m])) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 99}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 8,
+        "title": "Companion Applications",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(companion_apply_total[5m])) by (status)",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32}
+      },
+      {
+        "id": 9,
+        "title": "Companion Profile Updates",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(companion_profile_update_total[5m])) by (status)",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32}
+      },
+      {
+        "id": 10,
+        "title": "Ranking Queries",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(ranking_query_total[5m])) by (type, status)",
+            "legendFormat": "{{type}} - {{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40}
+      },
+      {
+        "id": 11,
+        "title": "Ranking Query Duration (P99)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(ranking_query_duration_seconds_bucket[5m])) by (le, type))",
+            "legendFormat": "P99 - {{type}}"
+          }
+        ],
+        "yAxes": [
+          {"label": "Duration (s)", "min": 0}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40}
+      },
+      {
+        "id": 12,
+        "title": "Redis Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(user_redis_operation_total[5m])) by (operation, status)",
+            "legendFormat": "{{operation}} - {{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 48}
+      },
+      {
+        "id": 13,
+        "title": "Redis Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(user_redis_operation_total{status=\"success\"}[5m])) / sum(rate(user_redis_operation_total[5m])) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 99}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48}
+      },
+      {
+        "id": 14,
+        "title": "Database Query Duration (P99)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(user_db_query_duration_seconds_bucket[5m])) by (le, operation))",
+            "legendFormat": "P99 - {{operation}}"
+          }
+        ],
+        "yAxes": [
+          {"label": "Duration (s)", "min": 0}
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 56}
+      },
+      {
+        "id": 15,
+        "title": "MQ Message Processing",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(user_mq_message_total[5m])) by (topic, status)",
+            "legendFormat": "{{topic}} - {{status}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 64}
+      },
+      {
+        "id": 16,
+        "title": "MQ Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(user_mq_message_total{status=\"success\"}[5m])) / sum(rate(user_mq_message_total[5m])) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 99}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 64}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}

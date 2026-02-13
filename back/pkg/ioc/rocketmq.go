@@ -8,7 +8,38 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
+	"github.com/apache/rocketmq-client-go/v2/rlog"
 )
+
+func init() {
+	rlog.SetLogger(&errorOnlyLogger{})
+}
+
+type errorOnlyLogger struct{}
+
+func (l *errorOnlyLogger) Debug(msg string, fields map[string]interface{})   {}
+func (l *errorOnlyLogger) Info(msg string, fields map[string]interface{})    {}
+func (l *errorOnlyLogger) Warning(msg string, fields map[string]interface{}) {}
+func (l *errorOnlyLogger) Error(msg string, fields map[string]interface{}) {
+	if msg != "" {
+		fmt.Printf("[rocketmq] %s", msg)
+		if len(fields) > 0 {
+			fmt.Printf(" %v", fields)
+		}
+		fmt.Println()
+	}
+}
+func (l *errorOnlyLogger) Fatal(msg string, fields map[string]interface{}) {
+	if msg != "" {
+		fmt.Printf("[rocketmq] FATAL: %s", msg)
+		if len(fields) > 0 {
+			fmt.Printf(" %v", fields)
+		}
+		fmt.Println()
+	}
+}
+func (l *errorOnlyLogger) Level(string)            {}
+func (l *errorOnlyLogger) OutputPath(string) error { return nil }
 
 // InitRocketMQProducer 根据配置初始化一个 RocketMQ Producer
 // group 为生产者分组名称，通常按业务划分，例如 "order-producer"

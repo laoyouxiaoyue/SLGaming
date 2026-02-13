@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
@@ -31,6 +33,12 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
+	startTime := time.Now()
+	defer func() {
+		duration := time.Since(startTime).Seconds()
+		metrics.UserLoginDuration.WithLabelValues("password").Observe(duration)
+	}()
+
 	phone := strings.TrimSpace(in.GetPhone())
 	password := strings.TrimSpace(in.GetPassword())
 
@@ -78,6 +86,7 @@ func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 			"phone":   phone,
 			"user_id": u.ID,
 		})
+		metrics.UserLoginTotal.WithLabelValues("error", "password").Inc()
 		return nil, status.Error(codes.PermissionDenied, "invalid credentials")
 	}
 
@@ -87,6 +96,8 @@ func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 		"uid":     u.UID,
 		"phone":   phone,
 	})
+
+	metrics.UserLoginTotal.WithLabelValues("success", "password").Inc()
 
 	return &user.LoginResponse{
 		Id:  u.ID,

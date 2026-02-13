@@ -2,8 +2,10 @@ package logic
 
 import (
 	"context"
+	"time"
 
 	"SLGaming/back/services/user/internal/helper"
+	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/svc"
 	"SLGaming/back/services/user/user"
 
@@ -27,7 +29,14 @@ func NewGetCompanionOrdersRankingLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *GetCompanionOrdersRankingLogic) GetCompanionOrdersRanking(in *user.GetCompanionOrdersRankingRequest) (*user.GetCompanionOrdersRankingResponse, error) {
+	startTime := time.Now()
+	defer func() {
+		duration := time.Since(startTime).Seconds()
+		metrics.RankingQueryDuration.WithLabelValues("orders").Observe(duration)
+	}()
+
 	if l.svcCtx.Redis == nil {
+		metrics.RankingQueryTotal.WithLabelValues("orders", "error").Inc()
 		return nil, status.Error(codes.FailedPrecondition, "redis not configured")
 	}
 
@@ -42,8 +51,11 @@ func (l *GetCompanionOrdersRankingLogic) GetCompanionOrdersRanking(in *user.GetC
 		&helper.OrdersRankingBuilder{},
 	)
 	if err != nil {
+		metrics.RankingQueryTotal.WithLabelValues("orders", "error").Inc()
 		return nil, err
 	}
+
+	metrics.RankingQueryTotal.WithLabelValues("orders", "success").Inc()
 
 	return &user.GetCompanionOrdersRankingResponse{
 		Rankings: result.Rankings,

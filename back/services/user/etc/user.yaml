@@ -50,6 +50,8 @@ RocketMQ:
   AccessKey: ""
   SecretKey: ""
 
+MetricsPort: 9086  # Prometheus metrics 端口
+
 
 #Nacos:
 #  Hosts:
