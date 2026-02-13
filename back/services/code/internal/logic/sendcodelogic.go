@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"SLGaming/back/services/code/code"
+	"SLGaming/back/services/code/internal/metrics"
 	"SLGaming/back/services/code/internal/svc"
 
 	"github.com/google/uuid"
@@ -34,11 +35,14 @@ func NewSendCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendCode
 }
 
 func (l *SendCodeLogic) SendCode(in *code.SendCodeRequest) (*code.SendCodeResponse, error) {
+	start := time.Now()
 	purpose := in.GetPurpose()
 	getTemplate := l.getTemplate(purpose)
 
 	// 手机号限流检查
 	if err := l.checkPhoneRateLimit(in.GetPhone(), purpose, getTemplate.MaxDailySends); err != nil {
+		// 记录限流拦截
+		metrics.CodeRateLimitTotal.WithLabelValues("phone_rate_limit").Inc()
 		return nil, err
 	}
 
@@ -66,11 +70,18 @@ func (l *SendCodeLogic) SendCode(in *code.SendCodeRequest) (*code.SendCodeRespon
 	// 5. 使用 SETEX 设置验证码
 	err = l.svcCtx.Redis.Setex(key, codeValue, int(expire/time.Second))
 	if err != nil {
+		metrics.CodeRedisErrorTotal.Inc()
+		metrics.CodeSendTotal.WithLabelValues(purpose, "failure").Inc()
+		metrics.CodeSendDuration.WithLabelValues(purpose).Observe(time.Since(start).Seconds())
 		return nil, fmt.Errorf("set code failed: %w", err)
 	}
 
 	// 更新限流计数
 	l.updateRateLimitCounters(in.GetPhone(), purpose)
+
+	// 记录成功指标
+	metrics.CodeSendTotal.WithLabelValues(purpose, "success").Inc()
+	metrics.CodeSendDuration.WithLabelValues(purpose).Observe(time.Since(start).Seconds())
 
 	logx.Infof("send code content: %s", renderTemplate(getTemplate.Content, codeValue, int(expire/time.Minute)))
 
@@ -190,6 +201,7 @@ func (l *SendCodeLogic) checkPhoneRateLimit(phone, purpose string, maxDailySends
 			return fmt.Errorf("手机号发送过于频繁，请稍后再试")
 		}
 		if ttl > 0 {
+			metrics.CodeRateLimitTotal.WithLabelValues("phone_interval").Inc()
 			return fmt.Errorf("手机号发送过于频繁，请 %d 秒后再试", ttl)
 		}
 	}
@@ -209,6 +221,7 @@ func (l *SendCodeLogic) checkPhoneRateLimit(phone, purpose string, maxDailySends
 			}
 		}
 		if count >= maxDailySends {
+			metrics.CodeRateLimitTotal.WithLabelValues("phone_daily_limit").Inc()
 			return fmt.Errorf("该手机号今日发送次数已达上限（%d次）", maxDailySends)
 		}
 	}

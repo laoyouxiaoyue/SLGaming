@@ -14,6 +14,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// UpdateCompanionProfileHandler 更新陪玩资料
+// @Summary 更新陪玩资料
+// @Description 更新当前登录用户的陪玩资料信息
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.UpdateCompanionProfileRequest true "更新陪玩资料请求"
+// @Success 200 {object} types.UpdateCompanionProfileResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/user/companion/profile [put]
+// @Security BearerAuth
 func UpdateCompanionProfileHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.UpdateCompanionProfileRequest

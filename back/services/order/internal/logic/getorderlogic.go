@@ -50,6 +50,16 @@ func (l *GetOrderLogic) GetOrder(in *order.GetOrderRequest) (*order.GetOrderResp
 		return nil, status.Error(codes.Internal, "get order failed")
 	}
 
+	// 检查订单是否对该用户已删除
+	if in.GetOperatorId() != 0 {
+		if in.GetOperatorId() == o.BossID && o.BossDeletedAt != nil {
+			return nil, status.Error(codes.NotFound, "order not found")
+		}
+		if in.GetOperatorId() == o.CompanionID && o.CompanionDeletedAt != nil {
+			return nil, status.Error(codes.NotFound, "order not found")
+		}
+	}
+
 	return &order.GetOrderResponse{
 		Order: toOrderInfo(&o),
 	}, nil

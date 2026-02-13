@@ -38,8 +38,8 @@ COPY --from=builder /build/services/code/code .
 # 复制配置文件
 COPY --from=builder /build/services/code/etc ./etc
 
-# 暴露端口
-EXPOSE 8085
+# 暴露端口 (gRPC + Metrics)
+EXPOSE 8085 9085
 
 # 运行应用
 CMD ["./code", "-f", "etc/code.yaml"]

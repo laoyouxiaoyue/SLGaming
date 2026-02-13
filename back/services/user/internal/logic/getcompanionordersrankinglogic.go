@@ -31,16 +31,14 @@ func (l *GetCompanionOrdersRankingLogic) GetCompanionOrdersRanking(in *user.GetC
 		return nil, status.Error(codes.FailedPrecondition, "redis not configured")
 	}
 
-	// 规范化分页参数
-	pagination := helper.NormalizePagination(in.GetPage(), in.GetPageSize())
-
-	// 使用公共排名查询逻辑
+	// 使用公共排名查询逻辑（ZSet只存前100名）
 	result, err := helper.QueryRankingWithProfiles(
 		l.ctx,
 		l.svcCtx,
 		l.Logger,
 		"ranking:orders",
-		pagination,
+		in.GetPage(),
+		in.GetPageSize(),
 		&helper.OrdersRankingBuilder{},
 	)
 	if err != nil {

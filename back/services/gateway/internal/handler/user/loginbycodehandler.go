@@ -15,6 +15,16 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// LoginByCodeHandler 验证码登录
+// @Summary 验证码登录
+// @Description 使用手机号和验证码登录
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.LoginByCodeRequest true "验证码登录请求"
+// @Success 200 {object} types.LoginByCodeResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Router /api/user/login-by-code [post]
 func LoginByCodeHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.LoginByCodeRequest

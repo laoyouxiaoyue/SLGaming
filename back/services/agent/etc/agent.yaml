@@ -23,7 +23,8 @@ Consul:
   Token: ""
   Service:
     Name: agent-rpc
-    ID: agent-rpc-1
+    # ID 留空，自动生成唯一标识（支持多实例）
+    ID: ""
     Address: 0.0.0.0
     Tags:
       - rpc

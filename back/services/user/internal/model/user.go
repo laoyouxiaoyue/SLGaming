@@ -44,6 +44,10 @@ type User struct {
 
 	// 个人简介（所有用户通用）
 	Bio string `gorm:"type:text;comment:个人简介" json:"bio"`
+
+	// 冗余计数字段：粉丝数与关注数（用于快速展示，最终以 follows 表为准）
+	FollowerCount  int64 `gorm:"not null;default:0;comment:粉丝数" json:"follower_count"`
+	FollowingCount int64 `gorm:"not null;default:0;comment:关注数" json:"following_count"`
 }
 
 func (u *User) TableName() string {

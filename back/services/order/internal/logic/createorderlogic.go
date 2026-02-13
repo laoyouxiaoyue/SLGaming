@@ -70,6 +70,9 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	if in.GetBossId() == 0 || in.GetCompanionId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "boss_id and companion_id are required")
 	}
+	if in.GetBossId() == in.GetCompanionId() {
+		return nil, status.Error(codes.InvalidArgument, "cannot create order for yourself")
+	}
 	if in.GetDurationHours() <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "duration_hours must be positive")
 	}

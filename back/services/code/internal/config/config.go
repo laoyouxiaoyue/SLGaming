@@ -9,8 +9,9 @@ type Config struct {
 	Nacos         NacosConf           `json:",optional"` // Nacos 配置
 	Consul        ConsulConf          `json:",optional"`
 	TemplateNacos TemplateNacosConf   `json:",optional"`
-	Template      map[string]Template `json:",optional"` // 加载后的模板
-	RateLimit     RateLimitConf       `json:",optional"` // 限流配置
+	Template      map[string]Template `json:",optional"`     // 加载后的模板
+	RateLimit     RateLimitConf       `json:",optional"`     // 限流配置
+	MetricsPort   int                 `json:",default=9092"` // Prometheus metrics 端口
 }
 
 type Template struct {

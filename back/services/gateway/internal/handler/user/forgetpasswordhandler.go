@@ -15,6 +15,16 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// ForgetPasswordHandler 忘记密码
+// @Summary 忘记密码
+// @Description 通过手机号和验证码重置密码
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.ForgetPasswordRequest true "忘记密码请求"
+// @Success 200 {object} types.ForgetPasswordResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Router /api/user/forgetPassword [put]
 func ForgetPasswordHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.ForgetPasswordRequest

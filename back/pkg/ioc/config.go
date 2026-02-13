@@ -10,8 +10,10 @@ type ConsulConfig interface {
 	GetServiceID() string
 	GetServiceAddress() string
 	GetServiceTags() []string
+	GetServiceMeta() map[string]string
 	GetCheckInterval() string
 	GetCheckTimeout() string
+	GetCheckHTTP() string
 }
 
 // NacosConfig 定义 Nacos 配置接口

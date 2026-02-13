@@ -25,6 +25,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// UploadAvatarHandler 上传头像
+// @Summary 上传头像
+// @Description 上传用户头像，支持 jpg、png、gif、webp 格式，最大 5MB
+// @Tags 用户
+// @Accept multipart/form-data
+// @Produce json
+// @Param avatar formData file true "头像文件"
+// @Success 200 {object} types.UploadAvatarResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/user/avatar [post]
+// @Security BearerAuth
 func UploadAvatarHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		maxSizeMB := svcCtx.Config.Upload.MaxSizeMB

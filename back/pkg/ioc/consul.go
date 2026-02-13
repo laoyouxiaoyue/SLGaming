@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -14,13 +15,15 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-// getLocalIP 获取本机的第一个非回环 IPv4 地址
+// getLocalIP 获取本机的第一个有效的内网 IPv4 地址
+// 优先返回 192.168.x.x 或 10.x.x.x 等私有地址，过滤掉 169.254.x.x (APIPA)
 func getLocalIP() (string, error) {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		return "", fmt.Errorf("get interface addrs: %w", err)
 	}
 
+	var fallbackIP string
 	for _, addr := range addrs {
 		ipNet, ok := addr.(*net.IPNet)
 		if !ok {
@@ -33,10 +36,42 @@ func getLocalIP() (string, error) {
 			continue
 		}
 
-		return ip.String(), nil
+		ipStr := ip.String()
+
+		// 跳过 169.254.x.x (APIPA 自动配置地址)
+		if strings.HasPrefix(ipStr, "169.254.") {
+			continue
+		}
+
+		// 优先返回私有地址：192.168.x.x, 10.x.x.x, 172.16-31.x.x
+		if strings.HasPrefix(ipStr, "192.168.") ||
+			strings.HasPrefix(ipStr, "10.") ||
+			(strings.HasPrefix(ipStr, "172.") && len(ipStr) > 6) {
+			// 检查 172.16-31.x.x
+			parts := strings.Split(ipStr, ".")
+			if len(parts) >= 2 && parts[0] == "172" {
+				secondOctet := 0
+				fmt.Sscanf(parts[1], "%d", &secondOctet)
+				if secondOctet >= 16 && secondOctet <= 31 {
+					return ipStr, nil
+				}
+				continue
+			}
+			return ipStr, nil
+		}
+
+		// 记录第一个有效的非 APIPA 地址作为备选
+		if fallbackIP == "" {
+			fallbackIP = ipStr
+		}
 	}
 
-	return "", fmt.Errorf("no non-loopback IPv4 address found")
+	// 如果没有找到私有地址，返回备选地址
+	if fallbackIP != "" {
+		return fallbackIP, nil
+	}
+
+	return "", fmt.Errorf("no valid local IPv4 address found")
 }
 
 // getPublicIP 获取公网 IP 地址
@@ -103,6 +138,59 @@ func getPublicIPWithFallback() (string, error) {
 	return localIP, nil
 }
 
+// getBestIPForEnv 根据运行环境获取最合适的 IP
+// Windows/Mac 本地开发使用内网 IP，Linux 服务器使用公网 IP
+func getBestIPForEnv() (string, error) {
+	os := runtime.GOOS
+	logx.Infof("[ip_detect] 当前操作系统: %s", os)
+
+	switch os {
+	case "windows", "darwin":
+		// Windows/Mac 本地开发环境：优先使用内网 IP
+		ip, err := getLocalIP()
+		if err == nil {
+			logx.Infof("[ip_detect] %s 环境使用内网IP: %s", os, ip)
+			return ip, nil
+		}
+		// 内网 IP 获取失败，尝试公网 IP
+		logx.Infof("[ip_detect] %s 环境获取内网IP失败: %v，尝试公网IP", os, err)
+		ip, err = getPublicIP()
+		if err != nil {
+			return "", fmt.Errorf("failed to get IP on %s: %w", os, err)
+		}
+		logx.Infof("[ip_detect] %s 环境使用公网IP: %s", os, ip)
+		return ip, nil
+	case "linux":
+		// Linux 服务器环境：优先使用公网 IP
+		ip, err := getPublicIP()
+		if err == nil {
+			logx.Infof("[ip_detect] %s 环境使用公网IP: %s", os, ip)
+			return ip, nil
+		}
+		// 公网 IP 获取失败，使用内网 IP
+		logx.Infof("[ip_detect] %s 环境获取公网IP失败: %v，使用内网IP", os, err)
+		ip, err = getLocalIP()
+		if err != nil {
+			return "", fmt.Errorf("failed to get IP on %s: %w", os, err)
+		}
+		logx.Infof("[ip_detect] %s 环境使用内网IP: %s", os, ip)
+		return ip, nil
+	default:
+		// 其他系统：优先使用内网 IP
+		ip, err := getLocalIP()
+		if err == nil {
+			logx.Infof("[ip_detect] %s 环境使用内网IP: %s", os, ip)
+			return ip, nil
+		}
+		ip, err = getPublicIP()
+		if err != nil {
+			return "", fmt.Errorf("failed to get IP on %s: %w", os, err)
+		}
+		logx.Infof("[ip_detect] %s 环境使用公网IP: %s", os, ip)
+		return ip, nil
+	}
+}
+
 // ConsulRegistrar Consul 服务注册器
 type ConsulRegistrar struct {
 	client    *api.Client
@@ -141,10 +229,10 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 	// 确定服务注册地址
 	serviceAddr := cfg.GetServiceAddress()
 	if strings.TrimSpace(serviceAddr) == "" || serviceAddr == "0.0.0.0" {
-		// 如果配置为空或 0.0.0.0，优先获取公网 IP
+		// 如果配置为空或 0.0.0.0，根据环境自动选择合适的 IP
 		if host == "" || host == "0.0.0.0" {
-			// 优先尝试获取公网 IP，失败则回退到内网 IP
-			ip, err := getPublicIPWithFallback()
+			// 根据操作系统自动选择：Windows/Mac 用内网 IP，Linux 用公网 IP
+			ip, err := getBestIPForEnv()
 			if err != nil {
 				logx.Infof("[consul_register] 警告: 获取IP地址失败, error=%v, 使用回退IP 127.0.0.1", err)
 				serviceAddr = "127.0.0.1"
@@ -155,7 +243,7 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 			serviceAddr = host
 		}
 	} else if serviceAddr == "127.0.0.1" {
-		// 如果明确配置为 127.0.0.1，直接使用，不自动获取公网 IP
+		// 如果明确配置为 127.0.0.1，直接使用，不自动获取 IP
 		serviceAddr = "127.0.0.1"
 	}
 
@@ -204,7 +292,20 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 		Address: serviceAddr,
 		Port:    port,
 		Tags:    cfg.GetServiceTags(),
+		Meta:    cfg.GetServiceMeta(),
 		Check:   check,
+	}
+
+	// 如果配置了额外的 HTTP 健康检查（用于 metrics），添加 Checks
+	if cfg.GetCheckHTTP() != "" {
+		reg.Checks = []*api.AgentServiceCheck{
+			check,
+			{
+				HTTP:     cfg.GetCheckHTTP(),
+				Interval: checkInterval,
+				Timeout:  checkTimeout,
+			},
+		}
 	}
 
 	if err := client.Agent().ServiceRegister(reg); err != nil {

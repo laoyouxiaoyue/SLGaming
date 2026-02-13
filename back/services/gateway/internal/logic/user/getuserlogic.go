@@ -73,13 +73,15 @@ func (l *GetUserLogic) GetUser(req *types.GetUserRequest) (resp *types.GetUserRe
 			Msg:  "success",
 		},
 		Data: types.UserInfo{
-			Id:        rpcResp.User.Id,
-			Uid:       rpcResp.User.Uid,
-			Nickname:  rpcResp.User.Nickname,
-			Phone:     rpcResp.User.Phone,
-			Role:      int(rpcResp.User.Role),
-			AvatarUrl: rpcResp.User.AvatarUrl,
-			Bio:       rpcResp.User.Bio,
+			Id:             rpcResp.User.Id,
+			Uid:            rpcResp.User.Uid,
+			Nickname:       rpcResp.User.Nickname,
+			Phone:          rpcResp.User.Phone,
+			Role:           int(rpcResp.User.Role),
+			AvatarUrl:      rpcResp.User.AvatarUrl,
+			Bio:            rpcResp.User.Bio,
+			FollowerCount:  rpcResp.User.FollowerCount,
+			FollowingCount: rpcResp.User.FollowingCount,
 		},
 	}, nil
 }

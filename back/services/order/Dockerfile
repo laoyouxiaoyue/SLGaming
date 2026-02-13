@@ -38,8 +38,8 @@ COPY --from=builder /build/services/order/order .
 # 复制配置文件
 COPY --from=builder /build/services/order/etc ./etc
 
-# 暴露端口
-EXPOSE 8087
+# 暴露端口 (gRPC + Metrics)
+EXPOSE 8087 9087
 
 # 运行应用
 CMD ["./order", "-f", "etc/order.yaml"]

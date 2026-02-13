@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -23,8 +24,17 @@ type Config struct {
 	Consul   ConsulConf   `json:",optional"`
 	Upstream UpstreamConf `json:",optional"` // 上游服务配置
 
+	// CacheRedis 配置（用于排行榜、缓存、布隆过滤器）
+	// 注意：不能命名为 Redis，因为 zrpc.RpcServerConf 已包含 Redis 字段
+	CacheRedis RedisConf `json:",optional"`
+
 	// RocketMQ 消息队列配置（用于钱包变动、订单结算等异步处理）
 	RocketMQ RocketMQConf `json:",optional"`
+}
+
+// RedisConf Redis 配置（嵌入 go-zero 的 RedisConf）
+type RedisConf struct {
+	redis.RedisConf
 }
 
 // UpstreamConf 上游服务配置

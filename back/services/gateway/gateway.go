@@ -1,6 +1,16 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
+// @title 陪玩平台 API
+// @version 1.0
+// @description 陪玩平台 Gateway 服务 API 文档
+// @host localhost:8888
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description JWT Token，格式: Bearer {token}
+
 package main
 
 import (
@@ -17,11 +27,13 @@ import (
 	"syscall"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
+	_ "SLGaming/back/services/gateway/docs"
 	"SLGaming/back/services/gateway/internal/handler"
 	"SLGaming/back/services/gateway/internal/ioc"
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 
+	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -40,11 +52,19 @@ func main() {
 	// Consul 注册器（用于退出时注销）
 	var registrar *pkgIoc.ConsulRegistrar
 
+	// 限流器中间件（用于优雅停止）
+	var rateLimiterMiddleware *middleware.RateLimiterMiddleware
+
 	// 优雅停机：确保信号时只 Stop/Deregister 一次
 	var stopOnce sync.Once
 	stopServer := func() {
 		stopOnce.Do(func() {
 			logx.Info("shutting down gateway server")
+			// 停止限流器清理协程
+			if rateLimiterMiddleware != nil {
+				rateLimiterMiddleware.Stop()
+				logx.Info("rate limiter stopped")
+			}
 			server.Stop()
 			if registrar != nil {
 				registrar.Deregister()
@@ -66,13 +86,41 @@ func main() {
 	server.Use(middleware.CORSMiddleware(nil))
 
 	// 全局应用限流中间件（在鉴权之前，避免无效请求占用资源）
-	server.Use(middleware.RateLimitMiddleware(&c.RateLimit))
+	// 使用可管理的限流器，支持优雅停止
+	rateLimiterMiddleware = middleware.NewRateLimiterMiddleware(&c.RateLimit)
+	server.Use(rateLimiterMiddleware.Handler)
 
 	// 全局应用鉴权中间件（公开接口会在中间件中自动跳过）
 	server.Use(middleware.AuthMiddleware(ctx))
 
 	// 注册路由处理器
 	handler.RegisterHandlers(server, ctx)
+
+	// 注册 Swagger UI 路由
+	// Swagger UI 入口
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/index.html",
+		Handler: httpSwagger.WrapHandler,
+	})
+	// Swagger JSON 文档
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/doc.json",
+		Handler: httpSwagger.WrapHandler,
+	})
+	// Swagger YAML 文档
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/doc.yaml",
+		Handler: httpSwagger.WrapHandler,
+	})
+	// Swagger UI 静态资源
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/:path",
+		Handler: httpSwagger.WrapHandler,
+	})
 
 	// 提供本地上传文件访问
 	baseURLRaw := strings.TrimSpace(c.Upload.BaseURL)

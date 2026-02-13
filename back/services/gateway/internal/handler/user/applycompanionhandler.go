@@ -12,6 +12,18 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// ApplyCompanionHandler 申请成为陪玩
+// @Summary 申请成为陪玩
+// @Description 申请成为陪玩，需要设置游戏技能和价格
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body types.ApplyCompanionRequest true "申请陪玩请求"
+// @Success 200 {object} types.ApplyCompanionResponse "成功"
+// @Failure 400 {object} types.BaseResp "请求参数错误"
+// @Failure 401 {object} types.BaseResp "未授权"
+// @Router /api/user/companion/apply [post]
+// @Security BearerAuth
 func ApplyCompanionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.ApplyCompanionRequest

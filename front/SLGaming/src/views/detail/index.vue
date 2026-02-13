@@ -1,8 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage, ElMessageBox } from "element-plus";
-import "element-plus/theme-chalk/el-message-box.css";
+import { ElMessage } from "element-plus";
 import { getCompanionPublicProfileAPI } from "@/api/companion/companion.js";
 import { createOrderAPI } from "@/api/order/order";
 import { useWalletStore } from "@/stores/walletStore";
@@ -138,7 +137,6 @@ const createOrder = async () => {
       durationHours: orderForm.value.durationHours,
     };
     await createOrderAPI(data);
-    walletStore.getWallet();
     ElMessage.success({
       message: "支付成功！",
       duration: 1500,

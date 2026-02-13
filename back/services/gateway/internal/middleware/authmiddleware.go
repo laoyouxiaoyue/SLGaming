@@ -41,7 +41,12 @@ func isPublicPath(path string) bool {
 		return true
 	}
 	cleaned := pathClean(path)
+	// 静态资源访问
 	if cleaned == "/uploads" || strings.HasPrefix(cleaned, "/uploads/") {
+		return true
+	}
+	// Swagger UI 文档
+	if cleaned == "/swagger" || strings.HasPrefix(cleaned, "/swagger/") {
 		return true
 	}
 	return publicPaths[cleaned]

@@ -11,6 +11,14 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
+// ListGameSkillsHandler 获取游戏技能列表
+// @Summary 获取游戏技能列表
+// @Description 获取所有支持的游戏技能列表
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Success 200 {object} types.ListGameSkillsResponse "成功"
+// @Router /api/user/gameskills [get]
 func ListGameSkillsHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		l := user.NewListGameSkillsLogic(r.Context(), svcCtx)

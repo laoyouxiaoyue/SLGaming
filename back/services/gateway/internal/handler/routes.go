@@ -8,6 +8,7 @@ import (
 
 	agent "SLGaming/back/services/gateway/internal/handler/agent"
 	code "SLGaming/back/services/gateway/internal/handler/code"
+	follow "SLGaming/back/services/gateway/internal/handler/follow"
 	order "SLGaming/back/services/gateway/internal/handler/order"
 	user "SLGaming/back/services/gateway/internal/handler/user"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -40,6 +41,41 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
+				Path:    "/api/user/follow",
+				Handler: follow.FollowUserHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/follow/mutual",
+				Handler: follow.GetMutualFollowListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/follow/status",
+				Handler: follow.CheckFollowStatusHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/followers",
+				Handler: follow.GetMyFollowersListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/following",
+				Handler: follow.GetMyFollowingListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/user/unfollow",
+				Handler: follow.UnfollowUserHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
 				Path:    "/api/order",
 				Handler: order.CreateOrderHandler(serverCtx),
 			},
@@ -62,6 +98,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/api/order/complete",
 				Handler: order.CompleteOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/order/delete",
+				Handler: order.DeleteOrderHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,

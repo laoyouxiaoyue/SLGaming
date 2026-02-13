@@ -3,6 +3,7 @@ syntax = "v1"
 
 import "base.api"
 import "user.api"
+import "follow.api"
 import "code.api"
 import "order.api"
 import "agent.api"

@@ -40,13 +40,15 @@ func ToUserInfo(u *model.User) *user.UserInfo {
 		return nil
 	}
 	return &user.UserInfo{
-		Id:        u.ID,
-		Uid:       u.UID,
-		Nickname:  u.Nickname,
-		Phone:     u.Phone,
-		Role:      int32(u.Role),
-		AvatarUrl: u.AvatarURL,
-		Bio:       u.Bio,
+		Id:             u.ID,
+		Uid:            u.UID,
+		Nickname:       u.Nickname,
+		Phone:          u.Phone,
+		Role:           int32(u.Role),
+		AvatarUrl:      u.AvatarURL,
+		Bio:            u.Bio,
+		FollowerCount:  u.FollowerCount,
+		FollowingCount: u.FollowingCount,
 	}
 }
 

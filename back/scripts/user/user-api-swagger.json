@@ -31,6 +31,11 @@
       "name": "陪玩信息",
       "description": "陪玩信息查询、更新和列表接口"
     }
+    ,
+    {
+      "name": "关注",
+      "description": "用户关注/粉丝相关接口"
+    }
   ],
   "securityDefinitions": {
     "BearerAuth": {
@@ -274,7 +279,11 @@
                   "phone": "13800138000",
                   "role": 1,
                   "avatarUrl": "https://example.com/avatar/1.jpg",
-                  "bio": "这是一个测试用户"
+                  "bio": "这是一个测试用户",
+                  "balance": 10000,
+                  "frozenBalance": 500,
+                  "follower_count": 10,
+                  "following_count": 5
                 }
               }
             }
@@ -342,7 +351,11 @@
                   "phone": "13800138000",
                   "role": 1,
                   "avatarUrl": "https://example.com/avatar/1.jpg",
-                  "bio": "更新后的个人简介"
+                  "bio": "更新后的个人简介",
+                  "balance": 10000,
+                  "frozenBalance": 500,
+                  "follower_count": 10,
+                  "following_count": 5
                 }
               }
             }
@@ -1234,7 +1247,11 @@
                   "phone": "13800138000",
                   "role": 2,
                   "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=13900000001",
-                  "bio": "专业陪玩，技术过硬，带你上分！"
+                  "bio": "专业陪玩，技术过硬，带你上分！",
+                  "balance": 10000,
+                  "frozenBalance": 500,
+                  "follower_count": 10,
+                  "following_count": 5
                 }
               }
             }
@@ -1613,6 +1630,231 @@
           }
         }
       }
+    },
+    "/user/follow": {
+      "post": {
+        "tags": ["关注"],
+        "summary": "关注用户",
+        "description": "关注目标用户（需要登录）",
+        "operationId": "followUser",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FollowUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "关注成功",
+            "schema": {
+              "$ref": "#/definitions/FollowUserResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/unfollow": {
+      "post": {
+        "tags": ["关注"],
+        "summary": "取消关注",
+        "description": "取消对目标用户的关注（需要登录）",
+        "operationId": "unfollowUser",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UnfollowUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取消关注成功",
+            "schema": {
+              "$ref": "#/definitions/UnfollowUserResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/follow/status": {
+      "get": {
+        "tags": ["关注"],
+        "summary": "检查关注状态",
+        "description": "检查当前用户是否关注目标用户（需要登录）",
+        "operationId": "checkFollowStatus",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "targetUserId",
+            "in": "query",
+            "type": "integer",
+            "format": "int64",
+            "required": true,
+            "description": "目标用户ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "schema": {
+              "$ref": "#/definitions/CheckFollowStatusResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/followers": {
+      "get": {
+        "tags": ["关注"],
+        "summary": "获取粉丝列表",
+        "description": "分页获取当前用户的粉丝列表（需要登录）",
+        "operationId": "getMyFollowersList",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "页码（从1开始）",
+            "minimum": 1,
+            "default": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "description": "每页数量",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          {
+            "name": "userRole",
+            "in": "query",
+            "type": "integer",
+            "description": "过滤用户角色：1=老板,2=陪玩"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetMyFollowersListResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/following": {
+      "get": {
+        "tags": ["关注"],
+        "summary": "获取关注列表",
+        "description": "分页获取当前用户关注的人（需要登录）",
+        "operationId": "getMyFollowingList",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "页码（从1开始）",
+            "minimum": 1,
+            "default": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "description": "每页数量",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          {
+            "name": "userRole",
+            "in": "query",
+            "type": "integer",
+            "description": "过滤用户角色：1=老板,2=陪玩"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetMyFollowingListResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/follow/mutual": {
+      "get": {
+        "tags": ["关注"],
+        "summary": "获取互相关注列表",
+        "description": "分页获取与当前用户互相关注的人（需要登录）",
+        "operationId": "getMutualFollowList",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "页码（从1开始）",
+            "minimum": 1,
+            "default": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "description": "每页数量",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "schema": {
+              "$ref": "#/definitions/GetMutualFollowListResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1865,7 +2107,25 @@
         "bio": {
           "type": "string",
           "description": "个人简介"
-        }
+        },
+        "balance": {
+          "type": "integer",
+          "format": "int64",
+          "description": "帅币可用余额"
+        },
+        "frozenBalance": {
+          "type": "integer",
+          "format": "int64",
+          "description": "冻结帅币余额（预留）"
+        },
+        "follower_count": {
+          "type": "integer",
+           "description": "粉丝数量"
+        },
+        "following_count": {
+          "type": "integer",
+          "description": "关注数量"
+        }     
       }
     },
     "GetUserRequest": {
@@ -2660,6 +2920,281 @@
           "properties": {
             "data": {
               "$ref": "#/definitions/GetCompanionListData"
+            }
+          }
+        }
+      ]
+    }
+    ,
+    "FollowUserRequest": {
+      "type": "object",
+      "required": ["userId"],
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "被关注的用户ID",
+          "example": 2
+        }
+      }
+    },
+    "FollowUserResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "description": "操作是否成功"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "操作消息"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "UnfollowUserRequest": {
+      "type": "object",
+      "required": ["userId"],
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "要取消关注的用户ID",
+          "example": 2
+        }
+      }
+    },
+    "UnfollowUserResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "description": "操作是否成功"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "操作消息"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "UserFollowInfo": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户ID"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "昵称"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "头像URL"
+        },
+        "role": {
+          "type": "integer",
+          "description": "用户角色：1=老板,2=陪玩"
+        },
+        "isVerified": {
+          "type": "boolean",
+          "description": "是否验证（仅陪玩）"
+        },
+        "rating": {
+          "type": "number",
+          "format": "double",
+          "description": "评分（仅陪玩）"
+        },
+        "totalOrders": {
+          "type": "integer",
+          "format": "int64",
+          "description": "总接单数（仅陪玩）"
+        },
+        "isMutual": {
+          "type": "boolean",
+          "description": "是否互相关注"
+        },
+        "followedAt": {
+          "type": "integer",
+          "format": "int64",
+          "description": "关注时间戳"
+        }
+      }
+    },
+    "GetMyFollowingListData": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserFollowInfo"
+          },
+          "description": "关注列表"
+        },
+        "total": {
+          "type": "integer",
+          "description": "总数"
+        },
+        "page": {
+          "type": "integer",
+          "description": "当前页码"
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "每页数量"
+        }
+      }
+    },
+    "GetMyFollowingListResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/GetMyFollowingListData"
+            }
+          }
+        }
+      ]
+    },
+    "GetMyFollowersListData": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserFollowInfo"
+          },
+          "description": "粉丝列表"
+        },
+        "total": {
+          "type": "integer",
+          "description": "总数"
+        },
+        "page": {
+          "type": "integer",
+          "description": "当前页码"
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "每页数量"
+        }
+      }
+    },
+    "GetMyFollowersListResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/GetMyFollowersListData"
+            }
+          }
+        }
+      ]
+    },
+    "GetMutualFollowListData": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserFollowInfo"
+          },
+          "description": "互相关注列表"
+        },
+        "total": {
+          "type": "integer",
+          "description": "总数"
+        },
+        "page": {
+          "type": "integer",
+          "description": "当前页码"
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "每页数量"
+        }
+      }
+    },
+    "GetMutualFollowListResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/GetMutualFollowListData"
+            }
+          }
+        }
+      ]
+    },
+    "CheckFollowStatusData": {
+      "type": "object",
+      "properties": {
+        "isFollowing": {
+          "type": "boolean",
+          "description": "当前用户是否关注目标用户"
+        },
+        "isFollowed": {
+          "type": "boolean",
+          "description": "目标用户是否关注当前用户"
+        },
+        "isMutual": {
+          "type": "boolean",
+          "description": "是否互相关注"
+        }
+      }
+    },
+    "CheckFollowStatusResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseResp"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/definitions/CheckFollowStatusData"
             }
           }
         }

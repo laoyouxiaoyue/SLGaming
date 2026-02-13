@@ -11,8 +11,10 @@ type ConsulConfigAdapter struct {
 		ID            string
 		Address       string
 		Tags          []string
+		Meta          map[string]string
 		CheckInterval string
 		CheckTimeout  string
+		CheckHTTP     string
 	}
 }
 
@@ -46,6 +48,14 @@ func (c *ConsulConfigAdapter) GetCheckInterval() string {
 
 func (c *ConsulConfigAdapter) GetCheckTimeout() string {
 	return c.Service.CheckTimeout
+}
+
+func (c *ConsulConfigAdapter) GetServiceMeta() map[string]string {
+	return c.Service.Meta
+}
+
+func (c *ConsulConfigAdapter) GetCheckHTTP() string {
+	return c.Service.CheckHTTP
 }
 
 // NacosConfigAdapter Nacos 配置适配器

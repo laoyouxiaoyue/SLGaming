@@ -146,3 +146,34 @@ func (s *UserServer) DeleteGameSkill(ctx context.Context, in *user.DeleteGameSki
 	l := logic.NewDeleteGameSkillLogic(ctx, s.svcCtx)
 	return l.DeleteGameSkill(in)
 }
+
+// 关注相关接口
+func (s *UserServer) FollowUser(ctx context.Context, in *user.FollowUserRequest) (*user.FollowUserResponse, error) {
+	l := logic.NewFollowUserLogic(ctx, s.svcCtx)
+	return l.FollowUser(in)
+}
+
+func (s *UserServer) UnfollowUser(ctx context.Context, in *user.UnfollowUserRequest) (*user.UnfollowUserResponse, error) {
+	l := logic.NewUnfollowUserLogic(ctx, s.svcCtx)
+	return l.UnfollowUser(in)
+}
+
+func (s *UserServer) GetMyFollowingList(ctx context.Context, in *user.GetMyFollowingListRequest) (*user.GetMyFollowingListResponse, error) {
+	l := logic.NewGetMyFollowingListLogic(ctx, s.svcCtx)
+	return l.GetMyFollowingList(in)
+}
+
+func (s *UserServer) GetMyFollowersList(ctx context.Context, in *user.GetMyFollowersListRequest) (*user.GetMyFollowersListResponse, error) {
+	l := logic.NewGetMyFollowersListLogic(ctx, s.svcCtx)
+	return l.GetMyFollowersList(in)
+}
+
+func (s *UserServer) GetMutualFollowList(ctx context.Context, in *user.GetMutualFollowListRequest) (*user.GetMutualFollowListResponse, error) {
+	l := logic.NewGetMutualFollowListLogic(ctx, s.svcCtx)
+	return l.GetMutualFollowList(in)
+}
+
+func (s *UserServer) CheckFollowStatus(ctx context.Context, in *user.CheckFollowStatusRequest) (*user.CheckFollowStatusResponse, error) {
+	l := logic.NewCheckFollowStatusLogic(ctx, s.svcCtx)
+	return l.CheckFollowStatus(in)
+}

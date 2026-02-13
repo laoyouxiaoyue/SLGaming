@@ -36,6 +36,9 @@ onMounted(() => {
             <a href="javascript:;" @click="$router.push('/')"><sl-icon name="icon-shouye" />首页</a>
           </li>
           <li>
+            <a href="javascript:;" @click="$router.push('/')"><sl-icon name="icon-shouye" />首页</a>
+          </li>
+          <li>
             <a href="javascript:;" @click="$router.push('/order/boss')"
               ><sl-icon name="icon-dingdan1" />我的订单</a
             >

@@ -38,8 +38,8 @@ COPY --from=builder /build/services/user/user .
 # 复制配置文件
 COPY --from=builder /build/services/user/etc ./etc
 
-# 暴露端口
-EXPOSE 8086
+# 暴露端口 (gRPC + Metrics)
+EXPOSE 8086 9086
 
 # 运行应用
 CMD ["./user", "-f", "etc/user.yaml"]

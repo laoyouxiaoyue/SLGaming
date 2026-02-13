@@ -1,0 +1,139 @@
+// api/gateway/follow.api
+syntax = "v1"
+
+import "base.api"
+
+// 关注相关类型
+type UserFollowInfo {
+	UserId     uint64 `json:"userId"` // 用户ID
+	Nickname   string `json:"nickname"` // 昵称
+	AvatarUrl  string `json:"avatarUrl"` // 头像URL
+	IsMutual   bool   `json:"isMutual"` // 是否互相关注
+	FollowedAt int64  `json:"followedAt"` // 关注时间戳
+}
+
+type FollowUserRequest {
+	// 操作人ID由后端从token获取
+	UserId uint64 `json:"userId"` // 被关注的用户ID
+}
+
+type FollowUserResponse {
+	BaseResp
+	Data FollowUserData `json:"data"`
+}
+
+type FollowUserData {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type UnfollowUserRequest {
+	// 操作人ID由后端从token获取
+	UserId uint64 `json:"userId"` // 要取消关注的用户ID
+}
+
+type UnfollowUserResponse {
+	BaseResp
+	Data UnfollowUserData `json:"data"`
+}
+
+type UnfollowUserData {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type GetMyFollowingListRequest {
+	// 操作人ID由后端从token获取
+	Page     int    `form:"page,optional"`
+	PageSize int    `form:"pageSize,optional"`
+	Keyword  string `form:"keyword,optional"` // 搜索关键词（昵称模糊匹配）
+}
+
+type GetMyFollowersListRequest {
+	// 操作人ID由后端从token获取
+	Page     int `form:"page,optional"`
+	PageSize int `form:"pageSize,optional"`
+}
+
+type GetMutualFollowListRequest {
+	// 操作人ID由后端从token获取
+	Page     int `form:"page,optional"`
+	PageSize int `form:"pageSize,optional"`
+}
+
+type GetMyFollowingListData {
+	Users    []UserFollowInfo `json:"users"`
+	Total    int              `json:"total"`
+	Page     int              `json:"page"`
+	PageSize int              `json:"pageSize"`
+}
+
+type GetMyFollowingListResponse {
+	BaseResp
+	Data GetMyFollowingListData `json:"data"`
+}
+
+type GetMyFollowersListData {
+	Users    []UserFollowInfo `json:"users"`
+	Total    int              `json:"total"`
+	Page     int              `json:"page"`
+	PageSize int              `json:"pageSize"`
+}
+
+type GetMyFollowersListResponse {
+	BaseResp
+	Data GetMyFollowersListData `json:"data"`
+}
+
+type GetMutualFollowListData {
+	Users    []UserFollowInfo `json:"users"`
+	Total    int              `json:"total"`
+	Page     int              `json:"page"`
+	PageSize int              `json:"pageSize"`
+}
+
+type GetMutualFollowListResponse {
+	BaseResp
+	Data GetMutualFollowListData `json:"data"`
+}
+
+type CheckFollowStatusRequest {
+	// 操作人ID由后端从token获取
+	TargetUserId uint64 `form:"targetUserId"` // 目标用户ID
+}
+
+type CheckFollowStatusResponse {
+	BaseResp
+	Data CheckFollowStatusData `json:"data"`
+}
+
+type CheckFollowStatusData {
+	IsFollowing bool `json:"isFollowing"` // 当前用户是否关注目标用户
+	IsFollowed  bool `json:"isFollowed"` // 目标用户是否关注当前用户
+	IsMutual    bool `json:"isMutual"` // 是否互相关注
+}
+
+// 用户服务接口定义（关注相关）
+@server (
+	group: follow
+)
+service gateway {
+	@handler followUser
+	post /api/user/follow (FollowUserRequest) returns (FollowUserResponse)
+
+	@handler unfollowUser
+	post /api/user/unfollow (UnfollowUserRequest) returns (UnfollowUserResponse)
+
+	@handler getMyFollowingList
+	get /api/user/following (GetMyFollowingListRequest) returns (GetMyFollowingListResponse)
+
+	@handler getMyFollowersList
+	get /api/user/followers (GetMyFollowersListRequest) returns (GetMyFollowersListResponse)
+
+	@handler getMutualFollowList
+	get /api/user/follow/mutual (GetMutualFollowListRequest) returns (GetMutualFollowListResponse)
+
+	@handler checkFollowStatus
+	get /api/user/follow/status (CheckFollowStatusRequest) returns (CheckFollowStatusResponse)
+}
+

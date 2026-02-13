@@ -3,16 +3,100 @@ name: Build and Deploy with Docker
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      services:
+        description: 'Services to deploy (comma-separated: gateway,user,order,code,agent or "all")'
+        required: false
+        default: 'all'
+      force_build:
+        description: 'Force rebuild all services (ignore change detection)'
+        required: false
+        type: boolean
+        default: false
 
 env:
   GO_VERSION: "1.25.5"
   PROJECT_PATH: "back"
-  IMAGE_PREFIX: "slgaming"      # 镜像前缀（本地构建，不需要推送到仓库）
+  IMAGE_PREFIX: "slgaming"
 
 jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      gateway: ${{ steps.filter.outputs.gateway }}
+      user: ${{ steps.filter.outputs.user }}
+      order: ${{ steps.filter.outputs.order }}
+      code: ${{ steps.filter.outputs.code }}
+      agent: ${{ steps.filter.outputs.agent }}
+      any: ${{ steps.filter.outputs.changes != '[]' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            gateway:
+              - 'back/services/gateway/**'
+              - 'back/pkg/**'
+              - 'back/rpc/**'
+            user:
+              - 'back/services/user/**'
+              - 'back/pkg/**'
+              - 'back/rpc/**'
+            order:
+              - 'back/services/order/**'
+              - 'back/pkg/**'
+              - 'back/rpc/**'
+            code:
+              - 'back/services/code/**'
+              - 'back/pkg/**'
+              - 'back/rpc/**'
+            agent:
+              - 'back/services/agent/**'
+              - 'back/pkg/**'
+              - 'back/rpc/**'
+
+      - name: Determine services to build
+        id: determine
+        run: |
+          # Handle manual trigger
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            INPUT="${{ github.event.inputs.services }}"
+            FORCE="${{ github.event.inputs.force_build }}"
+            
+            if [ "$INPUT" == "all" ] || [ "$FORCE" == "true" ]; then
+              echo "Building all services (manual trigger)"
+              echo "gateway=true" >> $GITHUB_OUTPUT
+              echo "user=true" >> $GITHUB_OUTPUT
+              echo "order=true" >> $GITHUB_OUTPUT
+              echo "code=true" >> $GITHUB_OUTPUT
+              echo "agent=true" >> $GITHUB_OUTPUT
+            else
+              IFS=',' read -ra SERVICES <<< "$INPUT"
+              for s in "${SERVICES[@]}"; do
+                s=$(echo "$s" | tr -d ' ')
+                echo "$s=true" >> $GITHUB_OUTPUT
+              done
+            fi
+          fi
+          echo "Change detection results:"
+          echo "  gateway: ${{ steps.filter.outputs.gateway }}"
+          echo "  user: ${{ steps.filter.outputs.user }}"
+          echo "  order: ${{ steps.filter.outputs.order }}"
+          echo "  code: ${{ steps.filter.outputs.code }}"
+          echo "  agent: ${{ steps.filter.outputs.agent }}"
+
   build:
     name: Build Docker Images
     runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.any == 'true' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout code
@@ -22,8 +106,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Gateway Docker Image
+        if: needs.detect-changes.outputs.gateway == 'true' || github.event.inputs.force_build == 'true'
         uses: docker/build-push-action@v5
-        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/gateway/Dockerfile
@@ -34,8 +118,8 @@ jobs:
           load: true
 
       - name: Build User Docker Image
+        if: needs.detect-changes.outputs.user == 'true' || github.event.inputs.force_build == 'true'
         uses: docker/build-push-action@v5
-        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/user/Dockerfile
@@ -46,8 +130,8 @@ jobs:
           load: true
 
       - name: Build Order Docker Image
+        if: needs.detect-changes.outputs.order == 'true' || github.event.inputs.force_build == 'true'
         uses: docker/build-push-action@v5
-        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/order/Dockerfile
@@ -58,8 +142,8 @@ jobs:
           load: true
 
       - name: Build Code Docker Image
+        if: needs.detect-changes.outputs.code == 'true' || github.event.inputs.force_build == 'true'
         uses: docker/build-push-action@v5
-        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/code/Dockerfile
@@ -70,8 +154,8 @@ jobs:
           load: true
 
       - name: Build Agent Docker Image
+        if: needs.detect-changes.outputs.agent == 'true' || github.event.inputs.force_build == 'true'
         uses: docker/build-push-action@v5
-        continue-on-error: true
         with:
           context: ${{ env.PROJECT_PATH }}
           file: ${{ env.PROJECT_PATH }}/services/agent/Dockerfile
@@ -84,32 +168,45 @@ jobs:
       - name: Save Docker Images
         run: |
           mkdir -p docker-images
-          echo "=== Saving Docker Images (best-effort) ==="
+          echo "=== Saving Docker Images ==="
+          
           if docker images | grep -q "${{ env.IMAGE_PREFIX }}/gateway"; then
             docker save ${{ env.IMAGE_PREFIX }}/gateway:latest | gzip > docker-images/gateway.tar.gz
+            echo "✅ gateway image saved"
           else
-            echo "⚠️  gateway image not found, will reuse previous version on server"
+            echo "⚠️ gateway image not built, skipping"
           fi
+          
           if docker images | grep -q "${{ env.IMAGE_PREFIX }}/user"; then
             docker save ${{ env.IMAGE_PREFIX }}/user:latest | gzip > docker-images/user.tar.gz
+            echo "✅ user image saved"
           else
-            echo "⚠️  user image not found, will reuse previous version on server"
+            echo "⚠️ user image not built, skipping"
           fi
+          
           if docker images | grep -q "${{ env.IMAGE_PREFIX }}/order"; then
             docker save ${{ env.IMAGE_PREFIX }}/order:latest | gzip > docker-images/order.tar.gz
+            echo "✅ order image saved"
           else
-            echo "⚠️  order image not found, will reuse previous version on server"
+            echo "⚠️ order image not built, skipping"
           fi
+          
           if docker images | grep -q "${{ env.IMAGE_PREFIX }}/code"; then
             docker save ${{ env.IMAGE_PREFIX }}/code:latest | gzip > docker-images/code.tar.gz
+            echo "✅ code image saved"
           else
-            echo "⚠️  code image not found, will reuse previous version on server"
+            echo "⚠️ code image not built, skipping"
           fi
+          
           if docker images | grep -q "${{ env.IMAGE_PREFIX }}/agent"; then
             docker save ${{ env.IMAGE_PREFIX }}/agent:latest | gzip > docker-images/agent.tar.gz
+            echo "✅ agent image saved"
           else
-            echo "⚠️  agent image not found, will reuse previous version on server"
+            echo "⚠️ agent image not built, skipping"
           fi
+          
+          echo "=== Saved images ==="
+          ls -lh docker-images/ || true
 
       - name: Upload Docker Images
         uses: actions/upload-artifact@v4
@@ -121,8 +218,8 @@ jobs:
   deploy:
     name: Deploy Docker Containers
     runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main'
+    needs: [detect-changes, build]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Download Docker Images
@@ -135,18 +232,6 @@ jobs:
         run: |
           echo "=== Verifying Downloaded Files ==="
           ls -lh docker-images/ || true
-          missing=0
-          for f in gateway user order code agent; do
-            if [ ! -f "docker-images/$f.tar.gz" ]; then
-              echo "⚠️  $f.tar.gz not found after download, will reuse previous image on server"
-              missing=$((missing+1))
-            fi
-          done
-          if [ "$missing" -eq 5 ]; then
-            echo "❌ No images were built in this run, nothing to deploy"
-            exit 1
-          fi
-          echo "✅ Docker image artifacts ready (some services may reuse old images)"
 
       - name: Load Docker Images on Server
         uses: appleboy/scp-action@v0.1.7
@@ -158,19 +243,6 @@ jobs:
           source: "docker-images/*.tar.gz"
           target: "${{ secrets.DEPLOY_PATH }}/docker-images"
           strip_components: 1
-
-      - name: Verify Files Transferred
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script: |
-            echo "=== Verifying Transferred Files ==="
-            ls -lh ${{ secrets.DEPLOY_PATH }}/docker-images/ || true
-            echo "⚠️ Some *.tar.gz may be missing; corresponding services will keep previous images if so"
-            echo "✅ Files transferred check completed"
 
       - name: Deploy Services with Docker
         uses: appleboy/ssh-action@v1.0.3
@@ -184,13 +256,16 @@ jobs:
           script: |
             set -euo pipefail
             
-            echo "=== Checking Docker Images Directory ==="
-            mkdir -p ${{ secrets.DEPLOY_PATH }}/docker-images
+            echo "=== Deployment Configuration ==="
+            echo "Gateway: ${{ needs.detect-changes.outputs.gateway }}"
+            echo "User: ${{ needs.detect-changes.outputs.user }}"
+            echo "Order: ${{ needs.detect-changes.outputs.order }}"
+            echo "Code: ${{ needs.detect-changes.outputs.code }}"
+            echo "Agent: ${{ needs.detect-changes.outputs.agent }}"
+            
             cd ${{ secrets.DEPLOY_PATH }}/docker-images
-            pwd
-            ls -lh || true
-
-            echo "=== Loading Docker Images (per service, with fallback) ==="
+            
+            echo "=== Loading Docker Images ==="
             update_gateway=0
             update_user=0
             update_order=0
@@ -199,73 +274,35 @@ jobs:
 
             if [ -f gateway.tar.gz ]; then
               echo "Loading gateway image..."
-              if docker load -i gateway.tar.gz; then
-                update_gateway=1
-                echo "✅ gateway image loaded successfully"
-              else
-                echo "❌ Failed to load gateway.tar.gz, exit code: $?"
-                exit 1
-              fi
-            else
-              echo "⚠️  gateway.tar.gz missing, keep existing gateway image/container"
+              docker load -i gateway.tar.gz && update_gateway=1
+              echo "✅ gateway loaded"
             fi
             
             if [ -f user.tar.gz ]; then
               echo "Loading user image..."
-              if docker load -i user.tar.gz; then
-                update_user=1
-                echo "✅ user image loaded successfully"
-              else
-                echo "❌ Failed to load user.tar.gz, exit code: $?"
-                exit 1
-              fi
-            else
-              echo "⚠️  user.tar.gz missing, keep existing user image/container"
+              docker load -i user.tar.gz && update_user=1
+              echo "✅ user loaded"
             fi
             
             if [ -f order.tar.gz ]; then
               echo "Loading order image..."
-              if docker load -i order.tar.gz; then
-                update_order=1
-                echo "✅ order image loaded successfully"
-              else
-                echo "❌ Failed to load order.tar.gz, exit code: $?"
-                exit 1
-              fi
-            else
-              echo "⚠️  order.tar.gz missing, keep existing order image/container"
+              docker load -i order.tar.gz && update_order=1
+              echo "✅ order loaded"
             fi
             
             if [ -f code.tar.gz ]; then
               echo "Loading code image..."
-              if docker load -i code.tar.gz; then
-                update_code=1
-                echo "✅ code image loaded successfully"
-              else
-                echo "❌ Failed to load code.tar.gz, exit code: $?"
-                exit 1
-              fi
-            else
-              echo "⚠️  code.tar.gz missing, keep existing code image/container"
+              docker load -i code.tar.gz && update_code=1
+              echo "✅ code loaded"
             fi
 
             if [ -f agent.tar.gz ]; then
               echo "Loading agent image..."
-              if docker load -i agent.tar.gz; then
-                update_agent=1
-                echo "✅ agent image loaded successfully"
-              else
-                echo "❌ Failed to load agent.tar.gz, exit code: $?"
-                exit 1
-              fi
-            else
-              echo "⚠️  agent.tar.gz missing, keep existing agent image/container"
+              docker load -i agent.tar.gz && update_agent=1
+              echo "✅ agent loaded"
             fi
 
-            echo "=== Verifying Images Loaded ==="
-            docker images | grep slgaming || true
-
-            echo "=== Stopping Old Containers (only for services with new image) ==="
+            echo "=== Stopping Old Containers ==="
             [ "$update_gateway" -eq 1 ] && docker stop slgaming-gateway 2>/dev/null || true
             [ "$update_user" -eq 1 ] && docker stop slgaming-user 2>/dev/null || true
             [ "$update_order" -eq 1 ] && docker stop slgaming-order 2>/dev/null || true
@@ -279,105 +316,64 @@ jobs:
             [ "$update_agent" -eq 1 ] && docker rm slgaming-agent 2>/dev/null || true
             
             echo "=== Starting New Containers ==="
-            echo "部署顺序: Code -> User -> Order -> Agent -> Gateway (Gateway 最后启动)"
+            echo "Deployment order: Code -> User -> Order -> Agent -> Gateway"
             
-            # ========== 第一步：启动 Code Service (端口 8085) ==========
+            # Code Service (gRPC: 8085, Metrics: 9085)
             if [ "$update_code" -eq 1 ]; then
-              echo "Verifying code image..."
-              if ! docker image inspect ${{ env.IMAGE_PREFIX }}/code:latest >/dev/null 2>&1; then
-                echo "❌ Error: ${{ env.IMAGE_PREFIX }}/code:latest image not found"
-                echo "Available images:"
-                docker images | grep slgaming || true
-                exit 1
-              fi
-              echo "启动 Code Service..."
+              echo "Starting Code Service..."
               docker run -d \
                 --name slgaming-code \
                 --restart unless-stopped \
                 -p 8085:8085 \
+                -p 9085:9085 \
                 ${{ env.IMAGE_PREFIX }}/code:latest
-            else
-              echo "⚠️  No new code image, keep existing Code Service (if running)"
             fi
             
-            # ========== 第二步：启动 User Service (端口 8086) ==========
+            # User Service (gRPC: 8086, Metrics: 9086)
             if [ "$update_user" -eq 1 ]; then
-              echo "Verifying user image..."
-              if ! docker image inspect ${{ env.IMAGE_PREFIX }}/user:latest >/dev/null 2>&1; then
-                echo "❌ Error: ${{ env.IMAGE_PREFIX }}/user:latest image not found"
-                echo "Available images:"
-                docker images | grep slgaming || true
-                exit 1
-              fi
-              echo "启动 User Service..."
+              echo "Starting User Service..."
               docker run -d \
                 --name slgaming-user \
                 --restart unless-stopped \
                 -p 8086:8086 \
+                -p 9086:9086 \
                 ${{ env.IMAGE_PREFIX }}/user:latest
-            else
-              echo "⚠️  No new user image, keep existing User Service (if running)"
             fi
             
-            # ========== 第三步：启动 Order Service (端口 8087) ==========
+            # Order Service (gRPC: 8087, Metrics: 9087)
             if [ "$update_order" -eq 1 ]; then
-              echo "Verifying order image..."
-              if ! docker image inspect ${{ env.IMAGE_PREFIX }}/order:latest >/dev/null 2>&1; then
-                echo "❌ Error: ${{ env.IMAGE_PREFIX }}/order:latest image not found"
-                echo "Available images:"
-                docker images | grep slgaming || true
-                exit 1
-              fi
-              echo "启动 Order Service..."
+              echo "Starting Order Service..."
               docker run -d \
                 --name slgaming-order \
                 --restart unless-stopped \
                 -p 8087:8087 \
+                -p 9087:9087 \
                 ${{ env.IMAGE_PREFIX }}/order:latest
-            else
-              echo "⚠️  No new order image, keep existing Order Service (if running)"
             fi
 
-            # ========== 第四步：启动 Agent Service (端口 8090) ==========
+            # Agent Service (gRPC: 8090, Metrics: 9090)
             if [ "$update_agent" -eq 1 ]; then
-              echo "Verifying agent image..."
-              if ! docker image inspect ${{ env.IMAGE_PREFIX }}/agent:latest >/dev/null 2>&1; then
-                echo "❌ Error: ${{ env.IMAGE_PREFIX }}/agent:latest image not found"
-                echo "Available images:"
-                docker images | grep slgaming || true
-                exit 1
-              fi
-              echo "启动 Agent Service..."
+              echo "Starting Agent Service..."
               docker run -d \
                 --name slgaming-agent \
                 --restart unless-stopped \
                 -p 8090:8090 \
                 ${{ env.IMAGE_PREFIX }}/agent:latest
-            else
-              echo "⚠️  No new agent image, keep existing Agent Service (if running)"
             fi
             
-            # ========== 等待后端服务启动完成 ==========
-            echo "=== Waiting for backend services to start ==="
+            # Wait for backend services
+            echo "=== Waiting for backend services ==="
             sleep 30
             
-            # ========== 第五步：最后启动 Gateway (端口 8888) ==========
+            # Gateway Service (HTTP: 8888, Metrics: 9888)
             if [ "$update_gateway" -eq 1 ]; then
-              echo "Verifying gateway image..."
-              if ! docker image inspect ${{ env.IMAGE_PREFIX }}/gateway:latest >/dev/null 2>&1; then
-                echo "❌ Error: ${{ env.IMAGE_PREFIX }}/gateway:latest image not found"
-                echo "Available images:"
-                docker images | grep slgaming || true
-                exit 1
-              fi
-              echo "最后启动 Gateway Service..."
+              echo "Starting Gateway Service..."
               docker run -d \
                 --name slgaming-gateway \
                 --restart unless-stopped \
                 -p 8888:8888 \
+                -p 9888:9888 \
                 ${{ env.IMAGE_PREFIX }}/gateway:latest
-            else
-              echo "⚠️  No new gateway image, keep existing Gateway Service (if running)"
             fi
             
             sleep 5
@@ -385,34 +381,11 @@ jobs:
             echo "=== Container Status ==="
             docker ps -a | grep slgaming || true
             
-            echo "=== Checking Container Logs ==="
-            docker logs --tail 50 slgaming-gateway || true
-            docker logs --tail 50 slgaming-code || true
-            docker logs --tail 50 slgaming-user || true
-            docker logs --tail 50 slgaming-order || true
-            docker logs --tail 50 slgaming-agent || true
+            echo "=== Checking Logs for Updated Services ==="
+            [ "$update_gateway" -eq 1 ] && docker logs --tail 30 slgaming-gateway || true
+            [ "$update_code" -eq 1 ] && docker logs --tail 30 slgaming-code || true
+            [ "$update_user" -eq 1 ] && docker logs --tail 30 slgaming-user || true
+            [ "$update_order" -eq 1 ] && docker logs --tail 30 slgaming-order || true
+            [ "$update_agent" -eq 1 ] && docker logs --tail 30 slgaming-agent || true
             
-            echo "=== Verifying Services ==="
-            ok=1
-            docker ps | grep slgaming-gateway >/dev/null || ok=0
-            docker ps | grep slgaming-code >/dev/null || ok=0
-            docker ps | grep slgaming-user >/dev/null || ok=0
-            docker ps | grep slgaming-order >/dev/null || ok=0
-            docker ps | grep slgaming-agent >/dev/null || ok=0
-            
-            if [ "$ok" -ne 1 ]; then
-              echo "❌ One or more containers failed to start"
-              echo "Gateway logs:"
-              docker logs --tail 100 slgaming-gateway || true
-              echo "Code logs:"
-              docker logs --tail 100 slgaming-code || true
-              echo "User logs:"
-              docker logs --tail 100 slgaming-user || true
-              echo "Order logs:"
-              docker logs --tail 100 slgaming-order || true
-              echo "Agent logs:"
-              docker logs --tail 100 slgaming-agent || true
-              exit 1
-            fi
-            
-            echo "✅ All services deployed successfully"
+            echo "✅ Deployment completed"

@@ -38,8 +38,8 @@ COPY --from=builder /build/services/gateway/gateway .
 # 复制配置文件
 COPY --from=builder /build/services/gateway/etc ./etc
 
-# 暴露端口
-EXPOSE 8888
+# 暴露端口 (HTTP + Metrics)
+EXPOSE 8888 9888
 
 # 运行应用
 CMD ["./gateway", "-f", "etc/gateway.yaml"]

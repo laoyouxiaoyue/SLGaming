@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"SLGaming/back/services/code/code"
+	"SLGaming/back/services/code/internal/metrics"
 	"SLGaming/back/services/code/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,6 +35,7 @@ func NewVerifyCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Verify
 }
 
 func (l *VerifyCodeLogic) VerifyCode(in *code.VerifyCodeRequest) (*code.VerifyCodeResponse, error) {
+	start := time.Now()
 	phone := strings.TrimSpace(in.GetPhone())
 	if phone == "" {
 		phone = "unknown"
@@ -45,9 +47,15 @@ func (l *VerifyCodeLogic) VerifyCode(in *code.VerifyCodeRequest) (*code.VerifyCo
 	}
 
 	if err := l.checkVerifyPhoneDailyLimit(phone); err != nil {
+		metrics.CodeRateLimitTotal.WithLabelValues("verify_phone_daily").Inc()
+		metrics.CodeVerifyTotal.WithLabelValues("failure").Inc()
+		metrics.CodeVerifyDuration.Observe(time.Since(start).Seconds())
 		return nil, err
 	}
 	if err := l.checkVerifyIPDailyLimit(clientIP); err != nil {
+		metrics.CodeRateLimitTotal.WithLabelValues("verify_ip_daily").Inc()
+		metrics.CodeVerifyTotal.WithLabelValues("failure").Inc()
+		metrics.CodeVerifyDuration.Observe(time.Since(start).Seconds())
 		return nil, err
 	}
 
@@ -57,6 +65,9 @@ func (l *VerifyCodeLogic) VerifyCode(in *code.VerifyCodeRequest) (*code.VerifyCo
 		// Redis 查询失败，可能是验证码不存在或网络问题
 		// 返回验证失败，但不暴露具体错误信息
 		l.Errorf("get verification code failed: %v, key: %s", err, key)
+		metrics.CodeRedisErrorTotal.Inc()
+		metrics.CodeVerifyTotal.WithLabelValues("failure").Inc()
+		metrics.CodeVerifyDuration.Observe(time.Since(start).Seconds())
 		l.recordVerifyPhoneUsage(phone)
 		l.recordVerifyIPUsage(clientIP)
 		return &code.VerifyCodeResponse{
@@ -72,8 +83,12 @@ func (l *VerifyCodeLogic) VerifyCode(in *code.VerifyCodeRequest) (*code.VerifyCo
 			// 删除失败不影响验证结果，但记录日志
 			l.Errorf("delete verification code failed: %v, key: %s", err, key)
 		}
+		metrics.CodeVerifyTotal.WithLabelValues("success").Inc()
+	} else {
+		metrics.CodeVerifyTotal.WithLabelValues("failure").Inc()
 	}
 
+	metrics.CodeVerifyDuration.Observe(time.Since(start).Seconds())
 	l.recordVerifyPhoneUsage(phone)
 	l.recordVerifyIPUsage(clientIP)
 
