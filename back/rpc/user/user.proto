@@ -371,8 +371,7 @@ message GetMyFollowingListRequest {
   uint64 operator_id = 1;   // 操作人ID
   int32 page = 2;           // 页码（从1开始）
   int32 page_size = 3;      // 每页数量
-  int32 user_role = 4;      // 可选，过滤用户角色：1=老板, 2=陪玩
-  string keyword = 5;       // 可选，搜索关键词（昵称模糊匹配）
+  string keyword = 4;       // 可选，搜索关键词（昵称模糊匹配）
 }
 
 // 获取我的粉丝列表
@@ -380,7 +379,6 @@ message GetMyFollowersListRequest {
   uint64 operator_id = 1;   // 操作人ID
   int32 page = 2;           // 页码（从1开始）
   int32 page_size = 3;      // 每页数量
-  int32 user_role = 4;      // 可选，过滤用户角色：1=老板, 2=陪玩
 }
 
 // 获取互相关注列表
@@ -407,12 +405,8 @@ message UserFollowInfo {
   uint64 user_id = 1;
   string nickname = 2;
   string avatar_url = 3;
-  int32 role = 4;            // 用户角色：1=老板, 2=陪玩
-  bool is_verified = 5;      // 是否验证（仅陪玩）
-  double rating = 6;           // 评分（仅陪玩）
-  int64 total_orders = 7;     // 总订单数（仅陪玩）
-  bool is_mutual = 8;         // 是否互相关注
-  int64 followed_at = 9;      // 关注时间戳
+  bool is_mutual = 4;        // 是否互相关注
+  int64 followed_at = 5;     // 关注时间戳
 }
 
 message GetMyFollowingListResponse {

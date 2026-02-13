@@ -119,9 +119,8 @@ func (l *GetMutualFollowListLogic) GetMutualFollowList(in *user.GetMutualFollowL
 			UserId:     u.User.ID,
 			Nickname:   u.User.Nickname,
 			AvatarUrl:  u.User.AvatarURL,
-			Role:       int32(u.User.Role),
-			IsMutual:   true,                               // 互相关注列表中的用户都是互相关注的
-			FollowedAt: u.FollowRelation.FollowedAt.Unix(), // 添加关注时间戳
+			IsMutual:   true,
+			FollowedAt: u.FollowRelation.FollowedAt.Unix(),
 		})
 	}
 

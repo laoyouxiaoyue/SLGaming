@@ -85,9 +85,8 @@ func (l *GetMyFollowersListLogic) GetMyFollowersList(in *user.GetMyFollowersList
 			UserId:     f.User.ID,
 			Nickname:   f.User.Nickname,
 			AvatarUrl:  f.User.AvatarURL,
-			Role:       int32(f.User.Role),
 			IsMutual:   mutualFollowMap[f.User.ID],
-			FollowedAt: f.FollowRelation.FollowedAt.Unix(), // 添加关注时间戳
+			FollowedAt: f.FollowRelation.FollowedAt.Unix(),
 		})
 	}
 

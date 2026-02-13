@@ -259,7 +259,6 @@ type GetMyFollowersListData struct {
 type GetMyFollowersListRequest struct {
 	Page     int `form:"page,optional"`
 	PageSize int `form:"pageSize,optional"`
-	UserRole int `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
 }
 
 type GetMyFollowersListResponse struct {
@@ -277,8 +276,7 @@ type GetMyFollowingListData struct {
 type GetMyFollowingListRequest struct {
 	Page     int    `form:"page,optional"`
 	PageSize int    `form:"pageSize,optional"`
-	UserRole int    `form:"userRole,optional"` // 过滤用户角色：1=老板,2=陪玩
-	Keyword  string `form:"keyword,optional"`  // 搜索关键词（昵称模糊匹配）
+	Keyword  string `form:"keyword,optional"` // 搜索关键词（昵称模糊匹配）
 }
 
 type GetMyFollowingListResponse struct {
@@ -597,15 +595,11 @@ type UploadAvatarResponse struct {
 }
 
 type UserFollowInfo struct {
-	UserId      uint64  `json:"userId"`      // 用户ID
-	Nickname    string  `json:"nickname"`    // 昵称
-	AvatarUrl   string  `json:"avatarUrl"`   // 头像URL
-	Role        int     `json:"role"`        // 用户角色：1=老板,2=陪玩
-	IsVerified  bool    `json:"isVerified"`  // 是否验证（仅陪玩）
-	Rating      float64 `json:"rating"`      // 评分（仅陪玩）
-	TotalOrders int64   `json:"totalOrders"` // 总接单数（仅陪玩）
-	IsMutual    bool    `json:"isMutual"`    // 是否互相关注
-	FollowedAt  int64   `json:"followedAt"`  // 关注时间戳
+	UserId     uint64 `json:"userId"`     // 用户ID
+	Nickname   string `json:"nickname"`   // 昵称
+	AvatarUrl  string `json:"avatarUrl"`  // 头像URL
+	IsMutual   bool   `json:"isMutual"`   // 是否互相关注
+	FollowedAt int64  `json:"followedAt"` // 关注时间戳
 }
 
 type UserInfo struct {

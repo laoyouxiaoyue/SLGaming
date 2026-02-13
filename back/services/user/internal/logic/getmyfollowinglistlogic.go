@@ -62,59 +62,50 @@ func (l *GetMyFollowingListLogic) GetMyFollowingList(in *user.GetMyFollowingList
 		}
 	}
 
-	// 5. 构建查询条件
-	query := db.Model(&model.FollowRelation{}).Where("follower_id = ?", in.OperatorId)
-	if len(matchedUserIds) > 0 {
-		query = query.Where("following_id IN ?", matchedUserIds)
-	}
+	// 5. 定义查询条件参数
+	followerID := in.OperatorId
+	hasKeywordFilter := len(matchedUserIds) > 0
 
-	// 6. 并发查询总数
-	var total int64
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := query.Count(&total).Error; err != nil {
-			l.Errorf("get following total failed: %v", err)
-		}
-	}()
+	// 6. 从用户表获取关注总数（O(1)查询，避免COUNT性能问题）
+	var currentUser model.User
+	if err := db.First(&currentUser, followerID).Error; err != nil {
+		l.Errorf("get user following count failed: %v", err)
+		return nil, status.Error(codes.Internal, "get user info failed")
+	}
+	total := currentUser.FollowingCount
 
 	// 7. 查询关注列表，按关注时间倒序排序
 	var followRelations []model.FollowRelation
-	if err := query.Offset(int(offset)).Limit(int(pageSize)).Order("followed_at DESC").Find(&followRelations).Error; err != nil {
+	listQuery := db.Model(&model.FollowRelation{}).Where("follower_id = ?", followerID)
+	if hasKeywordFilter {
+		listQuery = listQuery.Where("following_id IN ?", matchedUserIds)
+	}
+	if err := listQuery.Offset(int(offset)).Limit(int(pageSize)).Order("followed_at DESC").Find(&followRelations).Error; err != nil {
 		l.Errorf("get following list failed: %v", err)
 		return nil, status.Error(codes.Internal, "get following list failed")
 	}
 
-	// 6. 提取关注者ID列表
+	// 8. 提取关注者ID列表
 	var followingIds []uint64
 	for _, relation := range followRelations {
 		followingIds = append(followingIds, relation.FollowingID)
 	}
 
-	// 7. 批量查询用户信息和陪玩信息
+	// 9. 批量查询用户信息和互相关注关系（使用新的WaitGroup）
 	var users []model.User
-	var companionProfiles []model.CompanionProfile
+	var wg sync.WaitGroup
 
 	if len(followingIds) > 0 {
-		// 并发查询用户信息和陪玩信息
-		wg.Add(2)
+		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			if err := db.Where("id IN ?", followingIds).Find(&users).Error; err != nil {
 				l.Errorf("get users failed: %v", err)
 			}
 		}()
-
-		go func() {
-			defer wg.Done()
-			if err := db.Where("user_id IN ?", followingIds).Find(&companionProfiles).Error; err != nil {
-				l.Errorf("get companion profiles failed: %v", err)
-			}
-		}()
 	}
 
-	// 8. 批量查询互相关注关系
+	// 10. 批量查询互相关注关系
 	var mutualFollowMap = make(map[uint64]bool)
 	if len(followingIds) > 0 {
 		wg.Add(1)
@@ -133,15 +124,10 @@ func (l *GetMyFollowingListLogic) GetMyFollowingList(in *user.GetMyFollowingList
 
 	wg.Wait()
 
-	// 9. 构建响应
+	// 11. 构建响应
 	userMap := make(map[uint64]*model.User)
 	for i := range users {
 		userMap[users[i].ID] = &users[i]
-	}
-
-	profileMap := make(map[uint64]*model.CompanionProfile)
-	for i := range companionProfiles {
-		profileMap[companionProfiles[i].UserID] = &companionProfiles[i]
 	}
 
 	var userInfos []*user.UserFollowInfo
@@ -151,27 +137,12 @@ func (l *GetMyFollowingListLogic) GetMyFollowingList(in *user.GetMyFollowingList
 			continue
 		}
 
-		// 角色过滤
-		if in.UserRole > 0 && u.Role != int(in.UserRole) {
-			continue
-		}
-
-		p := profileMap[relation.FollowingID]
-
 		userInfo := &user.UserFollowInfo{
 			UserId:     u.ID,
 			Nickname:   u.Nickname,
 			AvatarUrl:  u.AvatarURL,
-			Role:       int32(u.Role),
-			IsMutual:   mutualFollowMap[relation.FollowingID], // 使用批量查询结果
-			FollowedAt: relation.FollowedAt.Unix(),            // 添加关注时间戳
-		}
-
-		// 补充陪玩特定信息
-		if p != nil {
-			userInfo.IsVerified = p.IsVerified
-			userInfo.Rating = p.Rating
-			userInfo.TotalOrders = p.TotalOrders
+			IsMutual:   mutualFollowMap[relation.FollowingID],
+			FollowedAt: relation.FollowedAt.Unix(),
 		}
 
 		userInfos = append(userInfos, userInfo)

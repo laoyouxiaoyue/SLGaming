@@ -55,15 +55,11 @@ func (l *GetMutualFollowListLogic) GetMutualFollowList(req *types.GetMutualFollo
 	users := make([]types.UserFollowInfo, 0, len(rpcResp.GetUsers()))
 	for _, u := range rpcResp.GetUsers() {
 		users = append(users, types.UserFollowInfo{
-			UserId:      u.GetUserId(),
-			Nickname:    u.GetNickname(),
-			AvatarUrl:   u.GetAvatarUrl(),
-			Role:        int(u.GetRole()),
-			IsVerified:  u.GetIsVerified(),
-			Rating:      u.GetRating(),
-			TotalOrders: u.GetTotalOrders(),
-			IsMutual:    u.GetIsMutual(),
-			FollowedAt:  u.GetFollowedAt(),
+			UserId:     u.GetUserId(),
+			Nickname:   u.GetNickname(),
+			AvatarUrl:  u.GetAvatarUrl(),
+			IsMutual:   u.GetIsMutual(),
+			FollowedAt: u.GetFollowedAt(),
 		})
 	}
 

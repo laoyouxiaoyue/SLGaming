@@ -934,21 +934,9 @@ definitions:
       isMutual:
         description: 是否互相关注
         type: boolean
-      isVerified:
-        description: 是否验证（仅陪玩）
-        type: boolean
       nickname:
         description: 昵称
         type: string
-      rating:
-        description: 评分（仅陪玩）
-        type: number
-      role:
-        description: 用户角色：1=老板,2=陪玩
-        type: integer
-      totalOrders:
-        description: 总接单数（仅陪玩）
-        type: integer
       userId:
         description: 用户ID
         type: integer
@@ -1788,7 +1776,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: 获取当前登录用户的粉丝列表，支持分页和角色筛选
+      description: 获取当前登录用户的粉丝列表，支持分页
       parameters:
       - default: 1
         description: 页码（从1开始）
@@ -1799,10 +1787,6 @@ paths:
         description: 每页数量
         in: query
         name: pageSize
-        type: integer
-      - description: 过滤用户角色：1=老板,2=陪玩
-        in: query
-        name: userRole
         type: integer
       produces:
       - application/json
@@ -1824,7 +1808,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: 获取当前登录用户的关注列表，支持分页、角色筛选和昵称搜索
+      description: 获取当前登录用户的关注列表，支持分页和昵称搜索
       parameters:
       - default: 1
         description: 页码（从1开始）
@@ -1835,10 +1819,6 @@ paths:
         description: 每页数量
         in: query
         name: pageSize
-        type: integer
-      - description: 过滤用户角色：1=老板,2=陪玩
-        in: query
-        name: userRole
         type: integer
       - description: 搜索关键词（昵称模糊匹配）
         in: query
