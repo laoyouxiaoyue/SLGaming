@@ -22,7 +22,7 @@ onMounted(() => {
     <div class="container">
       <ul>
         <li class="rank-item">
-          <a href="javascript:;" class="menu-item" @click="$router.push('/')">
+          <a href="javascript:;" class="menu-item" @click="$router.push('/rank')">
             <sl-icon name="icon-guanjun" size="16" class="rank-icon" />排行榜
           </a>
         </li>

@@ -22,6 +22,7 @@ import Relation from "@/views/relation/index.vue";
 import FansList from "@/views/relation/component/FansList.vue";
 import FollowList from "@/views/relation/component/FollowList.vue";
 import PersonalHomepage from "@/views/bossdetail/PersonalHomepage.vue";
+import Rank from "@/views/rank/index.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -32,6 +33,10 @@ const router = createRouter({
         {
           path: "",
           component: Home,
+        },
+        {
+          path: "rank",
+          component: Rank,
         },
         {
           path: "detail/:id",
