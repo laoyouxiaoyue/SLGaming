@@ -10,6 +10,14 @@ export const useUserStore = defineStore(
   "user",
   () => {
     // 1. 定义管理用户数据的state
+    /**
+     * userInfo存放内容形式:
+     * {
+     *   accessToken: string,  // 访问令牌，用于API请求认证
+     *   refreshToken: string, // 刷新令牌，用于获取新的accessToken
+     *   expiresIn: number     // 访问令牌过期时间（秒），例如 600
+     * }
+     */
     const userInfo = ref({});
     // 2. 定义获取接口数据的action函数
     const getUserInfo = async ({ phone, password }) => {

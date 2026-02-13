@@ -2,20 +2,29 @@ import http from "@/utils/http";
 
 /**
  * 获取用户信息
+ * @param {object} [params]
+ * @param {number} [params.id] - 用户ID（可选，不传则获取当前用户）
+ * @param {number} [params.uid] - 用户UID（可选）
+ * @param {string} [params.phone] - 手机号（可选）
  * @returns {Promise}
  * @returns {object} data
+ * @returns {string} data.avatarUrl - 头像URL
+ * @returns {number} data.balance - 帅币可用余额
+ * @returns {string} data.bio - 个人简介
+ * @returns {number} data.followerCount - 粉丝数
+ * @returns {number} data.followingCount - 关注数
+ * @returns {number} data.frozenBalance - 冻结帅币余额（预留）
  * @returns {number} data.id - 用户ID (int64)
- * @returns {number} data.uid - 用户UID (int64)
  * @returns {string} data.nickname - 昵称
  * @returns {string} data.phone - 手机号
  * @returns {number} data.role - 用户角色：1=老板, 2=陪玩, 3=管理员
- * @returns {string} data.avatarUrl - 头像URL
- * @returns {string} data.bio - 个人简介
+ * @returns {number} data.uid - 用户唯一标识 (int64)
  */
-export const getInfoAPI = () => {
+export const getInfoAPI = ({ id, uid, phone } = {}) => {
   return http({
     url: "/user",
     method: "GET",
+    params: { id, uid, phone },
   });
 };
 
