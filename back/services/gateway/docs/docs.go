@@ -357,6 +357,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/delete": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "删除已完成、已取消或已评价的订单（软删除，仅对当前用户隐藏）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "订单"
+                ],
+                "summary": "删除订单",
+                "parameters": [
+                    {
+                        "description": "删除订单请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteOrderResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/types.BaseResp"
+                        }
+                    },
+                    "401": {
+                        "description": "未授权",
+                        "schema": {
+                            "$ref": "#/definitions/types.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/types.BaseResp"
+                        }
+                    },
+                    "404": {
+                        "description": "订单不存在",
+                        "schema": {
+                            "$ref": "#/definitions/types.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/rate": {
             "post": {
                 "security": [
@@ -2229,6 +2292,37 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/types.OrderInfo"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteOrderData": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "types.DeleteOrderRequest": {
+            "type": "object",
+            "properties": {
+                "orderId": {
+                    "description": "订单ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "types.DeleteOrderResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/types.DeleteOrderData"
                 },
                 "msg": {
                     "type": "string"

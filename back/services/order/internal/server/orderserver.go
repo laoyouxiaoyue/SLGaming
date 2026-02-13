@@ -65,4 +65,10 @@ func (s *OrderServer) GetOrderList(ctx context.Context, in *order.GetOrderListRe
 	return l.GetOrderList(in)
 }
 
+// 删除订单
+func (s *OrderServer) DeleteOrder(ctx context.Context, in *order.DeleteOrderRequest) (*order.DeleteOrderResponse, error) {
+	l := logic.NewDeleteOrderLogic(ctx, s.svcCtx)
+	return l.DeleteOrder(in)
+}
+
 // 获取指定陪玩的订单评价列表（仅返回已评价订单）

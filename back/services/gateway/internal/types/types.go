@@ -136,6 +136,19 @@ type CreateOrderResponse struct {
 	Data OrderInfo `json:"data"`
 }
 
+type DeleteOrderData struct {
+	Success bool `json:"success"`
+}
+
+type DeleteOrderRequest struct {
+	OrderId uint64 `json:"orderId"` // 订单ID
+}
+
+type DeleteOrderResponse struct {
+	BaseResp
+	Data DeleteOrderData `json:"data"`
+}
+
 type FollowUserData struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
