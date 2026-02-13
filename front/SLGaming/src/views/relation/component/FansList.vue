@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { getFollowersAPI, followUserAPI, unfollowUserAPI } from "@/api/relation";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Menu } from "@element-plus/icons-vue";
 
+const router = useRouter();
 const followers = ref([]);
 const loading = ref(false);
 // eslint-disable-next-line no-unused-vars
@@ -23,6 +25,14 @@ const fetchFollowers = async () => {
     console.error("获取粉丝列表失败:", error);
   } finally {
     loading.value = false;
+  }
+};
+
+const handleNavigate = (item) => {
+  if (item.role === 1) {
+    router.push(`/bossdetail/${item.userId}`);
+  } else if (item.role === 2) {
+    router.push(`/detail/${item.userId}`);
   }
 };
 
@@ -66,11 +76,11 @@ onMounted(() => {
         <el-empty description="暂无粉丝" />
       </div>
       <div v-for="item in followers" :key="item.userId" class="follower-card">
-        <div class="left-section">
+        <div class="left-section" @click="handleNavigate(item)">
           <el-avatar :size="60" :src="item.avatarUrl" />
         </div>
         <div class="right-section">
-          <div class="nickname">{{ item.nickname }}</div>
+          <div class="nickname" @click="handleNavigate(item)">{{ item.nickname }}</div>
           <div
             class="action-btn"
             :class="{ 'is-mutual': item.isMutual }"
@@ -138,6 +148,7 @@ onMounted(() => {
 
 .left-section {
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .right-section {
@@ -152,6 +163,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 500;
   color: #303133;
+  cursor: pointer;
 }
 
 .action-btn {

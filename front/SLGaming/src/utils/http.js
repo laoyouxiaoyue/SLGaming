@@ -8,7 +8,7 @@ const JSONBigInt = JSONBig({ storeAsString: true });
 // 创建axios实例
 const http = axios.create({
   baseURL: "/api",
-  timeout: 100000,
+  timeout: 1000000,
   // 显式设置 responseType 为 text，防止 axios/浏览器自动尝试解析 JSON 导致精度丢失
   responseType: "text",
   // 处理服务器返回的大整数精度问题
