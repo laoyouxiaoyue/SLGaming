@@ -10,6 +10,7 @@ import (
 	"SLGaming/back/services/agent/agent"
 	"SLGaming/back/services/agent/agentclient"
 	"SLGaming/back/services/user/internal/config"
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
 
@@ -24,13 +25,13 @@ import (
 func StartAvatarModerationConsumer(ctx context.Context, svcCtx *svc.ServiceContext) {
 	cfg := svcCtx.Config().RocketMQ
 	if len(cfg.NameServers) == 0 {
-		logx.Infof("avatar moderation consumer not started: rocketmq not configured")
+		helper.LogInfo(logx.WithContext(ctx), helper.OpMQConsumer, "avatar moderation consumer not started: rocketmq not configured", nil)
 		return
 	}
 
 	consumer, err := initAvatarConsumer(cfg, svcCtx)
 	if err != nil {
-		logx.Errorf("init avatar moderation consumer failed: %v", err)
+		helper.LogError(logx.WithContext(ctx), helper.OpMQConsumer, "init avatar moderation consumer failed", err, nil)
 		return
 	}
 
@@ -39,7 +40,10 @@ func StartAvatarModerationConsumer(ctx context.Context, svcCtx *svc.ServiceConte
 		shutdownAvatarConsumer(consumer)
 	}()
 
-	logx.Infof("avatar moderation consumer started, topic=%s", avatarmq.AvatarEventTopic())
+	helper.LogSuccess(logx.WithContext(ctx), helper.OpMQConsumer, map[string]interface{}{
+		"consumer": "avatar_moderation",
+		"topic":    avatarmq.AvatarEventTopic(),
+	})
 }
 
 func initAvatarConsumer(cfg config.RocketMQConf, svcCtx *svc.ServiceContext) (rocketmq.PushConsumer, error) {
@@ -64,41 +68,62 @@ func shutdownAvatarConsumer(consumer rocketmq.PushConsumer) {
 }
 
 func handleAvatarEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
+	logger := logx.WithContext(ctx)
+
 	if msg.GetTags() != avatarmq.EventTypeAvatarSubmit() {
-		logx.Infof("skipping message with tag %s, expected %s", msg.GetTags(), avatarmq.EventTypeAvatarSubmit())
+		helper.LogInfo(logger, helper.OpMQConsumer, "skipping message with unexpected tag", map[string]interface{}{
+			"tag":      msg.GetTags(),
+			"expected": avatarmq.EventTypeAvatarSubmit(),
+		})
 		return nil
 	}
 
 	var payload avatarmq.AvatarModerationPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("[AvatarModeration] Failed to unmarshal payload: %v, message_id=%s, body=%s",
-			err, msg.MsgId, string(msg.Body))
+		helper.LogError(logger, helper.OpMQConsumer, "unmarshal AvatarModeration payload failed", err, map[string]interface{}{
+			"message_id": msg.MsgId,
+			"body":       string(msg.Body),
+		})
 		return nil
 	}
 	if payload.UserID == 0 || payload.AvatarURL == "" {
-		logx.Errorf("[AvatarModeration] Invalid payload: user_id=%d, avatar_url=%s, request_id=%s",
-			payload.UserID, payload.AvatarURL, payload.RequestID)
+		helper.LogError(logger, helper.OpMQConsumer, "invalid AvatarModeration payload", nil, map[string]interface{}{
+			"user_id":    payload.UserID,
+			"avatar_url": payload.AvatarURL,
+			"request_id": payload.RequestID,
+		})
 		return nil
 	}
 
-	logx.Infof("[AvatarModeration] Processing avatar moderation: user_id=%d, avatar_url=%s, request_id=%s",
-		payload.UserID, payload.AvatarURL, payload.RequestID)
+	helper.LogInfo(logger, helper.OpMQConsumer, "processing avatar moderation", map[string]interface{}{
+		"user_id":    payload.UserID,
+		"avatar_url": payload.AvatarURL,
+		"request_id": payload.RequestID,
+	})
 
 	if payload.DefaultAvatarURL != "" {
-		logx.Infof("[AvatarModeration] Setting default avatar for user %d: %s", payload.UserID, payload.DefaultAvatarURL)
+		helper.LogInfo(logger, helper.OpMQConsumer, "setting default avatar", map[string]interface{}{
+			"user_id":        payload.UserID,
+			"default_avatar": payload.DefaultAvatarURL,
+		})
 		if err := updateUserAvatar(ctx, svcCtx, payload.UserID, payload.DefaultAvatarURL); err != nil {
-			logx.Errorf("[AvatarModeration] Failed to update default avatar for user %d: %v", payload.UserID, err)
+			helper.LogError(logger, helper.OpMQConsumer, "update default avatar failed", err, map[string]interface{}{
+				"user_id": payload.UserID,
+			})
 			return err
 		}
-		logx.Infof("[AvatarModeration] Default avatar updated successfully for user %d", payload.UserID)
 	}
 
 	if svcCtx.AgentRPC == nil {
-		logx.Errorf("[AvatarModeration] Agent RPC client not initialized for user %d", payload.UserID)
+		helper.LogError(logger, helper.OpMQConsumer, "agent rpc not initialized", nil, map[string]interface{}{
+			"user_id": payload.UserID,
+		})
 		return status.Error(codes.Unavailable, "agent rpc not initialized")
 	}
 
-	logx.Infof("[AvatarModeration] Calling agent moderation service for user %d", payload.UserID)
+	helper.LogInfo(logger, helper.OpMQConsumer, "calling agent moderation service", map[string]interface{}{
+		"user_id": payload.UserID,
+	})
 	moderateCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 	resp, err := svcCtx.AgentRPC.ModerateAvatar(moderateCtx, &agentclient.ModerateAvatarRequest{
@@ -108,29 +133,49 @@ func handleAvatarEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *pri
 		RequestId: payload.RequestID,
 	})
 	if err != nil {
-		logx.Errorf("[AvatarModeration] Failed to call moderation service for user %d: %v, request_id=%s",
-			payload.UserID, err, payload.RequestID)
+		helper.LogError(logger, helper.OpMQConsumer, "call moderation service failed", err, map[string]interface{}{
+			"user_id":    payload.UserID,
+			"request_id": payload.RequestID,
+		})
 		return err
 	}
-	logx.Infof("[AvatarModeration] Moderation service response for user %d: decision=%v, request_id=%s",
-		payload.UserID, resp.GetDecision(), payload.RequestID)
+
+	helper.LogInfo(logger, helper.OpMQConsumer, "moderation service response", map[string]interface{}{
+		"user_id":    payload.UserID,
+		"decision":   resp.GetDecision().String(),
+		"request_id": payload.RequestID,
+	})
+
 	if resp == nil || resp.GetDecision() != agent.ModerationDecision_PASS {
-		logx.Infof("[AvatarModeration] Avatar moderation rejected or no decision for user %d, decision=%v",
-			payload.UserID, resp.GetDecision())
+		helper.LogInfo(logger, helper.OpMQConsumer, "avatar moderation rejected", map[string]interface{}{
+			"user_id":  payload.UserID,
+			"decision": resp.GetDecision().String(),
+		})
 		return nil
 	}
 
-	logx.Infof("[AvatarModeration] Avatar moderation passed for user %d, updating avatar to %s", payload.UserID, payload.AvatarURL)
+	helper.LogInfo(logger, helper.OpMQConsumer, "avatar moderation passed, updating avatar", map[string]interface{}{
+		"user_id":    payload.UserID,
+		"avatar_url": payload.AvatarURL,
+	})
 	if err := updateUserAvatar(ctx, svcCtx, payload.UserID, payload.AvatarURL); err != nil {
-		logx.Errorf("[AvatarModeration] Failed to update approved avatar for user %d: %v", payload.UserID, err)
+		helper.LogError(logger, helper.OpMQConsumer, "update approved avatar failed", err, map[string]interface{}{
+			"user_id": payload.UserID,
+		})
 		return err
 	}
-	logx.Infof("[AvatarModeration] Approved avatar updated successfully for user %d", payload.UserID)
 
+	helper.LogSuccess(logger, helper.OpMQConsumer, map[string]interface{}{
+		"event":      "avatar_moderation_passed",
+		"user_id":    payload.UserID,
+		"avatar_url": payload.AvatarURL,
+	})
 	return nil
 }
 
 func updateUserAvatar(ctx context.Context, svcCtx *svc.ServiceContext, userID uint64, avatarURL string) error {
+	logger := logx.WithContext(ctx)
+
 	if userID == 0 || avatarURL == "" {
 		return nil
 	}
@@ -141,7 +186,9 @@ func updateUserAvatar(ctx context.Context, svcCtx *svc.ServiceContext, userID ui
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		logx.Errorf("user not found when updating avatar: user_id=%d", userID)
+		helper.LogError(logger, helper.OpMQConsumer, "user not found when updating avatar", nil, map[string]interface{}{
+			"user_id": userID,
+		})
 		return nil
 	}
 	return nil

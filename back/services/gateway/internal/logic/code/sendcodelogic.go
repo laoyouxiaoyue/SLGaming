@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"SLGaming/back/services/code/codeclient"
+	"SLGaming/back/services/gateway/internal/helper"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
@@ -29,8 +30,14 @@ func NewSendCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendCode
 }
 
 func (l *SendCodeLogic) SendCode(req *types.SendCodeRequest) (resp *types.SendCodeResponse, err error) {
+	helper.LogRequest(l.Logger, helper.OpSendCode, map[string]interface{}{
+		"phone":   helper.MaskPhone(req.Phone),
+		"purpose": req.Purpose,
+	})
+
 	if l.svcCtx.CodeRPC == nil {
 		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "CodeRPC")
+		helper.LogError(l.Logger, helper.OpSendCode, "code rpc not available", nil, nil)
 		return &types.SendCodeResponse{
 			BaseResp: types.BaseResp{Code: code, Msg: msg},
 		}, nil
@@ -50,6 +57,11 @@ func (l *SendCodeLogic) SendCode(req *types.SendCodeRequest) (resp *types.SendCo
 			},
 		}, nil
 	}
+
+	helper.LogSuccess(l.Logger, helper.OpSendCode, map[string]interface{}{
+		"phone":   helper.MaskPhone(req.Phone),
+		"purpose": req.Purpose,
+	})
 
 	return &types.SendCodeResponse{
 		BaseResp: types.BaseResp{

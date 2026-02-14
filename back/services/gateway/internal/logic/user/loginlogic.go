@@ -6,6 +6,7 @@ package user
 import (
 	"context"
 
+	"SLGaming/back/services/gateway/internal/helper"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
@@ -29,8 +30,13 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
+	helper.LogRequest(l.Logger, helper.OpLogin, map[string]interface{}{
+		"phone": helper.MaskPhone(req.Phone),
+	})
+
 	if l.svcCtx.UserRPC == nil {
 		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		helper.LogError(l.Logger, helper.OpLogin, "user rpc not available", nil, nil)
 		return &types.LoginResponse{
 			BaseResp: types.BaseResp{Code: code, Msg: msg},
 		}, nil
@@ -62,6 +68,10 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 			},
 		}, nil
 	}
+
+	helper.LogSuccess(l.Logger, helper.OpLogin, map[string]interface{}{
+		"user_id": rpcResp.Id,
+	})
 
 	return &types.LoginResponse{
 		BaseResp: types.BaseResp{

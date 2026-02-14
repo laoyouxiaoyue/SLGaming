@@ -28,40 +28,35 @@ var (
 	templatesFile = flag.String("t", "etc/code-templates.yaml", "the templates file")
 )
 
-// getAvailablePort 获取一个可用的随机端口
 func getAvailablePort() (int, error) {
-	// 监听随机端口（:0 表示让系统自动分配）
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
 		return 0, fmt.Errorf("failed to listen: %w", err)
 	}
 	defer listener.Close()
 
-	// 获取分配的端口
 	addr := listener.Addr().(*net.TCPAddr)
 	return addr.Port, nil
 }
 
-// startMetricsServer 启动 metrics HTTP 服务，返回实际使用的端口
 func startMetricsServer(preferredPort int) (int, error) {
 	port := preferredPort
 
-	// 如果配置为 0 或负数，则使用随机端口
 	if port <= 0 {
 		var err error
 		port, err = getAvailablePort()
 		if err != nil {
 			return 0, fmt.Errorf("failed to get available port: %w", err)
 		}
-		logx.Infof("Auto-assigned metrics port: %d", port)
+		logx.Infof("[server] info: auto-assigned metrics port, port=%d", port)
 	}
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 		addr := fmt.Sprintf(":%d", port)
-		logx.Infof("Starting metrics server at %s", addr)
+		logx.Infof("[server] info: metrics server started, listen_on=%s", addr)
 		if err := http.ListenAndServe(addr, nil); err != nil {
-			logx.Errorf("metrics server failed: %v", err)
+			logx.Errorf("[server] failed: metrics server failed, listen_on=%s, error=%v", addr, err)
 		}
 	}()
 
@@ -74,16 +69,14 @@ func main() {
 	c := ioc.LoadConfig(*configFile, *templatesFile)
 	ctx := svc.NewServiceContext(c)
 
-	// 启动 Prometheus metrics HTTP 服务（自动分配端口）
 	metricsPort, err := startMetricsServer(c.MetricsPort)
 	if err != nil {
-		logx.Errorf("failed to start metrics server: %v", err)
-		// 不退出，继续启动 gRPC 服务
+		logx.Errorf("[server] failed: start metrics server failed, error=%v", err)
 	}
 
 	registrar, err := ioc.RegisterConsul(c.Consul, c.ListenOn, metricsPort)
 	if err != nil {
-		logx.Errorf("consul register failed: %v", err)
+		logx.Errorf("[server] failed: consul register failed, listen_on=%s, error=%v", c.ListenOn, err)
 	}
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
@@ -93,11 +86,10 @@ func main() {
 		}
 	})
 
-	// 捕获退出信号，优雅停机
 	var stopOnce sync.Once
 	stopServer := func() {
 		stopOnce.Do(func() {
-			logx.Info("shutting down code rpc server")
+			logx.Infof("[server] info: shutting down, reason=signal")
 			s.Stop()
 			if registrar != nil {
 				registrar.Deregister()
@@ -115,7 +107,7 @@ func main() {
 
 	defer stopServer()
 
-	logx.Info(c.Template)
-	fmt.Printf("Starting rpc server at %s, metrics at :%d\n", c.ListenOn, metricsPort)
+	logx.Infof("[server] succeeded: service started, listen_on=%s, metrics_port=%d, mode=%s", c.ListenOn, metricsPort, c.Mode)
+
 	s.Start()
 }

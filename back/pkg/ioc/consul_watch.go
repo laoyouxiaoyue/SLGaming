@@ -12,13 +12,14 @@ import (
 
 // ConsulWatcher Consul 服务监听器
 type ConsulWatcher struct {
-	client      *api.Client
-	serviceName string
-	endpoints   []string
-	mu          sync.RWMutex
-	ctx         context.Context
-	cancel      context.CancelFunc
-	onChange    func([]string)
+	client       *api.Client
+	serviceName  string
+	endpoints    []string
+	mu           sync.RWMutex
+	ctx          context.Context
+	cancel       context.CancelFunc
+	onChange     func([]string)
+	firstResolve bool
 }
 
 // NewConsulWatcher 创建 Consul 服务监听器
@@ -37,11 +38,12 @@ func NewConsulWatcher(cfg ConsulConfig, serviceName string, onChange func([]stri
 
 	ctx, cancel := context.WithCancel(context.Background())
 	watcher := &ConsulWatcher{
-		client:      client,
-		serviceName: serviceName,
-		ctx:         ctx,
-		cancel:      cancel,
-		onChange:    onChange,
+		client:       client,
+		serviceName:  serviceName,
+		ctx:          ctx,
+		cancel:       cancel,
+		onChange:     onChange,
+		firstResolve: true,
 	}
 
 	// 初始解析一次（允许失败，服务可能还没启动）
@@ -49,6 +51,9 @@ func NewConsulWatcher(cfg ConsulConfig, serviceName string, onChange func([]stri
 	if err != nil {
 		logx.Infof("[consul_watch] 初始解析服务端点失败（服务可能未启动）: service=%s, error=%v，将等待服务注册后自动发现", serviceName, err)
 		endpoints = []string{} // 使用空数组，稍后通过 watch 更新
+	} else {
+		watcher.firstResolve = false
+		logx.Infof("[consul_watch] 服务发现成功: service=%s, endpoints=%v", serviceName, endpoints)
 	}
 	watcher.setEndpoints(endpoints)
 
@@ -77,12 +82,11 @@ func (w *ConsulWatcher) setEndpoints(endpoints []string) {
 	w.endpoints = endpoints
 }
 
-// resolveEndpoints 解析服务端点
+// resolveEndpoints 解析服务端点（不打印成功日志）
 func (w *ConsulWatcher) resolveEndpoints() ([]string, error) {
 	// 先尝试通过健康检查查询
 	services, _, err := w.client.Health().Service(w.serviceName, "", false, nil)
 	if err != nil {
-		logx.Errorf("[consul_watch] 失败: 从Consul查询服务失败, service=%s, error=%v", w.serviceName, err)
 		return nil, fmt.Errorf("query consul service: %w", err)
 	}
 
@@ -97,15 +101,12 @@ func (w *ConsulWatcher) resolveEndpoints() ([]string, error) {
 			endpoint := fmt.Sprintf("%s:%d", address, port)
 			endpoints = append(endpoints, endpoint)
 		}
-		logx.Infof("[consul_watch] 成功: 从健康检查解析服务端点, service=%s, endpoints=%v", w.serviceName, endpoints)
 		return endpoints, nil
 	}
 
 	// 如果健康检查找不到，从 Agent 查询
-	logx.Infof("[consul_watch] 信息: 通过健康检查未找到服务，尝试从Agent查询, service=%s", w.serviceName)
 	agentServices, err := w.client.Agent().Services()
 	if err != nil {
-		logx.Errorf("[consul_watch] 失败: 查询Agent服务失败, service=%s, error=%v", w.serviceName, err)
 		return nil, fmt.Errorf("query consul agent services: %w", err)
 	}
 
@@ -121,11 +122,9 @@ func (w *ConsulWatcher) resolveEndpoints() ([]string, error) {
 	}
 
 	if len(endpoints) > 0 {
-		logx.Infof("[consul_watch] 成功: 从Agent解析服务端点, service=%s, endpoints=%v", w.serviceName, endpoints)
 		return endpoints, nil
 	}
 
-	logx.Errorf("[consul_watch] 失败: 在Consul中未找到服务, service=%s", w.serviceName)
 	return nil, fmt.Errorf("service %s not found in consul", w.serviceName)
 }
 
@@ -148,7 +147,7 @@ func (w *ConsulWatcher) watch() {
 				if len(currentEndpoints) == 0 {
 					logx.Debugf("[consul_watch] 服务暂未注册，继续等待: service=%s", w.serviceName)
 				} else {
-					logx.Errorf("[consul_watch] 失败: 解析服务端点失败, service=%s, error=%v", w.serviceName, err)
+					logx.Errorf("[consul_watch] 解析服务端点失败: service=%s, error=%v", w.serviceName, err)
 				}
 				continue
 			}
@@ -156,11 +155,16 @@ func (w *ConsulWatcher) watch() {
 			// 检查是否有变化
 			currentEndpoints := w.GetEndpoints()
 			if !endpointsEqual(currentEndpoints, endpoints) {
+				// 端点发生变化，打印日志
 				logx.Infof("[consul_watch] 检测到服务变化: service=%s, old=%v, new=%v", w.serviceName, currentEndpoints, endpoints)
 				w.setEndpoints(endpoints)
 				if w.onChange != nil {
 					w.onChange(endpoints)
 				}
+			} else if w.firstResolve && len(endpoints) > 0 {
+				// 首次成功解析（初始解析失败后首次成功）
+				w.firstResolve = false
+				logx.Infof("[consul_watch] 服务发现成功: service=%s, endpoints=%v", w.serviceName, endpoints)
 			}
 		}
 	}

@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/logic"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -72,7 +73,7 @@ type orderPaymentPendingEventPayload struct {
 func StartOrderRefundConsumer(ctx context.Context, svcCtx *svc.ServiceContext) {
 	cfg := svcCtx.Config().RocketMQ
 	if len(cfg.NameServers) == 0 {
-		logx.Infof("order refund consumer not started: rocketmq not configured")
+		helper.LogInfo(logx.WithContext(ctx), helper.OpMQConsumer, "order refund consumer not started: rocketmq not configured", nil)
 		return
 	}
 
@@ -93,7 +94,7 @@ func StartOrderRefundConsumer(ctx context.Context, svcCtx *svc.ServiceContext) {
 		},
 	)
 	if err != nil {
-		logx.Errorf("init order refund consumer failed: %v", err)
+		helper.LogError(logx.WithContext(ctx), helper.OpMQConsumer, "init order refund consumer failed", err, nil)
 		return
 	}
 
@@ -103,7 +104,10 @@ func StartOrderRefundConsumer(ctx context.Context, svcCtx *svc.ServiceContext) {
 		pkgIoc.ShutdownRocketMQConsumer(consumer)
 	}()
 
-	logx.Infof("order refund consumer started, topic=%s", orderEventTopic)
+	helper.LogSuccess(logx.WithContext(ctx), helper.OpMQConsumer, map[string]interface{}{
+		"consumer": "order_refund",
+		"topic":    orderEventTopic,
+	})
 }
 
 func handleOrderEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
@@ -124,46 +128,72 @@ func handleOrderEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *prim
 // handleOrderCancelled 处理 ORDER_CANCELLED 事件，执行钱包退款
 // 注意：只有当 NeedRefund=true 时才执行退款（已创建但未支付的订单不需要退款）
 func handleOrderCancelled(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
+	logger := logx.WithContext(ctx)
+
 	var payload orderCancelledEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("unmarshal ORDER_CANCELLED payload failed: %v, body=%s", err, string(msg.Body))
+		helper.LogError(logger, helper.OpMQConsumer, "unmarshal ORDER_CANCELLED payload failed", err, map[string]interface{}{
+			"body": string(msg.Body),
+		})
 		return nil // 丢弃这条，避免一直重试
 	}
 
 	if payload.BossID == 0 || payload.Amount <= 0 {
-		logx.Errorf("invalid ORDER_CANCELLED payload: boss_id=%d, amount=%d", payload.BossID, payload.Amount)
+		helper.LogError(logger, helper.OpMQConsumer, "invalid ORDER_CANCELLED payload", nil, map[string]interface{}{
+			"boss_id": payload.BossID,
+			"amount":  payload.Amount,
+		})
 		return nil
 	}
 
 	// 只有当 NeedRefund=true 时才执行退款
 	// 如果订单未支付（NeedRefund=false），则不需要退款，直接返回成功
 	if !payload.NeedRefund {
-		logx.Infof("order cancelled without refund: order_no=%s, boss_id=%d (order was not paid)",
-			payload.OrderNo, payload.BossID)
+		helper.LogInfo(logger, helper.OpMQConsumer, "order cancelled without refund (order was not paid)", map[string]interface{}{
+			"order_no": payload.OrderNo,
+			"boss_id":  payload.BossID,
+		})
 		return nil
 	}
 
 	// 使用退款逻辑进行幂等退款（Amount 为正数，BizOrderID 用于幂等控制），通过 RocketMQ 事务消息发送退款成功事件
 	l := logic.NewRefundLogic(ctx, svcCtx)
 	if err := l.Refund(payload.BossID, payload.Amount, payload.BizOrderID, payload.OrderNo, "order refund"); err != nil {
-		logx.Errorf("refund wallet failed for order %s, user=%d, amount=%d, err=%v",
-			payload.OrderNo, payload.BossID, payload.Amount, err)
+		helper.LogError(logger, helper.OpMQConsumer, "refund wallet failed", err, map[string]interface{}{
+			"order_no": payload.OrderNo,
+			"boss_id":  payload.BossID,
+			"amount":   payload.Amount,
+		})
 		return err
 	}
 
+	helper.LogSuccess(logger, helper.OpMQConsumer, map[string]interface{}{
+		"event":    "order_cancelled",
+		"order_no": payload.OrderNo,
+		"boss_id":  payload.BossID,
+		"amount":   payload.Amount,
+		"refunded": true,
+	})
 	return nil
 }
 
 // handleOrderCompleted 处理 ORDER_COMPLETED 事件，给陪玩充值
 func handleOrderCompleted(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
+	logger := logx.WithContext(ctx)
+
 	var payload orderCompletedEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("unmarshal ORDER_COMPLETED payload failed: %v, body=%s", err, string(msg.Body))
+		helper.LogError(logger, helper.OpMQConsumer, "unmarshal ORDER_COMPLETED payload failed", err, map[string]interface{}{
+			"body": string(msg.Body),
+		})
 		return nil // 丢弃这条，避免一直重试
 	}
 
 	if payload.CompanionID == 0 || payload.Amount <= 0 {
-		logx.Errorf("invalid ORDER_COMPLETED payload: companion_id=%d, amount=%d", payload.CompanionID, payload.Amount)
+		helper.LogError(logger, helper.OpMQConsumer, "invalid ORDER_COMPLETED payload", nil, map[string]interface{}{
+			"companion_id": payload.CompanionID,
+			"amount":       payload.Amount,
+		})
 		return nil
 	}
 
@@ -176,28 +206,42 @@ func handleOrderCompleted(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 		Remark:     "order completed payment",
 	})
 	if err != nil {
-		logx.Errorf("recharge wallet failed for order %s, companion=%d, amount=%d, err=%v",
-			payload.OrderNo, payload.CompanionID, payload.Amount, err)
+		helper.LogError(logger, helper.OpMQConsumer, "recharge wallet failed", err, map[string]interface{}{
+			"order_no":     payload.OrderNo,
+			"companion_id": payload.CompanionID,
+			"amount":       payload.Amount,
+		})
 		return err
 	}
 
-	logx.Infof("recharge wallet success for order %s, companion=%d, amount=%d",
-		payload.OrderNo, payload.CompanionID, payload.Amount)
+	helper.LogSuccess(logger, helper.OpMQConsumer, map[string]interface{}{
+		"event":        "order_completed",
+		"order_no":     payload.OrderNo,
+		"companion_id": payload.CompanionID,
+		"amount":       payload.Amount,
+	})
 	return nil
 }
 
 // handlePaymentPending 处理 ORDER_PAYMENT_PENDING 事件，执行扣款
 // 扣款成功后，通过 RocketMQ 事务消息发送支付结果事件
 func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
+	logger := logx.WithContext(ctx)
+
 	var payload orderPaymentPendingEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("unmarshal ORDER_PAYMENT_PENDING payload failed: %v, body=%s", err, string(msg.Body))
+		helper.LogError(logger, helper.OpMQConsumer, "unmarshal ORDER_PAYMENT_PENDING payload failed", err, map[string]interface{}{
+			"body": string(msg.Body),
+		})
 		return nil // 丢弃这条，避免一直重试
 	}
 
 	if payload.BossID == 0 || payload.Amount <= 0 || payload.OrderNo == "" {
-		logx.Errorf("invalid ORDER_PAYMENT_PENDING payload: boss_id=%d, amount=%d, order_no=%s",
-			payload.BossID, payload.Amount, payload.OrderNo)
+		helper.LogError(logger, helper.OpMQConsumer, "invalid ORDER_PAYMENT_PENDING payload", nil, map[string]interface{}{
+			"boss_id":  payload.BossID,
+			"amount":   payload.Amount,
+			"order_no": payload.OrderNo,
+		})
 		return nil
 	}
 
@@ -214,8 +258,10 @@ func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 			Where("type = ? AND biz_order_id = ?", "CONSUME", payload.BizOrderID).
 			First(&existedTr).Error; err == nil {
 			// 已经扣过款了，直接返回成功（幂等）
-			logx.Infof("payment already consumed for order %s, biz_order_id=%s, skip duplicate consume",
-				payload.OrderNo, payload.BizOrderID)
+			helper.LogInfo(logger, helper.OpMQConsumer, "payment already consumed, skip duplicate", map[string]interface{}{
+				"order_no":     payload.OrderNo,
+				"biz_order_id": payload.BizOrderID,
+			})
 			paymentSucceeded = true
 			return nil
 		} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -273,7 +319,9 @@ func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 	})
 
 	if err != nil {
-		logx.Errorf("payment transaction failed for order %s: %v", payload.OrderNo, err)
+		helper.LogError(logger, helper.OpMQConsumer, "payment transaction failed", err, map[string]interface{}{
+			"order_no": payload.OrderNo,
+		})
 		return err
 	}
 
@@ -287,8 +335,10 @@ func handlePaymentPending(ctx context.Context, svcCtx *svc.ServiceContext, msg *
 
 // sendPaymentSucceededEvent 发送支付成功事件（事务提交后调用）
 func sendPaymentSucceededEvent(ctx context.Context, svcCtx *svc.ServiceContext, payload *orderPaymentPendingEventPayload) error {
+	logger := logx.WithContext(ctx)
+
 	if svcCtx.EventProducer == nil {
-		logx.Errorf("event producer not initialized, cannot send payment succeeded event")
+		helper.LogError(logger, helper.OpMQConsumer, "event producer not initialized, cannot send payment succeeded event", nil, nil)
 		return nil // 不返回错误，避免影响主流程
 	}
 
@@ -301,7 +351,7 @@ func sendPaymentSucceededEvent(ctx context.Context, svcCtx *svc.ServiceContext, 
 	}
 	succeededPayloadJSON, err := json.Marshal(succeededPayload)
 	if err != nil {
-		logx.Errorf("marshal payment succeeded payload failed: %v", err)
+		helper.LogError(logger, helper.OpMQConsumer, "marshal payment succeeded payload failed", err, nil)
 		return nil // 不返回错误，避免影响主流程
 	}
 
@@ -309,19 +359,27 @@ func sendPaymentSucceededEvent(ctx context.Context, svcCtx *svc.ServiceContext, 
 	msg.WithTag(eventTypePaymentSucceeded)
 
 	if _, err := svcCtx.EventProducer.SendSync(ctx, msg); err != nil {
-		logx.Errorf("send payment succeeded event failed: order_no=%s, err=%v", payload.OrderNo, err)
+		helper.LogError(logger, helper.OpMQConsumer, "send payment succeeded event failed", err, map[string]interface{}{
+			"order_no": payload.OrderNo,
+		})
 		return nil // 不返回错误，避免影响主流程（消息发送失败不影响扣款结果）
 	}
 
-	logx.Infof("payment succeeded for order %s, boss=%d, amount=%d",
-		payload.OrderNo, payload.BossID, payload.Amount)
+	helper.LogSuccess(logger, helper.OpMQConsumer, map[string]interface{}{
+		"event":    "payment_succeeded",
+		"order_no": payload.OrderNo,
+		"boss_id":  payload.BossID,
+		"amount":   payload.Amount,
+	})
 	return nil
 }
 
 // sendPaymentFailedEvent 发送支付失败事件（事务提交后调用）
 func sendPaymentFailedEvent(ctx context.Context, svcCtx *svc.ServiceContext, payload *orderPaymentPendingEventPayload, reason string) error {
+	logger := logx.WithContext(ctx)
+
 	if svcCtx.EventProducer == nil {
-		logx.Errorf("event producer not initialized, cannot send payment failed event")
+		helper.LogError(logger, helper.OpMQConsumer, "event producer not initialized, cannot send payment failed event", nil, nil)
 		return nil // 不返回错误，避免影响主流程
 	}
 
@@ -335,7 +393,7 @@ func sendPaymentFailedEvent(ctx context.Context, svcCtx *svc.ServiceContext, pay
 	}
 	failedPayloadJSON, err := json.Marshal(failedPayload)
 	if err != nil {
-		logx.Errorf("marshal payment failed payload failed: %v", err)
+		helper.LogError(logger, helper.OpMQConsumer, "marshal payment failed payload failed", err, nil)
 		return nil // 不返回错误，避免影响主流程
 	}
 
@@ -343,11 +401,17 @@ func sendPaymentFailedEvent(ctx context.Context, svcCtx *svc.ServiceContext, pay
 	msg.WithTag(eventTypePaymentFailed)
 
 	if _, err := svcCtx.EventProducer.SendSync(ctx, msg); err != nil {
-		logx.Errorf("send payment failed event failed: order_no=%s, err=%v", payload.OrderNo, err)
+		helper.LogError(logger, helper.OpMQConsumer, "send payment failed event failed", err, map[string]interface{}{
+			"order_no": payload.OrderNo,
+		})
 		return nil // 不返回错误，避免影响主流程
 	}
 
-	logx.Errorf("consume wallet failed for order %s, boss=%d, amount=%d, reason=%s",
-		payload.OrderNo, payload.BossID, payload.Amount, reason)
+	helper.LogError(logger, helper.OpMQConsumer, "consume wallet failed", nil, map[string]interface{}{
+		"order_no": payload.OrderNo,
+		"boss_id":  payload.BossID,
+		"amount":   payload.Amount,
+		"reason":   reason,
+	})
 	return nil
 }

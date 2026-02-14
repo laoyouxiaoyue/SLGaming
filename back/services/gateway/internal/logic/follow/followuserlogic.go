@@ -6,6 +6,7 @@ package follow
 import (
 	"context"
 
+	"SLGaming/back/services/gateway/internal/helper"
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
@@ -30,16 +31,25 @@ func NewFollowUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Follow
 }
 
 func (l *FollowUserLogic) FollowUser(req *types.FollowUserRequest) (resp *types.FollowUserResponse, err error) {
-	if l.svcCtx.UserRPC == nil {
-		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
-		return &types.FollowUserResponse{BaseResp: types.BaseResp{Code: code, Msg: msg}}, nil
-	}
-
 	userID, err := middleware.GetUserID(l.ctx)
 	if err != nil || userID == 0 {
+		helper.LogWarning(l.Logger, helper.OpFollowUser, "unauthorized", map[string]interface{}{
+			"target_user_id": req.UserId,
+		})
 		return &types.FollowUserResponse{
 			BaseResp: types.BaseResp{Code: 401, Msg: "未登录或认证失败"},
 		}, nil
+	}
+
+	helper.LogRequest(l.Logger, helper.OpFollowUser, map[string]interface{}{
+		"user_id":        userID,
+		"target_user_id": req.UserId,
+	})
+
+	if l.svcCtx.UserRPC == nil {
+		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		helper.LogError(l.Logger, helper.OpFollowUser, "user rpc not available", nil, nil)
+		return &types.FollowUserResponse{BaseResp: types.BaseResp{Code: code, Msg: msg}}, nil
 	}
 
 	rpcResp, err := l.svcCtx.UserRPC.FollowUser(l.ctx, &userclient.FollowUserRequest{
@@ -50,6 +60,12 @@ func (l *FollowUserLogic) FollowUser(req *types.FollowUserRequest) (resp *types.
 		code, msg := utils.HandleRPCError(err, l.Logger, "FollowUser")
 		return &types.FollowUserResponse{BaseResp: types.BaseResp{Code: code, Msg: msg}}, nil
 	}
+
+	helper.LogSuccess(l.Logger, helper.OpFollowUser, map[string]interface{}{
+		"user_id":        userID,
+		"target_user_id": req.UserId,
+		"success":        rpcResp.Success,
+	})
 
 	return &types.FollowUserResponse{
 		BaseResp: types.BaseResp{Code: 0, Msg: "success"},

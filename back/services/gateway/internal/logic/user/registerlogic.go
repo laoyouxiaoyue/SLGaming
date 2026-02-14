@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"SLGaming/back/services/code/codeclient"
+	"SLGaming/back/services/gateway/internal/helper"
 	"SLGaming/back/services/gateway/internal/svc"
 	"SLGaming/back/services/gateway/internal/types"
 	"SLGaming/back/services/gateway/internal/utils"
@@ -30,8 +31,15 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.RegisterResponse, err error) {
+	helper.LogRequest(l.Logger, helper.OpRegister, map[string]interface{}{
+		"phone":    helper.MaskPhone(req.Phone),
+		"nickname": req.Nickname,
+		"role":     req.Role,
+	})
+
 	if l.svcCtx.UserRPC == nil {
 		code, msg := utils.HandleRPCClientUnavailable(l.Logger, "UserRPC")
+		helper.LogError(l.Logger, helper.OpRegister, "user rpc not available", nil, nil)
 		return &types.RegisterResponse{
 			BaseResp: types.BaseResp{Code: code, Msg: msg},
 		}, nil
@@ -54,6 +62,9 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 			}, nil
 		}
 		if !verifyResp.Passed {
+			helper.LogWarning(l.Logger, helper.OpRegister, "verify code failed", map[string]interface{}{
+				"phone": helper.MaskPhone(req.Phone),
+			})
 			return &types.RegisterResponse{
 				BaseResp: types.BaseResp{
 					Code: 400,
@@ -91,6 +102,12 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 			},
 		}, nil
 	}
+
+	helper.LogSuccess(l.Logger, helper.OpRegister, map[string]interface{}{
+		"user_id":  rpcResp.Id,
+		"nickname": req.Nickname,
+		"role":     req.Role,
+	})
 
 	return &types.RegisterResponse{
 		BaseResp: types.BaseResp{

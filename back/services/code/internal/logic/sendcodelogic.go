@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"SLGaming/back/services/code/code"
+	"SLGaming/back/services/code/internal/helper"
 	"SLGaming/back/services/code/internal/metrics"
 	"SLGaming/back/services/code/internal/svc"
 
@@ -37,11 +38,17 @@ func NewSendCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendCode
 func (l *SendCodeLogic) SendCode(in *code.SendCodeRequest) (*code.SendCodeResponse, error) {
 	start := time.Now()
 	purpose := in.GetPurpose()
+	phone := in.GetPhone()
+	maskedPhone := helper.MaskPhone(phone)
+
+	helper.LogRequest(l.Logger, helper.OpSendCode, map[string]interface{}{
+		"phone":   maskedPhone,
+		"purpose": purpose,
+	})
+
 	getTemplate := l.getTemplate(purpose)
 
-	// 手机号限流检查
-	if err := l.checkPhoneRateLimit(in.GetPhone(), purpose, getTemplate.MaxDailySends); err != nil {
-		// 记录限流拦截
+	if err := l.checkPhoneRateLimit(phone, purpose, getTemplate.MaxDailySends); err != nil {
 		metrics.CodeRateLimitTotal.WithLabelValues("phone_rate_limit").Inc()
 		return nil, err
 	}
@@ -51,43 +58,61 @@ func (l *SendCodeLogic) SendCode(in *code.SendCodeRequest) (*code.SendCodeRespon
 		expire = defaultExpireSeconds * time.Second
 	}
 
-	key := fmt.Sprintf("code:%s:%s", in.GetPurpose(), in.GetPhone())
+	key := fmt.Sprintf("code:%s:%s", purpose, phone)
 
 	codeValue, err := generateCode(getTemplate.CodeLength)
 	if err != nil {
+		helper.LogError(l.Logger, helper.OpSendCode, "generate code failed", err, map[string]interface{}{
+			"phone": maskedPhone,
+		})
 		return nil, err
 	}
 
-	// 4. 检查验证码是否已存在（未过期）
 	ttl, err := l.svcCtx.Redis.Ttl(key)
 	if err != nil {
-		// Redis 查询失败，记录日志但不阻止发送（可能是网络问题）
-		l.Errorf("check code ttl failed: %v", err)
+		helper.LogError(l.Logger, helper.OpSendCode, "check code ttl failed", err, map[string]interface{}{
+			"phone": maskedPhone,
+			"key":   key,
+		})
 	} else if ttl > 0 {
+		helper.LogWarning(l.Logger, helper.OpSendCode, "code not expired", map[string]interface{}{
+			"phone":      maskedPhone,
+			"remain_ttl": ttl,
+		})
 		return nil, fmt.Errorf("验证码尚未过期，请 %d 秒后再试", ttl)
 	}
 
-	// 5. 使用 SETEX 设置验证码
 	err = l.svcCtx.Redis.Setex(key, codeValue, int(expire/time.Second))
 	if err != nil {
 		metrics.CodeRedisErrorTotal.Inc()
 		metrics.CodeSendTotal.WithLabelValues(purpose, "failure").Inc()
 		metrics.CodeSendDuration.WithLabelValues(purpose).Observe(time.Since(start).Seconds())
+		helper.LogError(l.Logger, helper.OpSendCode, "redis set code failed", err, map[string]interface{}{
+			"phone": maskedPhone,
+			"key":   key,
+		})
 		return nil, fmt.Errorf("set code failed: %w", err)
 	}
 
-	// 更新限流计数
-	l.updateRateLimitCounters(in.GetPhone(), purpose)
+	l.updateRateLimitCounters(phone, purpose)
 
-	// 记录成功指标
 	metrics.CodeSendTotal.WithLabelValues(purpose, "success").Inc()
 	metrics.CodeSendDuration.WithLabelValues(purpose).Observe(time.Since(start).Seconds())
 
-	logx.Infof("send code content: %s", renderTemplate(getTemplate.Content, codeValue, int(expire/time.Minute)))
+	expireAt := time.Now().Add(expire).Unix()
+	helper.LogSuccess(l.Logger, helper.OpSendCode, map[string]interface{}{
+		"phone":     maskedPhone,
+		"purpose":   purpose,
+		"expire_at": expireAt,
+	})
+
+	helper.LogInfo(l.Logger, helper.OpSendCode, "code content", map[string]interface{}{
+		"content": renderTemplate(getTemplate.Content, codeValue, int(expire/time.Minute)),
+	})
 
 	return &code.SendCodeResponse{
 		RequestId: uuid.NewString(),
-		ExpireAt:  time.Now().Add(expire).Unix(),
+		ExpireAt:  expireAt,
 	}, nil
 }
 
@@ -134,22 +159,7 @@ func (l *SendCodeLogic) getTemplate(purpose string) struct {
 }
 
 func generateCode(length int) (string, error) {
-	// 暂时返回固定验证码，方便测试
 	return "123456", nil
-
-	// 原随机生成代码（已注释，需要时恢复）：
-	// if length <= 0 {
-	// 	length = defaultCodeLength
-	// }
-	// result := make([]byte, length)
-	// for i := 0; i < length; i++ {
-	// 	n, err := rand.Int(rand.Reader, big.NewInt(10))
-	// 	if err != nil {
-	// 		return "", err
-	// 	}
-	// 	result[i] = byte('0' + n.Int64())
-	// }
-	// return string(result), nil
 }
 
 func renderTemplate(content string, code string, expireMinutes int) string {
@@ -174,11 +184,9 @@ func renderTemplate(content string, code string, expireMinutes int) string {
 	return buf.String()
 }
 
-// getClientIP 从 gRPC context 中获取客户端IP
-// checkPhoneRateLimit 检查手机号限流
 func (l *SendCodeLogic) checkPhoneRateLimit(phone, purpose string, maxDailySends int) error {
 	if maxDailySends <= 0 {
-		maxDailySends = 10 // 默认值
+		maxDailySends = 10
 	}
 
 	cfg := l.svcCtx.Config.RateLimit
@@ -187,41 +195,59 @@ func (l *SendCodeLogic) checkPhoneRateLimit(phone, purpose string, maxDailySends
 		sendInterval = defaultPhoneSendInterval
 	}
 
-	// 1. 检查手机号发送间隔
+	maskedPhone := helper.MaskPhone(phone)
+
 	phoneLockKey := fmt.Sprintf("rate:phone:lock:%s", phone)
 	exists, err := l.svcCtx.Redis.Exists(phoneLockKey)
 	if err != nil {
-		// Redis 查询失败，记录日志但不阻止发送（可能是网络问题）
-		l.Errorf("check phone lock exists failed: %v", err)
+		helper.LogError(l.Logger, helper.OpSendCode, "check phone lock exists failed", err, map[string]interface{}{
+			"phone": maskedPhone,
+		})
 	} else if exists {
 		ttl, err := l.svcCtx.Redis.Ttl(phoneLockKey)
 		if err != nil {
-			l.Errorf("check phone lock ttl failed: %v", err)
-			// 如果查询 TTL 失败，假设锁还存在，返回错误
+			helper.LogError(l.Logger, helper.OpSendCode, "check phone lock ttl failed", err, map[string]interface{}{
+				"phone": maskedPhone,
+			})
 			return fmt.Errorf("手机号发送过于频繁，请稍后再试")
 		}
 		if ttl > 0 {
 			metrics.CodeRateLimitTotal.WithLabelValues("phone_interval").Inc()
+			helper.LogWarning(l.Logger, helper.OpSendCode, "rate limited: phone interval", map[string]interface{}{
+				"phone":      maskedPhone,
+				"remain_ttl": ttl,
+				"type":       "phone_interval",
+			})
 			return fmt.Errorf("手机号发送过于频繁，请 %d 秒后再试", ttl)
 		}
 	}
 
-	// 2. 检查手机号每日发送次数（按purpose区分）
 	today := time.Now().Format("20060102")
 	phoneDailyKey := fmt.Sprintf("rate:phone:daily:%s:%s:%s", phone, purpose, today)
 	countStr, err := l.svcCtx.Redis.Get(phoneDailyKey)
 	if err != nil {
-		// Redis 查询失败，记录日志但不阻止发送（可能是网络问题）
-		l.Errorf("get phone daily count failed: %v", err)
+		helper.LogError(l.Logger, helper.OpSendCode, "get phone daily count failed", err, map[string]interface{}{
+			"phone": maskedPhone,
+			"key":   phoneDailyKey,
+		})
 	} else {
 		count := 0
 		if countStr != "" {
 			if _, err := fmt.Sscanf(countStr, "%d", &count); err != nil {
-				l.Errorf("parse phone daily count failed: %v, value: %s", err, countStr)
+				helper.LogError(l.Logger, helper.OpSendCode, "parse phone daily count failed", err, map[string]interface{}{
+					"phone": maskedPhone,
+					"value": countStr,
+				})
 			}
 		}
 		if count >= maxDailySends {
 			metrics.CodeRateLimitTotal.WithLabelValues("phone_daily_limit").Inc()
+			helper.LogWarning(l.Logger, helper.OpSendCode, "rate limited: daily limit exceeded", map[string]interface{}{
+				"phone":       maskedPhone,
+				"daily_count": count,
+				"max_limit":   maxDailySends,
+				"type":        "phone_daily_limit",
+			})
 			return fmt.Errorf("该手机号今日发送次数已达上限（%d次）", maxDailySends)
 		}
 	}
@@ -229,32 +255,37 @@ func (l *SendCodeLogic) checkPhoneRateLimit(phone, purpose string, maxDailySends
 	return nil
 }
 
-// updateRateLimitCounters 更新限流计数器
-// 注意：这些操作失败不应该影响主流程，只记录日志
 func (l *SendCodeLogic) updateRateLimitCounters(phone, purpose string) {
 	cfg := l.svcCtx.Config.RateLimit
 	today := time.Now().Format("20060102")
+	maskedPhone := helper.MaskPhone(phone)
 
-	// 设置手机号发送锁
 	phoneSendInterval := cfg.PhoneSendInterval
 	if phoneSendInterval <= 0 {
 		phoneSendInterval = defaultPhoneSendInterval
 	}
 	phoneLockKey := fmt.Sprintf("rate:phone:lock:%s", phone)
 	if err := l.svcCtx.Redis.Setex(phoneLockKey, "1", phoneSendInterval); err != nil {
-		l.Errorf("set phone lock failed: %v, key: %s", err, phoneLockKey)
+		helper.LogError(l.Logger, helper.OpSendCode, "set phone lock failed", err, map[string]interface{}{
+			"phone": maskedPhone,
+			"key":   phoneLockKey,
+		})
 	}
 
-	// 增加手机号每日计数
 	phoneDailyKey := fmt.Sprintf("rate:phone:daily:%s:%s:%s", phone, purpose, today)
 	_, err := l.svcCtx.Redis.Incr(phoneDailyKey)
 	if err != nil {
-		l.Errorf("incr phone daily count failed: %v, key: %s", err, phoneDailyKey)
+		helper.LogError(l.Logger, helper.OpSendCode, "incr phone daily count failed", err, map[string]interface{}{
+			"phone": maskedPhone,
+			"key":   phoneDailyKey,
+		})
 	} else {
-		// 设置过期时间为当天结束
 		remainingSeconds := 86400 - (time.Now().Unix() % 86400)
 		if err := l.svcCtx.Redis.Expire(phoneDailyKey, int(remainingSeconds)); err != nil {
-			l.Errorf("expire phone daily count failed: %v, key: %s", err, phoneDailyKey)
+			helper.LogError(l.Logger, helper.OpSendCode, "expire phone daily count failed", err, map[string]interface{}{
+				"phone": maskedPhone,
+				"key":   phoneDailyKey,
+			})
 		}
 	}
 }

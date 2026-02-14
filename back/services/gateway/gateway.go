@@ -29,6 +29,7 @@ import (
 	pkgIoc "SLGaming/back/pkg/ioc"
 	_ "SLGaming/back/services/gateway/docs"
 	"SLGaming/back/services/gateway/internal/handler"
+	"SLGaming/back/services/gateway/internal/helper"
 	"SLGaming/back/services/gateway/internal/ioc"
 	"SLGaming/back/services/gateway/internal/middleware"
 	"SLGaming/back/services/gateway/internal/svc"
@@ -42,6 +43,8 @@ var configFile = flag.String("f", "etc/gateway.yaml", "the config file")
 
 func main() {
 	flag.Parse()
+
+	logger := logx.WithContext(nil)
 
 	// 加载配置（支持从 Nacos 加载）
 	c := ioc.LoadConfig(*configFile)
@@ -59,11 +62,13 @@ func main() {
 	var stopOnce sync.Once
 	stopServer := func() {
 		stopOnce.Do(func() {
-			logx.Info("shutting down gateway server")
+			helper.LogInfo(logger, helper.OpServer, "shutting down", map[string]interface{}{
+				"reason": "signal",
+			})
 			// 停止限流器清理协程
 			if rateLimiterMiddleware != nil {
 				rateLimiterMiddleware.Stop()
-				logx.Info("rate limiter stopped")
+				helper.LogInfo(logger, helper.OpServer, "rate limiter stopped", nil)
 			}
 			server.Stop()
 			if registrar != nil {
@@ -76,7 +81,10 @@ func main() {
 	var err error
 	registrar, err = ioc.RegisterConsul(c.Consul, fmt.Sprintf("%s:%d", c.Host, c.Port))
 	if err != nil {
-		logx.Errorf("consul register failed: %v", err)
+		helper.LogError(logger, helper.OpServer, "consul register failed", err, map[string]interface{}{
+			"host": c.Host,
+			"port": c.Port,
+		})
 	}
 
 	// 创建服务上下文
@@ -220,6 +228,11 @@ func main() {
 
 	defer stopServer()
 
-	logx.Infof("Starting gateway server at %s:%d...\n", c.Host, c.Port)
+	helper.LogSuccess(logger, helper.OpServer, map[string]interface{}{
+		"host": c.Host,
+		"port": c.Port,
+		"mode": c.Mode,
+	})
+
 	server.Start()
 }

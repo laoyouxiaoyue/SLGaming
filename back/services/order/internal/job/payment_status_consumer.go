@@ -53,7 +53,7 @@ type orderRefundSucceededEventPayload struct {
 func StartPaymentStatusConsumer(ctx context.Context, svcCtx *svc.ServiceContext) {
 	cfg := svcCtx.Config.RocketMQ
 	if len(cfg.NameServers) == 0 {
-		logx.Infof("payment status consumer not started: rocketmq not configured")
+		logx.Infof("[payment_event] info: consumer not started, reason=rocketmq not configured")
 		return
 	}
 
@@ -73,7 +73,7 @@ func StartPaymentStatusConsumer(ctx context.Context, svcCtx *svc.ServiceContext)
 		},
 	)
 	if err != nil {
-		logx.Errorf("init payment status consumer failed: %v", err)
+		logx.Errorf("[payment_event] failed: init consumer failed, error=%v", err)
 		return
 	}
 
@@ -82,7 +82,7 @@ func StartPaymentStatusConsumer(ctx context.Context, svcCtx *svc.ServiceContext)
 		pkgIoc.ShutdownRocketMQConsumer(consumer)
 	}()
 
-	logx.Infof("payment status consumer started, topic=%s", orderMQ.OrderEventTopic())
+	logx.Infof("[payment_event] succeeded: consumer started, topic=%s", orderMQ.OrderEventTopic())
 }
 
 func handlePaymentStatusEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
@@ -103,12 +103,12 @@ func handlePaymentStatusEvent(ctx context.Context, svcCtx *svc.ServiceContext, m
 func handlePaymentSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
 	var payload orderPaymentSucceededEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("unmarshal ORDER_PAYMENT_SUCCEEDED payload failed: %v, body=%s", err, string(msg.Body))
+		logx.Errorf("[payment_event] failed: unmarshal ORDER_PAYMENT_SUCCEEDED payload failed, body=%s, error=%v", string(msg.Body), err)
 		return nil
 	}
 
 	if payload.OrderID == 0 && payload.OrderNo == "" {
-		logx.Errorf("invalid ORDER_PAYMENT_SUCCEEDED payload: order_id=0 and order_no empty")
+		logx.Errorf("[payment_event] failed: invalid ORDER_PAYMENT_SUCCEEDED payload, order_id=0 and order_no empty")
 		return nil
 	}
 
@@ -124,19 +124,17 @@ func handlePaymentSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg
 
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				logx.Errorf("order not found when handling ORDER_PAYMENT_SUCCEEDED, order_id=%d, order_no=%s",
-					payload.OrderID, payload.OrderNo)
+				logx.Errorf("[payment_event] failed: order not found when handling ORDER_PAYMENT_SUCCEEDED, order_id=%d, order_no=%s", payload.OrderID, payload.OrderNo)
 				return nil
 			}
-			logx.Errorf("get order failed when handling ORDER_PAYMENT_SUCCEEDED: %v", err)
+			logx.Errorf("[payment_event] failed: get order failed when handling ORDER_PAYMENT_SUCCEEDED, error=%v", err)
 			return err
 		}
 
 		// 只有在 CREATED 状态时才更新为已支付（幂等）
 		if o.Status != model.OrderStatusCreated {
 			// 状态不符，直接返回，不视为错误，避免重复处理
-			logx.Infof("order status is not CREATED when handling ORDER_PAYMENT_SUCCEEDED, order_id=%d, status=%d",
-				o.ID, o.Status)
+			logx.Infof("[payment_event] warning: order status is not CREATED when handling ORDER_PAYMENT_SUCCEEDED, order_id=%d, status=%d", o.ID, o.Status)
 			return nil
 		}
 
@@ -145,11 +143,11 @@ func handlePaymentSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg
 		o.PaidAt = &now
 
 		if err := tx.Save(&o).Error; err != nil {
-			logx.Errorf("update order status to PAID failed: %v", err)
+			logx.Errorf("[payment_event] failed: update order status to PAID failed, order_id=%d, error=%v", o.ID, err)
 			return err
 		}
 
-		logx.Infof("order payment succeeded, order_id=%d, order_no=%s", o.ID, o.OrderNo)
+		logx.Infof("[payment_event] succeeded: order payment succeeded, order_id=%d, order_no=%s", o.ID, o.OrderNo)
 		return nil
 	})
 }
@@ -158,12 +156,12 @@ func handlePaymentSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg
 func handlePaymentFailed(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
 	var payload orderPaymentFailedEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("unmarshal ORDER_PAYMENT_FAILED payload failed: %v, body=%s", err, string(msg.Body))
+		logx.Errorf("[payment_event] failed: unmarshal ORDER_PAYMENT_FAILED payload failed, body=%s, error=%v", string(msg.Body), err)
 		return nil
 	}
 
 	if payload.OrderID == 0 && payload.OrderNo == "" {
-		logx.Errorf("invalid ORDER_PAYMENT_FAILED payload: order_id=0 and order_no empty")
+		logx.Errorf("[payment_event] failed: invalid ORDER_PAYMENT_FAILED payload, order_id=0 and order_no empty")
 		return nil
 	}
 
@@ -179,19 +177,17 @@ func handlePaymentFailed(ctx context.Context, svcCtx *svc.ServiceContext, msg *p
 
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				logx.Errorf("order not found when handling ORDER_PAYMENT_FAILED, order_id=%d, order_no=%s",
-					payload.OrderID, payload.OrderNo)
+				logx.Errorf("[payment_event] failed: order not found when handling ORDER_PAYMENT_FAILED, order_id=%d, order_no=%s", payload.OrderID, payload.OrderNo)
 				return nil
 			}
-			logx.Errorf("get order failed when handling ORDER_PAYMENT_FAILED: %v", err)
+			logx.Errorf("[payment_event] failed: get order failed when handling ORDER_PAYMENT_FAILED, error=%v", err)
 			return err
 		}
 
 		// 只有在 CREATED 状态时才更新为已取消（幂等）
 		if o.Status != model.OrderStatusCreated {
 			// 状态不符，直接返回，不视为错误，避免重复处理
-			logx.Infof("order status is not CREATED when handling ORDER_PAYMENT_FAILED, order_id=%d, status=%d",
-				o.ID, o.Status)
+			logx.Infof("[payment_event] warning: order status is not CREATED when handling ORDER_PAYMENT_FAILED, order_id=%d, status=%d", o.ID, o.Status)
 			return nil
 		}
 
@@ -201,11 +197,11 @@ func handlePaymentFailed(ctx context.Context, svcCtx *svc.ServiceContext, msg *p
 		o.CancelReason = "payment failed: " + payload.Reason
 
 		if err := tx.Save(&o).Error; err != nil {
-			logx.Errorf("update order status to CANCELLED failed: %v", err)
+			logx.Errorf("[payment_event] failed: update order status to CANCELLED failed, order_id=%d, error=%v", o.ID, err)
 			return err
 		}
 
-		logx.Infof("order payment failed, order_id=%d, order_no=%s, reason=%s", o.ID, o.OrderNo, payload.Reason)
+		logx.Infof("[payment_event] succeeded: order payment failed, order_id=%d, order_no=%s, reason=%s", o.ID, o.OrderNo, payload.Reason)
 		return nil
 	})
 }
@@ -214,12 +210,12 @@ func handlePaymentFailed(ctx context.Context, svcCtx *svc.ServiceContext, msg *p
 func handleRefundSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
 	var payload orderRefundSucceededEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("unmarshal ORDER_REFUND_SUCCEEDED payload failed: %v, body=%s", err, string(msg.Body))
+		logx.Errorf("[payment_event] failed: unmarshal ORDER_REFUND_SUCCEEDED payload failed, body=%s, error=%v", string(msg.Body), err)
 		return nil
 	}
 
 	if payload.OrderID == 0 && payload.OrderNo == "" {
-		logx.Errorf("invalid ORDER_REFUND_SUCCEEDED payload: order_id=0 and order_no empty")
+		logx.Errorf("[payment_event] failed: invalid ORDER_REFUND_SUCCEEDED payload, order_id=0 and order_no empty")
 		return nil
 	}
 
@@ -235,19 +231,17 @@ func handleRefundSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg 
 
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				logx.Errorf("order not found when handling ORDER_REFUND_SUCCEEDED, order_id=%d, order_no=%s",
-					payload.OrderID, payload.OrderNo)
+				logx.Errorf("[payment_event] failed: order not found when handling ORDER_REFUND_SUCCEEDED, order_id=%d, order_no=%s", payload.OrderID, payload.OrderNo)
 				return nil
 			}
-			logx.Errorf("get order failed when handling ORDER_REFUND_SUCCEEDED: %v", err)
+			logx.Errorf("[payment_event] failed: get order failed when handling ORDER_REFUND_SUCCEEDED, error=%v", err)
 			return err
 		}
 
 		// 只有在 CANCEL_REFUNDING 状态时才更新为已取消（幂等）
 		if o.Status != model.OrderStatusCancelRefunding {
 			// 状态不符，直接返回，不视为错误，避免重复处理
-			logx.Infof("order status is not CANCEL_REFUNDING when handling ORDER_REFUND_SUCCEEDED, order_id=%d, status=%d",
-				o.ID, o.Status)
+			logx.Infof("[payment_event] warning: order status is not CANCEL_REFUNDING when handling ORDER_REFUND_SUCCEEDED, order_id=%d, status=%d", o.ID, o.Status)
 			return nil
 		}
 
@@ -256,11 +250,11 @@ func handleRefundSucceeded(ctx context.Context, svcCtx *svc.ServiceContext, msg 
 		o.CancelledAt = &now
 
 		if err := tx.Save(&o).Error; err != nil {
-			logx.Errorf("update order status to CANCELLED failed: %v", err)
+			logx.Errorf("[payment_event] failed: update order status to CANCELLED failed, order_id=%d, error=%v", o.ID, err)
 			return err
 		}
 
-		logx.Infof("order refund succeeded, order_id=%d, order_no=%s, amount=%d", o.ID, o.OrderNo, payload.Amount)
+		logx.Infof("[payment_event] succeeded: order refund succeeded, order_id=%d, order_no=%s, amount=%d", o.ID, o.OrderNo, payload.Amount)
 		return nil
 	})
 }

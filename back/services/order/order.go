@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -18,6 +17,7 @@ import (
 	"SLGaming/back/services/order/order"
 
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
@@ -32,23 +32,20 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
-	// 注册到 Consul（如果配置了）
 	var registrar *ioc.ConsulRegistrar
 	var err error
 	if c.Consul.Address != "" && c.Consul.Service.Name != "" {
 		registrar, err = orderioc.RegisterConsul(c.Consul, c.ListenOn)
 		if err != nil {
-			fmt.Printf("failed to register service to consul: %v\n", err)
+			logx.Errorf("[server] failed: consul register failed, listen_on=%s, error=%v", c.ListenOn, err)
 		}
 	}
 
 	ctx := svc.NewServiceContext(c)
 
-	// 启动支付状态消费者
 	consumerCtx, cancel := context.WithCancel(context.Background())
 	job.StartPaymentStatusConsumer(consumerCtx, ctx)
 
-	// 创建 gRPC 服务器
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		order.RegisterOrderServer(grpcServer, server.NewOrderServer(ctx))
 
@@ -57,12 +54,11 @@ func main() {
 		}
 	})
 
-	// 捕获退出信号，优雅停机
 	var stopOnce sync.Once
 	stopServer := func() {
 		stopOnce.Do(func() {
-			fmt.Println("shutting down order rpc server")
-			cancel() // 停止消费者
+			logx.Infof("[server] info: shutting down, reason=signal")
+			cancel()
 			s.Stop()
 			if registrar != nil {
 				registrar.Deregister()
@@ -80,6 +76,7 @@ func main() {
 
 	defer stopServer()
 
-	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
+	logx.Infof("[server] succeeded: service started, listen_on=%s, mode=%s", c.ListenOn, c.Mode)
+
 	s.Start()
 }

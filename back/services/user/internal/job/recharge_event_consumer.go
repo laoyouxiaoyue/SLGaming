@@ -7,6 +7,7 @@ import (
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/pkg/rechargemq"
+	"SLGaming/back/services/user/internal/helper"
 	"SLGaming/back/services/user/internal/logic"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -20,7 +21,7 @@ import (
 func StartRechargeEventConsumer(ctx context.Context, svcCtx *svc.ServiceContext) {
 	cfg := svcCtx.Config().RocketMQ
 	if len(cfg.NameServers) == 0 {
-		logx.Infof("recharge event consumer not started: rocketmq not configured")
+		helper.LogInfo(logx.WithContext(ctx), helper.OpMQConsumer, "recharge event consumer not started: rocketmq not configured", nil)
 		return
 	}
 
@@ -40,7 +41,7 @@ func StartRechargeEventConsumer(ctx context.Context, svcCtx *svc.ServiceContext)
 		},
 	)
 	if err != nil {
-		logx.Errorf("init recharge event consumer failed: %v", err)
+		helper.LogError(logx.WithContext(ctx), helper.OpMQConsumer, "init recharge event consumer failed", err, nil)
 		return
 	}
 
@@ -50,26 +51,41 @@ func StartRechargeEventConsumer(ctx context.Context, svcCtx *svc.ServiceContext)
 		pkgIoc.ShutdownRocketMQConsumer(consumer)
 	}()
 
-	logx.Infof("recharge event consumer started, topic=%s", rechargemq.RechargeEventTopic())
+	helper.LogSuccess(logx.WithContext(ctx), helper.OpMQConsumer, map[string]interface{}{
+		"consumer": "recharge_event",
+		"topic":    rechargemq.RechargeEventTopic(),
+	})
 }
 
 func handleRechargeEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *primitive.MessageExt) error {
+	logger := logx.WithContext(ctx)
+
 	var payload rechargemq.RechargeEventPayload
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
-		logx.Errorf("[RechargeEvent] Failed to unmarshal payload: %v, message_id=%s, body=%s",
-			err, msg.MsgId, string(msg.Body))
+		helper.LogError(logger, helper.OpMQConsumer, "unmarshal RechargeEvent payload failed", err, map[string]interface{}{
+			"message_id": msg.MsgId,
+			"body":       string(msg.Body),
+		})
 		return nil // 丢弃这条，避免一直重试
 	}
 
 	if payload.OrderNo == "" || payload.UserID == 0 || payload.Amount <= 0 {
-		logx.Errorf("[RechargeEvent] Invalid payload: order_no=%s, user_id=%d, amount=%d, message_id=%s",
-			payload.OrderNo, payload.UserID, payload.Amount, msg.MsgId)
+		helper.LogError(logger, helper.OpMQConsumer, "invalid RechargeEvent payload", nil, map[string]interface{}{
+			"message_id": msg.MsgId,
+			"order_no":   payload.OrderNo,
+			"user_id":    payload.UserID,
+			"amount":     payload.Amount,
+		})
 		return nil
 	}
 
 	tag := msg.GetTags()
-	logx.Infof("[RechargeEvent] Processing event: tag=%s, order_no=%s, user_id=%d, amount=%d",
-		tag, payload.OrderNo, payload.UserID, payload.Amount)
+	helper.LogInfo(logger, helper.OpMQConsumer, "processing event", map[string]interface{}{
+		"tag":      tag,
+		"order_no": payload.OrderNo,
+		"user_id":  payload.UserID,
+		"amount":   payload.Amount,
+	})
 
 	switch tag {
 	case rechargemq.EventTypeRechargeSuccess():
@@ -80,18 +96,24 @@ func handleRechargeEvent(ctx context.Context, svcCtx *svc.ServiceContext, msg *p
 		return handleRechargeStatusUpdate(ctx, svcCtx, &payload, model.RechargeStatusFailed)
 	default:
 		// 未识别的 tag 忽略
-		logx.Infof("[RechargeEvent] Skipping unknown tag: %s, message_id=%s", tag, msg.MsgId)
+		helper.LogInfo(logger, helper.OpMQConsumer, "skipping unknown tag", map[string]interface{}{
+			"tag":        tag,
+			"message_id": msg.MsgId,
+		})
 		return nil
 	}
 }
 
 func handleRechargeSuccess(ctx context.Context, svcCtx *svc.ServiceContext, payload *rechargemq.RechargeEventPayload) error {
-	logx.Infof("[RechargeEvent] Processing success event: order_no=%s, user_id=%d, amount=%d",
-		payload.OrderNo, payload.UserID, payload.Amount)
+	logger := logx.WithContext(ctx)
+
+	helper.LogInfo(logger, helper.OpMQConsumer, "processing success event", map[string]interface{}{
+		"order_no": payload.OrderNo,
+		"user_id":  payload.UserID,
+		"amount":   payload.Amount,
+	})
 
 	// 先入账（幂等）
-	logx.Infof("[RechargeEvent] Recharging wallet: user_id=%d, amount=%d, order_no=%s",
-		payload.UserID, payload.Amount, payload.OrderNo)
 	rechargeLogic := logic.NewRechargeLogic(ctx, svcCtx)
 	if _, err := rechargeLogic.Recharge(&user.RechargeRequest{
 		UserId:     payload.UserID,
@@ -99,20 +121,19 @@ func handleRechargeSuccess(ctx context.Context, svcCtx *svc.ServiceContext, payl
 		BizOrderId: payload.OrderNo,
 		Remark:     payload.Remark,
 	}); err != nil {
-		logx.Errorf("[RechargeEvent] Failed to recharge wallet: order_no=%s, user_id=%d, amount=%d, err=%v",
-			payload.OrderNo, payload.UserID, payload.Amount, err)
+		helper.LogError(logger, helper.OpMQConsumer, "recharge wallet failed", err, map[string]interface{}{
+			"order_no": payload.OrderNo,
+			"user_id":  payload.UserID,
+			"amount":   payload.Amount,
+		})
 		return err
 	}
-	logx.Infof("[RechargeEvent] Wallet recharged successfully: user_id=%d, amount=%d, order_no=%s",
-		payload.UserID, payload.Amount, payload.OrderNo)
 
 	// 更新订单状态/交易号/支付时间
 	paidAt := payload.PaidAt
 	if paidAt <= 0 {
 		paidAt = time.Now().Unix()
 	}
-	logx.Infof("[RechargeEvent] Updating order status to success: order_no=%s, trade_no=%s",
-		payload.OrderNo, payload.TradeNo)
 	updateLogic := logic.NewUpdateRechargeOrderStatusLogic(ctx, svcCtx)
 	_, err := updateLogic.UpdateRechargeOrderStatus(&user.UpdateRechargeOrderStatusRequest{
 		OrderNo: payload.OrderNo,
@@ -122,18 +143,30 @@ func handleRechargeSuccess(ctx context.Context, svcCtx *svc.ServiceContext, payl
 		PaidAt:  paidAt,
 	})
 	if err != nil {
-		logx.Errorf("[RechargeEvent] Failed to update order status: order_no=%s, err=%v", payload.OrderNo, err)
+		helper.LogError(logger, helper.OpMQConsumer, "update order status failed", err, map[string]interface{}{
+			"order_no": payload.OrderNo,
+		})
 		return err
 	}
-	logx.Infof("[RechargeEvent] Order status updated successfully: order_no=%s", payload.OrderNo)
 
+	helper.LogSuccess(logger, helper.OpMQConsumer, map[string]interface{}{
+		"event":    "recharge_success",
+		"order_no": payload.OrderNo,
+		"user_id":  payload.UserID,
+		"amount":   payload.Amount,
+	})
 	return nil
 }
 
 func handleRechargeStatusUpdate(ctx context.Context, svcCtx *svc.ServiceContext,
 	payload *rechargemq.RechargeEventPayload, status int) error {
-	logx.Infof("[RechargeEvent] Processing status update: order_no=%s, user_id=%d, status=%d",
-		payload.OrderNo, payload.UserID, status)
+	logger := logx.WithContext(ctx)
+
+	helper.LogInfo(logger, helper.OpMQConsumer, "processing status update", map[string]interface{}{
+		"order_no": payload.OrderNo,
+		"user_id":  payload.UserID,
+		"status":   status,
+	})
 
 	updateLogic := logic.NewUpdateRechargeOrderStatusLogic(ctx, svcCtx)
 	paidAt := payload.PaidAt
@@ -148,12 +181,17 @@ func handleRechargeStatusUpdate(ctx context.Context, svcCtx *svc.ServiceContext,
 		PaidAt:  paidAt,
 	})
 	if err != nil {
-		logx.Errorf("[RechargeEvent] Failed to update order status: order_no=%s, status=%d, err=%v",
-			payload.OrderNo, status, err)
+		helper.LogError(logger, helper.OpMQConsumer, "update order status failed", err, map[string]interface{}{
+			"order_no": payload.OrderNo,
+			"status":   status,
+		})
 		return err
 	}
-	logx.Infof("[RechargeEvent] Order status updated successfully: order_no=%s, status=%d",
-		payload.OrderNo, status)
 
+	helper.LogSuccess(logger, helper.OpMQConsumer, map[string]interface{}{
+		"event":    "recharge_status_update",
+		"order_no": payload.OrderNo,
+		"status":   status,
+	})
 	return nil
 }

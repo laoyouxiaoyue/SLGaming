@@ -1,13 +1,14 @@
 package logic
 
 import (
-	orderioc "SLGaming/back/services/order/internal/ioc"
 	"context"
 	"encoding/json"
 	"fmt"
 	"time"
 
 	"SLGaming/back/pkg/lock"
+	"SLGaming/back/services/order/internal/helper"
+	orderioc "SLGaming/back/services/order/internal/ioc"
 	"SLGaming/back/services/order/internal/model"
 	orderMQ "SLGaming/back/services/order/internal/mq"
 	"SLGaming/back/services/order/internal/svc"
@@ -42,14 +43,14 @@ func NewCreateOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Creat
 func (l *CreateOrderLogic) reinitUserRPC() error {
 	cfg := l.svcCtx.Config
 	if cfg.Upstream.UserService == "" {
-		l.Errorf("user service not configured")
+		helper.LogError(l.Logger, helper.OpCreateOrder, "user service not configured", nil, nil)
 		return fmt.Errorf("user service not configured")
 	}
 
 	// 使用 Consul 服务发现重新解析用户服务端点
 	endpoints, err := orderioc.ResolveServiceEndpoints(cfg.Consul, cfg.Upstream.UserService)
 	if err != nil {
-		l.Errorf("resolve user service endpoints failed: %v", err)
+		helper.LogError(l.Logger, helper.OpCreateOrder, "resolve user service endpoints failed", err, nil)
 		return err
 	}
 
@@ -61,12 +62,22 @@ func (l *CreateOrderLogic) reinitUserRPC() error {
 
 	// 初始化 UserRPC
 	l.svcCtx.UserRPC = userclient.NewUser(client)
-	l.Infof("reinit user rpc client success: service=%s, endpoints=%v", cfg.Upstream.UserService, endpoints)
+	helper.LogInfo(l.Logger, helper.OpCreateOrder, "reinit user rpc client success", map[string]interface{}{
+		"service":   cfg.Upstream.UserService,
+		"endpoints": endpoints,
+	})
 
 	return nil
 }
 
 func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
+	helper.LogRequest(l.Logger, helper.OpCreateOrder, map[string]interface{}{
+		"boss_id":        in.GetBossId(),
+		"companion_id":   in.GetCompanionId(),
+		"duration_hours": in.GetDurationHours(),
+		"game_name":      in.GetGameName(),
+	})
+
 	if in.GetBossId() == 0 || in.GetCompanionId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "boss_id and companion_id are required")
 	}
@@ -83,7 +94,7 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 			return nil, status.Error(codes.FailedPrecondition, "user rpc client not initialized")
 		}
 	}
-	fmt.Printf("-----------------------------------------\n")
+
 	// 使用双重分布式锁防止并发创建订单
 	// 第一层锁：基于 boss_id 和 companion_id，防止同一老板对同一陪玩并发创建多个订单
 	// 第二层锁：基于 companion_id，防止多个老板同时对同一陪玩下单（串行化处理）
@@ -93,11 +104,10 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 
 	// 如果分布式锁未初始化，直接执行（降级处理）
 	if l.svcCtx.DistributedLock == nil {
-		l.Infof("distributed lock not initialized, skipping lock for order creation")
+		helper.LogWarning(l.Logger, helper.OpCreateOrder, "distributed lock not initialized, skipping lock", nil)
 		return l.doCreateOrder(in)
 	}
 
-	// 使用双重分布式锁执行订单创建
 	var result *order.CreateOrderResponse
 	var createErr error
 
@@ -121,7 +131,7 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 		if err == context.DeadlineExceeded || err == context.Canceled {
 			return nil, status.Error(codes.DeadlineExceeded, "acquire lock timeout, please try again later")
 		}
-		l.Errorf("create order with lock failed: %v", err)
+		helper.LogError(l.Logger, helper.OpCreateOrder, "create order with lock failed", err, nil)
 		return nil, status.Error(codes.Internal, "create order failed")
 	}
 
@@ -135,7 +145,9 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		UserId: in.GetCompanionId(),
 	})
 	if err != nil {
-		l.Errorf("get companion profile failed: %v", err)
+		helper.LogError(l.Logger, helper.OpCreateOrder, "get companion profile failed", err, map[string]interface{}{
+			"companion_id": in.GetCompanionId(),
+		})
 		return nil, status.Error(codes.Internal, "get companion profile failed")
 	}
 	if cpResp == nil || cpResp.Profile == nil {
@@ -156,7 +168,9 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		UserId: in.GetBossId(),
 	})
 	if err != nil {
-		l.Errorf("get boss wallet failed: %v", err)
+		helper.LogError(l.Logger, helper.OpCreateOrder, "get boss wallet failed", err, map[string]interface{}{
+			"boss_id": in.GetBossId(),
+		})
 		return nil, status.Error(codes.Internal, "get wallet failed")
 	}
 	if walletResp == nil || walletResp.Wallet == nil {
@@ -165,8 +179,11 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 
 	currentBalance := walletResp.Wallet.Balance
 	if currentBalance < totalAmount {
-		l.Infof("create order failed: insufficient balance, boss_id=%d, current_balance=%d, required_amount=%d",
-			in.GetBossId(), currentBalance, totalAmount)
+		helper.LogWarning(l.Logger, helper.OpCreateOrder, "insufficient balance", map[string]interface{}{
+			"boss_id":         in.GetBossId(),
+			"current_balance": currentBalance,
+			"required_amount": totalAmount,
+		})
 		return nil, status.Error(codes.ResourceExhausted,
 			"insufficient handsome coins, current balance is insufficient for this order")
 	}
@@ -193,7 +210,7 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 	// 构造事务消息
 	msgBody, err := json.Marshal(payload)
 	if err != nil {
-		l.Errorf("marshal payment pending payload failed: %v", err)
+		helper.LogError(l.Logger, helper.OpCreateOrder, "marshal payment pending payload failed", err, nil)
 		return nil, status.Error(codes.Internal, "marshal payment event failed")
 	}
 	msg := primitive.NewMessage(orderMQ.OrderEventTopic(), msgBody)
@@ -209,7 +226,10 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		// 1. 发送半消息失败（网络问题、Broker 不可用等）
 		// 2. 本地事务执行失败（ExecuteCreateOrderTx 返回 error）
 		// 无论哪种情况，订单都不会创建，直接返回错误
-		l.Errorf("send transactional message failed: %v, result=%+v, order_no=%s", err, txRes, orderNo)
+		helper.LogError(l.Logger, helper.OpCreateOrder, "send transactional message failed", err, map[string]interface{}{
+			"order_no": orderNo,
+			"result":   fmt.Sprintf("%+v", txRes),
+		})
 		return nil, status.Error(codes.Internal, "create order failed: transaction message send failed")
 	}
 
@@ -222,14 +242,26 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		if err == gorm.ErrRecordNotFound {
 			// 订单不存在，说明本地事务回滚了（ExecuteCreateOrderTx 返回了 error）
 			// 可能的原因：数据库错误、数据校验失败、幂等检查发现重复等
-			l.Errorf("create order transaction rolled back, order not found after tx message, order_no=%s, tx_result=%+v",
-				orderNo, txRes)
+			helper.LogError(l.Logger, helper.OpCreateOrder, "create order transaction rolled back", err, map[string]interface{}{
+				"order_no": orderNo,
+				"result":   fmt.Sprintf("%+v", txRes),
+			})
 			return nil, status.Error(codes.Internal, "create order failed: local transaction rolled back")
 		}
 		// 数据库查询错误（非记录不存在）
-		l.Errorf("query order after transactional message failed: %v, order_no=%s", err, orderNo)
+		helper.LogError(l.Logger, helper.OpCreateOrder, "query order after transactional message failed", err, map[string]interface{}{
+			"order_no": orderNo,
+		})
 		return nil, status.Error(codes.Internal, "create order failed: query order error")
 	}
+
+	helper.LogSuccess(l.Logger, helper.OpCreateOrder, map[string]interface{}{
+		"order_id":     o.ID,
+		"order_no":     o.OrderNo,
+		"boss_id":      o.BossID,
+		"companion_id": o.CompanionID,
+		"total_amount": o.TotalAmount,
+	})
 
 	return &order.CreateOrderResponse{Order: toOrderInfo(&o)}, nil
 }
