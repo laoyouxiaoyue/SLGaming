@@ -9,6 +9,7 @@ import (
 	"SLGaming/back/pkg/lock"
 	"SLGaming/back/services/order/internal/helper"
 	orderioc "SLGaming/back/services/order/internal/ioc"
+	"SLGaming/back/services/order/internal/metrics"
 	"SLGaming/back/services/order/internal/model"
 	orderMQ "SLGaming/back/services/order/internal/mq"
 	"SLGaming/back/services/order/internal/svc"
@@ -71,6 +72,8 @@ func (l *CreateOrderLogic) reinitUserRPC() error {
 }
 
 func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
+	start := time.Now()
+
 	helper.LogRequest(l.Logger, helper.OpCreateOrder, map[string]interface{}{
 		"boss_id":        in.GetBossId(),
 		"companion_id":   in.GetCompanionId(),
@@ -79,18 +82,22 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	})
 
 	if in.GetBossId() == 0 || in.GetCompanionId() == 0 {
+		metrics.OrderCreateTotal.WithLabelValues("invalid_argument").Inc()
 		return nil, status.Error(codes.InvalidArgument, "boss_id and companion_id are required")
 	}
 	if in.GetBossId() == in.GetCompanionId() {
+		metrics.OrderCreateTotal.WithLabelValues("invalid_argument").Inc()
 		return nil, status.Error(codes.InvalidArgument, "cannot create order for yourself")
 	}
 	if in.GetDurationHours() <= 0 {
+		metrics.OrderCreateTotal.WithLabelValues("invalid_argument").Inc()
 		return nil, status.Error(codes.InvalidArgument, "duration_hours must be positive")
 	}
 
 	if l.svcCtx.UserRPC == nil {
 		// 尝试重新初始化 UserRPC
 		if err := l.reinitUserRPC(); err != nil {
+			metrics.OrderCreateTotal.WithLabelValues("rpc_unavailable").Inc()
 			return nil, status.Error(codes.FailedPrecondition, "user rpc client not initialized")
 		}
 	}
@@ -105,7 +112,7 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	// 如果分布式锁未初始化，直接执行（降级处理）
 	if l.svcCtx.DistributedLock == nil {
 		helper.LogWarning(l.Logger, helper.OpCreateOrder, "distributed lock not initialized, skipping lock", nil)
-		return l.doCreateOrder(in)
+		return l.doCreateOrder(in, start)
 	}
 
 	var result *order.CreateOrderResponse
@@ -117,29 +124,36 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 		MaxWaitTime:   5 * time.Second,        // 最大等待时间 5 秒
 	}
 
+	lockStart := time.Now()
 	// 先获取陪玩级别的锁（防止多个老板同时下单）
 	err := l.svcCtx.DistributedLock.WithLock(l.ctx, companionLockKey, lockValue, lockOptions, func() error {
 		// 在陪玩锁内，再获取老板-陪玩级别的锁（防止同一老板重复下单）
 		bossLockValue := uuid.New().String()
 		return l.svcCtx.DistributedLock.WithLock(l.ctx, bossCompanionLockKey, bossLockValue, lockOptions, func() error {
-			result, createErr = l.doCreateOrder(in)
+			result, createErr = l.doCreateOrder(in, start)
 			return createErr
 		})
 	})
 
 	if err != nil {
+		metrics.LockAcquireTotal.WithLabelValues("create_order", "failed").Inc()
 		if err == context.DeadlineExceeded || err == context.Canceled {
+			metrics.OrderCreateTotal.WithLabelValues("lock_timeout").Inc()
 			return nil, status.Error(codes.DeadlineExceeded, "acquire lock timeout, please try again later")
 		}
 		helper.LogError(l.Logger, helper.OpCreateOrder, "create order with lock failed", err, nil)
+		metrics.OrderCreateTotal.WithLabelValues("lock_failed").Inc()
 		return nil, status.Error(codes.Internal, "create order failed")
 	}
+
+	metrics.LockAcquireTotal.WithLabelValues("create_order", "success").Inc()
+	metrics.LockAcquireDuration.WithLabelValues("create_order").Observe(time.Since(lockStart).Seconds())
 
 	return result, createErr
 }
 
 // doCreateOrder 执行实际的订单创建逻辑（不加锁）
-func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
+func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest, start time.Time) (*order.CreateOrderResponse, error) {
 	// 1. 查询陪玩当前价格
 	cpResp, err := l.svcCtx.UserRPC.GetCompanionProfile(l.ctx, &userclient.GetCompanionProfileRequest{
 		UserId: in.GetCompanionId(),
@@ -148,14 +162,20 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		helper.LogError(l.Logger, helper.OpCreateOrder, "get companion profile failed", err, map[string]interface{}{
 			"companion_id": in.GetCompanionId(),
 		})
+		metrics.OrderCreateTotal.WithLabelValues("companion_profile_failed").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.Internal, "get companion profile failed")
 	}
 	if cpResp == nil || cpResp.Profile == nil {
+		metrics.OrderCreateTotal.WithLabelValues("companion_not_found").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.FailedPrecondition, "companion profile not found")
 	}
 
 	pricePerHour := cpResp.Profile.PricePerHour
 	if pricePerHour <= 0 {
+		metrics.OrderCreateTotal.WithLabelValues("invalid_price").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.FailedPrecondition, "invalid companion price")
 	}
 
@@ -171,9 +191,13 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 		helper.LogError(l.Logger, helper.OpCreateOrder, "get boss wallet failed", err, map[string]interface{}{
 			"boss_id": in.GetBossId(),
 		})
+		metrics.OrderCreateTotal.WithLabelValues("wallet_query_failed").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.Internal, "get wallet failed")
 	}
 	if walletResp == nil || walletResp.Wallet == nil {
+		metrics.OrderCreateTotal.WithLabelValues("wallet_not_found").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.FailedPrecondition, "wallet not found, please create wallet first")
 	}
 
@@ -184,6 +208,8 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 			"current_balance": currentBalance,
 			"required_amount": totalAmount,
 		})
+		metrics.OrderCreateTotal.WithLabelValues("insufficient_balance").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.ResourceExhausted,
 			"insufficient handsome coins, current balance is insufficient for this order")
 	}
@@ -193,6 +219,8 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 	// 3. 使用 RocketMQ 事务消息发送 ORDER_PAYMENT_PENDING，并在本地事务中创建订单
 	if l.svcCtx.OrderEventTxProducer == nil {
 		// 不提供降级方案，事务 Producer 必须初始化成功
+		metrics.OrderCreateTotal.WithLabelValues("producer_not_initialized").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.FailedPrecondition, "order transaction producer not initialized")
 	}
 
@@ -211,6 +239,8 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 	msgBody, err := json.Marshal(payload)
 	if err != nil {
 		helper.LogError(l.Logger, helper.OpCreateOrder, "marshal payment pending payload failed", err, nil)
+		metrics.OrderCreateTotal.WithLabelValues("marshal_failed").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.Internal, "marshal payment event failed")
 	}
 	msg := primitive.NewMessage(orderMQ.OrderEventTopic(), msgBody)
@@ -230,6 +260,8 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 			"order_no": orderNo,
 			"result":   fmt.Sprintf("%+v", txRes),
 		})
+		metrics.OrderCreateTotal.WithLabelValues("tx_message_failed").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.Internal, "create order failed: transaction message send failed")
 	}
 
@@ -246,14 +278,23 @@ func (l *CreateOrderLogic) doCreateOrder(in *order.CreateOrderRequest) (*order.C
 				"order_no": orderNo,
 				"result":   fmt.Sprintf("%+v", txRes),
 			})
+			metrics.OrderCreateTotal.WithLabelValues("tx_rolled_back").Inc()
+			metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 			return nil, status.Error(codes.Internal, "create order failed: local transaction rolled back")
 		}
 		// 数据库查询错误（非记录不存在）
 		helper.LogError(l.Logger, helper.OpCreateOrder, "query order after transactional message failed", err, map[string]interface{}{
 			"order_no": orderNo,
 		})
+		metrics.OrderCreateTotal.WithLabelValues("query_failed").Inc()
+		metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
 		return nil, status.Error(codes.Internal, "create order failed: query order error")
 	}
+
+	// 记录成功指标
+	metrics.OrderCreateTotal.WithLabelValues("success").Inc()
+	metrics.OrderCreateDuration.WithLabelValues().Observe(time.Since(start).Seconds())
+	metrics.OrderAmount.Observe(float64(o.TotalAmount))
 
 	helper.LogSuccess(l.Logger, helper.OpCreateOrder, map[string]interface{}{
 		"order_id":     o.ID,

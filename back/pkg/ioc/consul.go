@@ -213,6 +213,14 @@ func (r *ConsulRegistrar) Deregister() {
 // listenOn: 服务监听地址，格式如 "0.0.0.0:8080" 或 "127.0.0.1:8080"
 // checkType: 健康检查类型，"http" 或 "grpc"
 func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*ConsulRegistrar, error) {
+	return RegisterConsulWithMetrics(cfg, listenOn, checkType, 0)
+}
+
+// RegisterConsulWithMetrics 注册服务到 Consul，并注册 metrics 端口
+// listenOn: 服务监听地址，格式如 "0.0.0.0:8080" 或 "127.0.0.1:8080"
+// checkType: 健康检查类型，"http" 或 "grpc"
+// metricsPort: Prometheus metrics HTTP server 端口，0 表示不注册
+func RegisterConsulWithMetrics(cfg ConsulConfig, listenOn string, checkType string, metricsPort int) (*ConsulRegistrar, error) {
 	if cfg.GetAddress() == "" || cfg.GetServiceName() == "" {
 		return nil, nil
 	}
@@ -286,12 +294,19 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 		}
 	}
 
+	// 构建标签，添加 metrics 端口标签
+	tags := cfg.GetServiceTags()
+	if metricsPort > 0 {
+		metricsTag := fmt.Sprintf("metrics_port=%d", metricsPort)
+		tags = append(tags, metricsTag)
+	}
+
 	reg := &api.AgentServiceRegistration{
 		ID:      serviceID,
 		Name:    cfg.GetServiceName(),
 		Address: serviceAddr,
 		Port:    port,
-		Tags:    cfg.GetServiceTags(),
+		Tags:    tags,
 		Meta:    cfg.GetServiceMeta(),
 		Check:   check,
 	}
@@ -312,7 +327,7 @@ func RegisterConsul(cfg ConsulConfig, listenOn string, checkType string) (*Consu
 		logx.Errorf("[consul_register] 失败: 服务注册失败, service=%s, address=%s:%d, error=%v", reg.Name, serviceAddr, port, err)
 		return nil, fmt.Errorf("register consul service: %w", err)
 	}
-	logx.Infof("[consul_register] 成功: 服务已注册, service=%s, service_id=%s, address=%s:%d, check_type=%s", reg.Name, serviceID, serviceAddr, port, checkType)
+	logx.Infof("[consul_register] 成功: 服务已注册, service=%s, service_id=%s, address=%s:%d, check_type=%s, metrics_port=%d", reg.Name, serviceID, serviceAddr, port, checkType, metricsPort)
 
 	return &ConsulRegistrar{
 		client:    client,

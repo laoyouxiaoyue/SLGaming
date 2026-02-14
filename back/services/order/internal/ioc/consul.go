@@ -6,7 +6,7 @@ import (
 )
 
 // RegisterConsul 注册服务到 Consul（gRPC 服务）
-func RegisterConsul(cfg config.ConsulConf, listenOn string) (*ioc.ConsulRegistrar, error) {
+func RegisterConsul(cfg config.ConsulConf, listenOn string, metricsPort int) (*ioc.ConsulRegistrar, error) {
 	adapter := &ioc.ConsulConfigAdapter{
 		Address: cfg.Address,
 		Token:   cfg.Token,
@@ -18,7 +18,7 @@ func RegisterConsul(cfg config.ConsulConf, listenOn string) (*ioc.ConsulRegistra
 	adapter.Service.CheckInterval = cfg.Service.CheckInterval
 	adapter.Service.CheckTimeout = cfg.Service.CheckTimeout
 
-	return ioc.RegisterConsul(adapter, listenOn, "grpc")
+	return ioc.RegisterConsulWithMetrics(adapter, listenOn, "grpc", metricsPort)
 }
 
 // ResolveServiceEndpoints 通过 Consul 服务发现解析服务端点
@@ -29,5 +29,3 @@ func ResolveServiceEndpoints(cfg config.ConsulConf, serviceName string) ([]strin
 	}
 	return ioc.ResolveServiceEndpoints(adapter, serviceName)
 }
-
-

@@ -60,6 +60,9 @@ type Config struct {
 
 	// RocketMQ 消息队列配置（用于订单事件异步处理，例如退款、状态同步等）
 	RocketMQ RocketMQConf `json:",optional"`
+
+	// MetricsPort Prometheus metrics HTTP server 端口
+	MetricsPort int `json:",optional"`
 }
 
 // RocketMQConf RocketMQ 配置结构
