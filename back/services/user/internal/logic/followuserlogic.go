@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"SLGaming/back/services/user/internal/metrics"
 	"SLGaming/back/services/user/internal/model"
@@ -81,30 +80,32 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		// 如果存在，需要查数据库确认（布隆过滤器有假阳性）
 	}
 
-	// 4. 验证被关注用户是否存在
-	var targetUser model.User
-	if err := l.svcCtx.DB().Where("id = ?", in.UserId).First(&targetUser).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
-			return nil, status.Error(codes.NotFound, "target user not found")
-		}
-		l.Errorf("get target user failed: %v", err)
-		metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
-		return nil, status.Error(codes.Internal, "get target user failed")
+	// 4. 合并查询：验证用户是否存在 + 是否已关注（减少数据库调用）
+	var result struct {
+		UserExists bool
+		Followed   bool
 	}
-
-	// 5. 检查是否已经关注
-	var existing model.FollowRelation
-	if err := l.svcCtx.DB().Where("follower_id = ? AND following_id = ?", in.OperatorId, in.UserId).First(&existing).Error; err == nil {
-		metrics.FollowTotal.WithLabelValues("duplicate", "follow").Inc()
-		return nil, status.Error(codes.AlreadyExists, "you have already followed this user")
-	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		l.Errorf("check follow status failed: %v", err)
+	if err := l.svcCtx.DB().Raw(`
+		SELECT 
+			EXISTS(SELECT 1 FROM users WHERE id = ?) as user_exists,
+			EXISTS(SELECT 1 FROM follow_relations WHERE follower_id = ? AND following_id = ?) as followed
+	`, in.UserId, in.OperatorId, in.UserId).Scan(&result).Error; err != nil {
+		l.Errorf("check user and follow status failed: %v", err)
 		metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
 		return nil, status.Error(codes.Internal, "check follow status failed")
 	}
 
-	// 6. 检查关注人数上限（最多1000人）
+	if !result.UserExists {
+		metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
+		return nil, status.Error(codes.NotFound, "target user not found")
+	}
+
+	if result.Followed {
+		metrics.FollowTotal.WithLabelValues("duplicate", "follow").Inc()
+		return nil, status.Error(codes.AlreadyExists, "you have already followed this user")
+	}
+
+	// 5. 检查关注人数上限（最多1000人）
 	const maxFollowingCount = 1000
 	var followingCount int64
 

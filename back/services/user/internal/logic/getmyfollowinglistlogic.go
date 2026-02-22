@@ -66,13 +66,29 @@ func (l *GetMyFollowingListLogic) GetMyFollowingList(in *user.GetMyFollowingList
 	followerID := in.OperatorId
 	hasKeywordFilter := len(matchedUserIds) > 0
 
-	// 6. 从用户表获取关注总数（O(1)查询，避免COUNT性能问题）
-	var currentUser model.User
-	if err := db.First(&currentUser, followerID).Error; err != nil {
-		l.Errorf("get user following count failed: %v", err)
-		return nil, status.Error(codes.Internal, "get user info failed")
+	// 6. 获取关注总数（优先从 Redis 缓存获取，避免查用户表）
+	var total int64
+	if l.svcCtx.UserCache != nil {
+		count, err := l.svcCtx.UserCache.GetFollowingCount(int64(followerID))
+		if err == nil {
+			total = count
+		} else {
+			// Redis 未命中，从用户表获取
+			var currentUser model.User
+			if err := db.Select("following_count").First(&currentUser, followerID).Error; err != nil {
+				l.Errorf("get user following count failed: %v", err)
+				return nil, status.Error(codes.Internal, "get user info failed")
+			}
+			total = currentUser.FollowingCount
+		}
+	} else {
+		var currentUser model.User
+		if err := db.Select("following_count").First(&currentUser, followerID).Error; err != nil {
+			l.Errorf("get user following count failed: %v", err)
+			return nil, status.Error(codes.Internal, "get user info failed")
+		}
+		total = currentUser.FollowingCount
 	}
-	total := currentUser.FollowingCount
 
 	// 7. 查询关注列表，按关注时间倒序排序
 	var followRelations []model.FollowRelation

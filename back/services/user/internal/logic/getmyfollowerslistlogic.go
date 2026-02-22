@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"sync"
 
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -90,15 +89,19 @@ func (l *GetMyFollowersListLogic) GetMyFollowersList(in *user.GetMyFollowersList
 		})
 	}
 
-	// 5. 并发查询总记录数（提高性能）
+	// 5. 获取总记录数（优先从 Redis 缓存获取，避免慢 COUNT）
 	var total int64
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	if l.svcCtx.UserCache != nil {
+		count, err := l.svcCtx.UserCache.GetFollowerCount(int64(in.OperatorId))
+		if err == nil {
+			total = count
+		} else {
+			// Redis 未命中，从数据库查询
+			l.svcCtx.DB().Model(&model.FollowRelation{}).Where("following_id = ?", in.OperatorId).Count(&total)
+		}
+	} else {
 		l.svcCtx.DB().Model(&model.FollowRelation{}).Where("following_id = ?", in.OperatorId).Count(&total)
-	}()
-	wg.Wait()
+	}
 
 	// 限制返回的总数不超过最大值
 	if total > maxFollowersLimit {

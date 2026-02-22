@@ -67,7 +67,22 @@ func (l *UnfollowUserLogic) UnfollowUser(in *user.UnfollowUserRequest) (*user.Un
 		return nil, status.Error(codes.InvalidArgument, "cannot unfollow yourself")
 	}
 
-	// 3. 检查关注关系是否存在
+	// 3. 布隆过滤器快速检查目标用户是否存在
+	// 如果布隆过滤器说"不存在"，那用户一定不存在，直接返回（省去数据库查询）
+	if l.svcCtx.BloomFilter != nil {
+		exists, err := l.svcCtx.BloomFilter.UserID.MightContain(l.ctx, int64(in.UserId))
+		if err != nil {
+			l.Errorf("bloom filter check user failed: %v", err)
+			// 布隆过滤器查询失败，降级到数据库查询
+		} else if !exists {
+			// 用户一定不存在，直接返回
+			metrics.FollowTotal.WithLabelValues("not_found", "unfollow").Inc()
+			return nil, status.Error(codes.NotFound, "target user not found")
+		}
+		// 如果存在，需要查数据库确认关注关系（布隆过滤器有假阳性）
+	}
+
+	// 4. 检查关注关系是否存在
 	result := l.svcCtx.DB().Where("follower_id = ? AND following_id = ?", in.OperatorId, in.UserId).Delete(&model.FollowRelation{})
 	if result.Error != nil {
 		l.Errorf("delete follow relation failed: %v", result.Error)
