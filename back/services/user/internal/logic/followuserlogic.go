@@ -66,7 +66,22 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.InvalidArgument, "cannot follow yourself")
 	}
 
-	// 3. 验证被关注用户是否存在
+	// 3. 布隆过滤器快速检查被关注用户是否存在
+	// 如果布隆过滤器说"不存在"，那用户一定不存在，直接返回（省去数据库查询）
+	if l.svcCtx.BloomFilter != nil {
+		exists, err := l.svcCtx.BloomFilter.UserID.MightContain(l.ctx, int64(in.UserId))
+		if err != nil {
+			l.Errorf("bloom filter check user failed: %v", err)
+			// 布隆过滤器查询失败，降级到数据库查询
+		} else if !exists {
+			// 用户一定不存在，直接返回
+			metrics.FollowTotal.WithLabelValues("error", "follow").Inc()
+			return nil, status.Error(codes.NotFound, "target user not found")
+		}
+		// 如果存在，需要查数据库确认（布隆过滤器有假阳性）
+	}
+
+	// 4. 验证被关注用户是否存在
 	var targetUser model.User
 	if err := l.svcCtx.DB().Where("id = ?", in.UserId).First(&targetUser).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -78,7 +93,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.Internal, "get target user failed")
 	}
 
-	// 4. 检查是否已经关注
+	// 5. 检查是否已经关注
 	var existing model.FollowRelation
 	if err := l.svcCtx.DB().Where("follower_id = ? AND following_id = ?", in.OperatorId, in.UserId).First(&existing).Error; err == nil {
 		metrics.FollowTotal.WithLabelValues("duplicate", "follow").Inc()
@@ -89,7 +104,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.Internal, "check follow status failed")
 	}
 
-	// 5. 检查关注人数上限（最多1000人）
+	// 6. 检查关注人数上限（最多1000人）
 	const maxFollowingCount = 1000
 	var followingCount int64
 
@@ -120,7 +135,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.ResourceExhausted, "you can only follow up to 1000 users")
 	}
 
-	// 6. 创建关注关系
+	// 7. 创建关注关系
 	followRelation := model.FollowRelation{
 		FollowerID:  in.OperatorId,
 		FollowingID: in.UserId,
@@ -132,7 +147,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.Internal, "create follow relation failed")
 	}
 
-	// 7. 更新Redis缓存中的粉丝数和关注数
+	// 8. 更新Redis缓存中的粉丝数和关注数
 	if l.svcCtx.UserCache != nil {
 		// 增加被关注用户的粉丝数
 		if err := l.svcCtx.UserCache.IncrFollowerCount(int64(in.UserId)); err != nil {
@@ -144,7 +159,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		}
 	}
 
-	// 8. 发送关注事件到消息队列，异步更新数据库计数
+	// 9. 发送关注事件到消息队列，异步更新数据库计数
 	// 降级策略：如果MQ发送失败，直接同步更新数据库计数
 	mqSendSuccess := false
 	if l.svcCtx.EventProducer != nil {

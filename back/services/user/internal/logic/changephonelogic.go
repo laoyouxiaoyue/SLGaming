@@ -65,5 +65,17 @@ func (l *ChangePhoneLogic) ChangePhone(in *user.ChangePhoneRequest) (*user.Chang
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	// 将新手机号添加到布隆过滤器
+	// 注意：旧手机号无法从布隆过滤器中删除，这是布隆过滤器的设计限制
+	// 旧手机号留在过滤器中会略微增加假阳性率，但不会影响正确性
+	if l.svcCtx.BloomFilter != nil {
+		if err := l.svcCtx.BloomFilter.Phone.Add(l.ctx, newPhone); err != nil {
+			l.Logger.Errorf("add new phone to bloom filter failed: %v", err)
+			// 不影响主流程，仅记录错误
+		} else {
+			l.Logger.Infof("new phone added to bloom filter: user_id=%d, phone=%s", userID, newPhone)
+		}
+	}
+
 	return &user.ChangePhoneResponse{Success: true}, nil
 }
