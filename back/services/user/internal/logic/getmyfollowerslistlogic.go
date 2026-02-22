@@ -67,13 +67,15 @@ func (l *GetMyFollowersListLogic) GetMyFollowersList(in *user.GetMyFollowersList
 		followerIds = append(followerIds, f.FollowRelation.FollowerID)
 	}
 
-	// 3. 批量查询互相关注关系（避免为每个粉丝单独查询）
+	// 3. 批量查询互相关注关系（只取 ID，减少数据传输）
 	var mutualFollowMap = make(map[uint64]bool)
 	if len(followerIds) > 0 {
-		var mutualRelations []model.FollowRelation
-		l.svcCtx.DB().Where("follower_id = ? AND following_id IN ?", in.OperatorId, followerIds).Find(&mutualRelations)
-		for _, r := range mutualRelations {
-			mutualFollowMap[r.FollowingID] = true
+		var mutualIds []uint64
+		l.svcCtx.DB().Model(&model.FollowRelation{}).
+			Where("follower_id = ? AND following_id IN ?", in.OperatorId, followerIds).
+			Pluck("following_id", &mutualIds)
+		for _, id := range mutualIds {
+			mutualFollowMap[id] = true
 		}
 	}
 

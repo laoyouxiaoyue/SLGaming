@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"sync"
 
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/internal/svc"
@@ -31,23 +30,14 @@ func (l *GetMutualFollowListLogic) GetMutualFollowList(in *user.GetMutualFollowL
 	pageSize := clamp(int64(in.PageSize), 1, 100)
 	offset := (page - 1) * pageSize
 
-	// 1. 并发查询用户关注的人
+	// 1. 查询用户关注的人（只取 ID）
 	var followingIds []uint64
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var followingRelations []model.FollowRelation
-		if err := l.svcCtx.DB().Where("follower_id = ?", in.OperatorId).Find(&followingRelations).Error; err != nil {
-			l.Error("获取关注关系失败: %v", err)
-			return
-		}
-		for _, relation := range followingRelations {
-			followingIds = append(followingIds, relation.FollowingID)
-		}
-	}()
-
-	wg.Wait()
+	if err := l.svcCtx.DB().Model(&model.FollowRelation{}).
+		Where("follower_id = ?", in.OperatorId).
+		Pluck("following_id", &followingIds).Error; err != nil {
+		l.Error("获取关注关系失败: %v", err)
+		return nil, err
+	}
 
 	// 2. 如果用户没有关注任何人，直接返回空列表
 	if len(followingIds) == 0 {
@@ -59,68 +49,43 @@ func (l *GetMutualFollowListLogic) GetMutualFollowList(in *user.GetMutualFollowL
 		}, nil
 	}
 
-	// 3. 并发查询互相关注关系和总数
-	var mutualFollowRelations []model.FollowRelation
+	// 3. 查询互相关注总数
 	var total int64
-
-	wg.Add(2)
-
-	// 查询互相关注关系，按关注时间倒序排序
-	go func() {
-		defer wg.Done()
-		if err := l.svcCtx.DB().Where("follower_id IN ? AND following_id = ?", followingIds, in.OperatorId).Offset(int(offset)).Limit(int(pageSize)).Order("followed_at DESC").Find(&mutualFollowRelations).Error; err != nil {
-			l.Error("获取互相关注关系失败: %v", err)
-		}
-	}()
-
-	// 查询总记录数
-	go func() {
-		defer wg.Done()
-		if err := l.svcCtx.DB().Model(&model.FollowRelation{}).Where("follower_id IN ? AND following_id = ?", followingIds, in.OperatorId).Count(&total).Error; err != nil {
-			l.Error("获取互相关注总数失败: %v", err)
-		}
-	}()
-
-	wg.Wait()
-
-	// 4. 提取互相关注者ID列表
-	var mutualIds []uint64
-	for _, relation := range mutualFollowRelations {
-		mutualIds = append(mutualIds, relation.FollowerID)
+	if err := l.svcCtx.DB().Model(&model.FollowRelation{}).
+		Where("follower_id IN ? AND following_id = ?", followingIds, in.OperatorId).
+		Count(&total).Error; err != nil {
+		l.Error("获取互相关注总数失败: %v", err)
 	}
 
-	// 5. 如果没有互相关注的人，直接返回空列表
-	if len(mutualIds) == 0 {
-		return &user.GetMutualFollowListResponse{
-			Users:    []*user.UserFollowInfo{},
-			Total:    int32(total),
-			Page:     int32(page),
-			PageSize: int32(pageSize),
-		}, nil
-	}
-
-	// 6. 关联查询用户信息（减少N+1查询）
+	// 4. JOIN 查询互相关注关系和用户信息
 	type MutualWithUser struct {
-		FollowRelation model.FollowRelation
-		User           model.User
+		FollowerID uint64 `gorm:"column:follower_id"`
+		FollowedAt int64  `gorm:"column:followed_at"`
+		Nickname   string `gorm:"column:nickname"`
+		AvatarURL  string `gorm:"column:avatar_url"`
 	}
 
 	var mutualUsers []MutualWithUser
-	result := l.svcCtx.DB().Table("follow_relations").Select("follow_relations.*, users.*").Joins("JOIN users ON users.id = follow_relations.follower_id").Where("follow_relations.follower_id IN ? AND follow_relations.following_id = ?", mutualIds, in.OperatorId).Scan(&mutualUsers)
-	if result.Error != nil {
-		l.Error("获取互相关注用户信息失败: %v", result.Error)
-		return nil, result.Error
+	if err := l.svcCtx.DB().Table("follow_relations").
+		Select("follow_relations.follower_id, follow_relations.followed_at, users.nickname, users.avatar_url").
+		Joins("JOIN users ON users.id = follow_relations.follower_id").
+		Where("follow_relations.follower_id IN ? AND follow_relations.following_id = ?", followingIds, in.OperatorId).
+		Offset(int(offset)).Limit(int(pageSize)).
+		Order("follow_relations.followed_at DESC").
+		Scan(&mutualUsers).Error; err != nil {
+		l.Error("获取互相关注用户信息失败: %v", err)
+		return nil, err
 	}
 
-	// 7. 构建用户信息列表
+	// 5. 构建用户信息列表
 	userInfos := make([]*user.UserFollowInfo, 0, len(mutualUsers))
 	for _, u := range mutualUsers {
 		userInfos = append(userInfos, &user.UserFollowInfo{
-			UserId:     u.User.ID,
-			Nickname:   u.User.Nickname,
-			AvatarUrl:  u.User.AvatarURL,
+			UserId:     u.FollowerID,
+			Nickname:   u.Nickname,
+			AvatarUrl:  u.AvatarURL,
 			IsMutual:   true,
-			FollowedAt: u.FollowRelation.FollowedAt.Unix(),
+			FollowedAt: u.FollowedAt,
 		})
 	}
 

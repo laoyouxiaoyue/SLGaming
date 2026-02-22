@@ -109,26 +109,25 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 	const maxFollowingCount = 1000
 	var followingCount int64
 
-	// 优先从Redis获取关注数
+	// 优先从 Redis 获取关注数
 	if l.svcCtx.UserCache != nil {
 		count, err := l.svcCtx.UserCache.GetFollowingCount(int64(in.OperatorId))
 		if err == nil {
-			// 缓存命中
 			followingCount = count
-		} else {
-			// Redis未命中，从数据库查询
-			if err := l.svcCtx.DB().Model(&model.FollowRelation{}).Where("follower_id = ?", in.OperatorId).Count(&followingCount).Error; err != nil {
-				l.Errorf("get following count from db failed: %v", err)
-				return nil, status.Error(codes.Internal, "get following count failed")
-			}
-			// 回写Redis
-			l.svcCtx.UserCache.SetFollowingCount(int64(in.OperatorId), followingCount)
 		}
-	} else {
-		// Redis不可用，从数据库查询
-		if err := l.svcCtx.DB().Model(&model.FollowRelation{}).Where("follower_id = ?", in.OperatorId).Count(&followingCount).Error; err != nil {
-			l.Errorf("get following count from db failed: %v", err)
+	}
+
+	// Redis 未命中或不可用，从用户表获取 following_count（比 COUNT 快）
+	if followingCount == 0 {
+		var user model.User
+		if err := l.svcCtx.DB().Select("following_count").Where("id = ?", in.OperatorId).First(&user).Error; err != nil {
+			l.Errorf("get user following count failed: %v", err)
 			return nil, status.Error(codes.Internal, "get following count failed")
+		}
+		followingCount = user.FollowingCount
+		// 回写 Redis
+		if l.svcCtx.UserCache != nil {
+			l.svcCtx.UserCache.SetFollowingCount(int64(in.OperatorId), followingCount)
 		}
 	}
 
@@ -136,7 +135,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.ResourceExhausted, "you can only follow up to 1000 users")
 	}
 
-	// 7. 创建关注关系
+	// 6. 创建关注关系
 	followRelation := model.FollowRelation{
 		FollowerID:  in.OperatorId,
 		FollowingID: in.UserId,
@@ -148,7 +147,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		return nil, status.Error(codes.Internal, "create follow relation failed")
 	}
 
-	// 8. 更新Redis缓存中的粉丝数和关注数
+	// 7. 更新Redis缓存中的粉丝数和关注数
 	if l.svcCtx.UserCache != nil {
 		// 增加被关注用户的粉丝数
 		if err := l.svcCtx.UserCache.IncrFollowerCount(int64(in.UserId)); err != nil {
@@ -160,7 +159,7 @@ func (l *FollowUserLogic) FollowUser(in *user.FollowUserRequest) (*user.FollowUs
 		}
 	}
 
-	// 9. 发送关注事件到消息队列，异步更新数据库计数
+	// 8. 发送关注事件到消息队列，异步更新数据库计数
 	// 降级策略：如果MQ发送失败，直接同步更新数据库计数
 	mqSendSuccess := false
 	if l.svcCtx.EventProducer != nil {
