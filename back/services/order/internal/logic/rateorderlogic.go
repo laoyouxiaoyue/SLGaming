@@ -51,8 +51,11 @@ func (l *RateOrderLogic) RateOrder(in *order.RateOrderRequest) (*order.RateOrder
 	if o.BossID != in.GetBossId() {
 		return nil, status.Error(codes.PermissionDenied, "not allowed to rate this order")
 	}
-	if o.Status != model.OrderStatusCompleted && o.Status != model.OrderStatusRated {
+	if o.Status != model.OrderStatusCompleted {
 		return nil, status.Error(codes.FailedPrecondition, "order is not completed")
+	}
+	if o.Rating > 0 {
+		return nil, status.Error(codes.AlreadyExists, "order already rated")
 	}
 
 	o.Rating = in.GetRating()
