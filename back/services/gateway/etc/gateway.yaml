@@ -39,7 +39,7 @@ Redis:
   Key: ""
   Host: 120.26.29.242:6379
   Type: node
-  Pass: ""
+  Pass: "redisredis"
   Tls: false
 
 # JWT 配置

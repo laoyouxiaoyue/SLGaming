@@ -192,7 +192,7 @@ services:
         max-file: "3"
 
   redis:
-    image: redis:7-alpine
+    image: redis/redis-stack-server:latest
     container_name: redis
     restart: unless-stopped
     ports:
@@ -200,11 +200,11 @@ services:
     volumes:
       - ./redis/data:/data
       - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+    # command: redis-server --appendonly yes
     networks:
       - common
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "redisredis", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5

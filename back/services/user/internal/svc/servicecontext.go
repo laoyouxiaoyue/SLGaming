@@ -63,10 +63,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	// 初始化 Redis（用于排行榜、缓存、布隆过滤器）
 	var redisClient *redis.Redis
-	if c.CacheRedis.Host != "" {
-		redisClient = redis.MustNewRedis(c.CacheRedis.RedisConf)
+	if c.Redis.Host != "" {
+		redisClient = redis.MustNewRedis(c.Redis.RedisConf)
 		ctx.Redis = redisClient
-		logx.Infof("Redis 已初始化: %s", c.CacheRedis.Host)
+		logx.Infof("Redis 已初始化: %s", c.Redis.Host)
 	} else {
 		logx.Infof("Redis 未配置，排名功能、缓存、布隆过滤器将不可用")
 	}

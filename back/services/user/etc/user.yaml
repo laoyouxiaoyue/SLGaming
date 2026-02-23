@@ -35,11 +35,12 @@ Consul:
 Upstream:
   AgentService: agent-rpc
 
-# CacheRedis 配置（用于排行榜、缓存、布隆过滤器）
-CacheRedis:
+# Redis 配置（用于排行榜、缓存、布隆过滤器）
+Redis:
+  Key: ""
   Host: 120.26.29.242:6379
   Type: node
-  Pass: ""
+  Pass: "redisredis"
   Tls: false
 
 # RocketMQ 配置（预留，用于钱包变动、订单结算等异步处理）
