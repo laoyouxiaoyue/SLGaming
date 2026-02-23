@@ -16,7 +16,6 @@ import (
 	"SLGaming/back/services/order/order"
 
 	"github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/google/uuid"
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -54,7 +53,6 @@ func (l *CancelOrderLogic) CancelOrder(in *order.CancelOrderRequest) (*order.Can
 	// 使用分布式锁防止并发取消订单
 	// 锁的 key 基于 order_id，防止同一订单被并发取消
 	lockKey := fmt.Sprintf("cancel_order:%d", in.GetOrderId())
-	lockValue := uuid.New().String()
 
 	// 如果分布式锁未初始化，直接执行（降级处理）
 	if l.svcCtx.DistributedLock == nil {
@@ -66,13 +64,13 @@ func (l *CancelOrderLogic) CancelOrder(in *order.CancelOrderRequest) (*order.Can
 	var cancelErr error
 
 	lockOptions := &lock.LockOptions{
-		TTL:           30,                     // 锁过期时间 30 秒
-		RetryInterval: 100 * time.Millisecond, // 重试间隔 100ms
-		MaxWaitTime:   5 * time.Second,        // 最大等待时间 5 秒
+		TTL:           30 * time.Second,
+		RetryInterval: 100 * time.Millisecond,
+		MaxWaitTime:   5 * time.Second,
 	}
 
 	lockStart := time.Now()
-	err := l.svcCtx.DistributedLock.WithLock(l.ctx, lockKey, lockValue, lockOptions, func() error {
+	err := l.svcCtx.DistributedLock.WithLock(l.ctx, lockKey, lockOptions, func() error {
 		result, cancelErr = l.doCancelOrder(in, start)
 		return cancelErr
 	})

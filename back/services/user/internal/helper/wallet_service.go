@@ -3,8 +3,11 @@ package helper
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
+	"time"
 
+	"SLGaming/back/pkg/lock"
 	"SLGaming/back/services/user/internal/model"
 	"SLGaming/back/services/user/user"
 
@@ -31,7 +34,7 @@ type AfterTransactionCallback func(tx *gorm.DB) error
 // WalletUpdateRequest 钱包更新请求
 type WalletUpdateRequest struct {
 	UserID     uint64
-	Amount     int64  // 金额（正数，实际增减由操作类型决定）
+	Amount     int64 // 金额（正数，实际增减由操作类型决定）
 	Type       WalletOperationType
 	BizOrderID string // 业务订单号，用于幂等控制
 	Remark     string // 备注
@@ -47,7 +50,8 @@ type WalletUpdateResult struct {
 
 // WalletService 钱包服务
 type WalletService struct {
-	db *gorm.DB
+	db   *gorm.DB
+	lock *lock.DistributedLock
 }
 
 // NewWalletService 创建钱包服务
@@ -55,7 +59,13 @@ func NewWalletService(db *gorm.DB) *WalletService {
 	return &WalletService{db: db}
 }
 
+// NewWalletServiceWithLock 创建带分布式锁的钱包服务
+func NewWalletServiceWithLock(db *gorm.DB, dl *lock.DistributedLock) *WalletService {
+	return &WalletService{db: db, lock: dl}
+}
+
 // UpdateBalance 更新钱包余额（统一处理充值、消费、退款）
+// 如果设置了分布式锁，会先获取锁再执行操作
 func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequest) (*WalletUpdateResult, error) {
 	if req.UserID == 0 {
 		return nil, status.Error(codes.InvalidArgument, "user_id is required")
@@ -64,6 +74,30 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 		return nil, status.Error(codes.InvalidArgument, "amount must be positive")
 	}
 
+	// 如果有分布式锁，使用 WithLock 保护钱包操作
+	if s.lock != nil {
+		lockKey := fmt.Sprintf("wallet:%d", req.UserID)
+		lockOpts := &lock.LockOptions{
+			TTL:           30 * time.Second,
+			RetryInterval: 100 * time.Millisecond,
+			MaxWaitTime:   10 * time.Second,
+		}
+
+		var result *WalletUpdateResult
+		err := s.lock.WithLock(ctx, lockKey, lockOpts, func() error {
+			var err error
+			result, err = s.updateBalanceInTx(ctx, req)
+			return err
+		})
+		return result, err
+	}
+
+	// 没有分布式锁，直接执行（降级处理）
+	return s.updateBalanceInTx(ctx, req)
+}
+
+// updateBalanceInTx 在事务中更新钱包余额
+func (s *WalletService) updateBalanceInTx(ctx context.Context, req *WalletUpdateRequest) (*WalletUpdateResult, error) {
 	var wallet model.UserWallet
 
 	// 在事务中进行余额更新与流水记录
@@ -77,8 +111,8 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 				// 已经操作过了，直接视为成功（幂等）
 				if req.Logger != nil {
 					LogInfo(req.Logger, LogOperation(req.Type), "idempotent: duplicate biz_order_id", map[string]interface{}{
-						"user_id":              req.UserID,
-						"biz_order_id":         req.BizOrderID,
+						"user_id":                 req.UserID,
+						"biz_order_id":            req.BizOrderID,
 						"existing_transaction_id": existed.ID,
 					})
 				}
@@ -86,7 +120,7 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 				if err := tx.Where("user_id = ?", req.UserID).First(&wallet).Error; err != nil {
 					if req.Logger != nil {
 						LogError(req.Logger, LogOperation(req.Type), "idempotent check failed to get wallet", err, map[string]interface{}{
-							"user_id":     req.UserID,
+							"user_id":      req.UserID,
 							"biz_order_id": req.BizOrderID,
 						})
 					}
@@ -96,7 +130,7 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 			} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 				if req.Logger != nil {
 					LogError(req.Logger, LogOperation(req.Type), "idempotent check failed", err, map[string]interface{}{
-						"user_id":     req.UserID,
+						"user_id":      req.UserID,
 						"biz_order_id": req.BizOrderID,
 					})
 				}
@@ -149,7 +183,7 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 			if wallet.Balance < req.Amount {
 				if req.Logger != nil {
 					LogWarning(req.Logger, LogOperation(req.Type), "insufficient balance", map[string]interface{}{
-						"user_id":        req.UserID,
+						"user_id":         req.UserID,
 						"current_balance": wallet.Balance,
 						"required_amount": req.Amount,
 						"biz_order_id":    req.BizOrderID,
@@ -209,7 +243,7 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 				// 已有相同流水，说明之前已成功操作，直接返回成功
 				if req.Logger != nil {
 					LogInfo(req.Logger, LogOperation(req.Type), "idempotent: duplicate transaction detected", map[string]interface{}{
-						"user_id":     req.UserID,
+						"user_id":      req.UserID,
 						"biz_order_id": req.BizOrderID,
 					})
 				}
@@ -217,8 +251,8 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 			}
 			if req.Logger != nil {
 				LogError(req.Logger, LogOperation(req.Type), "create transaction record failed", err, map[string]interface{}{
-					"user_id":     req.UserID,
-					"wallet_id":   wallet.ID,
+					"user_id":      req.UserID,
+					"wallet_id":    wallet.ID,
 					"biz_order_id": req.BizOrderID,
 				})
 			}
@@ -259,8 +293,8 @@ func (s *WalletService) UpdateBalance(ctx context.Context, req *WalletUpdateRequ
 		// 其他数据库错误
 		if req.Logger != nil {
 			LogError(req.Logger, LogOperation(req.Type), "transaction failed", err, map[string]interface{}{
-				"user_id":     req.UserID,
-				"amount":      req.Amount,
+				"user_id":      req.UserID,
+				"amount":       req.Amount,
 				"biz_order_id": req.BizOrderID,
 			})
 		}

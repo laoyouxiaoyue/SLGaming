@@ -7,6 +7,7 @@ import (
 	"time"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
+	"SLGaming/back/pkg/lock"
 	"SLGaming/back/services/agent/agentclient"
 	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/cache"
@@ -39,6 +40,9 @@ type ServiceContext struct {
 	// 布隆过滤器
 	BloomFilter *bloom.UserBloomFilters
 
+	// 分布式锁（用于钱包充值/扣款等并发控制）
+	DistributedLock *lock.DistributedLock
+
 	// RocketMQ 普通生产者（用于发送非事务事件）
 	EventProducer rocketmq.Producer
 
@@ -67,6 +71,16 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		redisClient = redis.MustNewRedis(c.Redis.RedisConf)
 		ctx.Redis = redisClient
 		logx.Infof("Redis 已初始化: %s", c.Redis.Host)
+
+		// 初始化分布式锁
+		redisConfig := &pkgIoc.RedisConfigAdapter{
+			Host: c.Redis.Host,
+			Type: c.Redis.Type,
+			Pass: c.Redis.Pass,
+			Tls:  c.Redis.Tls,
+		}
+		ctx.DistributedLock = lock.NewDistributedLockFromConfig(redisConfig)
+		logx.Infof("分布式锁已初始化")
 	} else {
 		logx.Infof("Redis 未配置，排名功能、缓存、布隆过滤器将不可用")
 	}

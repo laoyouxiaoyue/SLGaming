@@ -18,7 +18,6 @@ import (
 	"SLGaming/back/services/user/userclient"
 
 	"github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/google/uuid"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc/codes"
@@ -107,7 +106,6 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	// 第二层锁：基于 companion_id，防止多个老板同时对同一陪玩下单（串行化处理）
 	bossCompanionLockKey := fmt.Sprintf("create_order:%d:%d", in.GetBossId(), in.GetCompanionId())
 	companionLockKey := fmt.Sprintf("companion_order:%d", in.GetCompanionId())
-	lockValue := uuid.New().String()
 
 	// 如果分布式锁未初始化，直接执行（降级处理）
 	if l.svcCtx.DistributedLock == nil {
@@ -119,17 +117,16 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	var createErr error
 
 	lockOptions := &lock.LockOptions{
-		TTL:           30,                     // 锁过期时间 30 秒
-		RetryInterval: 100 * time.Millisecond, // 重试间隔 100ms
-		MaxWaitTime:   5 * time.Second,        // 最大等待时间 5 秒
+		TTL:           30 * time.Second,
+		RetryInterval: 100 * time.Millisecond,
+		MaxWaitTime:   5 * time.Second,
 	}
 
 	lockStart := time.Now()
 	// 先获取陪玩级别的锁（防止多个老板同时下单）
-	err := l.svcCtx.DistributedLock.WithLock(l.ctx, companionLockKey, lockValue, lockOptions, func() error {
+	err := l.svcCtx.DistributedLock.WithLock(l.ctx, companionLockKey, lockOptions, func() error {
 		// 在陪玩锁内，再获取老板-陪玩级别的锁（防止同一老板重复下单）
-		bossLockValue := uuid.New().String()
-		return l.svcCtx.DistributedLock.WithLock(l.ctx, bossCompanionLockKey, bossLockValue, lockOptions, func() error {
+		return l.svcCtx.DistributedLock.WithLock(l.ctx, bossCompanionLockKey, lockOptions, func() error {
 			result, createErr = l.doCreateOrder(in, start)
 			return createErr
 		})
