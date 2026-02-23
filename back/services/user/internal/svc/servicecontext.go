@@ -2,12 +2,11 @@ package svc
 
 import (
 	"context"
-	"fmt"
 	"sync"
-	"time"
 
 	pkgIoc "SLGaming/back/pkg/ioc"
 	"SLGaming/back/pkg/lock"
+	"SLGaming/back/pkg/rpc"
 	"SLGaming/back/services/agent/agentclient"
 	"SLGaming/back/services/user/internal/bloom"
 	"SLGaming/back/services/user/internal/cache"
@@ -19,7 +18,6 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
-	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
 )
 
@@ -130,46 +128,30 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	// 初始化 Agent RPC 客户端
 	if c.Upstream.AgentService != "" {
-		rpcTimeout := c.Upstream.RPCTimeout
-		if rpcTimeout <= 0 {
-			rpcTimeout = 10 * time.Second
+		retryOpts := c.Upstream.Retry
+		if retryOpts.MaxRetries == 0 {
+			retryOpts = rpc.DefaultRetryOptions()
 		}
-		if cli, err := newRPCClient(c.Consul, c.Upstream.AgentService, rpcTimeout); err != nil {
+
+		consulAdapter := &pkgIoc.ConsulConfigAdapter{
+			Address: c.Consul.Address,
+			Token:   c.Consul.Token,
+		}
+
+		cli, err := rpc.NewDynamicRPCClientOrFallback(consulAdapter, rpc.DynamicClientOptions{
+			ServiceName: c.Upstream.AgentService,
+			Timeout:     c.Upstream.RPCTimeout,
+			Retry:       retryOpts,
+		})
+		if err != nil {
 			logx.Errorf("init agent rpc client failed: service=%s, err=%v", c.Upstream.AgentService, err)
-		} else {
+		} else if cli != nil {
 			ctx.AgentRPC = agentclient.NewAgent(cli)
-			logx.Infof("init agent rpc client success: service=%s (timeout=%v)", c.Upstream.AgentService, rpcTimeout)
+			logx.Infof("init agent rpc client success: service=%s (动态客户端+自动重试)", c.Upstream.AgentService)
 		}
 	}
 
 	return ctx
-}
-
-func newRPCClient(consulConf config.ConsulConf, serviceName string, timeout time.Duration) (zrpc.Client, error) {
-	if serviceName == "" {
-		return nil, fmt.Errorf("service name is empty")
-	}
-
-	// 通过Consul服务发现获取Agent服务地址
-	adapter := &pkgIoc.ConsulConfigAdapter{
-		Address: consulConf.Address,
-		Token:   consulConf.Token,
-	}
-
-	endpoints, err := pkgIoc.ResolveServiceEndpoints(adapter, serviceName)
-	if err != nil {
-		logx.Errorf("resolve service endpoints failed: service=%s, err=%v", serviceName, err)
-		return nil, err
-	}
-
-	client := zrpc.MustNewClient(zrpc.RpcClientConf{
-		Endpoints: endpoints,
-		NonBlock:  true,
-		Timeout:   int64(timeout / time.Millisecond),
-	})
-	logx.Infof("create rpc client success: service=%s, endpoints=%v, timeout=%v", serviceName, endpoints, timeout)
-
-	return client, nil
 }
 
 // Config returns the latest configuration snapshot.

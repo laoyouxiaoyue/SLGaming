@@ -45,6 +45,14 @@ Redis:
 # 上游服务（通过 Consul 发现）
 Upstream:
   UserService: user-rpc
+  RPCTimeout: 10s
+  # RPC 重试配置
+  Retry:
+    MaxRetries: 3
+    InitialBackoff: 100ms
+    MaxBackoff: 5s
+    BackoffMultiplier: 2.0
+    RetryTimeout: 30s
 
 # RocketMQ 配置（预留，用于订单事件异步处理：下单、支付、取消、退款等）
 RocketMQ:

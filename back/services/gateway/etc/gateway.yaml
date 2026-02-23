@@ -33,6 +33,14 @@ Upstream:
   UserService: user-rpc   # Consul 中的用户服务名称
   OrderService: order-rpc # Consul 中的订单服务名称
   AgentService: agent-rpc # Consul 中的智能服务名称
+  RPCTimeout: 10s
+  # RPC 重试配置
+  Retry:
+    MaxRetries: 3
+    InitialBackoff: 100ms
+    MaxBackoff: 5s
+    BackoffMultiplier: 2.0
+    RetryTimeout: 30s
 
 # Redis 配置（用于存储 Refresh Token）
 Redis:

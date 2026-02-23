@@ -1,10 +1,9 @@
-// Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
-
 package config
 
 import (
 	"time"
+
+	"SLGaming/back/pkg/rpc"
 
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
@@ -59,11 +58,12 @@ type ConsulServiceConf struct {
 
 // UpstreamConf 上游服务配置
 type UpstreamConf struct {
-	CodeService  string        `json:",optional"`    // 验证码服务名称（用于 Consul 服务发现）
-	UserService  string        `json:",optional"`    // 用户服务名称（用于 Consul 服务发现）
-	OrderService string        `json:",optional"`    // 订单服务名称（用于 Consul 服务发现）
-	AgentService string        `json:",optional"`    // 智能服务名称（用于 Consul 服务发现）
-	RPCTimeout   time.Duration `json:",default=10s"` // RPC 调用超时时间，默认 10 秒
+	CodeService  string           `json:",optional"`
+	UserService  string           `json:",optional"`
+	OrderService string           `json:",optional"`
+	AgentService string           `json:",optional"`
+	RPCTimeout   time.Duration    `json:",default=10s"`
+	Retry        rpc.RetryOptions `json:",optional"`
 }
 
 // RedisConf Redis 配置

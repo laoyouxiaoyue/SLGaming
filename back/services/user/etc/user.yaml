@@ -34,6 +34,14 @@ Consul:
 
 Upstream:
   AgentService: agent-rpc
+  RPCTimeout: 10s
+  # RPC 重试配置
+  Retry:
+    MaxRetries: 3
+    InitialBackoff: 100ms
+    MaxBackoff: 5s
+    BackoffMultiplier: 2.0
+    RetryTimeout: 30s
 
 # Redis 配置（用于排行榜、缓存、布隆过滤器）
 Redis:

@@ -8,7 +8,6 @@ import (
 
 	"SLGaming/back/pkg/lock"
 	"SLGaming/back/services/order/internal/helper"
-	orderioc "SLGaming/back/services/order/internal/ioc"
 	"SLGaming/back/services/order/internal/metrics"
 	"SLGaming/back/services/order/internal/model"
 	orderMQ "SLGaming/back/services/order/internal/mq"
@@ -19,7 +18,6 @@ import (
 
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
@@ -37,37 +35,6 @@ func NewCreateOrderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Creat
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
-}
-
-// reinitUserRPC 尝试重新初始化 UserRPC
-func (l *CreateOrderLogic) reinitUserRPC() error {
-	cfg := l.svcCtx.Config
-	if cfg.Upstream.UserService == "" {
-		helper.LogError(l.Logger, helper.OpCreateOrder, "user service not configured", nil, nil)
-		return fmt.Errorf("user service not configured")
-	}
-
-	// 使用 Consul 服务发现重新解析用户服务端点
-	endpoints, err := orderioc.ResolveServiceEndpoints(cfg.Consul, cfg.Upstream.UserService)
-	if err != nil {
-		helper.LogError(l.Logger, helper.OpCreateOrder, "resolve user service endpoints failed", err, nil)
-		return err
-	}
-
-	// 创建新的 RPC 客户端
-	client := zrpc.MustNewClient(zrpc.RpcClientConf{
-		Endpoints: endpoints,
-		NonBlock:  true,
-	})
-
-	// 初始化 UserRPC
-	l.svcCtx.UserRPC = userclient.NewUser(client)
-	helper.LogInfo(l.Logger, helper.OpCreateOrder, "reinit user rpc client success", map[string]interface{}{
-		"service":   cfg.Upstream.UserService,
-		"endpoints": endpoints,
-	})
-
-	return nil
 }
 
 func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
@@ -94,16 +61,10 @@ func (l *CreateOrderLogic) CreateOrder(in *order.CreateOrderRequest) (*order.Cre
 	}
 
 	if l.svcCtx.UserRPC == nil {
-		// 尝试重新初始化 UserRPC
-		if err := l.reinitUserRPC(); err != nil {
-			metrics.OrderCreateTotal.WithLabelValues("rpc_unavailable").Inc()
-			return nil, status.Error(codes.FailedPrecondition, "user rpc client not initialized")
-		}
+		metrics.OrderCreateTotal.WithLabelValues("rpc_unavailable").Inc()
+		return nil, status.Error(codes.FailedPrecondition, "user rpc client not initialized")
 	}
 
-	// 使用双重分布式锁防止并发创建订单
-	// 第一层锁：基于 boss_id 和 companion_id，防止同一老板对同一陪玩并发创建多个订单
-	// 第二层锁：基于 companion_id，防止多个老板同时对同一陪玩下单（串行化处理）
 	bossCompanionLockKey := fmt.Sprintf("create_order:%d:%d", in.GetBossId(), in.GetCompanionId())
 	companionLockKey := fmt.Sprintf("companion_order:%d", in.GetCompanionId())
 

@@ -3,6 +3,8 @@ package config
 import (
 	"time"
 
+	"SLGaming/back/pkg/rpc"
+
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -26,8 +28,9 @@ type Config struct {
 }
 
 type UpstreamConf struct {
-	AgentService string        `json:",optional"`
-	RPCTimeout   time.Duration `json:",default=10s"`
+	AgentService string           `json:",optional"`
+	RPCTimeout   time.Duration    `json:",default=10s"`
+	Retry        rpc.RetryOptions `json:",optional"`
 }
 
 type MysqlConf struct {

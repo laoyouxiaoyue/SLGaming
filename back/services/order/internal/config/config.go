@@ -3,6 +3,8 @@ package config
 import (
 	"time"
 
+	"SLGaming/back/pkg/rpc"
+
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -39,8 +41,9 @@ type ConsulServiceConf struct {
 }
 
 type UpstreamConf struct {
-	UserService string        `json:",optional"`
-	RPCTimeout  time.Duration `json:",default=10s"`
+	UserService string           `json:",optional"`
+	RPCTimeout  time.Duration    `json:",default=10s"`
+	Retry       rpc.RetryOptions `json:",optional"`
 }
 
 type Config struct {

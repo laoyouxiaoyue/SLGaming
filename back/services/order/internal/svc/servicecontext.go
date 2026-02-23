@@ -3,10 +3,10 @@ package svc
 import (
 	"context"
 	"log"
-	"time"
 
 	"SLGaming/back/pkg/ioc"
 	"SLGaming/back/pkg/lock"
+	"SLGaming/back/pkg/rpc"
 	"SLGaming/back/services/order/internal/config"
 	orderioc "SLGaming/back/services/order/internal/ioc"
 	orderMQ "SLGaming/back/services/order/internal/mq"
@@ -17,7 +17,6 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
-	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
 )
 
@@ -28,29 +27,23 @@ type ServiceContext struct {
 	Redis   *redis.Redis
 	UserRPC userclient.User
 
-	// 分布式锁（用于订单创建、取消等并发控制）
 	DistributedLock *lock.DistributedLock
 
-	// RocketMQ 生产者（用于发送订单领域事件）
-	OrderEventProducer rocketmq.Producer
-
-	// RocketMQ 事务生产者（用于 CreateOrder 等需要事务消息的场景）
+	OrderEventProducer   rocketmq.Producer
 	OrderEventTxProducer rocketmq.TransactionProducer
+	dynamicRPCClients    []*rpc.DynamicRPCClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	// 初始化 MySQL
 	db, err := orderioc.InitMysql(c.Mysql)
 	if err != nil {
 		log.Fatalf("failed to init mysql: %v", err)
 	}
 
-	// 初始化 Redis（如果配置了）
 	var redisClient *redis.Redis
 	var distributedLock *lock.DistributedLock
 	if c.Redis.Host != "" {
 		redisClient = redis.MustNewRedis(c.Redis.RedisConf)
-		// 使用 Redis 配置创建分布式锁（基于 redsync，类似 Redisson）
 		redisConfig := &ioc.RedisConfigAdapter{
 			Host: c.Redis.Host,
 			Type: c.Redis.Type,
@@ -70,7 +63,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		DistributedLock: distributedLock,
 	}
 
-	// 初始化 RocketMQ Producer（如果配置了）
 	if len(c.RocketMQ.NameServers) > 0 {
 		mqCfg := &ioc.RocketMQConfigAdapter{
 			NameServers: c.RocketMQ.NameServers,
@@ -78,7 +70,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			AccessKey:   c.RocketMQ.AccessKey,
 			SecretKey:   c.RocketMQ.SecretKey,
 		}
-		// 普通 Producer（用于非事务消息场景，当前可能暂未使用）
 		if producer, err := ioc.InitRocketMQProducer(mqCfg, "order-event-producer"); err != nil {
 			logx.Errorf("init rocketmq producer failed: %v", err)
 		} else {
@@ -86,7 +77,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			logx.Infof("init rocketmq producer success, nameservers=%v", c.RocketMQ.NameServers)
 		}
 
-		// 事务 Producer（用于订单相关的事务消息：CreateOrder、CancelOrder、CompleteOrder）
 		txProducer, err := ioc.InitRocketMQTransactionProducer(
 			mqCfg,
 			"order-transaction-producer",
@@ -105,36 +95,35 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		}
 	}
 
-	// 初始化 User RPC 客户端（通过 Consul 服务发现）
 	if c.Upstream.UserService != "" {
-		rpcTimeout := c.Upstream.RPCTimeout
-		if rpcTimeout <= 0 {
-			rpcTimeout = 10 * time.Second
+		retryOpts := c.Upstream.Retry
+		if retryOpts.MaxRetries == 0 {
+			retryOpts = rpc.DefaultRetryOptions()
 		}
-		if cli, err := newRPCClient(c.Consul, c.Upstream.UserService, rpcTimeout); err != nil {
+
+		cli, err := rpc.NewDynamicRPCClientOrFallback(&ioc.ConsulConfigAdapter{
+			Address: c.Consul.Address,
+			Token:   c.Consul.Token,
+		}, rpc.DynamicClientOptions{
+			ServiceName: c.Upstream.UserService,
+			Timeout:     c.Upstream.RPCTimeout,
+			Retry:       retryOpts,
+		})
+		if err != nil {
 			logx.Errorf("init user rpc client failed: service=%s, err=%v", c.Upstream.UserService, err)
-		} else {
+		} else if cli != nil {
 			ctx.UserRPC = userclient.NewUser(cli)
-			logx.Infof("init user rpc client success: service=%s (timeout=%v)", c.Upstream.UserService, rpcTimeout)
+			logx.Infof("init user rpc client success: service=%s (动态客户端+自动重试)", c.Upstream.UserService)
 		}
 	}
 
 	return ctx
 }
 
-func newRPCClient(consulConf config.ConsulConf, serviceName string, timeout time.Duration) (zrpc.Client, error) {
-	endpoints, err := orderioc.ResolveServiceEndpoints(consulConf, serviceName)
-	if err != nil {
-		logx.Errorf("resolve service endpoints failed: service=%s, err=%v", serviceName, err)
-		return nil, err
+func (s *ServiceContext) Close() {
+	for _, client := range s.dynamicRPCClients {
+		if client != nil {
+			client.Stop()
+		}
 	}
-
-	client := zrpc.MustNewClient(zrpc.RpcClientConf{
-		Endpoints: endpoints,
-		NonBlock:  true,
-		Timeout:   int64(timeout / time.Millisecond),
-	})
-
-	logx.Infof("create rpc client success: service=%s, endpoints=%v, timeout=%v", serviceName, endpoints, timeout)
-	return client, nil
 }
