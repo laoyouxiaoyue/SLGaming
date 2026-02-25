@@ -19,17 +19,17 @@ export const followUserAPI = (data) => {
 /**
  * 取消关注接口
  *
- * @param {object} params - 查询参数
- * @param {number} params.userId - 目标用户ID (必须)
+ * @param {object} data - 查询参数
+ * @param {number} data.userId - 目标用户ID (必须)
  *
  * @returns {Promise}
  * @returns {boolean} response.data.success - 操作是否成功
  */
-export const unfollowUserAPI = (params) => {
+export const unfollowUserAPI = (data) => {
   return http({
     url: "/user/unfollow",
     method: "POST",
-    params,
+    data,
   });
 };
 /**
