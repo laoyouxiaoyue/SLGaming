@@ -32,6 +32,11 @@ export const useUserStore = defineStore(
       userInfo.value = {};
     };
 
+    const setTokens = ({ accessToken, refreshToken }) => {
+      userInfo.value.accessToken = accessToken;
+      userInfo.value.refreshToken = refreshToken;
+    };
+
     // 封装通用退出登录逻辑
     const logout = async () => {
       try {
@@ -58,6 +63,7 @@ export const useUserStore = defineStore(
       getUserInfoByCode,
       clearUserInfo,
       logout,
+      setTokens,
     };
   },
   {
