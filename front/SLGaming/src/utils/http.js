@@ -70,6 +70,11 @@ http.interceptors.response.use(
     const userStore = useUserStore();
     const { config, response } = e;
 
+    // 如果该请求已经重试过一次，直接失败，避免无限刷新循环
+    if (config && config._isRetry) {
+      return Promise.reject(e);
+    }
+
     // 3. 如果不是401错误，直接提示错误并返回
     if (!response || response.status !== 401) {
       const errorMsg = e.response?.data?.msg || "请求失败，请稍后重试";
@@ -79,10 +84,18 @@ http.interceptors.response.use(
 
     // 4. 如果正在刷新token，将当前失败的请求加入队列
     if (isRefreshing) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         requestQueue.push((newToken) => {
-          config.headers.Authorization = `Bearer ${newToken}`;
-          resolve(http(config));
+          try {
+            config.headers.Authorization = `Bearer ${newToken}`;
+            // 标记已重试，防止再次进入刷新流程
+            config._isRetry = true;
+            // 返回 http(config) 的 promise，这样后续可收集为 promises
+            return http(config).then(resolve).catch(reject);
+          } catch (err) {
+            reject(err);
+            return Promise.reject(err);
+          }
         });
       });
     }
@@ -97,9 +110,19 @@ http.interceptors.response.use(
       userStore.setTokens({ accessToken, refreshToken });
       config.headers.Authorization = `Bearer ${accessToken}`;
 
-      // 5.2 重新执行队列中的所有请求
-      requestQueue.forEach((cb) => cb(accessToken));
+      // 5.2 重新执行队列中的所有请求（收集 promises 并安全处理）
+      const promises = requestQueue.map((cb) => {
+        try {
+          return cb(accessToken);
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      });
       requestQueue = []; // 清空队列
+      // 可选：等待所有重试完成并记录结果，避免未处理拒绝
+      Promise.allSettled(promises).then(() => {
+        // 可在此处记录日志或处理失败项
+      });
 
       // 5.3 重新执行本次失败的请求
       return http(config);
